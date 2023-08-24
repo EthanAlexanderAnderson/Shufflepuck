@@ -1,0 +1,59 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class LineScript : MonoBehaviour
+{
+    private LogicScript logic;
+    public SpriteRenderer spriteRenderer;
+
+    public bool movingLeft = false;
+    public float moveSpeed = 10;
+    public float value = 50;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        transform.localPosition = new Vector3(Random.Range(-10.0f, 10.0f), 0, -2);
+        logic = GameObject.FindGameObjectWithTag("logic").GetComponent<LogicScript>();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (logic.difficulty == 2)
+        {
+            moveSpeed = 20;
+        }
+        else
+        {
+            moveSpeed = 10;
+        }
+        if (logic.activeBar == "angle" || logic.activeBar == "power" || logic.activeBar == "spin")
+        {
+            spriteRenderer.enabled = true;
+            if (movingLeft)
+            {
+                transform.position += (Vector3.left * moveSpeed) * Time.deltaTime;
+            } 
+            else
+            {
+                transform.position += (Vector3.right * moveSpeed) * Time.deltaTime;
+            }
+
+            value = (transform.position.x + 10) * 5;
+
+            if (transform.position.x > 10)
+            {
+                movingLeft = true;
+            } else if (transform.position.x < -10)
+            {
+                movingLeft = false;
+            }
+        }
+        else
+        {
+            spriteRenderer.enabled = false;
+        }
+    }
+}

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 0e5709dfa5e4c7a44919ac805243af6c
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - puckBlue: {fileID: 1573578925046104636, guid: 523175d1e5f8501469e3832882a7a95d, type: 3}
+  - puckPink: {fileID: 1573578925046104636, guid: f04165ff5dd89264e930f74144e49f66, type: 3}
+  - startButton: {instanceID: 0}
+  - playerScoreText: {instanceID: 0}
+  - CPUScoreText: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
