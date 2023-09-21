@@ -21,19 +21,13 @@ public class PuckScript : MonoBehaviour
     private bool pastSafeLine;
     private bool playersPuck;
     private float velocity;
-    //private float angularVelocity;
 
     // this one actually does stuff
     public float powerModifier = 10;
 
-    //public float velocityModifier;
     public float angularVelocity;
     public float angularVelocityModifier;
-    // public float oldVelocity = 999;
     public float counterForce;
-
-    //public float radius = 0.5f;
-    //public float airDensity = 0.1f;
 
     // scoring
     private int puckBaseValue = 1;
@@ -55,28 +49,20 @@ public class PuckScript : MonoBehaviour
             pastSafeLine = true;
         }
 
-        //if (velocity > 2 && velocity < 10)
-        //{
-        //    angularVelocity = rb.angularVelocity;
-        //    rb.AddForce(transform.right * ((angularVelocity * (velocity * velocityModifier)) / 2 ));
-        //}
-        //var direction = rb.angularVelocity * rb.velocity;
-        //var magnitude = 4 / 3f * Mathf.PI * airDensity * Mathf.Pow(radius, 3);
-        //rb.AddForce(magnitude * direction);
         angularVelocity = rb.angularVelocity;
         var right = transform.InverseTransformDirection(transform.right);
         var up = transform.InverseTransformDirection(transform.up);
         if (!isSlowed() && isShot() && pastSafeLine)
         {
-            rb.AddForce((right * angularVelocity * angularVelocityModifier) * -0.002f);
+            rb.AddForce((right * angularVelocity * angularVelocityModifier) * -0.03f);
             // counter force down
             if (angularVelocity > 0)
             {
-                rb.AddForce((up * angularVelocity * angularVelocityModifier * counterForce) * -0.002f);
+                rb.AddForce((up * angularVelocity * angularVelocityModifier * counterForce) * -0.03f);
             }
             else
             {
-                rb.AddForce((up * angularVelocity * angularVelocityModifier * counterForce) * 0.002f);
+                rb.AddForce((up * angularVelocity * angularVelocityModifier * counterForce) * 0.03f);
             }
 
 

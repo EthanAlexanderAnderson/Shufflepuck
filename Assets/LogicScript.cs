@@ -100,9 +100,7 @@ public class LogicScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        PlayerPrefs.SetInt("easyHighscore", 99);
-        PlayerPrefs.SetInt("mediumHighscore", 99);
-        PlayerPrefs.SetInt("hardHighscore", 99);
+        Application.targetFrameRate = 30;
         // connect scripts
         bar = GameObject.FindGameObjectWithTag("bar").GetComponent<BarScript>();
         line = GameObject.FindGameObjectWithTag("line").GetComponent<LineScript>();
@@ -118,6 +116,7 @@ public class LogicScript : MonoBehaviour
         // only do this stuff when game is running (not in menu etc.)
         if (gameIsRunning && (playerPuckCount > 0 || CPUPuckCount > 0))
         {
+            //Debug.Log(allPucksAreStopped().ToString());
             // clear pucks in non-safe zones
             cleanupDeadPucks();
 
@@ -180,7 +179,7 @@ public class LogicScript : MonoBehaviour
             }
 
             // CPU's turn
-            if (!isPlayersTurn && (activePlayerPuckScript == null || activePlayerPuckScript.isSlowed()))
+            if (!isPlayersTurn && (activePlayerPuckScript == null || (activePlayerPuckScript.isSlowed() && allPucksAreSlowed())))
             {
                 // timestamp the beginning of CPU's turn for delays
                 if (tempTime == 0)
@@ -217,13 +216,13 @@ public class LogicScript : MonoBehaviour
 
                 }
 
-                if (tempTime + 1.5 < timer && Mathf.Abs(line.value - CPUShotAngle) < 0.5f && activeBar == "angle")
+                if (tempTime + 1.5 < timer && Mathf.Abs(line.value - CPUShotAngle) < (1.0f + difficulty) && activeBar == "angle")
                 {
                     bar.changeBar("power");
                     activeBar = "power";
                 }
 
-                if (tempTime + 3 < timer && Mathf.Abs(line.value - CPUShotPower) < 0.5f && activeBar == "power")
+                if (tempTime + 3 < timer && Mathf.Abs(line.value - CPUShotPower) < (1.0f + difficulty) && activeBar == "power")
                 {
                     if (difficulty < 2)
                     {
@@ -243,7 +242,7 @@ public class LogicScript : MonoBehaviour
                     }
                 }
                 // spin for hard mode only
-                if (tempTime + 4.5 < timer && Mathf.Abs(line.value - CPUShotSpin) < 0.5f && activeBar == "spin")
+                if (tempTime + 4.5 < timer && Mathf.Abs(line.value - CPUShotSpin) < (1.0f + difficulty) && activeBar == "spin")
                 {
                     activeCPUPuckScript.shoot(CPUShotAngle, CPUShotPower, CPUShotSpin);
                     isPlayersTurn = true;
@@ -260,9 +259,10 @@ public class LogicScript : MonoBehaviour
             timer += Time.deltaTime;
         }
         // ran out of pucks (game over)
-        else if (gameIsRunning && (playerPuckCount <= 0 || CPUPuckCount <= 0) && activePlayerPuckScript.isStopped())
+        else if (gameIsRunning && (playerPuckCount <= 0 || CPUPuckCount <= 0) && allPucksAreStopped())
         {
             gameIsRunning = false;
+            updateScores();
 
             if (playerScore > CPUScore)
             {
@@ -343,6 +343,7 @@ public class LogicScript : MonoBehaviour
         table.GetComponent<TableScript>().showBoard();
         playerPuckCount = 5;
         CPUPuckCount = 5;
+        randomizeCPUPuckSprite();
         // reset UI
         gameResultText.text = "";
         playerScoreText.text = 0.ToString();
@@ -372,6 +373,38 @@ public class LogicScript : MonoBehaviour
     }
 
     private PuckScript pucki;
+    public bool allPucksAreStopped()
+    {
+        var allPucks = GameObject.FindGameObjectsWithTag("puck");
+        foreach (var puck in allPucks)
+        {
+            pucki = puck.GetComponent<PuckScript>();
+            // IF shot, but not stopped, return false
+            if (pucki.isShot() && !pucki.isStopped())
+            {
+                return false;
+            }
+        }
+        // IF all shot puts are stopped, return true
+        return true;
+    }
+
+    public bool allPucksAreSlowed()
+    {
+        var allPucks = GameObject.FindGameObjectsWithTag("puck");
+        foreach (var puck in allPucks)
+        {
+            pucki = puck.GetComponent<PuckScript>();
+            // IF shot, but not stopped, return false
+            if (pucki.isShot() && !pucki.isSlowed())
+            {
+                return false;
+            }
+        }
+        // IF all shot puts are stopped, return true
+        return true;
+    }
+
     public void updateScores()
     {
         int playerSum = 0;
@@ -467,6 +500,17 @@ public class LogicScript : MonoBehaviour
         togglePopup(customizePopup);
     }
 
+    public void randomizeCPUPuckSprite()
+    {
+        CPUPuckSprite = colorIDtoPuckSprite(Random.Range(0, 8));
+        CPUPuckIcon.GetComponent<Image>().sprite = CPUPuckSprite;
+        while (CPUPuckSprite == playerPuckSprite)
+        {
+            CPUPuckSprite = colorIDtoPuckSprite(Random.Range(0, 8));
+            CPUPuckIcon.GetComponent<Image>().sprite = CPUPuckSprite;
+        }
+    }
+
     public void togglePopup(GameObject popup)
     {
         popup.SetActive(!popup.activeInHierarchy);
@@ -489,6 +533,10 @@ public class LogicScript : MonoBehaviour
 
     public void returnToMenu()
     {
+        gameIsRunning = false;
+        playerPuckCount = 0;
+        CPUPuckCount = 0;
+        gameHud.SetActive(false);
         gameResultScreen.SetActive(false);
         titleScreen.SetActive(true);
     }
@@ -497,7 +545,6 @@ public class LogicScript : MonoBehaviour
     private (float, float, float) findOpenPath()
     {
         var pathCount = CPUPaths.Length;
-        //var pucki;
         var highestValue = 0;
         foreach (var path in CPUPaths)
         {
@@ -562,10 +609,10 @@ public class LogicScript : MonoBehaviour
 
     private void updateLocks()
     {
-        Debug.Log("updateLocks");
+        //Debug.Log("updateLocks");
         if (PlayerPrefs.GetInt("easyHighscore") > 0)
         {
-            Debug.Log("easyHighscore");
+            //Debug.Log("easyHighscore");
 
             GameObject[] gameObjectArray = GameObject.FindGameObjectsWithTag("easyLock");
 
@@ -576,7 +623,7 @@ public class LogicScript : MonoBehaviour
         }
         if (PlayerPrefs.GetInt("mediumHighscore") > 0)
         {
-            Debug.Log("mediumHighscore");
+            //Debug.Log("mediumHighscore");
 
             GameObject[] gameObjectArray = GameObject.FindGameObjectsWithTag("mediumLock");
 
@@ -587,7 +634,7 @@ public class LogicScript : MonoBehaviour
         }
         if (PlayerPrefs.GetInt("hardHighscore") > 0)
         {
-            Debug.Log("updateLocks");
+            //Debug.Log("updateLocks");
 
             GameObject[] gameObjectArray = GameObject.FindGameObjectsWithTag("hardLock");
 
@@ -601,6 +648,11 @@ public class LogicScript : MonoBehaviour
     public void setErrorMessage(string msg)
     {
         errorMessage.text = msg;
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
     }
 
 
