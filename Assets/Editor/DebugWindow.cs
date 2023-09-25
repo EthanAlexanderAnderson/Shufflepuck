@@ -6,6 +6,7 @@ using UnityEngine.UIElements;
 
 public class DebugWindow : EditorWindow
 {
+    private LogicScript logic;
     public GameObject puck;
 
     public float angle;
@@ -27,6 +28,8 @@ public class DebugWindow : EditorWindow
 
     public void CreateGUI()
     {
+        logic = GameObject.FindGameObjectWithTag("logic").GetComponent<LogicScript>();
+        puck = logic.puck;
         FloatField angleFloatField = new FloatField();
         angleFloatField.label = "Angle";
         rootVisualElement.Add(angleFloatField);
@@ -47,11 +50,6 @@ public class DebugWindow : EditorWindow
 
     public void DebugShoot(float angleParameter, float powerParameter, float spinParameter)
     {
-        Debug.Log("Clicked!");
-        Debug.Log(angleParameter);
-        Debug.Log(powerParameter);
-        Debug.Log(spinParameter);
-
         var objects = GameObject.FindGameObjectsWithTag("puck");
         foreach (var obj in objects)
         {

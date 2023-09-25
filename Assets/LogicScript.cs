@@ -17,6 +17,7 @@ public class LogicScript : MonoBehaviour
 
     [HideInInspector] public GameObject playerPuckIcon;
     [HideInInspector] public GameObject CPUPuckIcon;
+    public GameObject activePuckIcon;
 
     [HideInInspector] public Text playerPuckCountText;
     [HideInInspector] public Text CPUPuckCountText;
@@ -108,6 +109,7 @@ public class LogicScript : MonoBehaviour
         CPUPaths = GameObject.FindGameObjectsWithTag("cpu_path");
         updateProfileText();
         updateLocks();
+        selectPlayerPuckSprite(PlayerPrefs.GetInt("puck"));
     }
 
     // Update is called once per frame
@@ -116,7 +118,6 @@ public class LogicScript : MonoBehaviour
         // only do this stuff when game is running (not in menu etc.)
         if (gameIsRunning && (playerPuckCount > 0 || CPUPuckCount > 0))
         {
-            //Debug.Log(allPucksAreStopped().ToString());
             // clear pucks in non-safe zones
             cleanupDeadPucks();
 
@@ -341,18 +342,22 @@ public class LogicScript : MonoBehaviour
         gameHud.SetActive(true);
         titleScreen.SetActive(false);
         table.GetComponent<TableScript>().showBoard();
+        randomizeCPUPuckSprite();
+        // reset game variables
+        playerScore = 0;
+        CPUScore = 0;
         playerPuckCount = 5;
         CPUPuckCount = 5;
-        randomizeCPUPuckSprite();
+        isPlayersTurn = false;
+        isPlayerShooting = false;
+        isCPUShooting = true;
+        gameIsRunning = true;
         // reset UI
         gameResultText.text = "";
         playerScoreText.text = 0.ToString();
         CPUScoreText.text = 0.ToString();
         playerPuckCountText.text = 5.ToString();
         CPUPuckCountText.text = 5.ToString();
-        // flags
-        gameIsRunning = true;
-        isCPUShooting = true;
         puckHalo.SetActive(diff == 0);
     }
 
@@ -492,23 +497,35 @@ public class LogicScript : MonoBehaviour
     {
         playerPuckSprite = colorIDtoPuckSprite(id);
         playerPuckIcon.GetComponent<Image>().sprite = playerPuckSprite;
-        while (CPUPuckSprite == playerPuckSprite)
+        activePuckIcon.GetComponent<Image>().sprite = playerPuckSprite;
+        PlayerPrefs.SetInt("puck", id);
+
+        randomizeCPUPuckSprite();
+        //togglePopup(customizePopup);
+    }
+    public void randomizePlayerPuckSprite()
+    {
+        var prev = playerPuckSprite;
+        int rng;
+        do
         {
-            CPUPuckSprite = colorIDtoPuckSprite(Random.Range(0, 8));
-            CPUPuckIcon.GetComponent<Image>().sprite = CPUPuckSprite;
-        }
-        togglePopup(customizePopup);
+            rng = Random.Range(0, 8);
+            playerPuckSprite = colorIDtoPuckSprite(rng);
+        } while (prev == playerPuckSprite);
+        playerPuckIcon.GetComponent<Image>().sprite = playerPuckSprite;
+        activePuckIcon.GetComponent<Image>().sprite = playerPuckSprite;
+        PlayerPrefs.SetInt("puck", rng);
+
+        randomizeCPUPuckSprite();
     }
 
     public void randomizeCPUPuckSprite()
     {
-        CPUPuckSprite = colorIDtoPuckSprite(Random.Range(0, 8));
-        CPUPuckIcon.GetComponent<Image>().sprite = CPUPuckSprite;
-        while (CPUPuckSprite == playerPuckSprite)
+        do
         {
             CPUPuckSprite = colorIDtoPuckSprite(Random.Range(0, 8));
-            CPUPuckIcon.GetComponent<Image>().sprite = CPUPuckSprite;
-        }
+        } while (CPUPuckSprite == playerPuckSprite);
+        CPUPuckIcon.GetComponent<Image>().sprite = CPUPuckSprite;
     }
 
     public void togglePopup(GameObject popup)
@@ -525,8 +542,6 @@ public class LogicScript : MonoBehaviour
         Transform[] allChildren = titleScreen.transform.GetComponentsInChildren<Transform>(true);
         for (int i = 1; i < allChildren.Length; i++)
         {
-            //Debug.Log(allChildren[i].gameObject);
-            //allChildren.transform.parent.gameObject.SetActive(!gameObject.activeInHierarchy);
             allChildren[i].gameObject.SetActive(!allChildren[i].gameObject.activeInHierarchy);
         }
     }
@@ -655,25 +670,4 @@ public class LogicScript : MonoBehaviour
         Application.Quit();
     }
 
-
-    /*
-    // this only exists cuz of a stupid error idk how to fix yet
-    private bool puckIsShotAndStopped(PuckScript ps)
-    {
-        if (ps == null)
-        {
-            return false;
-        }
-        return (ps.isShot() && ps.isStopped());
-    }
-
-    private bool puckIsShotAndSlowed(PuckScript ps)
-    {
-        if (ps == null)
-        {
-            return false;
-        }
-        return (ps.isShot() && ps.isSlowed());
-    }
-    */
 }

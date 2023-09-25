@@ -1,12 +1,12 @@
 fileFormatVersion: 2
-guid: 86bf3d15f9c75b440b2239ad0f7ac671
+guid: 287ca600f3d6a484cab5aa89fb6e9b0e
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
   - m_ViewDataDictionary: {instanceID: 0}
   - puck: {fileID: 1573578925046104636, guid: 523175d1e5f8501469e3832882a7a95d, type: 3}
-  - playerPuckSprite: {fileID: 21300000, guid: b7df2d0d993f6f9408fc6c6cf2f94f62, type: 3}
+  - playerPuckSprite: {fileID: 21300000, guid: 70e7535b635533b44835250c3bf86d18, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
