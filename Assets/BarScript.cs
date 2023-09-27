@@ -1,3 +1,5 @@
+// Script to control the angle/power/spin bar
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,11 +17,7 @@ public class BarScript : MonoBehaviour
         spriteRenderer.enabled = false;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    // change bar sprite
     public void changeBar(string type)
     {
         switch (type)

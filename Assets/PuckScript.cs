@@ -1,3 +1,7 @@
+/* Each puck is assigned one of
+ * these scripts when it generates.
+ */
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -33,14 +37,9 @@ public class PuckScript : MonoBehaviour
     private int puckBaseValue = 1;
     private int zoneMultiplier = 0;
 
-    // ---------- DEFAULT UNITY FUNCTIONS ----------
-    void Start()
-    {
-
-    }
-
     void Update()
     {
+        // change the sliding SFX volume based on velocity
         velocity = rb.velocity.x + rb.velocity.y;
         noiseSFX.volume = velocity / 25.0f;
 
@@ -49,13 +48,16 @@ public class PuckScript : MonoBehaviour
             pastSafeLine = true;
         }
 
+        // handle spinning forces
         angularVelocity = rb.angularVelocity;
         var right = transform.InverseTransformDirection(transform.right);
         var up = transform.InverseTransformDirection(transform.up);
         if (!isSlowed() && isShot() && pastSafeLine)
         {
+            // add horizontal spinning force
             rb.AddForce((right * angularVelocity * angularVelocityModifier) * -0.03f);
-            // counter force down
+
+            // add counter force downwards
             if (angularVelocity > 0)
             {
                 rb.AddForce((up * angularVelocity * angularVelocityModifier * counterForce) * -0.03f);
@@ -64,15 +66,10 @@ public class PuckScript : MonoBehaviour
             {
                 rb.AddForce((up * angularVelocity * angularVelocityModifier * counterForce) * 0.03f);
             }
-
-
-            //oldVelocity = velocity;
         }
-
-
     }
 
-    // ---------- ALTER PUCK ----------
+    // initiate a new puck
     public PuckScript initPuck(bool isPlayersPuckParameter, Sprite sprite)
     {
         spriteRenderer.sprite = sprite;
@@ -104,7 +101,6 @@ public class PuckScript : MonoBehaviour
     }
 
     // ---------- GETTERS AND SETTERS ----------
-    // y > -9 is not ideal code quality wise, but it keeps triggering isSlowed true just after the puck is shot
     public bool isSlowed() { return rb.velocity.x < 1 && rb.velocity.y < 1 && isShot() && transform.position.y > -9; }
     public bool isStopped() { return rb.velocity.x < 0.1 && rb.velocity.y < 0.1 && isShot() && transform.position.y > -9; }
     public bool isShot() { return shot; }
@@ -115,6 +111,7 @@ public class PuckScript : MonoBehaviour
     public int getZoneMultiplier() { return zoneMultiplier; }
     public void setZoneMultiplier(int ZM) { zoneMultiplier = ZM; }
 
+    // when a puck enters a scoring zone, update its score and play a SFX
     public void enterScoreZone( bool isZoneSafe, int enteredZoneMultiplier)
     {
         // all zones are past safe line, so pastSafeLine can be set to true permanently
@@ -137,6 +134,8 @@ public class PuckScript : MonoBehaviour
             zoneMultiplier = enteredZoneMultiplier;
         }
     }
+
+    // when a puck exits a scoring zone
     public void exitScoreZone(bool isBoundary, int exitedZoneMultiplier)
     {
         // if you exit a boundry, the puck is no longer safe
@@ -165,11 +164,11 @@ public class PuckScript : MonoBehaviour
             ); 
     }
 
+    // play bonk SFX when pucks collide
     void OnCollisionEnter2D(Collision2D col)
     {
         if (rb.velocity.x + rb.velocity.y > 0.3)
         {
-            //Debug.Log("collide");
             if (rb.velocity.x + rb.velocity.y > 1)
             {
                 bonkHeavySFX.Play();

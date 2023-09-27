@@ -1,3 +1,8 @@
+/* Logic Script is kinda like the "main" function, 
+ * it controls most things happening in game and directs
+ * other scripts.
+ */
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -105,8 +110,9 @@ public class LogicScript : MonoBehaviour
         // connect scripts
         bar = GameObject.FindGameObjectWithTag("bar").GetComponent<BarScript>();
         line = GameObject.FindGameObjectWithTag("line").GetComponent<LineScript>();
-        gameResultText.text = "";
         CPUPaths = GameObject.FindGameObjectsWithTag("cpu_path");
+        gameResultText.text = "";
+        // load play prefs data
         updateProfileText();
         updateLocks();
         selectPlayerPuckSprite(PlayerPrefs.GetInt("puck"));
@@ -121,9 +127,10 @@ public class LogicScript : MonoBehaviour
             // clear pucks in non-safe zones
             cleanupDeadPucks();
 
-            // input
+            // if input
             if ((Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0)) && gameIsRunning && isPlayerShooting)
             {
+                // change state on tap depending on current state
                 switch (activeBar)
                 {
                     case "angle":
@@ -146,6 +153,7 @@ public class LogicScript : MonoBehaviour
                             playerPuckCountText.text = playerPuckCount.ToString();
                             isCPUShooting = true;
                         }
+                        // on hard diff, show spin bar
                         else
                         {
                             bar.changeBar("spin");
@@ -168,7 +176,7 @@ public class LogicScript : MonoBehaviour
                 }
             }
 
-            // Players turn
+            // start Players turn
             if (isPlayersTurn && activeCPUPuckScript.isShot() && activeCPUPuckScript.isSlowed())
             {
                 turnText.text = "Your Turn";
@@ -179,7 +187,7 @@ public class LogicScript : MonoBehaviour
                 isPlayerShooting = true;
             }
 
-            // CPU's turn
+            // start CPU's turn
             if (!isPlayersTurn && (activePlayerPuckScript == null || (activePlayerPuckScript.isSlowed() && allPucksAreSlowed())))
             {
                 // timestamp the beginning of CPU's turn for delays
@@ -216,13 +224,13 @@ public class LogicScript : MonoBehaviour
                     }
 
                 }
-
+                // after 1.5 seconds elapsed, CPU selects angle
                 if (tempTime + 1.5 < timer && Mathf.Abs(line.value - CPUShotAngle) < (1.0f + difficulty) && activeBar == "angle")
                 {
                     bar.changeBar("power");
                     activeBar = "power";
                 }
-
+                // after 3 seconds elapsed, CPU selects power
                 if (tempTime + 3 < timer && Mathf.Abs(line.value - CPUShotPower) < (1.0f + difficulty) && activeBar == "power")
                 {
                     if (difficulty < 2)
@@ -242,7 +250,7 @@ public class LogicScript : MonoBehaviour
                         activeBar = "spin";
                     }
                 }
-                // spin for hard mode only
+                // after 3 seconds elapsed, CPU selects spin (for hard mode only)
                 if (tempTime + 4.5 < timer && Mathf.Abs(line.value - CPUShotSpin) < (1.0f + difficulty) && activeBar == "spin")
                 {
                     activeCPUPuckScript.shoot(CPUShotAngle, CPUShotPower, CPUShotSpin);
@@ -282,68 +290,17 @@ public class LogicScript : MonoBehaviour
             gameHud.SetActive(false);
             gameResultScreen.SetActive(true);
         }
-
-        if (debug)
-        {
-            if (Input.GetKeyDown(KeyCode.Alpha1)) {
-                activePlayerPuckScript.shoot(50.0f, 10.0f);
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                activePlayerPuckScript.shoot(50.0f, 20.0f);
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha3))
-            {
-                activePlayerPuckScript.shoot(50.0f, 30.0f);
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha4))
-            {
-                activePlayerPuckScript.shoot(50.0f, 40.0f);
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha5))
-            {
-                activePlayerPuckScript.shoot(50.0f, 50.0f);
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha6))
-            {
-                activePlayerPuckScript.shoot(50.0f, 60.0f);
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha7))
-            {
-                activePlayerPuckScript.shoot(50.0f, 70.0f);
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha8))
-            {
-                activePlayerPuckScript.shoot(50.0f, 80.0f);
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha9))
-            {
-                activePlayerPuckScript.shoot(50.0f, 90.0f);
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha0))
-            {
-                activePlayerPuckScript.shoot(50.0f, 100.0f);
-            }
-            if (Input.GetKeyDown(KeyCode.Q))
-            {
-                activePlayerPuckScript.rb.AddTorque(500f);
-            }
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                activePlayerPuckScript.rb.AddTorque(-500f);
-            }
-        }
     }
 
     public void restartGame(int diff)
     {
-        difficulty = diff;
+        // organize scene
         clearAllPucks();
-        gameHud.SetActive(true);
         titleScreen.SetActive(false);
         table.GetComponent<TableScript>().showBoard();
-        randomizeCPUPuckSprite();
         // reset game variables
+        randomizeCPUPuckSprite();
+        difficulty = diff;
         playerScore = 0;
         CPUScore = 0;
         playerPuckCount = 5;
@@ -352,15 +309,17 @@ public class LogicScript : MonoBehaviour
         isPlayerShooting = false;
         isCPUShooting = true;
         gameIsRunning = true;
-        // reset UI
+        // reset UI text
         gameResultText.text = "";
         playerScoreText.text = 0.ToString();
         CPUScoreText.text = 0.ToString();
         playerPuckCountText.text = 5.ToString();
         CPUPuckCountText.text = 5.ToString();
+        gameHud.SetActive(true);
         puckHalo.SetActive(diff == 0);
     }
 
+    // create a puck. bool parameter of if its the player's puck or not so we can set the sprite
     public void createPuck(bool isPlayersPuck)
     {
         if (isPlayersPuck)
@@ -377,6 +336,7 @@ public class LogicScript : MonoBehaviour
         }
     }
 
+    // useful helper function for deciding when to allow actions. Returns true when all pucks have stopped moving
     private PuckScript pucki;
     public bool allPucksAreStopped()
     {
@@ -394,6 +354,7 @@ public class LogicScript : MonoBehaviour
         return true;
     }
 
+    // useful helper function for deciding when to allow actions. Returns true when all pucks have slowed down
     public bool allPucksAreSlowed()
     {
         var allPucks = GameObject.FindGameObjectsWithTag("puck");
@@ -410,6 +371,7 @@ public class LogicScript : MonoBehaviour
         return true;
     }
 
+    // update the UI scores text
     public void updateScores()
     {
         int playerSum = 0;
@@ -435,14 +397,13 @@ public class LogicScript : MonoBehaviour
         CPUScoreText.text = CPUScore.ToString();
     }
 
+    // destroy pucks out of bounds
     private void cleanupDeadPucks()
     {
         var objects = GameObject.FindGameObjectsWithTag("puck");
-        var objectCount = objects.Length;
         foreach (var obj in objects)
         {
             pucki = obj.GetComponent<PuckScript>();
-            Rigidbody2D puckiRB = GetComponent<Rigidbody2D>();
             if (!pucki.isSafe() && pucki.isStopped())
             {
                 Destroy(obj);
@@ -450,16 +411,17 @@ public class LogicScript : MonoBehaviour
         }
     }
 
+    // destroy ALL pucks
     private void clearAllPucks()
     {
         var objects = GameObject.FindGameObjectsWithTag("puck");
-        var objectCount = objects.Length;
         foreach (var obj in objects)
         {
             Destroy(obj);
         }
     }
 
+    // helper with the puck customization buttons
     private Sprite colorIDtoPuckSprite(int id)
     {
         switch (id)
@@ -493,16 +455,17 @@ public class LogicScript : MonoBehaviour
         }
     }
 
+    // helper with the puck customization buttons
     public void selectPlayerPuckSprite(int id)
     {
         playerPuckSprite = colorIDtoPuckSprite(id);
         playerPuckIcon.GetComponent<Image>().sprite = playerPuckSprite;
         activePuckIcon.GetComponent<Image>().sprite = playerPuckSprite;
         PlayerPrefs.SetInt("puck", id);
-
         randomizeCPUPuckSprite();
-        //togglePopup(customizePopup);
     }
+
+    // helper for randomize puck button
     public void randomizePlayerPuckSprite()
     {
         var prev = playerPuckSprite;
@@ -515,10 +478,10 @@ public class LogicScript : MonoBehaviour
         playerPuckIcon.GetComponent<Image>().sprite = playerPuckSprite;
         activePuckIcon.GetComponent<Image>().sprite = playerPuckSprite;
         PlayerPrefs.SetInt("puck", rng);
-
         randomizeCPUPuckSprite();
     }
 
+    // randomize CPU puck. This is called before every match
     public void randomizeCPUPuckSprite()
     {
         do
@@ -528,6 +491,7 @@ public class LogicScript : MonoBehaviour
         CPUPuckIcon.GetComponent<Image>().sprite = CPUPuckSprite;
     }
 
+    // Toggles for UI menus, such as profile or puck
     public void togglePopup(GameObject popup)
     {
         popup.SetActive(!popup.activeInHierarchy);
@@ -536,6 +500,7 @@ public class LogicScript : MonoBehaviour
         errorMessage.text = "";
     }
 
+    // Toggles for UI main menu buttons
     [ContextMenu("Toggle Main Menu Buttons")]
     private void toggleMainMenuButtons()
     {
@@ -546,6 +511,7 @@ public class LogicScript : MonoBehaviour
         }
     }
 
+    // back button after match is over
     public void returnToMenu()
     {
         gameIsRunning = false;
@@ -556,11 +522,13 @@ public class LogicScript : MonoBehaviour
         titleScreen.SetActive(true);
     }
 
+    // this is the CPU AI for hard mode
     private CPUPathScript best = null;
     private (float, float, float) findOpenPath()
     {
         var pathCount = CPUPaths.Length;
         var highestValue = 0;
+        // check all paths to see which are unblocked
         foreach (var path in CPUPaths)
         {
             var pathi = path.GetComponent<CPUPathScript>();
@@ -574,10 +542,12 @@ public class LogicScript : MonoBehaviour
                 }
             }
         }
+        // chose the highest-value unblocked path
         if (highestValue > 0)
         {
             return (best.angle, best.power, best.spin);
         }
+        // otherwise, shoot random
         else
         {
             Debug.Log("No path :(");
@@ -585,6 +555,7 @@ public class LogicScript : MonoBehaviour
         }
     }
 
+    // load player highscores from player prefs
     private void updateHighscore()
     {
         var currentHighscore = playerScore - CPUScore;
@@ -614,6 +585,7 @@ public class LogicScript : MonoBehaviour
         }
     }
 
+    // write highscores from player prefs to profile
     private void updateProfileText() 
     {
         profilePopupText.text = "Highscores: \n" +
@@ -622,12 +594,11 @@ public class LogicScript : MonoBehaviour
             "\nHard: " + PlayerPrefs.GetInt("hardHighscore");
     }
 
+    // unlock the unlockables based on player highscores
     private void updateLocks()
     {
-        //Debug.Log("updateLocks");
         if (PlayerPrefs.GetInt("easyHighscore") > 0)
         {
-            //Debug.Log("easyHighscore");
 
             GameObject[] gameObjectArray = GameObject.FindGameObjectsWithTag("easyLock");
 
@@ -638,7 +609,6 @@ public class LogicScript : MonoBehaviour
         }
         if (PlayerPrefs.GetInt("mediumHighscore") > 0)
         {
-            //Debug.Log("mediumHighscore");
 
             GameObject[] gameObjectArray = GameObject.FindGameObjectsWithTag("mediumLock");
 
@@ -649,7 +619,6 @@ public class LogicScript : MonoBehaviour
         }
         if (PlayerPrefs.GetInt("hardHighscore") > 0)
         {
-            //Debug.Log("updateLocks");
 
             GameObject[] gameObjectArray = GameObject.FindGameObjectsWithTag("hardLock");
 
@@ -660,6 +629,7 @@ public class LogicScript : MonoBehaviour
         }
     }
 
+    // shows up when you click something locked
     public void setErrorMessage(string msg)
     {
         errorMessage.text = msg;

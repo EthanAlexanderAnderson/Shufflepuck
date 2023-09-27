@@ -1,3 +1,7 @@
+/* Each scoring zone has one of these scripts,
+ * and a collider to detect pucks.
+ */
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,23 +20,18 @@ public class ScoreZoneScript : MonoBehaviour
         logic = GameObject.FindGameObjectWithTag("logic").GetComponent<LogicScript>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
+    // when a puck enters, trigger it's function
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.layer == 3)
         {
             puck = collision.gameObject.transform.parent.gameObject.GetComponent<PuckScript>();
-            //puck.isSafe = true;
-            //puck.zoneMultiplier = zoneMultiplier;
             puck.enterScoreZone(true, zoneMultiplier);
             logic.updateScores();
         }
     }
+
+    // when a puck exits, trigger it's function
     private void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.gameObject.layer == 3)
@@ -43,6 +42,7 @@ public class ScoreZoneScript : MonoBehaviour
         }
     }
 
+    // set the puck multiplier in the zone 
     private void OnTriggerStay2D(Collider2D collision)
     {
         if (collision.gameObject.layer == 3)

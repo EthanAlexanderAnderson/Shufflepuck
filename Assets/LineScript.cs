@@ -1,3 +1,5 @@
+// Script to control the moving line on the angle/power/spin bar
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,6 +23,7 @@ public class LineScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // change line speed based on match difficulty
         if (logic.difficulty == 2)
         {
             moveSpeed = 20;
@@ -29,6 +32,7 @@ public class LineScript : MonoBehaviour
         {
             moveSpeed = 10;
         }
+        // move the line back and forth
         if (logic.activeBar == "angle" || logic.activeBar == "power" || logic.activeBar == "spin")
         {
             spriteRenderer.enabled = true;
@@ -41,8 +45,6 @@ public class LineScript : MonoBehaviour
                 transform.position += (Vector3.right * moveSpeed) * Time.deltaTime;
             }
 
-            value = (transform.position.x + 10) * 5;
-
             if (transform.position.x > 10)
             {
                 movingLeft = true;
@@ -50,6 +52,9 @@ public class LineScript : MonoBehaviour
             {
                 movingLeft = false;
             }
+
+            // update the lines value based on its location
+            value = (transform.position.x + 10) * 5;
         }
         else
         {

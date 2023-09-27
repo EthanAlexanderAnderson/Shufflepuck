@@ -1,25 +1,12 @@
+// These path objects are used for hard CPU AI shots
+// it basically just keeps track of if any pucks block the path
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CPUPathScript : MonoBehaviour
 {
-
-    public int count;
-    
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        count = pucksInPath.Count;
-    }
-
-    //private List<GameObject>
     private List<GameObject> pucksInPath = new List<GameObject>();
     public List<GameObject> GetPucksInPath() { return pucksInPath; }
 
@@ -30,7 +17,6 @@ public class CPUPathScript : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        //Debug.Log("TRIGGER ENTER");
         if (!pucksInPath.Contains(collision.gameObject)) { pucksInPath.Add(collision.gameObject); }
     }
 

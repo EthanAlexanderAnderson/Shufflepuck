@@ -43,7 +43,6 @@ public class DebugWindow : EditorWindow
         spinFloatField.label = "Spin";
 
         Button shoot = new Button { text = "SHOOT" };
-        //shoot.text = "SHOOT";
         shoot.clicked += () => DebugShoot(angleFloatField.value, powerFloatField.value, spinFloatField.value);
         rootVisualElement.Add(shoot);
     }
@@ -60,15 +59,5 @@ public class DebugWindow : EditorWindow
         PuckScript = PuckObject.GetComponent<PuckScript>();
         PuckScript.initPuck(true, playerPuckSprite);
         PuckScript.shoot(angleParameter, powerParameter, spinParameter);
-    }
-
-    //private PuckScript pucki;
-    public void destroyAllPucks()
-    {
-        var objects = GameObject.FindGameObjectsWithTag("puck");
-        foreach (var obj in objects)
-        {
-            //obj.GetComponent<PuckScript>().shoot(angleParameter, powerParameter, spinParameter);
-        }
     }
 }

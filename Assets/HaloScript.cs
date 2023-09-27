@@ -1,3 +1,5 @@
+// Script to control the predicted shot location on easy mode
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,6 +32,7 @@ public class HaloScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // calculate the pucks estimated position
         if (logic.activeBar == "angle")
         {
             this.transform.position = new Vector3(0.0f, -10.0f, 1.0f);
