@@ -165,7 +165,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30119a0734817b04a8239ae71211b0e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  count: 0
   angle: 50
   power: 50
   spin: 50
@@ -691,7 +690,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30119a0734817b04a8239ae71211b0e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  count: 0
   angle: 98
   power: 101
   spin: 0
@@ -946,7 +944,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30119a0734817b04a8239ae71211b0e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  count: 0
   angle: 22
   power: 85
   spin: 100
@@ -1377,7 +1374,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30119a0734817b04a8239ae71211b0e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  count: 0
   angle: 40
   power: 55
   spin: 50
@@ -2300,7 +2296,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30119a0734817b04a8239ae71211b0e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  count: 0
   angle: 72
   power: 80
   spin: 0
@@ -3449,7 +3444,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30119a0734817b04a8239ae71211b0e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  count: 0
   angle: 78
   power: 85
   spin: 0
@@ -3869,7 +3863,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 20.10219
+  orthographic size: 19.2
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -4046,7 +4040,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30119a0734817b04a8239ae71211b0e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  count: 0
   angle: 2
   power: 101
   spin: 100
@@ -4892,7 +4885,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30119a0734817b04a8239ae71211b0e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  count: 0
   angle: 83.1
   power: 82.4
   spin: 50
@@ -5118,19 +5110,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 731288660}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 817506625}
-        m_TargetAssemblyTypeName: LogicScript, Assembly-CSharp
-        m_MethodName: selectPlayerPuckSprite
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 11
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &731288660
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6521,7 +6501,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30119a0734817b04a8239ae71211b0e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  count: 0
   angle: 28
   power: 80
   spin: 100
@@ -7151,7 +7130,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30119a0734817b04a8239ae71211b0e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  count: 0
   angle: 60
   power: 55
   spin: 50
@@ -9935,7 +9913,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30119a0734817b04a8239ae71211b0e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  count: 0
   angle: 50
   power: 70
   spin: 50
@@ -12308,7 +12285,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30119a0734817b04a8239ae71211b0e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  count: 0
   angle: 16.9
   power: 82.4
   spin: 50

@@ -98,19 +98,17 @@ public class LogicScript : MonoBehaviour
     public float CPUShotAngle = 0;
     public float CPUShotPower = 0;
     public float CPUShotSpin = 50;
-    private GameObject[] CPUPaths;
-
-    // debug
-    public bool debug = false;
 
     // Start is called before the first frame update
     void Start()
     {
+        //PlayerPrefs.SetInt("easyHighscore", 0);
+        //PlayerPrefs.SetInt("mediumHighscore", 0);
+        //PlayerPrefs.SetInt("hardHighscore", 0);
         Application.targetFrameRate = 30;
         // connect scripts
         bar = GameObject.FindGameObjectWithTag("bar").GetComponent<BarScript>();
         line = GameObject.FindGameObjectWithTag("line").GetComponent<LineScript>();
-        CPUPaths = GameObject.FindGameObjectsWithTag("cpu_path");
         gameResultText.text = "";
         // load play prefs data
         updateProfileText();
@@ -128,7 +126,7 @@ public class LogicScript : MonoBehaviour
             cleanupDeadPucks();
 
             // if input
-            if ((Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0)) && gameIsRunning && isPlayerShooting)
+            if ((Input.GetMouseButtonDown(0)) && gameIsRunning && isPlayerShooting)
             {
                 // change state on tap depending on current state
                 switch (activeBar)
@@ -177,7 +175,7 @@ public class LogicScript : MonoBehaviour
             }
 
             // start Players turn
-            if (isPlayersTurn && activeCPUPuckScript.isShot() && activeCPUPuckScript.isSlowed())
+            if (isPlayersTurn && activeCPUPuckScript.isSlowed())
             {
                 turnText.text = "Your Turn";
                 createPuck(true);
@@ -276,7 +274,7 @@ public class LogicScript : MonoBehaviour
             if (playerScore > CPUScore)
             {
                 gameResultText.text = "You Win!";
-                updateHighscore();
+                overwriteHighscore();
             }
             else if (playerScore < CPUScore)
             {
@@ -287,7 +285,7 @@ public class LogicScript : MonoBehaviour
                 gameResultText.text = "Tie";
             }
 
-            gameHud.SetActive(false);
+            //gameHud.SetActive(false);
             gameResultScreen.SetActive(true);
         }
     }
@@ -400,8 +398,7 @@ public class LogicScript : MonoBehaviour
     // destroy pucks out of bounds
     private void cleanupDeadPucks()
     {
-        var objects = GameObject.FindGameObjectsWithTag("puck");
-        foreach (var obj in objects)
+        foreach (var obj in GameObject.FindGameObjectsWithTag("puck"))
         {
             pucki = obj.GetComponent<PuckScript>();
             if (!pucki.isSafe() && pucki.isStopped())
@@ -414,8 +411,7 @@ public class LogicScript : MonoBehaviour
     // destroy ALL pucks
     private void clearAllPucks()
     {
-        var objects = GameObject.FindGameObjectsWithTag("puck");
-        foreach (var obj in objects)
+        foreach (var obj in GameObject.FindGameObjectsWithTag("puck"))
         {
             Destroy(obj);
         }
@@ -424,35 +420,8 @@ public class LogicScript : MonoBehaviour
     // helper with the puck customization buttons
     private Sprite colorIDtoPuckSprite(int id)
     {
-        switch (id)
-        {
-            case (0):
-                return puckBlue;
-            case (1):
-                return puckGreen;
-            case (2):
-                return puckGrey;
-            case (3):
-                return puckOrange;
-            case (4):
-                return puckPink;
-            case (5):
-                return puckPurple;
-            case (6):
-                return puckRed;
-            case (7):
-                return puckYellow;
-            case (8):
-                return puckRainbow;
-            case (9):
-                return puckCanada;
-            case (10):
-                return puckDonut;
-            case (11):
-                return puckCaptain;
-            default:
-                return puckBlue;
-        }
+        Sprite[] puckSprites = { puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain };
+        return (puckSprites[id]);
     }
 
     // helper with the puck customization buttons
@@ -523,11 +492,11 @@ public class LogicScript : MonoBehaviour
     }
 
     // this is the CPU AI for hard mode
-    private CPUPathScript best = null;
     private (float, float, float) findOpenPath()
     {
-        var pathCount = CPUPaths.Length;
-        var highestValue = 0;
+        GameObject[] CPUPaths = GameObject.FindGameObjectsWithTag("cpu_path");
+        CPUPathScript best = null;
+        int highestValue = 0;
         // check all paths to see which are unblocked
         foreach (var path in CPUPaths)
         {
@@ -555,40 +524,26 @@ public class LogicScript : MonoBehaviour
         }
     }
 
-    // load player highscores from player prefs
-    private void updateHighscore()
+    // write highscore to file and profile
+    private void overwriteHighscore()
     {
-        var currentHighscore = playerScore - CPUScore;
-        switch (difficulty)
+        int currentHighscore = playerScore - CPUScore;
+        string[] highscoresPlayerPrefsKeys = { "easyHighscore", "mediumHighscore", "hardHighscore" };
+        string activeHighscorePlayerPrefsKey = highscoresPlayerPrefsKeys[difficulty];
+
+        if (currentHighscore > PlayerPrefs.GetInt(activeHighscorePlayerPrefsKey))
         {
-            case (0):
-                if (currentHighscore > PlayerPrefs.GetInt("easyHighscore"))
-                {
-                    PlayerPrefs.SetInt("easyHighscore", currentHighscore);
-                    updateProfileText();
-                }
-                break;
-            case (1):
-                if (currentHighscore > PlayerPrefs.GetInt("mediumHighscore"))
-                {
-                    PlayerPrefs.SetInt("mediumHighscore", currentHighscore);
-                    updateProfileText();
-                }
-                break;
-            case (2):
-                if (currentHighscore > PlayerPrefs.GetInt("hardHighscore"))
-                {
-                    PlayerPrefs.SetInt("hardHighscore", currentHighscore);
-                    updateProfileText();
-                }
-                break;
+            PlayerPrefs.SetInt(activeHighscorePlayerPrefsKey, currentHighscore);
+            updateProfileText();
         }
+        
     }
 
     // write highscores from player prefs to profile
     private void updateProfileText() 
     {
-        profilePopupText.text = "Highscores: \n" +
+        profilePopupText.text = 
+            "Highscores: \n" +
             "\nEasy: " + PlayerPrefs.GetInt("easyHighscore") +
             "\nMedium: " + PlayerPrefs.GetInt("mediumHighscore") +
             "\nHard: " + PlayerPrefs.GetInt("hardHighscore");
@@ -597,35 +552,17 @@ public class LogicScript : MonoBehaviour
     // unlock the unlockables based on player highscores
     private void updateLocks()
     {
-        if (PlayerPrefs.GetInt("easyHighscore") > 0)
+        string[] highscoresPlayerPrefsKeys = { "easyHighscore", "mediumHighscore", "hardHighscore" };
+        string[] locksPlayerPrefsKeys = { "easyLock", "mediumLock", "hardLock" };
+
+        // for each different highscore, if it is greater than zero, unlock all objects of cooresponding type
+        for (int i = 0; i < highscoresPlayerPrefsKeys.Length; i++)
         {
-
-            GameObject[] gameObjectArray = GameObject.FindGameObjectsWithTag("easyLock");
-
-            foreach (GameObject go in gameObjectArray)
-            {
-                go.SetActive(false);
-            }
-        }
-        if (PlayerPrefs.GetInt("mediumHighscore") > 0)
-        {
-
-            GameObject[] gameObjectArray = GameObject.FindGameObjectsWithTag("mediumLock");
-
-            foreach (GameObject go in gameObjectArray)
-            {
-                go.SetActive(false);
-            }
-        }
-        if (PlayerPrefs.GetInt("hardHighscore") > 0)
-        {
-
-            GameObject[] gameObjectArray = GameObject.FindGameObjectsWithTag("hardLock");
-
-            foreach (GameObject go in gameObjectArray)
-            {
-                go.SetActive(false);
-            }
+            if (PlayerPrefs.GetInt(highscoresPlayerPrefsKeys[i]) > 0)
+                foreach (GameObject go in GameObject.FindGameObjectsWithTag(locksPlayerPrefsKeys[i]))
+                {
+                    go.SetActive(false);
+                }
         }
     }
 
