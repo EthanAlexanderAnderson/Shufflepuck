@@ -43,7 +43,7 @@ public class PuckScript : MonoBehaviour
         velocity = rb.velocity.x + rb.velocity.y;
         noiseSFX.volume = velocity / 25.0f;
 
-        if (isSafe())
+        if (IsSafe())
         {
             pastSafeLine = true;
         }
@@ -52,7 +52,7 @@ public class PuckScript : MonoBehaviour
         angularVelocity = rb.angularVelocity;
         var right = transform.InverseTransformDirection(transform.right);
         var up = transform.InverseTransformDirection(transform.up);
-        if (!isSlowed() && isShot() && pastSafeLine)
+        if (!IsSlowed() && IsShot() && pastSafeLine)
         {
             // add horizontal spinning force
             rb.AddForce((right * angularVelocity * angularVelocityModifier) * -0.03f);
@@ -70,17 +70,17 @@ public class PuckScript : MonoBehaviour
     }
 
     // initiate a new puck
-    public PuckScript initPuck(bool isPlayersPuckParameter, Sprite sprite)
+    public PuckScript InitPuck(bool IsPlayersPuckParameter, Sprite sprite)
     {
         spriteRenderer.sprite = sprite;
-        playersPuck = isPlayersPuckParameter;
+        playersPuck = IsPlayersPuckParameter;
         return this;
     }
 
     private float angle;
     private float power;
     private float spin;
-    public void shoot(float angleParameter, float powerParameter, float spinParameter = 50)
+    public void Shoot(float angleParameter, float powerParameter, float spinParameter = 50)
     {
         // normalize power and then scale
         power = (powerParameter - (powerParameter - 50) * 0.5f) * powerModifier;
@@ -91,7 +91,7 @@ public class PuckScript : MonoBehaviour
         Vector2 vector = new Vector2(xcomponent, ycomponent);
         // adjust spin
         spin = (spinParameter - 50) * -10;
-        // shoot
+        // Shoot
         rb.AddForce(vector);
         shot = true;
         // add spin
@@ -101,18 +101,18 @@ public class PuckScript : MonoBehaviour
     }
 
     // ---------- GETTERS AND SETTERS ----------
-    public bool isSlowed() { return rb.velocity.x < 1 && rb.velocity.y < 1 && isShot() && transform.position.y > -9; }
-    public bool isStopped() { return rb.velocity.x < 0.1 && rb.velocity.y < 0.1 && isShot() && transform.position.y > -9; }
-    public bool isShot() { return shot; }
-    public bool isSafe() { return safe; }
-    public bool isPastSafeLine() { return pastSafeLine; }
-    public bool isPlayersPuck() { return playersPuck; }
-    public int computeValue() { return puckBaseValue * zoneMultiplier; }
-    public int getZoneMultiplier() { return zoneMultiplier; }
-    public void setZoneMultiplier(int ZM) { zoneMultiplier = ZM; }
+    public bool IsSlowed() { return rb.velocity.x < 1 && rb.velocity.y < 1 && IsShot() && transform.position.y > -9; }
+    public bool IsStopped() { return rb.velocity.x < 0.1 && rb.velocity.y < 0.1 && IsShot() && transform.position.y > -9; }
+    public bool IsShot() { return shot; }
+    public bool IsSafe() { return safe; }
+    public bool IsPastSafeLine() { return pastSafeLine; }
+    public bool IsPlayersPuck() { return playersPuck; }
+    public int ComputeValue() { return puckBaseValue * zoneMultiplier; }
+    public int GetZoneMultiplier() { return zoneMultiplier; }
+    public void SetZoneMultiplier(int ZM) { zoneMultiplier = ZM; }
 
     // when a puck enters a scoring zone, update its score and play a SFX
-    public void enterScoreZone( bool isZoneSafe, int enteredZoneMultiplier)
+    public void EnterScoreZone( bool isZoneSafe, int enteredZoneMultiplier)
     {
         // all zones are past safe line, so pastSafeLine can be set to true permanently
         pastSafeLine = true;
@@ -120,9 +120,9 @@ public class PuckScript : MonoBehaviour
         if (enteredZoneMultiplier > zoneMultiplier || enteredZoneMultiplier == 0)
         {
             // if put moves into higher scoring zone and gains a point play SFX
-            if (enteredZoneMultiplier > zoneMultiplier && !isStopped())
+            if (enteredZoneMultiplier > zoneMultiplier && !IsStopped())
             {
-                if (isPlayersPuck())
+                if (IsPlayersPuck())
                 {
                     pointPlayerSFX.Play();
                 }
@@ -136,7 +136,7 @@ public class PuckScript : MonoBehaviour
     }
 
     // when a puck exits a scoring zone
-    public void exitScoreZone(bool isBoundary, int exitedZoneMultiplier)
+    public void ExitScoreZone(bool isBoundary, int exitedZoneMultiplier)
     {
         // if you exit a boundry, the puck is no longer safe
         if (isBoundary)
@@ -155,12 +155,12 @@ public class PuckScript : MonoBehaviour
     public string toString()
     {
         return (
-            "\n isPlayersPuck: " + isPlayersPuck() +
+            "\n IsPlayersPuck: " + IsPlayersPuck() +
             "\n puckBaseValue: " + puckBaseValue +
             "\n zoneMultiplier: " + zoneMultiplier +
-            "\n isShot: " + isShot() +
-            "\n isSafe: " + isSafe() +
-            "\n isStopped: " + isStopped()
+            "\n IsShot: " + IsShot() +
+            "\n IsSafe: " + IsSafe() +
+            "\n IsStopped: " + IsStopped()
             ); 
     }
 

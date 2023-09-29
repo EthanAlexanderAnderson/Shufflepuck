@@ -26,8 +26,8 @@ public class ScoreZoneScript : MonoBehaviour
         if (collision.gameObject.layer == 3)
         {
             puck = collision.gameObject.transform.parent.gameObject.GetComponent<PuckScript>();
-            puck.enterScoreZone(true, zoneMultiplier);
-            logic.updateScores();
+            puck.EnterScoreZone(true, zoneMultiplier);
+            logic.UpdateScores();
         }
     }
 
@@ -37,8 +37,8 @@ public class ScoreZoneScript : MonoBehaviour
         if (collision.gameObject.layer == 3)
         {
             puck = collision.gameObject.transform.parent.gameObject.GetComponent<PuckScript>();
-            puck.exitScoreZone(boundary, zoneMultiplier);
-            logic.updateScores();
+            puck.ExitScoreZone(boundary, zoneMultiplier);
+            logic.UpdateScores();
         }
     }
 
@@ -48,9 +48,9 @@ public class ScoreZoneScript : MonoBehaviour
         if (collision.gameObject.layer == 3)
         {
             puck = collision.gameObject.transform.parent.gameObject.GetComponent<PuckScript>();
-            if (puck.getZoneMultiplier() < zoneMultiplier && puck.transform.position.y < 15.75)
+            if (puck.GetZoneMultiplier() < zoneMultiplier && puck.transform.position.y < 15.75)
             {
-                puck.setZoneMultiplier(zoneMultiplier);
+                puck.SetZoneMultiplier(zoneMultiplier);
             }
         }
     }

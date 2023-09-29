@@ -111,9 +111,9 @@ public class LogicScript : MonoBehaviour
         line = GameObject.FindGameObjectWithTag("line").GetComponent<LineScript>();
         gameResultText.text = "";
         // load play prefs data
-        updateProfileText();
-        updateLocks();
-        selectPlayerPuckSprite(PlayerPrefs.GetInt("puck"));
+        UpdateProfileText();
+        UpdateLocks();
+        SelectPlayerPuckSprite(PlayerPrefs.GetInt("puck"));
     }
 
     // Update is called once per frame
@@ -123,7 +123,7 @@ public class LogicScript : MonoBehaviour
         if (gameIsRunning && (playerPuckCount > 0 || CPUPuckCount > 0))
         {
             // clear pucks in non-safe zones
-            cleanupDeadPucks();
+            CleanupDeadPucks();
 
             // if input
             if ((Input.GetMouseButtonDown(0)) && gameIsRunning && isPlayerShooting)
@@ -133,7 +133,7 @@ public class LogicScript : MonoBehaviour
                 {
                     case "angle":
                         angle = line.value;
-                        bar.changeBar("power");
+                        bar.ChangeBar("power");
                         activeBar = "power";
                         break;
                     case "power":
@@ -141,9 +141,9 @@ public class LogicScript : MonoBehaviour
                         // if non-hard diff, end turn
                         if (difficulty < 2)
                         {
-                            bar.changeBar("none");
+                            bar.ChangeBar("none");
                             activeBar = "none";
-                            activePlayerPuckScript.shoot(angle, power);
+                            activePlayerPuckScript.Shoot(angle, power);
                             isPlayersTurn = false;
                             isPlayerShooting = false;
                             turnText.text = "";
@@ -154,16 +154,16 @@ public class LogicScript : MonoBehaviour
                         // on hard diff, show spin bar
                         else
                         {
-                            bar.changeBar("spin");
+                            bar.ChangeBar("spin");
                             activeBar = "spin";
                         }
                         break;
                     // if hard, select spin
                     case "spin":
                         spin = line.value;
-                        bar.changeBar("none");
+                        bar.ChangeBar("none");
                         activeBar = "none";
-                        activePlayerPuckScript.shoot(angle, power, spin);
+                        activePlayerPuckScript.Shoot(angle, power, spin);
                         isPlayersTurn = false;
                         isPlayerShooting = false;
                         turnText.text = "";
@@ -175,18 +175,18 @@ public class LogicScript : MonoBehaviour
             }
 
             // start Players turn
-            if (isPlayersTurn && activeCPUPuckScript.isSlowed())
+            if (isPlayersTurn && activeCPUPuckScript.IsSlowed())
             {
                 turnText.text = "Your Turn";
-                createPuck(true);
-                bar.changeBar("angle");
+                CreatePuck(true);
+                bar.ChangeBar("angle");
                 activeBar = "angle";
                 isPlayersTurn = false;
                 isPlayerShooting = true;
             }
 
             // start CPU's turn
-            if (!isPlayersTurn && (activePlayerPuckScript == null || (activePlayerPuckScript.isSlowed() && allPucksAreSlowed())))
+            if (!isPlayersTurn && (activePlayerPuckScript == null || (activePlayerPuckScript.IsSlowed() && AllPucksAreSlowed())))
             {
                 // timestamp the beginning of CPU's turn for delays
                 if (tempTime == 0)
@@ -197,12 +197,12 @@ public class LogicScript : MonoBehaviour
                 // do this stuff immediately, once
                 if (isCPUShooting)
                 { 
-                    bar.changeBar("angle");
+                    bar.ChangeBar("angle");
                     activeBar = "angle";
                     turnText.text = "CPU's Turn";
-                    createPuck(false);
+                    CreatePuck(false);
                     isCPUShooting = false;
-                    // first turn on med-hard diff, CPU shoots perfect
+                    // first turn on med-hard diff, CPU Shoots perfect
                     if (difficulty == 1 && CPUPuckCount == 5)
                     {
                         CPUShotAngle = Random.Range(48.0f, 52.0f);
@@ -218,14 +218,14 @@ public class LogicScript : MonoBehaviour
                     else
                     {
                         Debug.Log("searching for path...");
-                        (CPUShotAngle, CPUShotPower, CPUShotSpin) = findOpenPath();
+                        (CPUShotAngle, CPUShotPower, CPUShotSpin) = FindOpenPath();
                     }
 
                 }
                 // after 1.5 seconds elapsed, CPU selects angle
                 if (tempTime + 1.5 < timer && Mathf.Abs(line.value - CPUShotAngle) < (1.0f + difficulty) && activeBar == "angle")
                 {
-                    bar.changeBar("power");
+                    bar.ChangeBar("power");
                     activeBar = "power";
                 }
                 // after 3 seconds elapsed, CPU selects power
@@ -233,10 +233,10 @@ public class LogicScript : MonoBehaviour
                 {
                     if (difficulty < 2)
                     {
-                        activeCPUPuckScript.shoot(CPUShotAngle, CPUShotPower);
+                        activeCPUPuckScript.Shoot(CPUShotAngle, CPUShotPower);
                         isPlayersTurn = true;
                         turnText.text = "";
-                        bar.changeBar("none");
+                        bar.ChangeBar("none");
                         activeBar = "none";
                         tempTime = 0;
                         CPUPuckCount--;
@@ -244,17 +244,17 @@ public class LogicScript : MonoBehaviour
                     }
                     else
                     {
-                        bar.changeBar("spin");
+                        bar.ChangeBar("spin");
                         activeBar = "spin";
                     }
                 }
                 // after 3 seconds elapsed, CPU selects spin (for hard mode only)
                 if (tempTime + 4.5 < timer && Mathf.Abs(line.value - CPUShotSpin) < (1.0f + difficulty) && activeBar == "spin")
                 {
-                    activeCPUPuckScript.shoot(CPUShotAngle, CPUShotPower, CPUShotSpin);
+                    activeCPUPuckScript.Shoot(CPUShotAngle, CPUShotPower, CPUShotSpin);
                     isPlayersTurn = true;
                     turnText.text = "";
-                    bar.changeBar("none");
+                    bar.ChangeBar("none");
                     activeBar = "none";
                     tempTime = 0;
                     CPUPuckCount--;
@@ -266,15 +266,15 @@ public class LogicScript : MonoBehaviour
             timer += Time.deltaTime;
         }
         // ran out of pucks (game over)
-        else if (gameIsRunning && (playerPuckCount <= 0 || CPUPuckCount <= 0) && allPucksAreStopped())
+        else if (gameIsRunning && (playerPuckCount <= 0 || CPUPuckCount <= 0) && AllPucksAreStopped())
         {
             gameIsRunning = false;
-            updateScores();
+            UpdateScores();
 
             if (playerScore > CPUScore)
             {
                 gameResultText.text = "You Win!";
-                overwriteHighscore();
+                OverwriteHighscore();
             }
             else if (playerScore < CPUScore)
             {
@@ -290,14 +290,14 @@ public class LogicScript : MonoBehaviour
         }
     }
 
-    public void restartGame(int diff)
+    public void RestartGame(int diff)
     {
         // organize scene
-        clearAllPucks();
+        ClearAllPucks();
         titleScreen.SetActive(false);
-        table.GetComponent<TableScript>().showBoard();
+        table.GetComponent<TableScript>().ShowBoard();
         // reset game variables
-        randomizeCPUPuckSprite();
+        RandomizeCPUPuckSprite();
         difficulty = diff;
         playerScore = 0;
         CPUScore = 0;
@@ -318,32 +318,32 @@ public class LogicScript : MonoBehaviour
     }
 
     // create a puck. bool parameter of if its the player's puck or not so we can set the sprite
-    public void createPuck(bool isPlayersPuck)
+    public void CreatePuck(bool IsPlayersPuck)
     {
-        if (isPlayersPuck)
+        if (IsPlayersPuck)
         {
             activePlayerPuckObject = Instantiate(puck, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
             activePlayerPuckScript = activePlayerPuckObject.GetComponent<PuckScript>();
-            activePlayerPuckScript.initPuck(true, playerPuckSprite);
+            activePlayerPuckScript.InitPuck(true, playerPuckSprite);
         }
         else
         {
             activeCPUPuckObject = Instantiate(puck, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
             activeCPUPuckScript = activeCPUPuckObject.GetComponent<PuckScript>();
-            activeCPUPuckScript.initPuck(false, CPUPuckSprite);
+            activeCPUPuckScript.InitPuck(false, CPUPuckSprite);
         }
     }
 
     // useful helper function for deciding when to allow actions. Returns true when all pucks have stopped moving
     private PuckScript pucki;
-    public bool allPucksAreStopped()
+    public bool AllPucksAreStopped()
     {
         var allPucks = GameObject.FindGameObjectsWithTag("puck");
         foreach (var puck in allPucks)
         {
             pucki = puck.GetComponent<PuckScript>();
             // IF shot, but not stopped, return false
-            if (pucki.isShot() && !pucki.isStopped())
+            if (pucki.IsShot() && !pucki.IsStopped())
             {
                 return false;
             }
@@ -353,14 +353,14 @@ public class LogicScript : MonoBehaviour
     }
 
     // useful helper function for deciding when to allow actions. Returns true when all pucks have slowed down
-    public bool allPucksAreSlowed()
+    public bool AllPucksAreSlowed()
     {
         var allPucks = GameObject.FindGameObjectsWithTag("puck");
         foreach (var puck in allPucks)
         {
             pucki = puck.GetComponent<PuckScript>();
             // IF shot, but not stopped, return false
-            if (pucki.isShot() && !pucki.isSlowed())
+            if (pucki.IsShot() && !pucki.IsSlowed())
             {
                 return false;
             }
@@ -370,7 +370,7 @@ public class LogicScript : MonoBehaviour
     }
 
     // update the UI scores text
-    public void updateScores()
+    public void UpdateScores()
     {
         int playerSum = 0;
         int CPUSum = 0;
@@ -378,13 +378,13 @@ public class LogicScript : MonoBehaviour
         foreach (var obj in objects)
         {
             pucki = obj.GetComponent<PuckScript>();
-            if (pucki.isPlayersPuck())
+            if (pucki.IsPlayersPuck())
             {
-                playerSum += pucki.computeValue();
+                playerSum += pucki.ComputeValue();
             }
             else
             {
-                CPUSum += pucki.computeValue();
+                CPUSum += pucki.ComputeValue();
             }
             
         }
@@ -396,12 +396,12 @@ public class LogicScript : MonoBehaviour
     }
 
     // destroy pucks out of bounds
-    private void cleanupDeadPucks()
+    private void CleanupDeadPucks()
     {
         foreach (var obj in GameObject.FindGameObjectsWithTag("puck"))
         {
             pucki = obj.GetComponent<PuckScript>();
-            if (!pucki.isSafe() && pucki.isStopped())
+            if (!pucki.IsSafe() && pucki.IsStopped())
             {
                 Destroy(obj);
             }
@@ -409,7 +409,7 @@ public class LogicScript : MonoBehaviour
     }
 
     // destroy ALL pucks
-    private void clearAllPucks()
+    private void ClearAllPucks()
     {
         foreach (var obj in GameObject.FindGameObjectsWithTag("puck"))
         {
@@ -418,60 +418,60 @@ public class LogicScript : MonoBehaviour
     }
 
     // helper with the puck customization buttons
-    private Sprite colorIDtoPuckSprite(int id)
+    private Sprite ColorIDtoPuckSprite(int id)
     {
         Sprite[] puckSprites = { puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain };
         return (puckSprites[id]);
     }
 
     // helper with the puck customization buttons
-    public void selectPlayerPuckSprite(int id)
+    public void SelectPlayerPuckSprite(int id)
     {
-        playerPuckSprite = colorIDtoPuckSprite(id);
+        playerPuckSprite = ColorIDtoPuckSprite(id);
         playerPuckIcon.GetComponent<Image>().sprite = playerPuckSprite;
         activePuckIcon.GetComponent<Image>().sprite = playerPuckSprite;
         PlayerPrefs.SetInt("puck", id);
-        randomizeCPUPuckSprite();
+        RandomizeCPUPuckSprite();
     }
 
     // helper for randomize puck button
-    public void randomizePlayerPuckSprite()
+    public void RandomizePlayerPuckSprite()
     {
         var prev = playerPuckSprite;
         int rng;
         do
         {
             rng = Random.Range(0, 8);
-            playerPuckSprite = colorIDtoPuckSprite(rng);
+            playerPuckSprite = ColorIDtoPuckSprite(rng);
         } while (prev == playerPuckSprite);
         playerPuckIcon.GetComponent<Image>().sprite = playerPuckSprite;
         activePuckIcon.GetComponent<Image>().sprite = playerPuckSprite;
         PlayerPrefs.SetInt("puck", rng);
-        randomizeCPUPuckSprite();
+        RandomizeCPUPuckSprite();
     }
 
     // randomize CPU puck. This is called before every match
-    public void randomizeCPUPuckSprite()
+    public void RandomizeCPUPuckSprite()
     {
         do
         {
-            CPUPuckSprite = colorIDtoPuckSprite(Random.Range(0, 8));
+            CPUPuckSprite = ColorIDtoPuckSprite(Random.Range(0, 8));
         } while (CPUPuckSprite == playerPuckSprite);
         CPUPuckIcon.GetComponent<Image>().sprite = CPUPuckSprite;
     }
 
     // Toggles for UI menus, such as profile or puck
-    public void togglePopup(GameObject popup)
+    public void TogglePopup(GameObject popup)
     {
         popup.SetActive(!popup.activeInHierarchy);
-        toggleMainMenuButtons();
-        updateLocks();
+        ToggleMainMenuButtons();
+        UpdateLocks();
         errorMessage.text = "";
     }
 
     // Toggles for UI main menu buttons
     [ContextMenu("Toggle Main Menu Buttons")]
-    private void toggleMainMenuButtons()
+    private void ToggleMainMenuButtons()
     {
         Transform[] allChildren = titleScreen.transform.GetComponentsInChildren<Transform>(true);
         for (int i = 1; i < allChildren.Length; i++)
@@ -481,7 +481,7 @@ public class LogicScript : MonoBehaviour
     }
 
     // back button after match is over
-    public void returnToMenu()
+    public void ReturnToMenu()
     {
         gameIsRunning = false;
         playerPuckCount = 0;
@@ -492,7 +492,7 @@ public class LogicScript : MonoBehaviour
     }
 
     // this is the CPU AI for hard mode
-    private (float, float, float) findOpenPath()
+    private (float, float, float) FindOpenPath()
     {
         GameObject[] CPUPaths = GameObject.FindGameObjectsWithTag("cpu_path");
         CPUPathScript best = null;
@@ -516,7 +516,7 @@ public class LogicScript : MonoBehaviour
         {
             return (best.angle, best.power, best.spin);
         }
-        // otherwise, shoot random
+        // otherwise, Shoot random
         else
         {
             Debug.Log("No path :(");
@@ -525,7 +525,7 @@ public class LogicScript : MonoBehaviour
     }
 
     // write highscore to file and profile
-    private void overwriteHighscore()
+    private void OverwriteHighscore()
     {
         int currentHighscore = playerScore - CPUScore;
         string[] highscoresPlayerPrefsKeys = { "easyHighscore", "mediumHighscore", "hardHighscore" };
@@ -534,13 +534,13 @@ public class LogicScript : MonoBehaviour
         if (currentHighscore > PlayerPrefs.GetInt(activeHighscorePlayerPrefsKey))
         {
             PlayerPrefs.SetInt(activeHighscorePlayerPrefsKey, currentHighscore);
-            updateProfileText();
+            UpdateProfileText();
         }
         
     }
 
     // write highscores from player prefs to profile
-    private void updateProfileText() 
+    private void UpdateProfileText() 
     {
         profilePopupText.text = 
             "Highscores: \n" +
@@ -550,7 +550,7 @@ public class LogicScript : MonoBehaviour
     }
 
     // unlock the unlockables based on player highscores
-    private void updateLocks()
+    private void UpdateLocks()
     {
         string[] highscoresPlayerPrefsKeys = { "easyHighscore", "mediumHighscore", "hardHighscore" };
         string[] locksPlayerPrefsKeys = { "easyLock", "mediumLock", "hardLock" };
@@ -567,7 +567,7 @@ public class LogicScript : MonoBehaviour
     }
 
     // shows up when you click something locked
-    public void setErrorMessage(string msg)
+    public void SetErrorMessage(string msg)
     {
         errorMessage.text = msg;
     }

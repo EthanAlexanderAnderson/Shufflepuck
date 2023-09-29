@@ -52,12 +52,12 @@ public class DebugWindow : EditorWindow
         var objects = GameObject.FindGameObjectsWithTag("puck");
         foreach (var obj in objects)
         {
-            obj.GetComponent<PuckScript>().shoot(angleParameter, powerParameter, spinParameter);
+            obj.GetComponent<PuckScript>().Shoot(angleParameter, powerParameter, spinParameter);
         }
 
         PuckObject = Instantiate(puck, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
         PuckScript = PuckObject.GetComponent<PuckScript>();
-        PuckScript.initPuck(true, playerPuckSprite);
-        PuckScript.shoot(angleParameter, powerParameter, spinParameter);
+        PuckScript.InitPuck(true, playerPuckSprite);
+        PuckScript.Shoot(angleParameter, powerParameter, spinParameter);
     }
 }

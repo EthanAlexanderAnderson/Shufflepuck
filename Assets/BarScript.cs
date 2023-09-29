@@ -18,7 +18,7 @@ public class BarScript : MonoBehaviour
     }
 
     // change bar sprite
-    public void changeBar(string type)
+    public void ChangeBar(string type)
     {
         switch (type)
         {

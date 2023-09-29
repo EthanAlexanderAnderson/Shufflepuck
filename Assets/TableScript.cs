@@ -21,7 +21,7 @@ public class TableScript : MonoBehaviour
         
     }
 
-    public void showBoard()
+    public void ShowBoard()
     {
         spriteRenderer.sprite = board;
     }
