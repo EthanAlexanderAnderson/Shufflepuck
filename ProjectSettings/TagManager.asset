@@ -12,6 +12,7 @@ TagManager:
   - easyLock
   - mediumLock
   - hardLock
+  - ui
   layers:
   - Default
   - TransparentFX

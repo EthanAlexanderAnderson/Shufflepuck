@@ -18,7 +18,7 @@ public class BarScript : MonoBehaviour
     }
 
     // change bar sprite
-    public void ChangeBar(string type)
+    public string ChangeBar(string type)
     {
         switch (type)
         {
@@ -41,5 +41,6 @@ public class BarScript : MonoBehaviour
                 spriteRenderer.enabled = false;
                 break;
         }
+        return type;
     }
 }
