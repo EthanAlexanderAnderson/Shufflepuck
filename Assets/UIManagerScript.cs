@@ -32,7 +32,19 @@ public class UIManagerScript : MonoBehaviour
     // local
     public GameObject activeUI;
 
-    public string TurnText { get; set; }
+    public string TurnText
+    {
+        get => turnText.text;
+        set
+        {
+            turnText.text = value;
+        }
+    }
+
+    public void SetTurnTextActive()
+    {
+        turnText.gameObject.SetActive(true);
+    }
 
     public void PostShotUpdate(int playerPuckCount, int opponentPuckCount)
     {
