@@ -74,9 +74,6 @@ public class LogicScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //PlayerPrefs.SetInt("easyHighscore", 0);
-        //PlayerPrefs.SetInt("mediumHighscore", 0);
-        //PlayerPrefs.SetInt("hardHighscore", 0);
         Application.targetFrameRate = 30;
         // connect scripts
         bar = GameObject.FindGameObjectWithTag("bar").GetComponent<BarScript>();
@@ -134,7 +131,6 @@ public class LogicScript : MonoBehaviour
                         isPlayersTurn = false;
                         isPlayerShooting = false;
                         playerPuckCount--;
-                        //(isPlayersTurn, null, playerPuckCount) = Shoot();
                         UI.PostShotUpdate(playerPuckCount, opponentPuckCount);
                         isCPUShooting = true;
                         break;
@@ -239,7 +235,6 @@ public class LogicScript : MonoBehaviour
     {
         // organize scene
         ClearAllPucks();
-        //titleScreen.SetActive(false);
         table.GetComponent<TableScript>().ShowBoard();
         // reset game variables
         RandomizeCPUPuckSprite();
@@ -253,8 +248,6 @@ public class LogicScript : MonoBehaviour
         isCPUShooting = true;
         gameIsRunning = true;
         // reset UI text
-
-        //gameHud.SetActive(true);
         puckHalo.SetActive(diff == 0);
         UI.ChangeUI(UI.gameHud);
     }
@@ -327,14 +320,10 @@ public class LogicScript : MonoBehaviour
             else
             {
                 CPUSum += pucki.ComputeValue();
-            }
-            
+            }  
         }
         playerScore = playerSum;
-        //playerScoreText.text = playerScore.ToString();
-        
         opponentScore = CPUSum;
-        //opponentScoreText.text = opponentScore.ToString();
         UI.UpdateScores(playerScore, opponentScore);
     }
 
@@ -401,17 +390,6 @@ public class LogicScript : MonoBehaviour
         UI.SetOpponentPuckIcon(CPUPuckSprite);
     }
 
-    // Toggles for UI main menu buttons
-    /*[ContextMenu("Toggle Main Menu Buttons")]
-    private void ToggleMainMenuButtons()
-    {
-        Transform[] allChildren = titleScreen.transform.GetComponentsInChildren<Transform>(true);
-        for (int i = 1; i < allChildren.Length; i++)
-        {
-            allChildren[i].gameObject.SetActive(!allChildren[i].gameObject.activeInHierarchy);
-        }
-    }
-    */
     // back button after match is over
     public void ReturnToMenu()
     {

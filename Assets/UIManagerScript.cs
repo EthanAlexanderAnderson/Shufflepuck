@@ -34,19 +34,6 @@ public class UIManagerScript : MonoBehaviour
 
     public string TurnText { get; set; }
 
-    /*public void SwapTurn(bool swappingToPlayersTurn, bool isMultiplayer)
-    {
-        turnText.gameObject.SetActive(true);
-        if (swappingToPlayersTurn)
-        {
-            turnText.text = "Your Turn";
-        }
-        else
-        {
-            turnText.text = isMultiplayer ? "Opponent's Turn" : "CPU's Turn";
-        }
-    }*/
-
     public void PostShotUpdate(int playerPuckCount, int opponentPuckCount)
     {
         turnText.gameObject.SetActive(false);
@@ -68,7 +55,6 @@ public class UIManagerScript : MonoBehaviour
         {
             gameResultText.text = "Tie";
         }
-        //gameResultScreen.SetActive(true);
     }
 
     public void UpdateScores(int playerScore, int opponentScore)
@@ -132,17 +118,7 @@ public class UIManagerScript : MonoBehaviour
         UpdateLocks();
         ResetHUD();
     }
-/*
-    public void ChangeUIHelper(string key)
-    {
-        ChangeUI(key switch
-        {
-            "title" => titleScreen,
-            "result" => gameResultScreen,
-            "HUD" => gameHud,
-        });
-    }
-*/
+
     public void ResetHUD()
     {
         gameResultText.text = "";
