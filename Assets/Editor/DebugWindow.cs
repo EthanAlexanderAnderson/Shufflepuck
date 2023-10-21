@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+//using Unity.Netcode;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -7,14 +8,15 @@ using UnityEngine.UIElements;
 public class DebugWindow : EditorWindow
 {
     private LogicScript logic;
+    private ServerLogicScript serverLogic;
     public GameObject puck;
 
     public float angle;
     public float power;
     public float spin;
 
-    private GameObject PuckObject;
-    private PuckScript PuckScript;
+    private GameObject puckObject;
+    private PuckScript puckScript;
 
     public Sprite playerPuckSprite;
 
@@ -29,7 +31,8 @@ public class DebugWindow : EditorWindow
     public void CreateGUI()
     {
         logic = GameObject.FindGameObjectWithTag("logic").GetComponent<LogicScript>();
-        puck = logic.puck;
+        serverLogic = GameObject.FindGameObjectWithTag("logic").GetComponent<ServerLogicScript>();
+        puck = logic.puckPrefab;
         FloatField angleFloatField = new FloatField();
         angleFloatField.label = "Angle";
         rootVisualElement.Add(angleFloatField);
@@ -45,6 +48,16 @@ public class DebugWindow : EditorWindow
         Button shoot = new Button { text = "SHOOT" };
         shoot.clicked += () => DebugShoot(angleFloatField.value, powerFloatField.value, spinFloatField.value);
         rootVisualElement.Add(shoot);
+
+        Button shootRpc = new Button { text = "SHOOT RPC" };
+        shootRpc.clicked += () => serverLogic.DebugShootServerRpc(angleFloatField.value, powerFloatField.value, spinFloatField.value);
+        rootVisualElement.Add(shootRpc);
+
+        Button addPlayer = new Button { text = "addPlayer" };
+        addPlayer.clicked += () => serverLogic.AddPlayerServerRpc();
+        rootVisualElement.Add(addPlayer);
+
+        //serverLogicScript.AddPlayerServerRpc(); 
     }
 
     public void DebugShoot(float angleParameter, float powerParameter, float spinParameter)
@@ -55,9 +68,11 @@ public class DebugWindow : EditorWindow
             obj.GetComponent<PuckScript>().Shoot(angleParameter, powerParameter, spinParameter);
         }
 
-        PuckObject = Instantiate(puck, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
-        PuckScript = PuckObject.GetComponent<PuckScript>();
-        PuckScript.InitPuck(true, playerPuckSprite);
-        PuckScript.Shoot(angleParameter, powerParameter, spinParameter);
+        puckObject = Instantiate(puck, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
+        puckScript = puckObject.GetComponent<PuckScript>();
+        puckScript.InitPuck(true, playerPuckSprite);
+        puckScript.Shoot(angleParameter, powerParameter, spinParameter);
     }
+
+
 }

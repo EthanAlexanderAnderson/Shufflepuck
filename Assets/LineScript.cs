@@ -10,8 +10,8 @@ public class LineScript : MonoBehaviour
     public SpriteRenderer spriteRenderer;
 
     public bool movingLeft = false;
-    public float moveSpeed = 10;
-    public float value = 50;
+    public float moveSpeed;
+    public float value = 80;
 
     // Start is called before the first frame update
     void Start()

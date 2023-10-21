@@ -5,8 +5,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class PuckScript : MonoBehaviour
+public class PuckScript : NetworkBehaviour
 {
     // puck object components
     public Rigidbody2D rb;
@@ -36,6 +37,17 @@ public class PuckScript : MonoBehaviour
     // scoring
     private int puckBaseValue = 1;
     private int zoneMultiplier = 0;
+
+    /*
+    [ServerRpc(RequireOwnership = false)]
+    public void SpawnPuckServerRpc()
+    {
+        if (!IsServer) return;
+        gameObject.GetComponent<NetworkObject>().Spawn();
+        Debug.Log("Server: puck has been spawned");
+        SpawnedPuckConfirmationClientRpc();
+    }
+    */
 
     void Update()
     {
@@ -98,6 +110,12 @@ public class PuckScript : MonoBehaviour
         rb.AddTorque(spin);
         // SFX
         shotSFX.Play();
+    }
+
+    [ServerRpc]
+    public void ShootServerRpc(float angleParameter, float powerParameter, float spinParameter = 50)
+    {
+        Shoot(angleParameter, powerParameter, spinParameter);
     }
 
     // ---------- GETTERS AND SETTERS ----------

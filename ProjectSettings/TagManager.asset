@@ -13,6 +13,7 @@ TagManager:
   - mediumLock
   - hardLock
   - ui
+  - competitor
   layers:
   - Default
   - TransparentFX

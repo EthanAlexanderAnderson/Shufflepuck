@@ -4,14 +4,16 @@
  */
 
 using UnityEngine;
-using UnityEngine.UI;
 
 public class LogicScript : MonoBehaviour
 {
     private UIManagerScript UI;
+    private ServerLogicScript serverLogic;
 
-    // pucks
-    [HideInInspector] public GameObject puck; // default puck prefab
+    // prefabs
+    public GameObject puckPrefab; // default puck prefab
+    //public GameObject competitorPrefab;
+    //public GameObject CPUPrefab;
 
     // sprites
     [HideInInspector] public Sprite puckBlue;
@@ -57,26 +59,43 @@ public class LogicScript : MonoBehaviour
         }
     }
 
+    public bool isOnline;
+    public bool IsOnline
+    {
+        get => isOnline;
+        set
+        {
+            isOnline = value;
+        }
+    }
+
     // temp variables
     private float tempTime = 0;
     public float CPUShotAngle = 0;
     public float CPUShotPower = 0;
     public float CPUShotSpin = 50;
 
-    public Competitor player = new();
-    public Competitor opponent = new();
+    public Competitor player;
+    public Competitor opponent;
     public Competitor activeCompetitor;
     public Competitor nonActiveCompetitor;
 
     // Start is called before the first frame update
     void Start()
     {
-
+        // create player objects
+        //player = Instantiate(competitorPrefab).GetComponent<Competitor>();
+        player = new Competitor();
+        player.isPlayer = true;
+        //opponent = Instantiate(competitorPrefab).GetComponent<Competitor>();
+        opponent = new Competitor();
+        opponent.isPlayer = false;
         Application.targetFrameRate = 30;
         // connect scripts
         bar = GameObject.FindGameObjectWithTag("bar").GetComponent<BarScript>();
         line = GameObject.FindGameObjectWithTag("line").GetComponent<LineScript>();
         UI = GameObject.FindGameObjectWithTag("ui").GetComponent<UIManagerScript>();
+        serverLogic = GameObject.FindGameObjectWithTag("logic").GetComponent<ServerLogicScript>();
         // load play prefs data
         UI.UpdateProfileText();
         UI.UpdateLocks();
@@ -236,7 +255,6 @@ public class LogicScript : MonoBehaviour
     {
         // organize scene
         ClearAllPucks();
-        table.GetComponent<TableScript>().ShowBoard();
         // reset game variables
         RandomizeCPUPuckSprite();
         difficulty = diff;
@@ -254,18 +272,60 @@ public class LogicScript : MonoBehaviour
         UI.ChangeUI(UI.gameHud);
     }
 
+    public void RestartGameOnline()
+    {
+        // organize scene
+        ClearAllPucks();
+        // reset game variables
+        RandomizeCPUPuckSprite();
+        difficulty = 2;
+        player.score = 0;
+        opponent.score = 0;
+        player.puckCount = 5;
+        opponent.puckCount = 5;
+        player.isTurn = false;
+        player.isShooting = false;
+        opponent.isTurn = false;
+        opponent.isShooting = false;
+        gameIsRunning = true;
+        // reset UI text
+        puckHalo.SetActive(false);
+        UI.ChangeUI(UI.gameHud);
+        UI.TurnText = "Opponent's Turn"; // this gets overwritten by StartTurn if going first
+    }
+
+    public void StartTurn()
+    {
+        player.isTurn = true;
+    }
+
     // create a puck. bool parameter of if its the player's puck or not so we can set the sprite
     public void CreatePuck(bool IsPlayersPuck)
     {
-        if (IsPlayersPuck)
+        GameObject activePuckObject;
+        if (IsOnline)
         {
-            player.activePuckObject = Instantiate(puck, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
+            serverLogic.CreatePuckServerRpc();
+            activePuckObject = 
+        }
+        else
+        {
+            activePuckObject = Instantiate(puckPrefab, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
+
+        }
+    }
+
+    public void IntializePuck(bool IsPlayerPuck, GameObject activePuckObject)
+    {
+        if (IsPlayerPuck)
+        {
+            player.activePuckObject = activePuckObject;
             player.activePuckScript = player.activePuckObject.GetComponent<PuckScript>();
             player.activePuckScript.InitPuck(true, player.puckSprite);
         }
         else
         {
-            opponent.activePuckObject = Instantiate(puck, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
+            opponent.activePuckObject = activePuckObject;
             opponent.activePuckScript = opponent.activePuckObject.GetComponent<PuckScript>();
             opponent.activePuckScript.InitPuck(false, opponent.puckSprite);
         }

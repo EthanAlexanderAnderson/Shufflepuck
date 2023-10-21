@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Unity.Netcode;
 using TMPro;
 using System.Collections.Generic;
 
@@ -16,6 +17,7 @@ public class UIManagerScript : MonoBehaviour
     public GameObject activePuckIcon;
     public TMP_Text errorMessage;
     public TMP_Text profilePopupText;
+    public GameObject startButton;
 
     // HUD
     public Text turnText;
@@ -107,7 +109,7 @@ public class UIManagerScript : MonoBehaviour
     {
         errorMessage.text = msg;
     }
-
+    
     // write highscore to file and profile
     public void OverwriteHighscore(int newHighscore, int difficulty)
     {
@@ -149,5 +151,21 @@ public class UIManagerScript : MonoBehaviour
     public void SetOpponentPuckIcon(Sprite sprite)
     {
         opponentPuckIcon.GetComponent<Image>().sprite = sprite;
+    }
+
+    public void Host()
+    {
+        NetworkManager.Singleton.StartHost();
+    }
+
+    public void Join()
+    {
+        NetworkManager.Singleton.StartClient();
+
+    }
+
+    public void enableStartButton()
+    {
+        startButton.SetActive(true);
     }
 }
