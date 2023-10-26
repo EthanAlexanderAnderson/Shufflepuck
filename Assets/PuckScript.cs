@@ -38,6 +38,8 @@ public class PuckScript : NetworkBehaviour
     private int puckBaseValue = 1;
     private int zoneMultiplier = 0;
 
+    private LogicScript logic;
+
     /*
     [ServerRpc(RequireOwnership = false)]
     public void SpawnPuckServerRpc()
@@ -48,6 +50,11 @@ public class PuckScript : NetworkBehaviour
         SpawnedPuckConfirmationClientRpc();
     }
     */
+
+    void OnEnable()
+    {
+        logic = GameObject.FindGameObjectWithTag("logic").GetComponent<LogicScript>();
+    }
 
     void Update()
     {
@@ -87,6 +94,18 @@ public class PuckScript : NetworkBehaviour
         spriteRenderer.sprite = sprite;
         playersPuck = IsPlayersPuckParameter;
         return this;
+    }
+
+    [ClientRpc]
+    public void InitPuckClientRpc(bool IsPlayersPuckParameter, int puckSpriteID, ClientRpcParams clientRpcParams = default)
+    {
+        if (!IsClient) return;
+
+        Sprite puckSprite = logic.ColorIDtoPuckSprite(puckSpriteID);
+        spriteRenderer.sprite = puckSprite;
+        playersPuck = IsPlayersPuckParameter;
+
+        Debug.Log($"Puck initialized. IsPlayersPuckParameter: {IsPlayersPuckParameter}. PuckSpriteID: {puckSpriteID}");
     }
 
     private float angle;

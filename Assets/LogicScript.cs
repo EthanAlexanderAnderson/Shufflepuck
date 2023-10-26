@@ -16,19 +16,19 @@ public class LogicScript : MonoBehaviour
     //public GameObject CPUPrefab;
 
     // sprites
-    [HideInInspector] public Sprite puckBlue;
-    [HideInInspector] public Sprite puckGreen;
-    [HideInInspector] public Sprite puckGrey;
-    [HideInInspector] public Sprite puckOrange;
-    [HideInInspector] public Sprite puckPink;
-    [HideInInspector] public Sprite puckPurple;
-    [HideInInspector] public Sprite puckRed;
-    [HideInInspector] public Sprite puckYellow;
+    [SerializeField] private Sprite puckBlue;
+    [SerializeField] private Sprite puckGreen;
+    [SerializeField] private Sprite puckGrey;
+    [SerializeField] private Sprite puckOrange;
+    [SerializeField] private Sprite puckPink;
+    [SerializeField] private Sprite puckPurple;
+    [SerializeField] private Sprite puckRed;
+    [SerializeField] private Sprite puckYellow;
 
-    [HideInInspector] public Sprite puckRainbow;
-    [HideInInspector] public Sprite puckCanada;
-    [HideInInspector] public Sprite puckDonut;
-    [HideInInspector] public Sprite puckCaptain;
+    [SerializeField] private Sprite puckRainbow;
+    [SerializeField] private Sprite puckCanada;
+    [SerializeField] private Sprite puckDonut;
+    [SerializeField] private Sprite puckCaptain;
 
     // table
     [HideInInspector] public GameObject table;
@@ -47,6 +47,7 @@ public class LogicScript : MonoBehaviour
     public bool gameIsRunning;
     public float timer = 0;
     public int difficulty; // 0 easy 1 medium 2 hard
+    public bool goingFirst;
 
     //public bool isLocal;
     public bool isLocal;
@@ -74,7 +75,6 @@ public class LogicScript : MonoBehaviour
     public float CPUShotAngle = 0;
     public float CPUShotPower = 0;
     public float CPUShotSpin = 50;
-
     public Competitor player;
     public Competitor opponent;
     public Competitor activeCompetitor;
@@ -114,9 +114,10 @@ public class LogicScript : MonoBehaviour
             CleanupDeadPucks();
 
             // start Players turn, do this then start shooting
-            if (player.isTurn && !player.isShooting && opponent.activePuckScript.IsSlowed())
+            if (player.isTurn && !player.isShooting && (goingFirst || opponent.activePuckScript.IsSlowed()))
             {
                 activeBar = bar.ChangeBar("angle");
+                line.isActive = true;
                 UI.SetTurnTextActive();
                 UI.TurnText = "Your Turn";
                 CreatePuck(true);
@@ -159,6 +160,7 @@ public class LogicScript : MonoBehaviour
             if (opponent.isTurn && (player.activePuckScript == null || (player.activePuckScript.IsSlowed() && AllPucksAreSlowed())))
             {
                 activeBar = bar.ChangeBar("angle");
+                line.isActive = true;
                 UI.SetTurnTextActive();
                 UI.TurnText = isLocal ? "Opponent's Turn":"CPU's Turn";
                 CreatePuck(false);
@@ -236,6 +238,7 @@ public class LogicScript : MonoBehaviour
     private void Shoot(float angle, float power, float spin = 50.0f)
     {
         activeBar = bar.ChangeBar("none");
+        line.isActive = false;
         activeCompetitor.activePuckScript.Shoot(angle, power, spin);
         activeCompetitor.isShooting = false;
         activeCompetitor.puckCount--;
@@ -296,28 +299,31 @@ public class LogicScript : MonoBehaviour
 
     public void StartTurn()
     {
+        goingFirst = true;
         player.isTurn = true;
     }
 
     // create a puck. bool parameter of if its the player's puck or not so we can set the sprite
-    public void CreatePuck(bool IsPlayersPuck)
+    public void CreatePuck(bool isPlayersPuck)
     {
-        GameObject activePuckObject;
-        if (IsOnline)
+        if (isPlayersPuck)
         {
-            serverLogic.CreatePuckServerRpc();
-            activePuckObject = 
+            player.activePuckObject = Instantiate(puckPrefab, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
+            player.activePuckScript = player.activePuckObject.GetComponent<PuckScript>();
+            player.activePuckScript.InitPuck(true, player.puckSprite);
         }
         else
         {
-            activePuckObject = Instantiate(puckPrefab, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
-
+            opponent.activePuckObject = Instantiate(puckPrefab, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
+            opponent.activePuckScript = opponent.activePuckObject.GetComponent<PuckScript>();
+            opponent.activePuckScript.InitPuck(false, opponent.puckSprite);
         }
     }
-
-    public void IntializePuck(bool IsPlayerPuck, GameObject activePuckObject)
+    /*
+    public void IntializePuck(bool IsPlayersPuck, GameObject activePuckObject)
     {
-        if (IsPlayerPuck)
+        Debug.Log("Calling IntializePuck");
+        if (IsPlayersPuck)
         {
             player.activePuckObject = activePuckObject;
             player.activePuckScript = player.activePuckObject.GetComponent<PuckScript>();
@@ -330,7 +336,7 @@ public class LogicScript : MonoBehaviour
             opponent.activePuckScript.InitPuck(false, opponent.puckSprite);
         }
     }
-
+    */
     // useful helper function for deciding when to allow actions. Returns true when all pucks have stopped moving
     private PuckScript pucki;
     public bool AllPucksAreStopped()
@@ -403,7 +409,7 @@ public class LogicScript : MonoBehaviour
     }
 
     // destroy ALL pucks
-    private void ClearAllPucks()
+    public void ClearAllPucks()
     {
         foreach (var obj in GameObject.FindGameObjectsWithTag("puck"))
         {
@@ -412,15 +418,16 @@ public class LogicScript : MonoBehaviour
     }
 
     // helper with the puck customization buttons
-    private Sprite ColorIDtoPuckSprite(int id)
+    public Sprite ColorIDtoPuckSprite(int id)
     {
         Sprite[] puckSprites = { puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain };
         return (puckSprites[id]);
     }
 
-    // helper with the puck customization buttons
+// helper with the puck customization buttons
     public void SelectPlayerPuckSprite(int id)
     {
+        player.puckSpriteID = id;
         player.puckSprite = ColorIDtoPuckSprite(id);
         UI.SetPlayerPuckIcon(player.puckSprite);
         PlayerPrefs.SetInt("puck", id);
@@ -435,6 +442,7 @@ public class LogicScript : MonoBehaviour
         do
         {
             rng = Random.Range(0, 8);
+            player.puckSpriteID = rng;
             player.puckSprite = ColorIDtoPuckSprite(rng);
         } while (prev == player.puckSprite);
         UI.SetPlayerPuckIcon(player.puckSprite);

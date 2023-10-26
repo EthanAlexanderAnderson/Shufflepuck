@@ -50,11 +50,11 @@ public class DebugWindow : EditorWindow
         rootVisualElement.Add(shoot);
 
         Button shootRpc = new Button { text = "SHOOT RPC" };
-        shootRpc.clicked += () => serverLogic.DebugShootServerRpc(angleFloatField.value, powerFloatField.value, spinFloatField.value);
+        //shootRpc.clicked += () => serverLogic.DebugShootServerRpc(angleFloatField.value, powerFloatField.value, spinFloatField.value);
         rootVisualElement.Add(shootRpc);
 
         Button addPlayer = new Button { text = "addPlayer" };
-        addPlayer.clicked += () => serverLogic.AddPlayerServerRpc();
+        addPlayer.clicked += () => serverLogic.AddPlayerServerRpc(0);
         rootVisualElement.Add(addPlayer);
 
         //serverLogicScript.AddPlayerServerRpc(); 

@@ -18,6 +18,8 @@ public class UIManagerScript : MonoBehaviour
     public TMP_Text errorMessage;
     public TMP_Text profilePopupText;
     public GameObject startButton;
+    public TMP_Text waitingText;
+    public GameObject waitingGif;
 
     // HUD
     public Text turnText;
@@ -142,6 +144,12 @@ public class UIManagerScript : MonoBehaviour
         opponentPuckCountText.text = 5.ToString();
     }
 
+    public void ResetWaitingScreen()
+    {
+        waitingText.text = "Waiting for Opponent...";
+        waitingGif.SetActive(true);
+    }
+
     public void SetPlayerPuckIcon(Sprite sprite)
     {
         playerPuckIcon.GetComponent<Image>().sprite = sprite;
@@ -164,8 +172,14 @@ public class UIManagerScript : MonoBehaviour
 
     }
 
-    public void enableStartButton()
+    public void EnableStartButton()
     {
+        waitingText.text = "0/2 Players Ready";
         startButton.SetActive(true);
+    }
+
+    public void Toggle(GameObject gameObject)
+    {
+        gameObject.SetActive(!true);
     }
 }

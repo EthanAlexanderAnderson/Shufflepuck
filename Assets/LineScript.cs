@@ -11,7 +11,9 @@ public class LineScript : MonoBehaviour
 
     public bool movingLeft = false;
     public float moveSpeed;
-    public float value = 80;
+    public float value;
+
+    public bool isActive;
 
     // Start is called before the first frame update
     void Start()
@@ -24,7 +26,7 @@ public class LineScript : MonoBehaviour
     void Update()
     {
         // change line speed based on match difficulty
-        if (logic.difficulty == 2)
+        if (logic.difficulty == 2 && !logic.isLocal && !logic.isOnline)
         {
             moveSpeed = 20;
         }
@@ -33,7 +35,7 @@ public class LineScript : MonoBehaviour
             moveSpeed = 10;
         }
         // move the line back and forth
-        if (logic.activeBar == "angle" || logic.activeBar == "power" || logic.activeBar == "spin")
+        if (isActive)
         {
             spriteRenderer.enabled = true;
             if (movingLeft)

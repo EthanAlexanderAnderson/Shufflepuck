@@ -16,6 +16,7 @@ public class MatchmakerClient : MonoBehaviour
     //[SerializeField] private GameObject gameHUD;
     private UIManagerScript UI;
     private ServerLogicScript serverLogic;
+    private LogicScript logic;
 
     // Getter
     private string PlayerID()
@@ -28,6 +29,7 @@ public class MatchmakerClient : MonoBehaviour
     {
         ServerStartUp.ClientInstance += SignIn;
         UI = GameObject.FindGameObjectWithTag("ui").GetComponent<UIManagerScript>();
+        logic = GameObject.FindGameObjectWithTag("logic").GetComponent<LogicScript>();
         serverLogic = GameObject.FindGameObjectWithTag("logic").GetComponent<ServerLogicScript>();
     }
 
@@ -111,15 +113,12 @@ public class MatchmakerClient : MonoBehaviour
         Debug.Log($"Ticket assigned: {assignment.Ip}:{assignment.Port}");
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(assignment.Ip, (ushort)assignment.Port);
         NetworkManager.Singleton.StartClient();
-        // added by me
-        //UI.ChangeUI(UI.gameHud);
-        //serverLogic.AddPlayerServerRpc();
-        UI.enableStartButton();
+        UI.EnableStartButton();
     }
 
     public void AddPlayer()
     {
-        serverLogic.AddPlayerServerRpc();
+        serverLogic.AddPlayerServerRpc(logic.player.puckSpriteID);
     }
 
     // Stop Client
