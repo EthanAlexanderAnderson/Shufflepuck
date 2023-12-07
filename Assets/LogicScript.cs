@@ -83,6 +83,7 @@ public class LogicScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        PlayerPrefs.SetInt("hardHighscore", 0);
         // create player objects
         //player = Instantiate(competitorPrefab).GetComponent<Competitor>();
         player = new Competitor();
@@ -230,8 +231,7 @@ public class LogicScript : MonoBehaviour
             isLocal = false;
             UpdateScores();
             UI.ChangeUI(UI.gameResultScreen);
-            UI.UpdateGameResult(player.score, opponent.score);
-            UI.OverwriteHighscore(player.score - opponent.score, difficulty); // move this call to within UI.UpdateGameResult maybe ?
+            UI.UpdateGameResult(player.score, opponent.score, difficulty);
         }
     }
 

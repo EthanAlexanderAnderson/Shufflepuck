@@ -113,7 +113,7 @@ public class MatchmakerClient : MonoBehaviour
         Debug.Log($"Ticket assigned: {assignment.Ip}:{assignment.Port}");
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(assignment.Ip, (ushort)assignment.Port);
         NetworkManager.Singleton.StartClient();
-        UI.EnableStartButton();
+        UI.EnableReadyButton();
     }
 
     public void AddPlayer()

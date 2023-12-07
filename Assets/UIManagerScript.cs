@@ -17,7 +17,7 @@ public class UIManagerScript : MonoBehaviour
     public GameObject activePuckIcon;
     public TMP_Text errorMessage;
     public TMP_Text profilePopupText;
-    public GameObject startButton;
+    public GameObject readyButton;
     public TMP_Text waitingText;
     public GameObject waitingGif;
 
@@ -32,6 +32,7 @@ public class UIManagerScript : MonoBehaviour
 
     // result
     public Text gameResultText;
+    public Text gameResultHighscoreMessageText;
 
     // local
     public GameObject activeUI;
@@ -56,27 +57,46 @@ public class UIManagerScript : MonoBehaviour
         playerPuckCountText.text = playerPuckCount.ToString();
         opponentPuckCountText.text = opponentPuckCount.ToString();
     }
-
-    public void UpdateGameResult(int playerScore, int opponentScore)
-    {
-        if (playerScore > opponentScore)
-        {
-            gameResultText.text = "You Win!";
-        }
-        else if (playerScore < opponentScore)
-        {
-            gameResultText.text = "You Lose";
-        }
-        else
-        {
-            gameResultText.text = "Tie";
-        }
-    }
-
     public void UpdateScores(int playerScore, int opponentScore)
     {
         playerScoreText.text = playerScore.ToString();
         opponentScoreText.text = opponentScore.ToString();
+    }
+
+    public void UpdateGameResult(int playerScore, int opponentScore, int difficulty)
+    {
+        int scoreDifference = playerScore - opponentScore;
+        string[] highscoresPlayerPrefsKeys = { "easyHighscore", "mediumHighscore", "hardHighscore" };
+
+        if (playerScore > opponentScore)
+        {
+            gameResultText.text = "You Win!";
+            if (scoreDifference > PlayerPrefs.GetInt(highscoresPlayerPrefsKeys[difficulty]))
+            {
+                gameResultHighscoreMessageText.text = "You won by " + scoreDifference + " points.\nNew Highscore!";
+                OverwriteHighscore(scoreDifference, difficulty);
+            }
+        }
+        else if (playerScore < opponentScore)
+        {
+            gameResultText.text = "You Lose";
+            gameResultHighscoreMessageText.text = "";
+        }
+        else
+        {
+            gameResultText.text = "Tie";
+            gameResultHighscoreMessageText.text = "";
+        }
+
+    }
+
+    // write highscore to file and profile
+    public void OverwriteHighscore(int newHighscore, int difficulty)
+    {
+        string[] highscoresPlayerPrefsKeys = { "easyHighscore", "mediumHighscore", "hardHighscore" };
+
+        PlayerPrefs.SetInt(highscoresPlayerPrefsKeys[difficulty], newHighscore);
+        UpdateProfileText();
     }
 
     // write highscores from player prefs to profile
@@ -111,19 +131,7 @@ public class UIManagerScript : MonoBehaviour
     {
         errorMessage.text = msg;
     }
-    
-    // write highscore to file and profile
-    public void OverwriteHighscore(int newHighscore, int difficulty)
-    {
-        string[] highscoresPlayerPrefsKeys = { "easyHighscore", "mediumHighscore", "hardHighscore" };
-        string activeHighscorePlayerPrefsKey = highscoresPlayerPrefsKeys[difficulty];
-
-        if (newHighscore > PlayerPrefs.GetInt(activeHighscorePlayerPrefsKey))
-        {
-            PlayerPrefs.SetInt(activeHighscorePlayerPrefsKey, newHighscore);
-            UpdateProfileText();
-        }
-    }
+  
 
     public void ChangeUI(GameObject newUI)
     {
@@ -172,10 +180,25 @@ public class UIManagerScript : MonoBehaviour
 
     }
 
-    public void EnableStartButton()
+    // there needs to be a delay on the ready button to prevent errors with async stuff
+    public void EnableReadyButton()
     {
         waitingText.text = "0/2 Players Ready";
-        startButton.SetActive(true);
+        enabledReadyButton = true;
+        CooldownTime = 1.0f;
+    }
+
+    float CooldownTime;
+    bool enabledReadyButton;
+
+    private void Update()
+    {
+        CooldownTime -= Time.deltaTime;
+        if (enabledReadyButton && CooldownTime <= 0f)
+        {
+            readyButton.SetActive(true);
+            enabledReadyButton = false;
+        }
     }
 
     public void Toggle(GameObject gameObject)
