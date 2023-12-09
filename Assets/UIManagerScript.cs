@@ -18,8 +18,11 @@ public class UIManagerScript : MonoBehaviour
     public TMP_Text errorMessage;
     public TMP_Text profilePopupText;
     public GameObject readyButton;
-    public TMP_Text waitingText;
+
+    // Lobby
+    public TMP_Text lobbyCodeText;
     public GameObject waitingGif;
+    public TMP_Text waitingText;
 
     // HUD
     public Text turnText;
@@ -113,16 +116,31 @@ public class UIManagerScript : MonoBehaviour
     public void UpdateLocks()
     {
         string[] highscoresPlayerPrefsKeys = { "easyHighscore", "mediumHighscore", "hardHighscore" };
-        string[] locksPlayerPrefsKeys = { "easyLock", "mediumLock", "hardLock" };
+        string[] difficultyLocksPlayerPrefsKeys = { "easyLock", "mediumLock", "hardLock" };
+        int combinedHighscore = 0;
 
         // for each different highscore, if it is greater than zero, unlock all objects of cooresponding type
         for (int i = 0; i < highscoresPlayerPrefsKeys.Length; i++)
         {
-            if (PlayerPrefs.GetInt(highscoresPlayerPrefsKeys[i]) > 0)
-                foreach (GameObject go in GameObject.FindGameObjectsWithTag(locksPlayerPrefsKeys[i]))
+            int iHighscore = PlayerPrefs.GetInt(highscoresPlayerPrefsKeys[i]);
+
+            if (iHighscore > 0)
+                foreach (GameObject go in GameObject.FindGameObjectsWithTag(difficultyLocksPlayerPrefsKeys[i]))
                 {
                     go.SetActive(false);
                 }
+
+            combinedHighscore += iHighscore;
+        }
+
+        // combined highscore locks
+        string[] combinedHighscoreLocksPlayerPrefsKeys = { "combined20Lock", "combined22Lock" };
+        for (int i = 20; i <= combinedHighscore; i += 2)
+        {
+            foreach (GameObject go in GameObject.FindGameObjectsWithTag(combinedHighscoreLocksPlayerPrefsKeys[(i - 20) / 2]))
+            {
+                go.SetActive(false);
+            }
         }
     }
 
@@ -154,7 +172,8 @@ public class UIManagerScript : MonoBehaviour
 
     public void ResetWaitingScreen()
     {
-        waitingText.text = "Waiting for Opponent...";
+        waitingText.text = "Searching for Opponent...";
+        lobbyCodeText.text = "";
         waitingGif.SetActive(true);
     }
 
@@ -186,6 +205,7 @@ public class UIManagerScript : MonoBehaviour
         waitingText.text = "0/2 Players Ready";
         enabledReadyButton = true;
         CooldownTime = 1.0f;
+        waitingGif.SetActive(false);
     }
 
     float CooldownTime;
@@ -201,8 +221,14 @@ public class UIManagerScript : MonoBehaviour
         }
     }
 
+    public void FailedToFindMatch()
+    {
+        waitingText.text = "Failed to find Opponent";
+        waitingGif.SetActive(false);
+    }
+
     public void Toggle(GameObject gameObject)
     {
-        gameObject.SetActive(!true);
+        gameObject.SetActive(!gameObject);
     }
 }

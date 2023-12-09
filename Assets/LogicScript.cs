@@ -83,9 +83,11 @@ public class LogicScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        PlayerPrefs.SetInt("hardHighscore", 0);
+        //PlayerPrefs.SetInt("easyHighscore", 1);
+        //PlayerPrefs.SetInt("mediumHighscore", 1);
+        //PlayerPrefs.SetInt("highHighscore", 1);
         // create player objects
-        //player = Instantiate(competitorPrefab).GetComponent<Competitor>();
+        // player = Instantiate(competitorPrefab).GetComponent<Competitor>();
         player = new Competitor();
         player.isPlayer = true;
         //opponent = Instantiate(competitorPrefab).GetComponent<Competitor>();

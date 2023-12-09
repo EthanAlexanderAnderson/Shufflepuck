@@ -9,6 +9,12 @@ using UnityEngine;
 using System;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
+using Unity.Services.Lobbies;
+using Unity.Services.Lobbies.Models;
+using UnityEngine.UI;
+using TMPro;
+using System.Linq;
+using Unity.Services.Matchmaker.Http;
 
 public class MatchmakerClient : MonoBehaviour
 { 
@@ -51,19 +57,19 @@ public class MatchmakerClient : MonoBehaviour
     }
 
     // START ONLINE PLAY (This is NOT the same as starting a network client, that happens after matching)
-
+    // StartClient() is called by Online -> Public button
     public void StartClient()
     {
         CreateATicket();
     }
 
-    private async void CreateATicket()
+    private async void CreateATicket( string lobbyID = "PUBLIC" )
     {
         await UnityServices.InitializeAsync();
         var options = new CreateTicketOptions("Public");
-        var players = new List<Player>
+        var players = new List<Unity.Services.Matchmaker.Models.Player>
         {
-            new Player(PlayerID())
+            new Unity.Services.Matchmaker.Models.Player(PlayerID(), new MatchmakingPlayerData { LobbyID = lobbyID })
         };
 
         var ticketResponse = await MatchmakerService.Instance.CreateTicketAsync(players, options);
@@ -103,6 +109,7 @@ public class MatchmakerClient : MonoBehaviour
                     gotAssignement = true;
                     Debug.Log($"Failed to get ticket status. Timed out");
                     UI.SetErrorMessage("Connection timed out. Please try again.");
+                    UI.FailedToFindMatch();
                     break;
             }
         } while (!gotAssignement);
@@ -114,6 +121,128 @@ public class MatchmakerClient : MonoBehaviour
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(assignment.Ip, (ushort)assignment.Port);
         NetworkManager.Singleton.StartClient();
         UI.EnableReadyButton();
+    }
+
+    // this will be for host / join private lobby
+    private Lobby hostLobby;
+    bool isHost;
+    private float heartbeatTimer;
+
+    public async void CreateLobby()
+    {
+        try
+        {
+            // lobby settings
+            string lobbyName = "MyLobby";
+            int maxPlayers = 2;
+            CreateLobbyOptions options = new CreateLobbyOptions();
+            options.IsPrivate = true;
+            // create lobby
+            Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
+            // setup lobby event detector
+            LobbyEventCallbacks callbacks = new LobbyEventCallbacks();
+            callbacks.LobbyChanged += OnLobbyChanged;
+            ILobbyEvents lobbyEvents = await Lobbies.Instance.SubscribeToLobbyEventsAsync(lobby.Id, callbacks);
+            // change UI
+            hostLobby = lobby;
+            isHost = true;
+            Debug.Log("Created Lobby. Code:  " + lobby.LobbyCode);
+            UI.lobbyCodeText.text = "Lobby Code: " + lobby.LobbyCode;
+        }
+        catch (LobbyServiceException e)
+        {
+            Debug.Log(e);
+        }
+    }
+
+    /*
+    private async void CreateALobbyTicket()
+    {
+        await UnityServices.InitializeAsync();
+        var options = new CreateTicketOptions("Private");
+
+        var players = new List<Unity.Services.Matchmaker.Models.Player>
+        {
+            new Unity.Services.Matchmaker.Models.Player(PlayerID(), new MatchmakingPlayerData { LobbyID = hostLobby.Id }),
+        };
+
+        var ticketResponse = await MatchmakerService.Instance.CreateTicketAsync(players, options);
+        ticketId = ticketResponse.Id;
+        Debug.Log($"Ticket ID: {ticketId}");
+        PollTicketStatus();
+    }
+    */
+
+    public class MatchmakingPlayerData
+    {
+        public string LobbyID;
+    }
+
+    public TMP_InputField lobbyCodeInputField;
+    public async void JoinLobby()
+    {
+        try
+        {
+            // idk why this block is needed but it is
+            UpdatePlayerOptions options = new UpdatePlayerOptions();
+
+            options.Data = new Dictionary<string, PlayerDataObject>()
+            {
+                {
+                    "existing data key", new PlayerDataObject(
+                        visibility: PlayerDataObject.VisibilityOptions.Private,
+                        value: "updated data value")
+                },
+                {
+                    "new data key", new PlayerDataObject(
+                        visibility: PlayerDataObject.VisibilityOptions.Public,
+                        value: "new data value")
+                }
+            };
+            // idk block end
+            hostLobby = await Lobbies.Instance.JoinLobbyByCodeAsync(lobbyCodeInputField.text);
+            isHost = false;
+            //await LobbyService.Instance.UpdatePlayerAsync("lobbyId", PlayerID(), options);
+            Debug.Log("Joined Lobby with code: " + lobbyCodeInputField.text);
+            UI.lobbyCodeText.text = "Lobby Code: " + lobbyCodeInputField.text;
+            Debug.Log(PlayerID());
+            CreateATicket(hostLobby.Id);
+            //UI.EnableReadyButton();
+        }
+        catch (LobbyServiceException e)
+        {
+            Debug.Log(e);
+        }
+    }
+
+    private void OnLobbyChanged(ILobbyChanges changes)
+    {
+        if (changes.PlayerJoined.Changed)
+        {
+            Debug.Log("Player Joined");
+            Debug.Log("HOST ID: " + PlayerID());
+            Debug.Log("JOINER ID: " + changes.PlayerJoined.Value[0].Player.Id);
+            CreateATicket(hostLobby.Id);
+        }
+    }
+
+    private void Update()
+    {
+        Heartbeat();
+    }
+
+    public async void Heartbeat()
+    {
+        if (hostLobby != null && isHost)
+        {
+            heartbeatTimer -= Time.deltaTime;
+            if (heartbeatTimer < 0f)
+            {
+                heartbeatTimer = 20;
+                await LobbyService.Instance.SendHeartbeatPingAsync(hostLobby.Id);
+                Debug.Log("heartbeating...");
+            }
+        }
     }
 
     public void AddPlayer()
