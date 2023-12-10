@@ -70,7 +70,7 @@ public class ClientLogicScript : NetworkBehaviour
             }
         }
 
-        if ((isTurn || isShooting) && !isRunning && puckCount <= 0)
+        if ((isTurn || isShooting) && isRunning && puckCount <= 0)
         {
             activeBar = bar.ChangeBar("none");
             line.isActive = false;
@@ -112,7 +112,7 @@ public class ClientLogicScript : NetworkBehaviour
         Debug.Log("Game Over");
         isRunning = false;
 
-        UI.turnText.text = "Game Over";
+        UI.TurnText = "Game Over";
 
         // THIS WHOLE SECTION IS REMOVED TEMPORARILY
         //UI.ChangeUI(UI.gameResultScreen);

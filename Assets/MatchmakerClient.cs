@@ -158,8 +158,19 @@ public class MatchmakerClient : MonoBehaviour
     }
 
     public TMP_InputField lobbyCodeInputField;
+
+    public void ChangeJoinButtonVisibiity()
+    {
+        joinButtion.SetActive(lobbyCodeInputField.text.Length == 6);
+    }
+
     public async void JoinLobby()
     {
+        if (lobbyCodeInputField.text.Length != 6)
+        {
+            UI.SetErrorMessage("Invalid lobby code");
+            return;
+        }
         try
         {
             // idk why this block is needed but it is
@@ -191,6 +202,8 @@ public class MatchmakerClient : MonoBehaviour
         catch (LobbyServiceException e)
         {
             Debug.Log(e);
+            UI.SetErrorMessage("Lobby not found");
+            UI.FailedToFindMatch();
         }
     }
 
@@ -205,6 +218,7 @@ public class MatchmakerClient : MonoBehaviour
         }
     }
 
+    [SerializeField] private GameObject joinButtion;
     private void Update()
     {
         Heartbeat();
