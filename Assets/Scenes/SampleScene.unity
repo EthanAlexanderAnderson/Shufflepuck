@@ -1235,7 +1235,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Searching for Opponent...
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &53472732
@@ -2328,7 +2328,19 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 11
+          m_IntArgument: 12
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 817506625}
+        m_TargetAssemblyTypeName: LogicScript, Assembly-CSharp
+        m_MethodName: SwapToAltSkin
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 193781909}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -2557,7 +2569,19 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 8
+          m_IntArgument: 9
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 817506625}
+        m_TargetAssemblyTypeName: LogicScript, Assembly-CSharp
+        m_MethodName: SwapToAltSkin
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 213640656}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -2721,6 +2745,18 @@ MonoBehaviour:
       - m_Target: {fileID: 31791089}
         m_TargetAssemblyTypeName: MatchmakerClient, Assembly-CSharp
         m_MethodName: StopClient
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 31791089}
+        m_TargetAssemblyTypeName: MatchmakerClient, Assembly-CSharp
+        m_MethodName: ShutdownLobby
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3229,7 +3265,19 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 1
+          m_IntArgument: 2
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 817506625}
+        m_TargetAssemblyTypeName: LogicScript, Assembly-CSharp
+        m_MethodName: SwapToAltSkin
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 282510313}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -4780,6 +4828,18 @@ MonoBehaviour:
       - m_Target: {fileID: 31791089}
         m_TargetAssemblyTypeName: MatchmakerClient, Assembly-CSharp
         m_MethodName: StopClient
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 31791089}
+        m_TargetAssemblyTypeName: MatchmakerClient, Assembly-CSharp
+        m_MethodName: ShutdownLobby
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7490,6 +7550,18 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 817506625}
+        m_TargetAssemblyTypeName: LogicScript, Assembly-CSharp
+        m_MethodName: SwapToAltSkin
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 784028103}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -7792,6 +7864,18 @@ MonoBehaviour:
   puckCanada: {fileID: 21300000, guid: 81e2f1213bbd4d7458359a81aca4a176, type: 3}
   puckDonut: {fileID: 21300000, guid: d1c246b6b22f4794d8c42157436e7b9d, type: 3}
   puckCaptain: {fileID: 21300000, guid: b7df2d0d993f6f9408fc6c6cf2f94f62, type: 3}
+  puckBlueAlt: {fileID: 21300000, guid: ef8d6bb1a63cdf64a85f0c1470ff0610, type: 3}
+  puckGreenAlt: {fileID: 21300000, guid: 7fee330ebeea5c944b7f84dccf8fc637, type: 3}
+  puckGreyAlt: {fileID: 21300000, guid: c7b01d5f12cc73c4bb187293387a8518, type: 3}
+  puckOrangeAlt: {fileID: 21300000, guid: 221450bd546e7504892bc7683ee57415, type: 3}
+  puckPinkAlt: {fileID: 21300000, guid: 759249fb7cb498240b59794a39f00ee6, type: 3}
+  puckPurpleAlt: {fileID: 21300000, guid: adb7e4bab2d0226429b30fa263ddc000, type: 3}
+  puckRedAlt: {fileID: 21300000, guid: aa2ae5758a953ea46b3e1a0df9c360d7, type: 3}
+  puckYellowAlt: {fileID: 21300000, guid: 81eee106045c3c14dbbd7078b3a9fd98, type: 3}
+  puckRainbowAlt: {fileID: 21300000, guid: 1605b45440c256f4181642e7212f53ca, type: 3}
+  puckCanadaAlt: {fileID: 21300000, guid: 4b8a42e57b1259e458df0d1f7348cf7f, type: 3}
+  puckDonutAlt: {fileID: 21300000, guid: a1fab01bf52cdb54d85577482856f353, type: 3}
+  puckCaptainAlt: {fileID: 21300000, guid: a83df4b398eab1a439db17eb08ee6884, type: 3}
   table: {fileID: 16345473}
   puckHalo: {fileID: 1167867919}
   activeBar: none
@@ -9272,7 +9356,19 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 4
+          m_IntArgument: 5
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 817506625}
+        m_TargetAssemblyTypeName: LogicScript, Assembly-CSharp
+        m_MethodName: SwapToAltSkin
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 939333733}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -10213,7 +10309,19 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 2
+          m_IntArgument: 3
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 817506625}
+        m_TargetAssemblyTypeName: LogicScript, Assembly-CSharp
+        m_MethodName: SwapToAltSkin
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 1009962908}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -11356,7 +11464,19 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 6
+          m_IntArgument: 7
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 817506625}
+        m_TargetAssemblyTypeName: LogicScript, Assembly-CSharp
+        m_MethodName: SwapToAltSkin
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 1161285787}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -13084,7 +13204,19 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 5
+          m_IntArgument: 6
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 817506625}
+        m_TargetAssemblyTypeName: LogicScript, Assembly-CSharp
+        m_MethodName: SwapToAltSkin
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 1341837555}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -13687,7 +13819,19 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 9
+          m_IntArgument: 10
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 817506625}
+        m_TargetAssemblyTypeName: LogicScript, Assembly-CSharp
+        m_MethodName: SwapToAltSkin
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 1474745721}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -14360,7 +14504,19 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 10
+          m_IntArgument: 11
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 817506625}
+        m_TargetAssemblyTypeName: LogicScript, Assembly-CSharp
+        m_MethodName: SwapToAltSkin
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 1591559154}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -14925,6 +15081,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 31791089}
+        m_TargetAssemblyTypeName: MatchmakerClient, Assembly-CSharp
+        m_MethodName: ShutdownLobby
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1615161866
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15280,7 +15448,19 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 7
+          m_IntArgument: 8
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 817506625}
+        m_TargetAssemblyTypeName: LogicScript, Assembly-CSharp
+        m_MethodName: SwapToAltSkin
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 1629683731}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -18681,7 +18861,19 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 3
+          m_IntArgument: 4
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 817506625}
+        m_TargetAssemblyTypeName: LogicScript, Assembly-CSharp
+        m_MethodName: SwapToAltSkin
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 2101830252}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0

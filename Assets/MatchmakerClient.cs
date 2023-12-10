@@ -227,6 +227,24 @@ public class MatchmakerClient : MonoBehaviour
         }
     }
 
+    public async void ShutdownLobby()
+    {
+        try 
+        {
+            if (hostLobby != null)
+            {
+                await LobbyService.Instance.DeleteLobbyAsync(hostLobby.Id);
+            }
+        }
+        catch (LobbyServiceException e)
+        {
+            Debug.Log(e);
+        }
+
+        hostLobby = null;
+        isHost = false;
+    }
+
     public void AddPlayer()
     {
         serverLogic.AddPlayerServerRpc(logic.player.puckSpriteID);

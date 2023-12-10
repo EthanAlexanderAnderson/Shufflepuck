@@ -101,7 +101,9 @@ public class PuckScript : NetworkBehaviour
     {
         if (!IsClient) return;
 
-        Sprite puckSprite = logic.ColorIDtoPuckSprite(puckSpriteID);
+        var swapAlt = !IsPlayersPuckParameter && puckSpriteID == logic.player.puckSpriteID ? -1 : 1;
+
+        Sprite puckSprite = logic.ColorIDtoPuckSprite(puckSpriteID * swapAlt);
         spriteRenderer.sprite = puckSprite;
         playersPuck = IsPlayersPuckParameter;
 

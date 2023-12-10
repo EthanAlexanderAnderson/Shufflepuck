@@ -170,7 +170,7 @@ public class UIManagerScript : MonoBehaviour
         opponentPuckCountText.text = 5.ToString();
     }
 
-    public void ResetWaitingScreen(string waitingTextInput = "Searching for Opponent...")
+    public void ResetWaitingScreen(string waitingTextInput)
     {
         waitingText.text = waitingTextInput;
         lobbyCodeText.text = "";
@@ -187,7 +187,7 @@ public class UIManagerScript : MonoBehaviour
     {
         opponentPuckIcon.GetComponent<Image>().sprite = sprite;
     }
-
+    
     public void Host()
     {
         NetworkManager.Singleton.StartHost();

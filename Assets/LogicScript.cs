@@ -4,6 +4,7 @@
  */
 
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LogicScript : MonoBehaviour
 {
@@ -29,6 +30,20 @@ public class LogicScript : MonoBehaviour
     [SerializeField] private Sprite puckCanada;
     [SerializeField] private Sprite puckDonut;
     [SerializeField] private Sprite puckCaptain;
+
+    [SerializeField] private Sprite puckBlueAlt;
+    [SerializeField] private Sprite puckGreenAlt;
+    [SerializeField] private Sprite puckGreyAlt;
+    [SerializeField] private Sprite puckOrangeAlt;
+    [SerializeField] private Sprite puckPinkAlt;
+    [SerializeField] private Sprite puckPurpleAlt;
+    [SerializeField] private Sprite puckRedAlt;
+    [SerializeField] private Sprite puckYellowAlt;
+
+    [SerializeField] private Sprite puckRainbowAlt;
+    [SerializeField] private Sprite puckCanadaAlt;
+    [SerializeField] private Sprite puckDonutAlt;
+    [SerializeField] private Sprite puckCaptainAlt;
 
     // table
     [HideInInspector] public GameObject table;
@@ -422,13 +437,24 @@ public class LogicScript : MonoBehaviour
     // helper with the puck customization buttons
     public Sprite ColorIDtoPuckSprite(int id)
     {
-        Sprite[] puckSprites = { puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain };
-        return (puckSprites[id]);
+        Sprite[] puckSprites = { null, puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain };
+        Sprite[] puckAltSprites = { null, puckBlueAlt, puckGreenAlt, puckGreyAlt, puckOrangeAlt, puckPinkAlt, puckPurpleAlt, puckRedAlt, puckYellowAlt, puckRainbowAlt, puckCanadaAlt, puckDonutAlt, puckCaptainAlt };
+        
+        if (id > 0)
+        {
+            return (puckSprites[id]);
+        }
+        else
+        {
+            return (puckAltSprites[id * -1]);
+        }
     }
 
 // helper with the puck customization buttons
     public void SelectPlayerPuckSprite(int id)
     {
+        //if (id == player.puckSpriteID) id *= -1;
+
         player.puckSpriteID = id;
         player.puckSprite = ColorIDtoPuckSprite(id);
         UI.SetPlayerPuckIcon(player.puckSprite);
@@ -443,7 +469,7 @@ public class LogicScript : MonoBehaviour
         int rng;
         do
         {
-            rng = Random.Range(0, 8);
+            rng = Random.Range(1, 9);
             player.puckSpriteID = rng;
             player.puckSprite = ColorIDtoPuckSprite(rng);
         } while (prev == player.puckSprite);
@@ -457,9 +483,27 @@ public class LogicScript : MonoBehaviour
     {
         do
         {
-            opponent.puckSprite = ColorIDtoPuckSprite(Random.Range(0, 8));
+            opponent.puckSprite = ColorIDtoPuckSprite(Random.Range(1, 9));
         } while (opponent.puckSprite == player.puckSprite);
         UI.SetOpponentPuckIcon(opponent.puckSprite);
+    }
+
+    public void SwapToAltSkin(GameObject gameObject)
+    {
+        Debug.Log(player.puckSpriteID);
+
+        if (gameObject.tag == "alt")
+        {
+            SelectPlayerPuckSprite(player.puckSpriteID * -1);
+            gameObject.tag = "Untagged";
+
+        } 
+        else
+        {
+            gameObject.tag = "alt";
+        }
+
+        gameObject.GetComponent<Image>().sprite = ColorIDtoPuckSprite(player.puckSpriteID * -1);
     }
 
     // back button after match is over

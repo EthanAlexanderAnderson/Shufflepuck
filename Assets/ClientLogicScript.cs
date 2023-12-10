@@ -134,13 +134,16 @@ public class ClientLogicScript : NetworkBehaviour
         Debug.Log("Client: Restarting game");
         Debug.Log($"player : {logic.player.puckSpriteID}     0 : {puckSpriteID_0}   1 : {puckSpriteID_1}");
 
+        // Set player and opp skin. if both players use same skin, swap opp to alt skin
         if (puckSpriteID_0 == logic.player.puckSpriteID)
         {
-            UI.SetOpponentPuckIcon(logic.ColorIDtoPuckSprite(puckSpriteID_1));
+            var swapAlt = puckSpriteID_0 == puckSpriteID_1 ? -1 : 1;
+            UI.SetOpponentPuckIcon(logic.ColorIDtoPuckSprite(puckSpriteID_1 * swapAlt));
         }
         else
         {
-            UI.SetOpponentPuckIcon(logic.ColorIDtoPuckSprite(puckSpriteID_0));
+            var swapAlt = puckSpriteID_0 == puckSpriteID_1 ? -1 : 1;
+            UI.SetOpponentPuckIcon(logic.ColorIDtoPuckSprite(puckSpriteID_0 * swapAlt));
         }
 
         puckHalo.SetActive(false);
