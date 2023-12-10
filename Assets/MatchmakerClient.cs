@@ -155,24 +155,6 @@ public class MatchmakerClient : MonoBehaviour
         }
     }
 
-    /*
-    private async void CreateALobbyTicket()
-    {
-        await UnityServices.InitializeAsync();
-        var options = new CreateTicketOptions("Private");
-
-        var players = new List<Unity.Services.Matchmaker.Models.Player>
-        {
-            new Unity.Services.Matchmaker.Models.Player(PlayerID(), new MatchmakingPlayerData { LobbyID = hostLobby.Id }),
-        };
-
-        var ticketResponse = await MatchmakerService.Instance.CreateTicketAsync(players, options);
-        ticketId = ticketResponse.Id;
-        Debug.Log($"Ticket ID: {ticketId}");
-        PollTicketStatus();
-    }
-    */
-
     public class MatchmakingPlayerData
     {
         public string LobbyID;

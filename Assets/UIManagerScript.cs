@@ -170,9 +170,9 @@ public class UIManagerScript : MonoBehaviour
         opponentPuckCountText.text = 5.ToString();
     }
 
-    public void ResetWaitingScreen()
+    public void ResetWaitingScreen(string waitingTextInput = "Searching for Opponent...")
     {
-        waitingText.text = "Searching for Opponent...";
+        waitingText.text = waitingTextInput;
         lobbyCodeText.text = "";
         waitingGif.SetActive(true);
     }
