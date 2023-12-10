@@ -139,7 +139,6 @@ public class LogicScript : MonoBehaviour
             {
                 activeBar = bar.ChangeBar("angle");
                 line.isActive = true;
-                UI.SetTurnTextActive();
                 UI.TurnText = "Your Turn";
                 CreatePuck(true);
                 player.isTurn = false;
@@ -182,7 +181,6 @@ public class LogicScript : MonoBehaviour
             {
                 activeBar = bar.ChangeBar("angle");
                 line.isActive = true;
-                UI.SetTurnTextActive();
                 UI.TurnText = isLocal ? "Opponent's Turn":"CPU's Turn";
                 CreatePuck(false);
                 opponent.isTurn = false;

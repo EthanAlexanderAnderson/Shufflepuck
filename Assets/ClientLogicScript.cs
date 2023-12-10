@@ -40,7 +40,6 @@ public class ClientLogicScript : NetworkBehaviour
         {
             activeBar = bar.ChangeBar("angle");
             line.isActive = true;
-            UI.SetTurnTextActive();
             UI.TurnText = "Your Turn";
             serverLogic.CreatePuckServerRpc();
             isTurn = false;

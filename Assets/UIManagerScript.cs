@@ -48,14 +48,8 @@ public class UIManagerScript : MonoBehaviour
         }
     }
 
-    public void SetTurnTextActive()
-    {
-        turnText.gameObject.SetActive(true);
-    }
-
     public void PostShotUpdate(int playerPuckCount, int opponentPuckCount)
     {
-        turnText.gameObject.SetActive(false);
         playerPuckCountText.text = playerPuckCount.ToString();
         opponentPuckCountText.text = opponentPuckCount.ToString();
     }
