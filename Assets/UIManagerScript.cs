@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using Unity.Netcode;
 using TMPro;
-using System.Collections.Generic;
 
 public class UIManagerScript : MonoBehaviour
 {
@@ -106,7 +105,7 @@ public class UIManagerScript : MonoBehaviour
     public void UpdateProfileText()
     {
         profilePopupText.text =
-            "Highscores: \n" +
+            "Highscores: \n\n" +
             "\nEasy: " + PlayerPrefs.GetInt("easyHighscore") +
             "\nMedium: " + PlayerPrefs.GetInt("mediumHighscore") +
             "\nHard: " + PlayerPrefs.GetInt("hardHighscore");
@@ -142,6 +141,26 @@ public class UIManagerScript : MonoBehaviour
                 go.SetActive(false);
             }
         }
+    }
+
+    int[] highscoreBackup = new int[] { 0, 0, 0 };
+    public void ResetHighscores()
+    {
+        highscoreBackup[0] = PlayerPrefs.GetInt("easyHighscore");
+        highscoreBackup[1] = PlayerPrefs.GetInt("mediumHighscore");
+        highscoreBackup[2] = PlayerPrefs.GetInt("hardHighscore");
+        PlayerPrefs.SetInt("easyHighscore", 0);
+        PlayerPrefs.SetInt("mediumHighscore", 0);
+        PlayerPrefs.SetInt("hardHighscore", 0);
+        UpdateProfileText();
+    }
+
+    public void UndoResetHighscores()
+    {
+        PlayerPrefs.SetInt("easyHighscore", highscoreBackup[0]);
+        PlayerPrefs.SetInt("mediumHighscore", highscoreBackup[1]);
+        PlayerPrefs.SetInt("hardHighscore", highscoreBackup[2]);
+        UpdateProfileText();
     }
 
     // shows up when you click something locked
@@ -229,6 +248,7 @@ public class UIManagerScript : MonoBehaviour
 
     public void Toggle(GameObject gameObject)
     {
-        gameObject.SetActive(!gameObject);
+        gameObject.SetActive(!gameObject.activeInHierarchy);
     }
+
 }

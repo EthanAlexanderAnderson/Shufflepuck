@@ -17,6 +17,9 @@ public class LogicScript : MonoBehaviour
     //public GameObject CPUPrefab;
 
     // sprites
+    
+    [SerializeField] private Sprite puckFlower;
+
     [SerializeField] private Sprite puckBlue;
     [SerializeField] private Sprite puckGreen;
     [SerializeField] private Sprite puckGrey;
@@ -256,6 +259,10 @@ public class LogicScript : MonoBehaviour
     {
         activeBar = bar.ChangeBar("none");
         line.isActive = false;
+        //Debug.Log((activeCompetitor == null ? "activeCompetitor is null " : "") + (activeCompetitor.activePuckScript == null ? "activeCompetitor.activePuckScript is null" : ""));
+        Debug.Log(activeCompetitor + " " + activeCompetitor.isPlayer);
+        Debug.Log(activeCompetitor.activePuckScript);
+        Debug.Log(angle +"   "+ power+"   "+spin);
         activeCompetitor.activePuckScript.Shoot(angle, power, spin);
         activeCompetitor.isShooting = false;
         activeCompetitor.puckCount--;
@@ -286,6 +293,8 @@ public class LogicScript : MonoBehaviour
         player.isShooting = false;
         opponent.isTurn = true;
         opponent.isShooting = false;
+        activeCompetitor = opponent;
+        nonActiveCompetitor = player;
         gameIsRunning = true;
         // reset UI text
         puckHalo.SetActive(diff == 0);
@@ -328,32 +337,17 @@ public class LogicScript : MonoBehaviour
             player.activePuckObject = Instantiate(puckPrefab, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
             player.activePuckScript = player.activePuckObject.GetComponent<PuckScript>();
             player.activePuckScript.InitPuck(true, player.puckSprite);
+            Debug.Log("create puck aps: " + player.activePuckScript);
         }
         else
         {
             opponent.activePuckObject = Instantiate(puckPrefab, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
             opponent.activePuckScript = opponent.activePuckObject.GetComponent<PuckScript>();
             opponent.activePuckScript.InitPuck(false, opponent.puckSprite);
+            Debug.Log("create puck aps: " + opponent.activePuckScript);
         }
     }
-    /*
-    public void IntializePuck(bool IsPlayersPuck, GameObject activePuckObject)
-    {
-        Debug.Log("Calling IntializePuck");
-        if (IsPlayersPuck)
-        {
-            player.activePuckObject = activePuckObject;
-            player.activePuckScript = player.activePuckObject.GetComponent<PuckScript>();
-            player.activePuckScript.InitPuck(true, player.puckSprite);
-        }
-        else
-        {
-            opponent.activePuckObject = activePuckObject;
-            opponent.activePuckScript = opponent.activePuckObject.GetComponent<PuckScript>();
-            opponent.activePuckScript.InitPuck(false, opponent.puckSprite);
-        }
-    }
-    */
+
     // useful helper function for deciding when to allow actions. Returns true when all pucks have stopped moving
     private PuckScript pucki;
     public bool AllPucksAreStopped()
@@ -432,15 +426,16 @@ public class LogicScript : MonoBehaviour
         {
             Destroy(obj);
         }
+
     }
 
     // helper with the puck customization buttons
     public Sprite ColorIDtoPuckSprite(int id)
     {
-        Sprite[] puckSprites = { null, puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain };
+        Sprite[] puckSprites = { puckFlower, puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain };
         Sprite[] puckAltSprites = { null, puckBlueAlt, puckGreenAlt, puckGreyAlt, puckOrangeAlt, puckPinkAlt, puckPurpleAlt, puckRedAlt, puckYellowAlt, puckRainbowAlt, puckCanadaAlt, puckDonutAlt, puckCaptainAlt };
         
-        if (id > 0)
+        if (id >= 0)
         {
             return (puckSprites[id]);
         }
@@ -504,6 +499,16 @@ public class LogicScript : MonoBehaviour
         }
 
         gameObject.GetComponent<Image>().sprite = ColorIDtoPuckSprite(player.puckSpriteID * -1);
+    }
+
+    int easterEgg = 0;
+    public void EasterEgg()
+    {
+        easterEgg++;
+        if (easterEgg == 10)
+        {
+            SelectPlayerPuckSprite(0);
+        }
     }
 
     // back button after match is over
