@@ -1,7 +1,5 @@
 // Script to control the moving line on the angle/power/spin bar
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class LineScript : MonoBehaviour

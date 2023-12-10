@@ -11,10 +11,7 @@ using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
-using UnityEngine.UI;
 using TMPro;
-using System.Linq;
-using Unity.Services.Matchmaker.Http;
 
 public class MatchmakerClient : MonoBehaviour
 { 

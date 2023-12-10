@@ -1,7 +1,5 @@
 // Script to control the angle/power/spin bar
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BarScript : MonoBehaviour

@@ -2,8 +2,6 @@
  * these scripts when it generates.
  */
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 

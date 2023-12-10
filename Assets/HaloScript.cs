@@ -1,7 +1,5 @@
 // Script to control the predicted shot location on easy mode
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class HaloScript : MonoBehaviour
