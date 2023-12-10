@@ -74,3 +74,7 @@ crashlytics-build.properties
 # added by ethan
 .utmp
 **/lib_burst_generated.txt
+*DoNotShip*
+/AppleBuild/
+/LinuxBuild/
+/WindowsBuild/

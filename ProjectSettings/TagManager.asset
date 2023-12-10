@@ -16,6 +16,7 @@ TagManager:
   - competitor
   - combined20Lock
   - combined22Lock
+  - alt
   layers:
   - Default
   - TransparentFX
