@@ -120,7 +120,9 @@ public class LogicScript : MonoBehaviour
         // load play prefs data
         UI.UpdateProfileText();
         UI.UpdateLocks();
-        SelectPlayerPuckSprite(PlayerPrefs.GetInt("puck"));
+        // load puck id, but not dev skin
+        SelectPlayerPuckSprite(PlayerPrefs.GetInt("puck") == 0 ? 1 : PlayerPrefs.GetInt("puck"));
+        //SelectPlayerPuckSprite(PlayerPrefs.GetInt("puck"));
         activeCompetitor = opponent;
         nonActiveCompetitor = player;
     }
