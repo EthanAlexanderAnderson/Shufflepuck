@@ -112,14 +112,6 @@ public class ClientLogicScript : NetworkBehaviour
         isRunning = false;
 
         UI.TurnText = "Game Over";
-
-        // THIS WHOLE SECTION IS REMOVED TEMPORARILY
-        //UI.ChangeUI(UI.gameResultScreen);
-        //UI.gameResultText.text = "Game Over!";
-        //UI.gameResultText.enabled = true;
-
-        // TODO: Make this work
-        //UI.UpdateGameResult(logic.player.score, logic.opponent.score);
     }
 
     [ClientRpc]

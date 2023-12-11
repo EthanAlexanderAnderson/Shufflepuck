@@ -7,10 +7,7 @@ public class ServerLogicScript : NetworkBehaviour
 {
     
     public GameObject puck;
-    //public Sprite puckSprite;
 
-    //private UIManagerScript UI;
-    //private LogicScript logic;
     private ClientLogicScript clientLogic;
 
     private List<ulong> clients = new(); // List of Client IDs
@@ -23,11 +20,9 @@ public class ServerLogicScript : NetworkBehaviour
     private GameObject activePuck;
 
     private int activeCompetitorIndex;
-    //public Competitor nonActiveCompetitor; // Let's not use this unless necessary
 
     private void OnEnable()
     {
-        //logic = GameObject.FindGameObjectWithTag("logic").GetComponent<LogicScript>();
         clientLogic = GameObject.FindGameObjectWithTag("logic").GetComponent<ClientLogicScript>();
     }
 
@@ -81,7 +76,6 @@ public class ServerLogicScript : NetworkBehaviour
 
         clientLogic.RestartGameOnlineClientRpc(competitorList[0].puckSpriteID, competitorList[1].puckSpriteID);
         clientLogic.StartTurnClientRpc(clientRpcParamsList[activeCompetitorIndex]);
-        //nonActiveCompetitor = randomInt == 1 ? competitorList[0] : competitorList[1];
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -109,14 +103,11 @@ public class ServerLogicScript : NetworkBehaviour
 
         PuckScript puckScript = puckObject.GetComponent<PuckScript>();
 
-        //competitorPuckCountList[activeCompetitorIndex]--;
-
         // tell the active competitor this new puck is theirs, tell non-active competitors it's not theirs
         for (int i = 0; i < competitorList.Count; i++)
         {
             puckScript.InitPuckClientRpc( i == activeCompetitorIndex, puckSpriteID, clientRpcParamsList[i] );
         }
-        //puckScript.InitPuckClientRpc(true, puckSpriteID);
         competitor.activePuckScript = puckScript;
 
         Debug.Log(
@@ -141,21 +132,6 @@ public class ServerLogicScript : NetworkBehaviour
         clientLogic.UpdatePuckCountClientRpc(false, competitorPuckCountList[activeCompetitorIndex], clientRpcParamsList[SwapCompetitors()]);
         // Also no idea if this works ^^^
 
-
-        // NO IDEA IF THIS SCALES PAST 2 PLAYERS (update it doesn't work regardless)
-        // for each player
-        /*
-        for (int i = 0; i < clientRpcParamsList.Count; i++)
-        {
-            // send each puck count
-            for (int j = 0; j < competitorList.Count; j++)
-            {
-                // send to the active player with true and non-active with false
-                clientLogic.UpdatePuckCountClientRpc((j == activeCompetitorIndex && i == activeCompetitorIndex), competitorPuckCountList[j], clientRpcParamsList[i]);
-            }
-            SwapCompetitors();
-        }
-        */
         clientLogic.StartTurnClientRpc(clientRpcParamsList[activeCompetitorIndex]);
     }
 

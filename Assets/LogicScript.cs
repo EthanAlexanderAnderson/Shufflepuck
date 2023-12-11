@@ -9,12 +9,9 @@ using UnityEngine.UI;
 public class LogicScript : MonoBehaviour
 {
     private UIManagerScript UI;
-    private ServerLogicScript serverLogic;
 
     // prefabs
     public GameObject puckPrefab; // default puck prefab
-    //public GameObject competitorPrefab;
-    //public GameObject CPUPrefab;
 
     // sprites
     
@@ -101,28 +98,19 @@ public class LogicScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //PlayerPrefs.SetInt("easyHighscore", 1);
-        //PlayerPrefs.SetInt("mediumHighscore", 1);
-        //PlayerPrefs.SetInt("highHighscore", 1);
         // create player objects
-        // player = Instantiate(competitorPrefab).GetComponent<Competitor>();
-        player = new Competitor();
-        player.isPlayer = true;
-        //opponent = Instantiate(competitorPrefab).GetComponent<Competitor>();
-        opponent = new Competitor();
-        opponent.isPlayer = false;
+        player = new Competitor { isPlayer = true };
+        opponent = new Competitor { isPlayer = false };
         Application.targetFrameRate = 30;
         // connect scripts
         bar = GameObject.FindGameObjectWithTag("bar").GetComponent<BarScript>();
         line = GameObject.FindGameObjectWithTag("line").GetComponent<LineScript>();
         UI = GameObject.FindGameObjectWithTag("ui").GetComponent<UIManagerScript>();
-        serverLogic = GameObject.FindGameObjectWithTag("logic").GetComponent<ServerLogicScript>();
         // load play prefs data
         UI.UpdateProfileText();
         UI.UpdateLocks();
         // load puck id, but not dev skin
         SelectPlayerPuckSprite(PlayerPrefs.GetInt("puck") == 0 ? 1 : PlayerPrefs.GetInt("puck"));
-        //SelectPlayerPuckSprite(PlayerPrefs.GetInt("puck"));
         activeCompetitor = opponent;
         nonActiveCompetitor = player;
     }
@@ -259,7 +247,6 @@ public class LogicScript : MonoBehaviour
     {
         activeBar = bar.ChangeBar("none");
         line.isActive = false;
-        //Debug.Log((activeCompetitor == null ? "activeCompetitor is null " : "") + (activeCompetitor.activePuckScript == null ? "activeCompetitor.activePuckScript is null" : ""));
         Debug.Log(activeCompetitor + " " + activeCompetitor.isPlayer);
         Debug.Log(activeCompetitor.activePuckScript);
         Debug.Log(angle +"   "+ power+"   "+spin);
@@ -448,8 +435,6 @@ public class LogicScript : MonoBehaviour
 // helper with the puck customization buttons
     public void SelectPlayerPuckSprite(int id)
     {
-        //if (id == player.puckSpriteID) id *= -1;
-
         player.puckSpriteID = id;
         player.puckSprite = ColorIDtoPuckSprite(id);
         UI.SetPlayerPuckIcon(player.puckSprite);

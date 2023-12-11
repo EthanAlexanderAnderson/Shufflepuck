@@ -17,8 +17,7 @@ public class PuckScript : NetworkBehaviour
     public AudioSource pointPlayerSFX;
     public AudioSource pointCPUSFX;
 
-    // script variables ( this are public only for debugging, changing power/angle does nothing)
-
+    // script variables
     private bool shot;
     private bool safe;
     private bool pastSafeLine;
@@ -37,17 +36,6 @@ public class PuckScript : NetworkBehaviour
     private int zoneMultiplier = 0;
 
     private LogicScript logic;
-
-    /*
-    [ServerRpc(RequireOwnership = false)]
-    public void SpawnPuckServerRpc()
-    {
-        if (!IsServer) return;
-        gameObject.GetComponent<NetworkObject>().Spawn();
-        Debug.Log("Server: puck has been spawned");
-        SpawnedPuckConfirmationClientRpc();
-    }
-    */
 
     void OnEnable()
     {

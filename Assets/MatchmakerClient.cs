@@ -16,7 +16,6 @@ using TMPro;
 public class MatchmakerClient : MonoBehaviour
 { 
     private string ticketId;
-    //[SerializeField] private GameObject gameHUD;
     private UIManagerScript UI;
     private ServerLogicScript serverLogic;
     private LogicScript logic;
@@ -202,12 +201,10 @@ public class MatchmakerClient : MonoBehaviour
             // idk block end
             hostLobby = await Lobbies.Instance.JoinLobbyByCodeAsync(lobbyCodeInputField.text);
             isHost = false;
-            //await LobbyService.Instance.UpdatePlayerAsync("lobbyId", PlayerID(), options);
             Debug.Log("Joined Lobby with code: " + lobbyCodeInputField.text);
             UI.lobbyCodeText.text = "Lobby Code: " + lobbyCodeInputField.text;
             Debug.Log(PlayerID());
             CreateATicket(hostLobby.Id);
-            //UI.EnableReadyButton();
         }
         catch (LobbyServiceException e)
         {
