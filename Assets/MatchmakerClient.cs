@@ -69,10 +69,19 @@ public class MatchmakerClient : MonoBehaviour
             new Unity.Services.Matchmaker.Models.Player(PlayerID(), new MatchmakingPlayerData { LobbyID = lobbyID })
         };
 
-        var ticketResponse = await MatchmakerService.Instance.CreateTicketAsync(players, options);
-        ticketId = ticketResponse.Id;
-        Debug.Log($"Ticket ID: {ticketId}");
-        PollTicketStatus();
+        try
+        {
+            var ticketResponse = await MatchmakerService.Instance.CreateTicketAsync(players, options);
+            ticketId = ticketResponse.Id;
+            Debug.Log($"Ticket ID: {ticketId}");
+            PollTicketStatus();
+        }
+        catch (MatchmakerServiceException e)
+        {
+            Debug.Log(e);
+            UI.SetErrorMessage("Failed to connect to server. Please try again.");
+            UI.FailedToFindMatch();
+        }
     }
 
     private async void PollTicketStatus()
@@ -149,6 +158,7 @@ public class MatchmakerClient : MonoBehaviour
         catch (LobbyServiceException e)
         {
             Debug.Log(e);
+            UI.SetErrorMessage("Failed to create Lobby. Please try again.");
         }
     }
 
@@ -168,7 +178,7 @@ public class MatchmakerClient : MonoBehaviour
     {
         if (lobbyCodeInputField.text.Length != 6)
         {
-            UI.SetErrorMessage("Invalid lobby code");
+            UI.SetErrorMessage("Invalid lobby code.");
             return;
         }
         try
@@ -202,7 +212,7 @@ public class MatchmakerClient : MonoBehaviour
         catch (LobbyServiceException e)
         {
             Debug.Log(e);
-            UI.SetErrorMessage("Lobby not found");
+            UI.SetErrorMessage("Lobby not found.");
             UI.FailedToFindMatch();
         }
     }
