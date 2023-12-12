@@ -6,12 +6,12 @@ using UnityEngine;
 
 public class CPUPathScript : MonoBehaviour
 {
-    private List<GameObject> pucksInPath = new List<GameObject>();
+    List<GameObject> pucksInPath = new();
     public List<GameObject> GetPucksInPath() { return pucksInPath; }
 
-    public float angle;
-    public float power;
-    public float spin;
+    [SerializeField] float angle;
+    [SerializeField] float power;
+    [SerializeField] float spin;
     public int value;
 
     public (float, float, float) GetPath() { return (angle, power, spin); }
