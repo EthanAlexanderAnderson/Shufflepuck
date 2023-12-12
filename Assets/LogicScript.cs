@@ -8,64 +8,61 @@ using UnityEngine.UI;
 
 public class LogicScript : MonoBehaviour
 {
-    private UIManagerScript UI;
+    UIManagerScript UI;
 
     // prefabs
     public GameObject puckPrefab; // default puck prefab
 
     // sprites
     
-    [SerializeField] private Sprite puckFlower;
+    [SerializeField] Sprite puckFlower;
 
-    [SerializeField] private Sprite puckBlue;
-    [SerializeField] private Sprite puckGreen;
-    [SerializeField] private Sprite puckGrey;
-    [SerializeField] private Sprite puckOrange;
-    [SerializeField] private Sprite puckPink;
-    [SerializeField] private Sprite puckPurple;
-    [SerializeField] private Sprite puckRed;
-    [SerializeField] private Sprite puckYellow;
+    [SerializeField] Sprite puckBlue;
+    [SerializeField] Sprite puckGreen;
+    [SerializeField] Sprite puckGrey;
+    [SerializeField] Sprite puckOrange;
+    [SerializeField] Sprite puckPink;
+    [SerializeField] Sprite puckPurple;
+    [SerializeField] Sprite puckRed;
+    [SerializeField] Sprite puckYellow;
 
-    [SerializeField] private Sprite puckRainbow;
-    [SerializeField] private Sprite puckCanada;
-    [SerializeField] private Sprite puckDonut;
-    [SerializeField] private Sprite puckCaptain;
+    [SerializeField] Sprite puckRainbow;
+    [SerializeField] Sprite puckCanada;
+    [SerializeField] Sprite puckDonut;
+    [SerializeField] Sprite puckCaptain;
 
-    [SerializeField] private Sprite puckBlueAlt;
-    [SerializeField] private Sprite puckGreenAlt;
-    [SerializeField] private Sprite puckGreyAlt;
-    [SerializeField] private Sprite puckOrangeAlt;
-    [SerializeField] private Sprite puckPinkAlt;
-    [SerializeField] private Sprite puckPurpleAlt;
-    [SerializeField] private Sprite puckRedAlt;
-    [SerializeField] private Sprite puckYellowAlt;
+    [SerializeField] Sprite puckBlueAlt;
+    [SerializeField] Sprite puckGreenAlt;
+    [SerializeField] Sprite puckGreyAlt;
+    [SerializeField] Sprite puckOrangeAlt;
+    [SerializeField] Sprite puckPinkAlt;
+    [SerializeField] Sprite puckPurpleAlt;
+    [SerializeField] Sprite puckRedAlt;
+    [SerializeField] Sprite puckYellowAlt;
 
-    [SerializeField] private Sprite puckRainbowAlt;
-    [SerializeField] private Sprite puckCanadaAlt;
-    [SerializeField] private Sprite puckDonutAlt;
-    [SerializeField] private Sprite puckCaptainAlt;
+    [SerializeField] Sprite puckRainbowAlt;
+    [SerializeField] Sprite puckCanadaAlt;
+    [SerializeField] Sprite puckDonutAlt;
+    [SerializeField] Sprite puckCaptainAlt;
 
-    // table
-    [HideInInspector] public GameObject table;
-
-    public GameObject puckHalo;
+    [SerializeField] GameObject puckHalo;
 
     // bar and line
-    private BarScript bar;
-    private LineScript line;
+    BarScript bar;
+    LineScript line;
     public string activeBar = "none";
-    public float angle;
-    public float power;
-    public float spin;
+    float angle;
+    float power;
+    float spin;
 
     // game state
-    public bool gameIsRunning;
-    public float timer = 0;
+    bool gameIsRunning;
+    float timer = 0;
     public int difficulty; // 0 easy 1 medium 2 hard
-    public bool goingFirst;
+    bool goingFirst;
 
     //public bool isLocal;
-    public bool isLocal;
+    bool isLocal;
     public bool IsLocal
     {
         get => isLocal;
@@ -75,7 +72,7 @@ public class LogicScript : MonoBehaviour
         }
     }
 
-    public bool isOnline;
+    bool isOnline;
     public bool IsOnline
     {
         get => isOnline;
@@ -528,7 +525,7 @@ public class LogicScript : MonoBehaviour
         // chose the highest-value unblocked path
         if (highestValue > 0)
         {
-            return (best.angle, best.power, best.spin);
+            return best.GetPath();
         }
         // otherwise, Shoot random
         else

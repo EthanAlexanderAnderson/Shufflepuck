@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class LineScript : MonoBehaviour
 {
-    private LogicScript logic;
-    public SpriteRenderer spriteRenderer;
+    LogicScript logic;
+    [SerializeField] SpriteRenderer spriteRenderer;
 
-    public bool movingLeft = false;
-    public float moveSpeed;
+    bool movingLeft;
+    float moveSpeed;
+
     public float value;
-
     public bool isActive;
 
     // Start is called before the first frame update
@@ -24,7 +24,7 @@ public class LineScript : MonoBehaviour
     void Update()
     {
         // change line speed based on match difficulty
-        if (logic.difficulty == 2 && !logic.isLocal && !logic.isOnline)
+        if (logic.difficulty == 2 && !logic.IsLocal && !logic.IsOnline)
         {
             moveSpeed = 20;
         }

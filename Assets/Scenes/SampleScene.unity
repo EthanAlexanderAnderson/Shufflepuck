@@ -168,7 +168,7 @@ MonoBehaviour:
   angle: 50
   power: 50
   spin: 50
-  value: 5
+  value: 0
 --- !u!61 &756733
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1070,6 +1070,18 @@ MonoBehaviour:
           m_StringArgument: Online play is not available in this version.
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 817506625}
+        m_TargetAssemblyTypeName: LogicScript, Assembly-CSharp
+        m_MethodName: ClearAllPucks
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &39654171
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1206,18 +1218,6 @@ MonoBehaviour:
       - m_Target: {fileID: 53472734}
         m_TargetAssemblyTypeName: MatchmakerClient, Assembly-CSharp
         m_MethodName: StartClient
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 817506625}
-        m_TargetAssemblyTypeName: LogicScript, Assembly-CSharp
-        m_MethodName: ClearAllPucks
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1567,7 +1567,7 @@ MonoBehaviour:
   angle: 98
   power: 101
   spin: 0
-  value: 1
+  value: 0
 --- !u!60 &73639749
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -1821,7 +1821,7 @@ MonoBehaviour:
   angle: 22
   power: 85
   spin: 100
-  value: 3
+  value: 0
 --- !u!60 &141762928
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -2434,7 +2434,7 @@ MonoBehaviour:
   angle: 40
   power: 55
   spin: 50
-  value: 4
+  value: 0
 --- !u!61 &207078887
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3663,7 +3663,7 @@ MonoBehaviour:
   angle: 72
   power: 80
   spin: 0
-  value: 6
+  value: 0
 --- !u!60 &345272539
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -4991,6 +4991,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 817506625}
+        m_TargetAssemblyTypeName: LogicScript, Assembly-CSharp
+        m_MethodName: ClearAllPucks
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &456539291
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5077,7 +5089,7 @@ MonoBehaviour:
   angle: 78
   power: 85
   spin: 0
-  value: 3
+  value: 0
 --- !u!60 &459286197
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -5673,7 +5685,7 @@ MonoBehaviour:
   angle: 2
   power: 101
   spin: 100
-  value: 1
+  value: 0
 --- !u!60 &541556641
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -6222,7 +6234,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 656067662}
         m_TargetAssemblyTypeName: AudioButtonScript, Assembly-CSharp
-        m_MethodName: toggleSound
+        m_MethodName: ToggleSound
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6663,7 +6675,7 @@ MonoBehaviour:
   angle: 83.1
   power: 82.4
   spin: 50
-  value: 2
+  value: 0
 --- !u!61 &683211351
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -8175,18 +8187,9 @@ MonoBehaviour:
   puckCanadaAlt: {fileID: 21300000, guid: 4b8a42e57b1259e458df0d1f7348cf7f, type: 3}
   puckDonutAlt: {fileID: 21300000, guid: a1fab01bf52cdb54d85577482856f353, type: 3}
   puckCaptainAlt: {fileID: 21300000, guid: a83df4b398eab1a439db17eb08ee6884, type: 3}
-  table: {fileID: 16345473}
   puckHalo: {fileID: 1167867919}
   activeBar: none
-  angle: 0
-  power: 0
-  spin: 0
-  gameIsRunning: 0
-  timer: 0
   difficulty: 0
-  goingFirst: 0
-  isLocal: 0
-  isOnline: 0
   CPUShotAngle: 0
   CPUShotPower: 0
   CPUShotSpin: 50
@@ -8512,7 +8515,7 @@ MonoBehaviour:
   angle: 28
   power: 80
   spin: 100
-  value: 6
+  value: 0
 --- !u!60 &835633550
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -8747,30 +8750,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 31791089}
-        m_TargetAssemblyTypeName: MatchmakerClient, Assembly-CSharp
-        m_MethodName: CreateLobby
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 817506625}
-        m_TargetAssemblyTypeName: LogicScript, Assembly-CSharp
-        m_MethodName: ClearAllPucks
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
       - m_Target: {fileID: 671090517}
         m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
         m_MethodName: ChangeUI
@@ -8778,6 +8757,18 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 573404777}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 31791089}
+        m_TargetAssemblyTypeName: MatchmakerClient, Assembly-CSharp
+        m_MethodName: CreateLobby
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -9309,7 +9300,7 @@ MonoBehaviour:
   angle: 60
   power: 55
   spin: 50
-  value: 4
+  value: 0
 --- !u!61 &917655134
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -9784,8 +9775,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 941852555}
-  movingLeft: 0
-  moveSpeed: 10
   value: 50
   isActive: 0
 --- !u!212 &941852555
@@ -12453,7 +12442,7 @@ MonoBehaviour:
   angle: 50
   power: 70
   spin: 50
-  value: 7
+  value: 0
 --- !u!61 &1237600845
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -12850,18 +12839,6 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 671090517}
         m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
-        m_MethodName: ResetWaitingScreen
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: Joining Lobby...
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 671090517}
-        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
         m_MethodName: ChangeUI
         m_Mode: 2
         m_Arguments:
@@ -12882,6 +12859,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: ResetWaitingScreen
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Joining Lobby...
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1298114023
@@ -13781,7 +13770,7 @@ GameObject:
   - component: {fileID: 1381086582}
   - component: {fileID: 1381086581}
   m_Layer: 5
-  m_Name: Undo Button
+  m_Name: Trash Undo Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14148,7 +14137,6 @@ GameObject:
   - component: {fileID: 1429334132}
   - component: {fileID: 1429334131}
   - component: {fileID: 1429334130}
-  - component: {fileID: 1429334129}
   m_Layer: 5
   m_Name: Trash Confirm Button
   m_TagString: Untagged
@@ -14175,21 +14163,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -1570}
   m_SizeDelta: {x: 240, y: 260}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1429334129
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1429334127}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: db63eba046514aa48a266ad56a1f7e3d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  volumeButton: {fileID: 1429334130}
-  volumeEnabled: {fileID: 21300000, guid: 83cf8cc0cb2238945b4819dd46fe2929, type: 3}
-  volumeDisabled: {fileID: 21300000, guid: 1a2463adafc2ea84489fed6c04aca1da, type: 3}
 --- !u!114 &1429334130
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16088,7 +16061,7 @@ MonoBehaviour:
   angle: 16.9
   power: 82.4
   spin: 50
-  value: 2
+  value: 0
 --- !u!61 &1618170138
 BoxCollider2D:
   m_ObjectHideFlags: 0

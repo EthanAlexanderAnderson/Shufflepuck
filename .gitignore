@@ -78,3 +78,5 @@ crashlytics-build.properties
 /AppleBuild/
 /LinuxBuild/
 /WindowsBuild/
+.editorconfig
+*.txt

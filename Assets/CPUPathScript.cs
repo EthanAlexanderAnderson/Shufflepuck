@@ -1,7 +1,6 @@
 // These path objects are used for hard CPU AI shots
 // it basically just keeps track of if any pucks block the path
 
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,6 +13,8 @@ public class CPUPathScript : MonoBehaviour
     public float power;
     public float spin;
     public int value;
+
+    public (float, float, float) GetPath() { return (angle, power, spin); }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
