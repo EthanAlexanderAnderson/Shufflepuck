@@ -8,15 +8,12 @@ public class HaloScript : MonoBehaviour
     private LineScript line;
     private LogicScript logic;
 
-    public float angleModifierX;
-    public float angleModifierY;
-    public float minusY;
-    public float powerModifier;
-    public float power;
-    public float angle;
-
-    public bool angleSet;
-    public bool powerSet;
+    [SerializeField] float angleModifierX;
+    [SerializeField] float angleModifierY;
+    [SerializeField] float minusY;
+    [SerializeField] float powerModifier;
+    [SerializeField] float power;
+    [SerializeField] float angle;
 
     // Start is called before the first frame update
     void Start()

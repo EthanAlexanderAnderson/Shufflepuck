@@ -11944,7 +11944,7 @@ Transform:
   m_GameObject: {fileID: 1167867919}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.83, y: 23.43, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.22, y: 0.22, z: 0.22}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -11968,8 +11968,6 @@ MonoBehaviour:
   powerModifier: 0.14
   power: 0
   angle: 0
-  angleSet: 0
-  powerSet: 0
 --- !u!212 &1167867922
 SpriteRenderer:
   m_ObjectHideFlags: 0
