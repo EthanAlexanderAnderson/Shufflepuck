@@ -168,7 +168,7 @@ MonoBehaviour:
   angle: 50
   power: 50
   spin: 50
-  value: 0
+  value: 5
 --- !u!61 &756733
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1567,7 +1567,7 @@ MonoBehaviour:
   angle: 98
   power: 101
   spin: 0
-  value: 0
+  value: 1
 --- !u!60 &73639749
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -1821,7 +1821,7 @@ MonoBehaviour:
   angle: 22
   power: 85
   spin: 100
-  value: 0
+  value: 3
 --- !u!60 &141762928
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -2434,7 +2434,7 @@ MonoBehaviour:
   angle: 40
   power: 55
   spin: 50
-  value: 0
+  value: 4
 --- !u!61 &207078887
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3651,7 +3651,7 @@ MonoBehaviour:
   angle: 72
   power: 80
   spin: 0
-  value: 0
+  value: 6
 --- !u!60 &345272539
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -5065,7 +5065,7 @@ MonoBehaviour:
   angle: 78
   power: 85
   spin: 0
-  value: 0
+  value: 3
 --- !u!60 &459286197
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -5661,7 +5661,7 @@ MonoBehaviour:
   angle: 2
   power: 101
   spin: 100
-  value: 0
+  value: 1
 --- !u!60 &541556641
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -6651,7 +6651,7 @@ MonoBehaviour:
   angle: 83.1
   power: 82.4
   spin: 50
-  value: 0
+  value: 2
 --- !u!61 &683211351
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -8491,7 +8491,7 @@ MonoBehaviour:
   angle: 28
   power: 80
   spin: 100
-  value: 0
+  value: 6
 --- !u!60 &835633550
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -9276,7 +9276,7 @@ MonoBehaviour:
   angle: 60
   power: 55
   spin: 50
-  value: 0
+  value: 4
 --- !u!61 &917655134
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -12418,7 +12418,7 @@ MonoBehaviour:
   angle: 50
   power: 70
   spin: 50
-  value: 0
+  value: 7
 --- !u!61 &1237600845
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -16037,7 +16037,7 @@ MonoBehaviour:
   angle: 16.9
   power: 82.4
   spin: 50
-  value: 0
+  value: 2
 --- !u!61 &1618170138
 BoxCollider2D:
   m_ObjectHideFlags: 0
