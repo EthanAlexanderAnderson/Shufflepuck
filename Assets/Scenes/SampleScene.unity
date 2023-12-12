@@ -3737,7 +3737,6 @@ GameObject:
   - component: {fileID: 350911835}
   - component: {fileID: 350911834}
   - component: {fileID: 350911833}
-  - component: {fileID: 350911837}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -3839,18 +3838,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &350911837
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 350911832}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5db838a4e1a7abe42a40e66123e3d58d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &375784725
 GameObject:
   m_ObjectHideFlags: 0
@@ -6580,6 +6567,7 @@ MonoBehaviour:
   lobbyCodeText: {fileID: 33220663}
   waitingGif: {fileID: 1992626500}
   waitingText: {fileID: 178977283}
+  waitingBackButton: {fileID: 1615161863}
   turnText: {fileID: 340869351}
   playerPuckCountText: {fileID: 309557851}
   opponentPuckCountText: {fileID: 838801539}

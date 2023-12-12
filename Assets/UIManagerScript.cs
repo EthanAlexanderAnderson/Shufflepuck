@@ -22,6 +22,7 @@ public class UIManagerScript : MonoBehaviour
     public TMP_Text lobbyCodeText;
     public GameObject waitingGif;
     public TMP_Text waitingText;
+    public GameObject waitingBackButton;
 
     // HUD
     public Text turnText;
@@ -214,10 +215,10 @@ public class UIManagerScript : MonoBehaviour
     // there needs to be a delay on the ready button to prevent errors with async stuff
     public void EnableReadyButton()
     {
-        waitingText.text = "0/2 Players Ready";
         enabledReadyButton = true;
-        CooldownTime = 1.0f;
-        waitingGif.SetActive(false);
+        CooldownTime = 2.0f;
+        waitingBackButton.SetActive(false);
+        // the waiting text & gif also update after cooldown to prevent confusion
     }
 
     float CooldownTime;
@@ -229,7 +230,10 @@ public class UIManagerScript : MonoBehaviour
         if (enabledReadyButton && CooldownTime <= 0f)
         {
             readyButton.SetActive(true);
+            waitingText.text = "0/2 Players Ready";
+            waitingGif.SetActive(false);
             enabledReadyButton = false;
+            waitingBackButton.SetActive(true);
         }
     }
 

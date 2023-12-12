@@ -270,37 +270,10 @@ public class LogicScript : MonoBehaviour
         activeCompetitor = opponent;
         nonActiveCompetitor = player;
         gameIsRunning = true;
-        // reset UI text
         puckHalo.SetActive(diff == 0);
+        line.isActive = false;
+        bar.ChangeBar("none");
         UI.ChangeUI(UI.gameHud);
-    }
-
-    public void RestartGameOnline()
-    {
-        // organize scene
-        ClearAllPucks();
-        // reset game variables
-        RandomizeCPUPuckSprite();
-        difficulty = 2;
-        player.score = 0;
-        opponent.score = 0;
-        player.puckCount = 5;
-        opponent.puckCount = 5;
-        player.isTurn = false;
-        player.isShooting = false;
-        opponent.isTurn = false;
-        opponent.isShooting = false;
-        gameIsRunning = true;
-        // reset UI text
-        puckHalo.SetActive(false);
-        UI.ChangeUI(UI.gameHud);
-        UI.TurnText = "Opponent's Turn"; // this gets overwritten by StartTurn if going first
-    }
-
-    public void StartTurn()
-    {
-        goingFirst = true;
-        player.isTurn = true;
     }
 
     // create a puck. bool parameter of if its the player's puck or not so we can set the sprite
@@ -455,6 +428,7 @@ public class LogicScript : MonoBehaviour
         UI.SetOpponentPuckIcon(opponent.puckSprite);
     }
 
+    // helper for customize puck menu buttons
     public void SwapToAltSkin(GameObject gameObject)
     {
         Debug.Log(player.puckSpriteID);
@@ -473,6 +447,7 @@ public class LogicScript : MonoBehaviour
         gameObject.GetComponent<Image>().sprite = ColorIDtoPuckSprite(player.puckSpriteID * -1);
     }
 
+    // helper for easter egg button
     int easterEgg = 0;
     public void EasterEgg()
     {
@@ -483,13 +458,15 @@ public class LogicScript : MonoBehaviour
         }
     }
 
-    // back button after match is over
+    // back button in game
     public void ReturnToMenu()
     {
         gameIsRunning = false;
         player.puckCount = 0;
         opponent.puckCount = 0;
         UI.ChangeUI(UI.titleScreen);
+        line.isActive = false;
+        bar.ChangeBar("none");
     }
 
     // this is the CPU AI for hard mode
