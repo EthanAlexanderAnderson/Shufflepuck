@@ -72,16 +72,6 @@ public class LogicScript : MonoBehaviour
         }
     }
 
-    bool isOnline;
-    public bool IsOnline
-    {
-        get => isOnline;
-        set
-        {
-            isOnline = value;
-        }
-    }
-
     // temp variables
     private float tempTime = 0;
     public float CPUShotAngle = 0;

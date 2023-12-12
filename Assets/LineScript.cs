@@ -24,7 +24,7 @@ public class LineScript : MonoBehaviour
     void Update()
     {
         // change line speed based on match difficulty
-        if (logic.difficulty == 2 && !logic.IsLocal && !logic.IsOnline)
+        if (logic.difficulty == 2 && !logic.IsLocal)
         {
             moveSpeed = 20;
         }
