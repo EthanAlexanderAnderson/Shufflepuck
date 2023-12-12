@@ -1,3 +1,5 @@
+// Note: This script is filled with try catch statements so that we can send an error code to the client. This code will show me exactly which function caused the error without digging in server logs.
+
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
@@ -30,52 +32,77 @@ public class ServerLogicScript : NetworkBehaviour
     public void AddPlayerServerRpc(int puckID, ServerRpcParams serverRpcParams = default)
     {
         if (!IsServer) return;
-        var clientId = serverRpcParams.Receive.SenderClientId;
 
-        clients.Add(clientId);
-
-        Competitor newCompetitor = new(puckID);
-        newCompetitor.clientID = clientId;
-
-        competitorList.Add(newCompetitor);
-
-        clientRpcParamsList.Add(new ClientRpcParams
+        try
         {
-            Send = new ClientRpcSendParams
+            var clientId = serverRpcParams.Receive.SenderClientId;
+
+            clients.Add(clientId);
+
+            Competitor newCompetitor = new(puckID);
+            newCompetitor.clientID = clientId;
+
+            competitorList.Add(newCompetitor);
+
+            clientRpcParamsList.Add(new ClientRpcParams
             {
-                TargetClientIds = new ulong[] { clientId }
-            }
-        });
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new ulong[] { clientId }
+                }
+            });
 
-        competitorPuckCountList.Add(5);
-        competitorScoreList.Add(0);
+            competitorPuckCountList.Add(5);
+            competitorScoreList.Add(0);
 
-        Debug.Log(
-            $"Client added to client list. \n" +
-            $"Client Index: {clients.Count - 1} \n" +
-            $"Client ID: {clientId} \n" +
-            $"Puck ID: {puckID} \n" );
-
-        clientLogic.UpdateReadyWaitingCompetitorsClientRpc();
-
-        if (clients.Count == 2)
+            Debug.Log(
+                $"Client added to client list. \n" +
+                $"Client Index: {clients.Count - 1} \n" +
+                $"Client ID: {clientId} \n" +
+                $"Puck ID: {puckID} \n");
+        }
+        catch (System.Exception e)
         {
-            SelectRandomStartingPlayer();
+            Debug.Log(e);
+            clientLogic.SetErrorMessageClientRpc(0);
+        }
+        try
+        {
+            clientLogic.UpdateReadyWaitingCompetitorsClientRpc();
+
+            if (clients.Count == 2)
+            {
+                SelectRandomStartingPlayer();
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.Log(e);
+            clientLogic.SetErrorMessageClientRpc(1);
         }
     }
 
     public void SelectRandomStartingPlayer()
     {
         if (!IsServer) return;
-        activeCompetitorIndex = Random.Range(0, 2);
 
-        Debug.Log(
-            $"Selected starting client. \n" +
-            $"Client Index #{activeCompetitorIndex} \n" +
-            $"Client ID : {clients[activeCompetitorIndex]}\n");
+        try
+        {
+            activeCompetitorIndex = Random.Range(0, 2);
 
-        clientLogic.RestartGameOnlineClientRpc(competitorList[0].puckSpriteID, competitorList[1].puckSpriteID);
-        clientLogic.StartTurnClientRpc(clientRpcParamsList[activeCompetitorIndex]);
+            Debug.Log(
+                $"Selected starting client. \n" +
+                $"Client Index #{activeCompetitorIndex} \n" +
+                $"Client ID : {clients[activeCompetitorIndex]}\n");
+
+            clientLogic.RestartGameOnlineClientRpc(competitorList[0].puckSpriteID, competitorList[1].puckSpriteID);
+            clientLogic.StartTurnClientRpc(clientRpcParamsList[activeCompetitorIndex]);
+        }
+        catch (System.Exception e)
+        {
+            Debug.Log(e);
+            clientLogic.SetErrorMessageClientRpc(2);
+        }
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -87,52 +114,74 @@ public class ServerLogicScript : NetworkBehaviour
 
     private void CreatePuck()
     {
-
-        if (competitorPuckCountList.All(n => n <= 0))
+        try
         {
-            clientLogic.GameOverConfirmationClientRpc();
-            return;
+            if (competitorPuckCountList.All(n => n <= 0))
+            {
+                clientLogic.GameOverConfirmationClientRpc();
+                return;
+            }
         }
-
-        Competitor competitor = competitorList[activeCompetitorIndex];
-        int puckSpriteID = competitor.puckSpriteID;
-
-        GameObject puckObject = Instantiate(puck, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
-        puckObject.GetComponent<NetworkObject>().Spawn();
-        competitor.activePuckObject = puckObject;
-
-        PuckScript puckScript = puckObject.GetComponent<PuckScript>();
-
-        // tell the active competitor this new puck is theirs, tell non-active competitors it's not theirs
-        for (int i = 0; i < competitorList.Count; i++)
+        catch (System.Exception e)
         {
-            puckScript.InitPuckClientRpc( i == activeCompetitorIndex, puckSpriteID, clientRpcParamsList[i] );
+            Debug.Log(e);
+            clientLogic.SetErrorMessageClientRpc(3);
         }
-        competitor.activePuckScript = puckScript;
+        try
+        {
+            Competitor competitor = competitorList[activeCompetitorIndex];
+            int puckSpriteID = competitor.puckSpriteID;
 
-        Debug.Log(
-            $"Puck has been spawned. \n" +
-            $"Owned by Client Index #{activeCompetitorIndex} \n" +
-            $"Client ID : {clients[activeCompetitorIndex]} \n" +
-            $"Puck Skin ID: {competitor.puckSpriteID} \n" );
+            GameObject puckObject = Instantiate(puck, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
+            puckObject.GetComponent<NetworkObject>().Spawn();
+            competitor.activePuckObject = puckObject;
+
+            PuckScript puckScript = puckObject.GetComponent<PuckScript>();
+
+            // tell the active competitor this new puck is theirs, tell non-active competitors it's not theirs
+            for (int i = 0; i < competitorList.Count; i++)
+            {
+                puckScript.InitPuckClientRpc(i == activeCompetitorIndex, puckSpriteID, clientRpcParamsList[i]);
+            }
+            competitor.activePuckScript = puckScript;
+
+            Debug.Log(
+                $"Puck has been spawned. \n" +
+                $"Owned by Client Index #{activeCompetitorIndex} \n" +
+                $"Client ID : {clients[activeCompetitorIndex]} \n" +
+                $"Puck Skin ID: {competitor.puckSpriteID} \n");
+        }
+        catch (System.Exception e)
+        {
+            Debug.Log(e);
+            clientLogic.SetErrorMessageClientRpc(4);
+        }
     }
 
     [ServerRpc(RequireOwnership = false)]
     public void ShootServerRpc(float angleParameter, float powerParameter, float spinParameter)
     {
         if (!IsServer) return;
-        
-        competitorList[activeCompetitorIndex].activePuckScript.Shoot(angleParameter, powerParameter, spinParameter);
 
-        // Update puck count
-        competitorPuckCountList[activeCompetitorIndex]--;
-        // tell active their puck count decreased
-        clientLogic.UpdatePuckCountClientRpc(true, competitorPuckCountList[activeCompetitorIndex], clientRpcParamsList[activeCompetitorIndex]);
-        // tell non-active their opponent's count decreased
-        clientLogic.UpdatePuckCountClientRpc(false, competitorPuckCountList[activeCompetitorIndex], clientRpcParamsList[SwapCompetitors()]);
-        // Also no idea if this works ^^^
+        try
+        {
+            competitorList[activeCompetitorIndex].activePuckScript.Shoot(angleParameter, powerParameter, spinParameter);
 
-        clientLogic.StartTurnClientRpc(clientRpcParamsList[activeCompetitorIndex]);
+            // Update puck count
+            competitorPuckCountList[activeCompetitorIndex]--;
+            // tell active their puck count decreased
+            clientLogic.UpdatePuckCountClientRpc(true, competitorPuckCountList[activeCompetitorIndex], clientRpcParamsList[activeCompetitorIndex]);
+            // tell non-active their opponent's count decreased
+            clientLogic.UpdatePuckCountClientRpc(false, competitorPuckCountList[activeCompetitorIndex], clientRpcParamsList[SwapCompetitors()]);
+            // Also no idea if this works ^^^
+
+            clientLogic.StartTurnClientRpc(clientRpcParamsList[activeCompetitorIndex]);
+        }
+        catch (System.Exception e)
+        {
+            Debug.Log(e);
+            clientLogic.SetErrorMessageClientRpc(5);
+        }
     }
 
     private int SwapCompetitors()

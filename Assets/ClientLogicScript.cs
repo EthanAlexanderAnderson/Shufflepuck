@@ -151,4 +151,11 @@ public class ClientLogicScript : NetworkBehaviour
         Debug.Log("Client: Starting turn");
         isTurn = true;
     }
+
+    [ClientRpc]
+    public void SetErrorMessageClientRpc(int code)
+    {
+        if (!IsClient) return;
+        UI.SetErrorMessage("Server Error: " + code + " - Contact developer.");
+    }
 }
