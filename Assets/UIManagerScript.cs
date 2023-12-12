@@ -209,7 +209,6 @@ public class UIManagerScript : MonoBehaviour
     public void Join()
     {
         NetworkManager.Singleton.StartClient();
-
     }
 
     // there needs to be a delay on the ready button to prevent errors with async stuff
