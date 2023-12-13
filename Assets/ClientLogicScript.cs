@@ -121,7 +121,6 @@ public class ClientLogicScript : NetworkBehaviour
 
         puckCount = 5;
         isRunning = true;
-        logic.difficulty = 2;
 
         Debug.Log("Client: Restarting game");
         Debug.Log($"player : {logic.player.puckSpriteID}     0 : {puckSpriteID_0}   1 : {puckSpriteID_1}");

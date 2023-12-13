@@ -58,7 +58,7 @@ public class LogicScript : MonoBehaviour
     // game state
     bool gameIsRunning;
     float timer = 0;
-    public int difficulty; // 0 easy 1 medium 2 hard
+    int difficulty; // 0 easy 1 medium 2 hard
     bool goingFirst;
 
     //public bool isLocal;
@@ -120,6 +120,7 @@ public class LogicScript : MonoBehaviour
                 CreatePuck(true);
                 player.isTurn = false;
                 player.isShooting = true;
+                goingFirst = false;
             }
 
             // now player may shoot
@@ -154,7 +155,7 @@ public class LogicScript : MonoBehaviour
             }
 
             // start CPU's turn, do this then start shooting
-            if (opponent.isTurn && (player.activePuckScript == null || (player.activePuckScript.IsSlowed() && AllPucksAreSlowed())))
+            if (opponent.isTurn && (player.activePuckScript == null || (player.activePuckScript.IsSlowed() && (AllPucksAreSlowed() && difficulty < 2 || AllPucksAreSlowedMore()))))
             {
                 activeBar = bar.ChangeBar("angle");
                 line.isActive = true;
@@ -177,7 +178,6 @@ public class LogicScript : MonoBehaviour
                 // hard uses paths, and random if no path is found
                 else
                 {
-                    Debug.Log("searching for path...");
                     (CPUShotAngle, CPUShotPower, CPUShotSpin) = FindOpenPath();
                 }
             }
@@ -234,9 +234,6 @@ public class LogicScript : MonoBehaviour
     {
         activeBar = bar.ChangeBar("none");
         line.isActive = false;
-        Debug.Log(activeCompetitor + " " + activeCompetitor.isPlayer);
-        Debug.Log(activeCompetitor.activePuckScript);
-        Debug.Log(angle +"   "+ power+"   "+spin);
         activeCompetitor.activePuckScript.Shoot(angle, power, spin);
         activeCompetitor.isShooting = false;
         activeCompetitor.puckCount--;
@@ -263,12 +260,27 @@ public class LogicScript : MonoBehaviour
         opponent.score = 0;
         player.puckCount = 5;
         opponent.puckCount = 5;
-        player.isTurn = false;
-        player.isShooting = false;
-        opponent.isTurn = true;
-        opponent.isShooting = false;
-        activeCompetitor = opponent;
-        nonActiveCompetitor = player;
+
+        if (diff < 2) // for easy & medium
+        {
+            player.isTurn = false;
+            player.isShooting = false;
+            opponent.isTurn = true;
+            opponent.isShooting = false;
+            activeCompetitor = opponent;
+            nonActiveCompetitor = player;
+        }
+        else // for hard
+        {
+            player.isTurn = true;
+            player.isShooting = false;
+            opponent.isTurn = false;
+            opponent.isShooting = false;
+            activeCompetitor = player;
+            nonActiveCompetitor = opponent;
+            goingFirst = true;
+        }
+
         gameIsRunning = true;
         puckHalo.SetActive(diff == 0);
         line.isActive = false;
@@ -284,15 +296,47 @@ public class LogicScript : MonoBehaviour
             player.activePuckObject = Instantiate(puckPrefab, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
             player.activePuckScript = player.activePuckObject.GetComponent<PuckScript>();
             player.activePuckScript.InitPuck(true, player.puckSprite);
-            Debug.Log("create puck aps: " + player.activePuckScript);
         }
         else
         {
             opponent.activePuckObject = Instantiate(puckPrefab, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
             opponent.activePuckScript = opponent.activePuckObject.GetComponent<PuckScript>();
             opponent.activePuckScript.InitPuck(false, opponent.puckSprite);
-            Debug.Log("create puck aps: " + opponent.activePuckScript);
         }
+    }
+
+    // useful helper function for deciding when to allow actions. Returns true when all pucks have slowed down
+    public bool AllPucksAreSlowed()
+    {
+        var allPucks = GameObject.FindGameObjectsWithTag("puck");
+        foreach (var puck in allPucks)
+        {
+            pucki = puck.GetComponent<PuckScript>();
+            // IF shot, but not stopped, return false
+            if (pucki.IsShot() && !pucki.IsSlowed())
+            {
+                return false;
+            }
+        }
+        // IF all shot puts are slowed, return true
+        return true;
+    }
+
+    // useful helper function for deciding when to allow actions. Returns true when all pucks have slowed down more
+    public bool AllPucksAreSlowedMore()
+    {
+        var allPucks = GameObject.FindGameObjectsWithTag("puck");
+        foreach (var puck in allPucks)
+        {
+            pucki = puck.GetComponent<PuckScript>();
+            // IF shot, but not stopped, return false
+            if (pucki.IsShot() && !pucki.IsSlowedMore())
+            {
+                return false;
+            }
+        }
+        // IF all shot puts are slowed more, return true
+        return true;
     }
 
     // useful helper function for deciding when to allow actions. Returns true when all pucks have stopped moving
@@ -305,23 +349,6 @@ public class LogicScript : MonoBehaviour
             pucki = puck.GetComponent<PuckScript>();
             // IF shot, but not stopped, return false
             if (pucki.IsShot() && !pucki.IsStopped())
-            {
-                return false;
-            }
-        }
-        // IF all shot puts are stopped, return true
-        return true;
-    }
-
-    // useful helper function for deciding when to allow actions. Returns true when all pucks have slowed down
-    public bool AllPucksAreSlowed()
-    {
-        var allPucks = GameObject.FindGameObjectsWithTag("puck");
-        foreach (var puck in allPucks)
-        {
-            pucki = puck.GetComponent<PuckScript>();
-            // IF shot, but not stopped, return false
-            if (pucki.IsShot() && !pucki.IsSlowed())
             {
                 return false;
             }
@@ -431,8 +458,6 @@ public class LogicScript : MonoBehaviour
     // helper for customize puck menu buttons
     public void SwapToAltSkin(GameObject gameObject)
     {
-        Debug.Log(player.puckSpriteID);
-
         if (gameObject.tag == "alt")
         {
             SelectPlayerPuckSprite(player.puckSpriteID * -1);
@@ -479,19 +504,19 @@ public class LogicScript : MonoBehaviour
         foreach (var path in CPUPaths)
         {
             var pathi = path.GetComponent<CPUPathScript>();
-            if (pathi.GetPucksInPath().Count == 0)
+            pathi.DisablePathVisualization();
+            var pathiShotValue = pathi.CalculateValue();
+            if (pathiShotValue > highestValue)
             {
-                Debug.Log("PATH FOUND. VALUE: " + pathi.value.ToString());
-                if (pathi.value > highestValue)
-                {
-                    best = pathi;
-                    highestValue = pathi.value;
-                }
+                best = pathi;
+                highestValue = pathiShotValue;
             }
         }
         // chose the highest-value unblocked path
         if (highestValue > 0)
         {
+            Debug.Log("Found path with highest value " + highestValue);
+            best.EnablePathVisualization();
             return best.GetPath();
         }
         // otherwise, Shoot random
