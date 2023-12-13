@@ -8,7 +8,7 @@ public class LineScript : MonoBehaviour
     [SerializeField] SpriteRenderer spriteRenderer;
 
     bool movingLeft;
-    float moveSpeed;
+    const float moveSpeed = 10;
 
     public float value;
     public bool isActive;
@@ -23,15 +23,6 @@ public class LineScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // change line speed based on match difficulty
-        if (logic.difficulty == 2 && !logic.IsLocal)
-        {
-            moveSpeed = 20;
-        }
-        else
-        {
-            moveSpeed = 10;
-        }
         // move the line back and forth
         if (isActive)
         {
