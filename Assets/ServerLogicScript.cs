@@ -171,9 +171,10 @@ public class ServerLogicScript : NetworkBehaviour
             competitorPuckCountList[activeCompetitorIndex]--;
             // tell active their puck count decreased
             clientLogic.UpdatePuckCountClientRpc(true, competitorPuckCountList[activeCompetitorIndex], clientRpcParamsList[activeCompetitorIndex]);
-            // tell non-active their opponent's count decreased
+            // tell non-active their opponent's count decreased, and swap competitors
             clientLogic.UpdatePuckCountClientRpc(false, competitorPuckCountList[activeCompetitorIndex], clientRpcParamsList[SwapCompetitors()]);
-            // Also no idea if this works ^^^
+
+            CleanupDeadPucks();
 
             clientLogic.StartTurnClientRpc(clientRpcParamsList[activeCompetitorIndex]);
         }
@@ -192,6 +193,28 @@ public class ServerLogicScript : NetworkBehaviour
             activeCompetitorIndex = 0;
         }
         return activeCompetitorIndex;
+    }
+
+    // we try to cleanup dead (out of bounds) pucks but if it fails, no biggie
+    private void CleanupDeadPucks()
+    {
+        try
+        {
+            foreach (var obj in GameObject.FindGameObjectsWithTag("puck"))
+            {
+                var pucki = obj.GetComponent<PuckScript>();
+                if (!pucki.IsSafe() && pucki.IsStopped())
+                {
+                    Destroy(obj);
+                }
+            }
+
+        }
+        catch (System.Exception e)
+        {
+            Debug.Log("CleanupDeadPucks Failed.");
+            Debug.Log(e);
+        }
     }
 
 
