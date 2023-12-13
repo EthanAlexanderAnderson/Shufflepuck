@@ -68,9 +68,10 @@ public class UIManagerScript : MonoBehaviour
         if (playerScore > opponentScore)
         {
             gameResultText.text = "You Win!";
+            gameResultHighscoreMessageText.text = "You won by " + scoreDifference + " points.";
             if (scoreDifference > PlayerPrefs.GetInt(highscoresPlayerPrefsKeys[difficulty]))
             {
-                gameResultHighscoreMessageText.text = "You won by " + scoreDifference + " points.\nNew Highscore!";
+                gameResultHighscoreMessageText.text = gameResultHighscoreMessageText.text + "\nNew Highscore!";
                 OverwriteHighscore(scoreDifference, difficulty);
             }
         }
