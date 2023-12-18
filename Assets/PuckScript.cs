@@ -101,6 +101,8 @@ public class PuckScript : NetworkBehaviour
     private float spin;
     public void Shoot(float angleParameter, float powerParameter, float spinParameter = 50)
     {
+        // give high power shots an extra oomf
+        if (powerParameter >= 96) { powerParameter += (powerParameter - 96) * 10; }
         // normalize power and then scale
         power = (powerParameter - (powerParameter - 50) * 0.5f) * powerModifier;
         // convert angle from 0-100 range to 60-120 range

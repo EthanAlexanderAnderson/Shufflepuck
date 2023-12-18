@@ -15,6 +15,7 @@ public class LogicScript : MonoBehaviour
     // sprites
     
     [SerializeField] Sprite puckFlower;
+    [SerializeField] Sprite puckMissing;
 
     [SerializeField] Sprite puckBlue;
     [SerializeField] Sprite puckGreen;
@@ -29,6 +30,16 @@ public class LogicScript : MonoBehaviour
     [SerializeField] Sprite puckCanada;
     [SerializeField] Sprite puckDonut;
     [SerializeField] Sprite puckCaptain;
+    [SerializeField] Sprite puckNuke;
+    [SerializeField] Sprite puckWreath;
+    [SerializeField] Sprite puckSky;
+    [SerializeField] Sprite puckDragon;
+    [SerializeField] Sprite puckNinja;
+    [SerializeField] Sprite puckEgg;
+    [SerializeField] Sprite puckMonster;
+    [SerializeField] Sprite puckEye;
+    [SerializeField] Sprite puckCamo;
+    [SerializeField] Sprite puckYingYang;
 
     [SerializeField] Sprite puckBlueAlt;
     [SerializeField] Sprite puckGreenAlt;
@@ -43,6 +54,16 @@ public class LogicScript : MonoBehaviour
     [SerializeField] Sprite puckCanadaAlt;
     [SerializeField] Sprite puckDonutAlt;
     [SerializeField] Sprite puckCaptainAlt;
+    [SerializeField] Sprite puckNukeAlt;
+    [SerializeField] Sprite puckWreathAlt;
+    [SerializeField] Sprite puckSkyAlt;
+    [SerializeField] Sprite puckDragonAlt;
+    [SerializeField] Sprite puckNinjaAlt;
+    [SerializeField] Sprite puckEggAlt;
+    [SerializeField] Sprite puckMonsterAlt;
+    [SerializeField] Sprite puckEyeAlt;
+    [SerializeField] Sprite puckCamoAlt;
+    [SerializeField] Sprite puckYingYangAlt;
 
     [SerializeField] GameObject puckHalo;
 
@@ -96,7 +117,7 @@ public class LogicScript : MonoBehaviour
         UI.UpdateProfileText();
         UI.UpdateLocks();
         // load puck id, but not dev skin
-        SelectPlayerPuckSprite(PlayerPrefs.GetInt("puck") == 0 ? 1 : PlayerPrefs.GetInt("puck"));
+        SelectPlayerPuckSprite(PlayerPrefs.GetInt("puck") == 0 && PlayerPrefs.GetInt("hardHighscore") <= 5 ? 1 : PlayerPrefs.GetInt("puck"));
         activeCompetitor = opponent;
         nonActiveCompetitor = player;
     }
@@ -405,9 +426,16 @@ public class LogicScript : MonoBehaviour
     // helper with the puck customization buttons
     public Sprite ColorIDtoPuckSprite(int id)
     {
-        Sprite[] puckSprites = { puckFlower, puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain };
-        Sprite[] puckAltSprites = { null, puckBlueAlt, puckGreenAlt, puckGreyAlt, puckOrangeAlt, puckPinkAlt, puckPurpleAlt, puckRedAlt, puckYellowAlt, puckRainbowAlt, puckCanadaAlt, puckDonutAlt, puckCaptainAlt };
-        
+        Sprite[] puckSprites = { puckFlower, puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain, puckNuke, puckWreath, puckSky, puckDragon, puckNinja, puckEgg, puckMonster, puckEye, puckCamo, puckYingYang };
+        Sprite[] puckAltSprites = { null, puckBlueAlt, puckGreenAlt, puckGreyAlt, puckOrangeAlt, puckPinkAlt, puckPurpleAlt, puckRedAlt, puckYellowAlt, puckRainbowAlt, puckCanadaAlt, puckDonutAlt, puckCaptainAlt, puckNukeAlt, puckWreathAlt, puckSkyAlt, puckDragonAlt, puckNinjaAlt, puckEggAlt, puckMonsterAlt, puckEyeAlt, puckCamoAlt, puckYingYangAlt };
+
+        // if out of range, return missing
+        if ((id >= puckSprites.Length) || (id <= puckSprites.Length * -1))
+        {
+            return puckMissing;
+        }
+
+        // if postitive, return regular, else return alt
         if (id >= 0)
         {
             return (puckSprites[id]);

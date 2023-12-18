@@ -132,10 +132,10 @@ public class UIManagerScript : MonoBehaviour
         }
 
         // combined highscore locks
-        string[] combinedHighscoreLocksPlayerPrefsKeys = { "combined20Lock", "combined22Lock" };
-        for (int i = 20; i <= combinedHighscore; i += 2)
+        //string[] combinedHighscoreLocksPlayerPrefsKeys = { "combined20Lock", "combined22Lock" };
+        for (int i = 10; i <= combinedHighscore; i += 2)
         {
-            foreach (GameObject go in GameObject.FindGameObjectsWithTag(combinedHighscoreLocksPlayerPrefsKeys[(i - 20) / 2]))
+            foreach (GameObject go in GameObject.FindGameObjectsWithTag(i + "CombinedLock"))
             {
                 go.SetActive(false);
             }
