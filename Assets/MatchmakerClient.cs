@@ -1,3 +1,12 @@
+/* This file controls the client-side networking.
+ * Including: 
+ * creating matchmaking tickets,
+ * creating lobbies,
+ * joining lobbies,
+ * change client UI,
+ * and more
+ */
+
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Services.Authentication;
@@ -40,6 +49,7 @@ public class MatchmakerClient : MonoBehaviour
         ServerStartUp.ClientInstance -= SignIn;
     }
 
+    // Called OnEnable() to sign in client
     private async void SignIn()
     {
         await ClientSignIn();
@@ -59,6 +69,7 @@ public class MatchmakerClient : MonoBehaviour
         CreateATicket();
     }
 
+    // Tell Unity Matchmaker we are looking for a game
     private async void CreateATicket( string lobbyID = "PUBLIC" )
     {
         await UnityServices.InitializeAsync();
@@ -83,6 +94,7 @@ public class MatchmakerClient : MonoBehaviour
         }
     }
 
+    // Waiting for response from Unity Matchmaker
     private async void PollTicketStatus()
     {
         MultiplayAssignment multiplayAssignment = null;
@@ -120,6 +132,7 @@ public class MatchmakerClient : MonoBehaviour
         } while (!gotAssignement);
     }
 
+    // When Unity Matchmaker assigns a game, start client and show ready button
     private void TicketAssigned(MultiplayAssignment assignment)
     {
         Debug.Log($"Ticket assigned: {assignment.Ip}:{assignment.Port}");
@@ -133,6 +146,8 @@ public class MatchmakerClient : MonoBehaviour
     bool isHost;
     private float heartbeatTimer;
 
+    // Called by Online -> Host button
+    // creates lobby with Unity Lobby service
     public async void CreateLobby()
     {
         try
@@ -168,11 +183,13 @@ public class MatchmakerClient : MonoBehaviour
 
     public TMP_InputField lobbyCodeInputField;
 
+    // only show the Join button when 6 characters are entered, helps misinput
     public void ChangeJoinButtonVisibiity()
     {
         joinButtion.SetActive(lobbyCodeInputField.text.Length == 6);
     }
 
+    // Called by Online -> Join -> Join button (after code is entered)
     public async void JoinLobby()
     {
         if (lobbyCodeInputField.text.Length != 6)
@@ -214,6 +231,7 @@ public class MatchmakerClient : MonoBehaviour
         }
     }
 
+    // For the host: when a competitor joins your lobby, tell Matchmaker to queue for a server
     private void OnLobbyChanged(ILobbyChanges changes)
     {
         if (changes.PlayerJoined.Changed)
@@ -231,6 +249,7 @@ public class MatchmakerClient : MonoBehaviour
         Heartbeat();
     }
 
+    // Keep lobby open while waiting for joiner
     public async void Heartbeat()
     {
         if (hostLobby != null && isHost)
@@ -245,6 +264,7 @@ public class MatchmakerClient : MonoBehaviour
         }
     }
 
+    // Called by the back button, shutdowns down the lobby and stops the heartbeat
     public async void ShutdownLobby()
     {
         try 
@@ -263,6 +283,7 @@ public class MatchmakerClient : MonoBehaviour
         isHost = false;
     }
 
+    // Called by the ready button
     public void AddPlayer()
     {
         serverLogic.AddPlayerServerRpc(logic.player.puckSpriteID);

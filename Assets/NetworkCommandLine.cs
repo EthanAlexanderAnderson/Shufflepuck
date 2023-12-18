@@ -1,3 +1,5 @@
+// NetwordCommandLine is used in the Unity Multiplay Build Configuration to handle Launch Parameteres
+
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;

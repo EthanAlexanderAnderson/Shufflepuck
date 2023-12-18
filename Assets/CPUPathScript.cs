@@ -1,5 +1,6 @@
-// These path objects are used for hard CPU AI shots
-// it basically just keeps track of if any pucks block the path
+// These path objects are used for hard CPU AI shots.
+// it basically just keeps track of if any pucks block the path.
+// as of A3 the CPU now has paths to knock player pucks out of scoring zones.
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -76,6 +77,7 @@ public class CPUPathScript : MonoBehaviour
         }
     }
 
+    // These two are only used to help me create CPU paths
     public void EnablePathVisualization()
     {
 #if (UNITY_EDITOR)

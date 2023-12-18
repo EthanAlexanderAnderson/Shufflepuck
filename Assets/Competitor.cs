@@ -1,3 +1,5 @@
+// Object Oriented style object to be used by the logic scripts 
+
 using UnityEngine;
 
 public class Competitor

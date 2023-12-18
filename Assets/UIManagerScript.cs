@@ -1,3 +1,6 @@
+// Most stuff involved with chaning or managing UI elements is done here
+// Methods are self explanatory for the most part
+
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.Netcode;
@@ -139,6 +142,7 @@ public class UIManagerScript : MonoBehaviour
         }
     }
 
+    // profile reset highscores button
     int[] highscoreBackup = new int[] { 0, 0, 0 };
     public void ResetHighscores()
     {
@@ -165,7 +169,7 @@ public class UIManagerScript : MonoBehaviour
         errorMessage.text = msg;
     }
   
-
+    // switch UI to new screen
     public void ChangeUI(GameObject newUI)
     {
         activeUI.SetActive(false);
@@ -176,6 +180,7 @@ public class UIManagerScript : MonoBehaviour
         ResetHUD();
     }
 
+    // reset in-game HUD
     public void ResetHUD()
     {
         gameResultText.text = "";
@@ -203,15 +208,6 @@ public class UIManagerScript : MonoBehaviour
         opponentPuckIcon.GetComponent<Image>().sprite = sprite;
     }
     
-    public void Host()
-    {
-        NetworkManager.Singleton.StartHost();
-    }
-
-    public void Join()
-    {
-        NetworkManager.Singleton.StartClient();
-    }
 
     // there needs to be a delay on the ready button to prevent errors with async stuff
     public void EnableReadyButton()

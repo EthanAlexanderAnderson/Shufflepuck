@@ -1,3 +1,5 @@
+// Script for AudioButton GameObject. Toggles game sound
+
 using UnityEngine;
 using UnityEngine.UI;
 

@@ -1,5 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
+// This keeps the game view consistent regardless of device
+
 using UnityEngine;
 
 // https://gamedev.stackexchange.com/questions/167317/scale-camera-to-fit-screen-size-unity

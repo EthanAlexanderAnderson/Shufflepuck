@@ -1,6 +1,5 @@
-/* Logic Script is kinda like the "main" function, 
- * it controls most things happening in game and directs
- * other scripts.
+/* Logic Script is kinda like the "main" function for playing vs CPU, 
+ * it controls most things happening in game and directs other scripts.
  */
 
 using UnityEngine;
@@ -419,7 +418,7 @@ public class LogicScript : MonoBehaviour
         }
     }
 
-// helper with the puck customization buttons
+    // helper with the puck customization buttons
     public void SelectPlayerPuckSprite(int id)
     {
         player.puckSpriteID = id;

@@ -1,3 +1,4 @@
+// This code is ran to start up the dedicated server
 
 using Newtonsoft.Json;
 using System;

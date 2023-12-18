@@ -1,3 +1,5 @@
+// This is only used with CPUPathScript to help me create CPU paths
+
 using UnityEngine;
 
 // https://stackoverflow.com/questions/39153239/how-to-make-a-highlight-around-a-polygoncollider2d-in-unity

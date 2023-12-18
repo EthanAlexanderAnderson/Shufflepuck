@@ -1,3 +1,8 @@
+/* This script runs the logic which is executed on the client during online play.
+*  Functions marked [ClientRpc] are functions which are called by the server and executed on the client.
+*  Functions with "ClientRpcParams clientRpcParams = default" as a parameter are only executed by 1 of the 2 competitors.
+*/
+
 using Unity.Netcode;
 using UnityEngine;
 
@@ -79,6 +84,7 @@ public class ClientLogicScript : NetworkBehaviour
         }
     }
 
+    // Server tells the client to update in-game UI showing puck counts for each player
     [ClientRpc]
     public void UpdatePuckCountClientRpc(bool isPlayer, int count, ClientRpcParams clientRpcParams = default)
     {
@@ -95,6 +101,7 @@ public class ClientLogicScript : NetworkBehaviour
         }
     }
 
+    // Server tells the client to update online waiting screen to show that a competitor has clicked the ready button
     [ClientRpc]
     public void UpdateReadyWaitingCompetitorsClientRpc()
     {
@@ -103,6 +110,7 @@ public class ClientLogicScript : NetworkBehaviour
         UI.waitingText.text = "1/2 Players Ready";
     }
 
+    // Server tells the client the game is over, and to display "game over" to the player
     [ClientRpc]
     public void GameOverConfirmationClientRpc()
     {
@@ -114,6 +122,8 @@ public class ClientLogicScript : NetworkBehaviour
         UI.TurnText = "Game Over";
     }
 
+    // Server tells the client to switch to game scene and start the game.
+    // Inputs the two puck skins used by the competitors.
     [ClientRpc]
     public void RestartGameOnlineClientRpc(int puckSpriteID_0, int puckSpriteID_1)
     {
@@ -142,6 +152,7 @@ public class ClientLogicScript : NetworkBehaviour
         UI.TurnText = "Opponent's Turn";
     }
 
+    // Server tells the client they can begin their turn
     [ClientRpc]
     public void StartTurnClientRpc(ClientRpcParams clientRpcParams = default)
     {
@@ -151,6 +162,9 @@ public class ClientLogicScript : NetworkBehaviour
         isTurn = true;
     }
 
+    // Server tells the client to set the error message.
+    // This happens when an error happens on the server.
+    // The codes are just used for debugging, instead of digging in the server logs.
     [ClientRpc]
     public void SetErrorMessageClientRpc(int code)
     {

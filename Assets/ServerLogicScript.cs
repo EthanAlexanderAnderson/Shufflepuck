@@ -1,4 +1,9 @@
-// Note: This script is filled with try catch statements so that we can send an error code to the client. This code will show me exactly which function caused the error without digging in server logs.
+/* This script runs the logic which is executed on the server during online play.
+ * Functions marked [ServerRpc] are functions which are called by the client and executed on the server.
+ *
+ * Note: This script is filled with try catch statements so that we can send an error code to the client. 
+ * This code will show me exactly which function caused the error without digging in server logs.
+ */
 
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +33,8 @@ public class ServerLogicScript : NetworkBehaviour
         clientLogic = GameObject.FindGameObjectWithTag("logic").GetComponent<ClientLogicScript>();
     }
 
+    // When 1 competitor is ready, setup their variables and update the ready text
+    // When both are ready, start the game
     [ServerRpc(RequireOwnership = false)]
     public void AddPlayerServerRpc(int puckID, ServerRpcParams serverRpcParams = default)
     {
@@ -82,6 +89,7 @@ public class ServerLogicScript : NetworkBehaviour
         }
     }
 
+    // Pick a random player to begin
     public void SelectRandomStartingPlayer()
     {
         if (!IsServer) return;
@@ -105,6 +113,7 @@ public class ServerLogicScript : NetworkBehaviour
         }
     }
 
+    // client tells the server to create a puck
     [ServerRpc(RequireOwnership = false)]
     public void CreatePuckServerRpc()
     {
@@ -116,6 +125,7 @@ public class ServerLogicScript : NetworkBehaviour
     {
         try
         {
+            // if both players have 0 pucks, end game
             if (competitorPuckCountList.All(n => n <= 0))
             {
                 clientLogic.GameOverConfirmationClientRpc();
@@ -158,6 +168,7 @@ public class ServerLogicScript : NetworkBehaviour
         }
     }
 
+    // Client tells the sever to shoot, given the shot parameters
     [ServerRpc(RequireOwnership = false)]
     public void ShootServerRpc(float angleParameter, float powerParameter, float spinParameter)
     {
@@ -195,7 +206,7 @@ public class ServerLogicScript : NetworkBehaviour
         return activeCompetitorIndex;
     }
 
-    // we try to cleanup dead (out of bounds) pucks but if it fails, no biggie
+    // Server cleans up out of bounds pucks
     private void CleanupDeadPucks()
     {
         try
@@ -216,110 +227,5 @@ public class ServerLogicScript : NetworkBehaviour
             Debug.Log(e);
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /*
-
-    // DEBUGGING FUNCTIONS
-    [ServerRpc(RequireOwnership = false)]
-    public void DebugShootServerRpc(float angleParameter, float powerParameter, float spinParameter)
-    {
-        if (!IsServer) return;
-        DebugShoot(angleParameter, powerParameter, spinParameter);
-    }
-
-    private void DebugShoot(float angleParameter, float powerParameter, float spinParameter)
-    {
-        var objects = GameObject.FindGameObjectsWithTag("puck");
-        foreach (var obj in objects)
-        {
-            obj.GetComponent<PuckScript>().Shoot(angleParameter, powerParameter, spinParameter);
-        }
-
-        var puckObject = Instantiate(puck, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
-        var puckScript = puckObject.GetComponent<PuckScript>();
-
-        puckObject.GetComponent<NetworkObject>().Spawn();
-        Debug.Log("Server: puck has been spawned");
-        clientLogic.SpawnedPuckConfirmationClientRpc();
-
-        puckScript.InitPuck(true, puckSprite);
-        puckScript.Shoot(angleParameter, powerParameter, spinParameter);
-    }*/
 }
 

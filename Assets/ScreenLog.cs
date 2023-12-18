@@ -1,3 +1,5 @@
+// This is only for development builds on android, basically shows the unity console on screen
+
 using UnityEngine;
 using System.Collections;
 

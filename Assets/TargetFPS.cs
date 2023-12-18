@@ -1,3 +1,5 @@
+// Pretty simple. Sets target frames per second
+
 using UnityEngine;
 
 public class TargetFPS : MonoBehaviour
