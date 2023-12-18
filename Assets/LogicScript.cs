@@ -420,7 +420,6 @@ public class LogicScript : MonoBehaviour
         {
             Destroy(obj);
         }
-
     }
 
     // helper with the puck customization buttons
@@ -436,13 +435,20 @@ public class LogicScript : MonoBehaviour
         }
 
         // if postitive, return regular, else return alt
-        if (id >= 0)
+        try
         {
-            return (puckSprites[id]);
+            if (id >= 0)
+            {
+                return (puckSprites[id]);
+            }
+            else
+            {
+                return (puckAltSprites[id * -1]);
+            }
         }
-        else
+        catch (System.IndexOutOfRangeException)
         {
-            return (puckAltSprites[id * -1]);
+            return puckMissing;
         }
     }
 
@@ -507,6 +513,17 @@ public class LogicScript : MonoBehaviour
         if (easterEgg == 10)
         {
             SelectPlayerPuckSprite(0);
+        }
+    }
+
+    // helper for debug mode button
+    int debugMode = 0;
+    public void DebugMode()
+    {
+        debugMode++;
+        if (debugMode == 10)
+        {
+            UI.EnableScreenLog();
         }
     }
 

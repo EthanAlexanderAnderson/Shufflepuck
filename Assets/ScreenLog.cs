@@ -8,11 +8,6 @@ public class ScreenLog : MonoBehaviour
     uint qsize = 15;  // number of messages to keep
     Queue myLogQueue = new Queue(); 
 
-    void Start()
-    {
-        Debug.Log("Started up logging.");
-    }
-
     void OnEnable()
     {
         Application.logMessageReceived += HandleLog;
@@ -35,9 +30,10 @@ public class ScreenLog : MonoBehaviour
     void OnGUI()
     {
         GUIStyle style = new();
-        style.fontSize = 36;
+        style.fontSize = Screen.width / 25;
         style.normal.textColor = Color.red;
-        GUILayout.BeginArea(new Rect(0, 590, Screen.width, Screen.height));
+        style.wordWrap = true;
+        GUILayout.BeginArea(new Rect(Screen.width / 20, Screen.height/20, Screen.width - (Screen.width / 12), Screen.height - (Screen.height / 20)));
         GUILayout.Label("\n" + string.Join("\n", myLogQueue.ToArray()), style);
         GUILayout.EndArea();
     }

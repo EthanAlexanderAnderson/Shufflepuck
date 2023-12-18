@@ -20,6 +20,7 @@ public class UIManagerScript : MonoBehaviour
     public TMP_Text errorMessage;
     public TMP_Text profilePopupText;
     public GameObject readyButton;
+    public GameObject screenLog;
 
     // Lobby
     public TMP_Text lobbyCodeText;
@@ -245,4 +246,9 @@ public class UIManagerScript : MonoBehaviour
         gameObject.SetActive(!gameObject.activeInHierarchy);
     }
 
+    public void EnableScreenLog()
+    {
+        screenLog.SetActive(true);
+        Debug.Log("Started up logging.");
+    }
 }
