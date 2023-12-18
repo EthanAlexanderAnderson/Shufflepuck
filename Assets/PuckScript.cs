@@ -25,7 +25,7 @@ public class PuckScript : NetworkBehaviour
     private float velocity;
 
     // this one actually does stuff
-    public float powerModifier = 10;
+    [SerializeField] float powerModifier;
 
     public float angularVelocity;
     public float angularVelocityModifier;

@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class LineScript : MonoBehaviour
 {
-    LogicScript logic;
     [SerializeField] SpriteRenderer spriteRenderer;
 
     bool movingLeft;
@@ -17,7 +16,6 @@ public class LineScript : MonoBehaviour
     void Start()
     {
         transform.localPosition = new Vector3(Random.Range(-10.0f, 10.0f), 0, -2);
-        logic = GameObject.FindGameObjectWithTag("logic").GetComponent<LogicScript>();
     }
 
     // Update is called once per frame
@@ -39,7 +37,8 @@ public class LineScript : MonoBehaviour
             if (transform.position.x > 10)
             {
                 movingLeft = true;
-            } else if (transform.position.x < -10)
+            } 
+            else if (transform.position.x < -10)
             {
                 movingLeft = false;
             }
