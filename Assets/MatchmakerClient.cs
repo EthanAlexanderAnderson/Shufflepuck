@@ -168,6 +168,7 @@ public class MatchmakerClient : MonoBehaviour
             isHost = true;
             Debug.Log("Created Lobby. Code:  " + lobby.LobbyCode);
             UI.lobbyCodeText.text = "Lobby Code: " + lobby.LobbyCode;
+            GUIUtility.systemCopyBuffer = lobby.LobbyCode;
         }
         catch (LobbyServiceException e)
         {
