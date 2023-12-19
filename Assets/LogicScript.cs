@@ -136,7 +136,7 @@ public class LogicScript : MonoBehaviour
             {
                 activeBar = bar.ChangeBar("angle");
                 line.isActive = true;
-                UI.TurnText = "Your Turn";
+                UI.TurnText = isLocal ? "Player 1's Turn" : "Your Turn";
                 CreatePuck(true);
                 player.isTurn = false;
                 player.isShooting = true;
@@ -179,7 +179,7 @@ public class LogicScript : MonoBehaviour
             {
                 activeBar = bar.ChangeBar("angle");
                 line.isActive = true;
-                UI.TurnText = isLocal ? "Opponent's Turn":"CPU's Turn";
+                UI.TurnText = isLocal ? "Player 2's Turn":"CPU's Turn";
                 CreatePuck(false);
                 opponent.isTurn = false;
                 opponent.isShooting = true;
@@ -243,10 +243,10 @@ public class LogicScript : MonoBehaviour
         else if (gameIsRunning && (player.puckCount <= 0 || opponent.puckCount <= 0) && AllPucksAreStopped())
         {
             gameIsRunning = false;
-            isLocal = false;
             UpdateScores();
             UI.ChangeUI(UI.gameResultScreen);
-            UI.UpdateGameResult(player.score, opponent.score, difficulty);
+            UI.UpdateGameResult(player.score, opponent.score, difficulty, isLocal);
+            isLocal = false;
         }
     }
 

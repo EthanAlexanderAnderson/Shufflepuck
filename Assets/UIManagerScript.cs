@@ -3,7 +3,6 @@
 
 using UnityEngine;
 using UnityEngine.UI;
-using Unity.Netcode;
 using TMPro;
 
 public class UIManagerScript : MonoBehaviour
@@ -64,9 +63,29 @@ public class UIManagerScript : MonoBehaviour
         opponentScoreText.text = opponentScore.ToString();
     }
 
-    public void UpdateGameResult(int playerScore, int opponentScore, int difficulty)
+    public void UpdateGameResult(int playerScore, int opponentScore, int difficulty, bool isLocal)
     {
         int scoreDifference = playerScore - opponentScore;
+
+        if (isLocal)
+        {
+            if (opponentScore < playerScore)
+            {
+                gameResultText.text = "Player 1 Won!";
+            }
+            else if (opponentScore > playerScore)
+            {
+                gameResultText.text = "Player 2 Won!";
+            }
+            else
+            {
+                gameResultText.text = "Tie!";
+                return;
+            }
+            gameResultHighscoreMessageText.text = "They won by " + System.Math.Abs(scoreDifference) + " points.";
+            return;
+        }
+
         string[] highscoresPlayerPrefsKeys = { "easyHighscore", "mediumHighscore", "hardHighscore" };
 
         if (playerScore > opponentScore)
