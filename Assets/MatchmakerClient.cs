@@ -287,7 +287,15 @@ public class MatchmakerClient : MonoBehaviour
     // Called by the ready button
     public void AddPlayer()
     {
-        serverLogic.AddPlayerServerRpc(logic.player.puckSpriteID);
+        try
+        {
+            serverLogic.AddPlayerServerRpc(logic.player.puckSpriteID);
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e);
+            UI.SetErrorMessage("Server Error: -1 - Contact developer.");
+        }
     }
 
     // Stop Client
