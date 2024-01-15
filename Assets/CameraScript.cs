@@ -20,10 +20,13 @@ public class CameraScript : MonoBehaviour
     // even if the screen/window size changes dynamically.
     void Update()
     {
-        float unitsPerPixel = sceneWidth / Screen.width;
+        if (Screen.width < Screen.height * 0.55)
+        {
+            float unitsPerPixel = sceneWidth / Screen.width;
 
-        float desiredHalfHeight = 0.5f * unitsPerPixel * Screen.height;
+            float desiredHalfHeight = 0.5f * unitsPerPixel * Screen.height;
 
-        _camera.orthographicSize = desiredHalfHeight;
+            _camera.orthographicSize = desiredHalfHeight;
+        }
     }
 }
