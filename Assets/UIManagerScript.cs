@@ -36,6 +36,10 @@ public class UIManagerScript : MonoBehaviour
     public Text playerScoreText;
     public Text opponentScoreText;
 
+    public Text AngleDebugText;
+    public Text PowerDebugText;
+    public Text SpinDebugText;
+
     // result
     public Text gameResultText;
     public Text gameResultHighscoreMessageText;
@@ -269,5 +273,14 @@ public class UIManagerScript : MonoBehaviour
     {
         screenLog.SetActive(true);
         Debug.Log("Started up logging.");
+    }
+
+    public void UpdateShotDebugText(float angleParameter, float powerParameter, float spinParameter = 50)
+    {
+#if (UNITY_EDITOR)
+        AngleDebugText.text = angleParameter.ToString();
+        PowerDebugText.text = powerParameter.ToString();
+        SpinDebugText.text = spinParameter.ToString();
+#endif
     }
 }

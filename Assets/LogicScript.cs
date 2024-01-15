@@ -159,6 +159,7 @@ public class LogicScript : MonoBehaviour
                         if (difficulty < 2)
                         {
                             Shoot(angle, power);
+                            UI.UpdateShotDebugText(angle, power);
                         }
                         // on hard diff, show spin bar
                         else
@@ -170,6 +171,7 @@ public class LogicScript : MonoBehaviour
                     case "spin":
                         spin = line.value;
                         Shoot(angle, power, spin);
+                        UI.UpdateShotDebugText(angle, power, spin);
                         break;
                 }
             }
@@ -211,12 +213,12 @@ public class LogicScript : MonoBehaviour
                 }
 
                 // after 1.5 seconds elapsed, CPU selects angle
-                if (tempTime + 1.5 < timer && Mathf.Abs(line.value - CPUShotAngle) < (1.0f + difficulty) && activeBar == "angle")
+                if (Mathf.Abs(line.value - CPUShotAngle) < (timer - (tempTime + 1.5)) && activeBar == "angle")
                 {
                     activeBar = bar.ChangeBar("power");
                 }
                 // after 3 seconds elapsed, CPU selects power
-                if (tempTime + 3 < timer && Mathf.Abs(line.value - CPUShotPower) < (1.0f + difficulty) && activeBar == "power")
+                if (Mathf.Abs(line.value - CPUShotPower) < (timer - (tempTime + 3)) && activeBar == "power")
                 {
                     if (difficulty < 2)
                     {
@@ -229,7 +231,7 @@ public class LogicScript : MonoBehaviour
                     }
                 }
                 // after 4.5 seconds elapsed, CPU selects spin (for hard mode only)
-                if (tempTime + 4.5 < timer && Mathf.Abs(line.value - CPUShotSpin) < (1.0f + difficulty) && activeBar == "spin")
+                if (Mathf.Abs(line.value - CPUShotSpin) < (timer - (tempTime + 4.5)) && activeBar == "spin")
                 {
                     Shoot(CPUShotAngle, CPUShotPower, CPUShotSpin);
                     tempTime = 0;
