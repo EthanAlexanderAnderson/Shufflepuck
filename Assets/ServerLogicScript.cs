@@ -227,5 +227,12 @@ public class ServerLogicScript : NetworkBehaviour
             Debug.Log(e);
         }
     }
-}
 
+    [ServerRpc(RequireOwnership = false)]
+    public void AlertDisconnectServerRpc()
+    {
+        if (!IsServer) return;
+
+        clientLogic.AlertDisconnectClientRpc();
+    }
+}

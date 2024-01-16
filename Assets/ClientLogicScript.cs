@@ -129,6 +129,8 @@ public class ClientLogicScript : NetworkBehaviour
     {
         if (!IsClient) return;
 
+        UI.titleScreenBackground.SetActive(false);
+
         puckCount = 5;
         isRunning = true;
 
@@ -170,5 +172,12 @@ public class ClientLogicScript : NetworkBehaviour
     {
         if (!IsClient) return;
         UI.SetErrorMessage("Server Error: " + code + " - Contact developer.");
+    }
+
+    [ClientRpc]
+    public void AlertDisconnectClientRpc()
+    {
+        if (!IsClient) return;
+        UI.SetErrorMessage("Your opponent has disconnected.");
     }
 }

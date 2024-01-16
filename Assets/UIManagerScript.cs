@@ -20,6 +20,7 @@ public class UIManagerScript : MonoBehaviour
     public TMP_Text profilePopupText;
     public GameObject readyButton;
     public GameObject screenLog;
+    public GameObject titleScreenBackground;
 
     // Lobby
     public TMP_Text lobbyCodeText;

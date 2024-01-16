@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 206fd689bf7f6a0448c25b0e6d100f2d
+guid: d83fa14700396b34ba9c9f093fd12cbd
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3277167989228934554
-    second: Title_background_0
+      213: -4510351227554036132
+    second: table_1_light_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -110,19 +110,6 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
-    buildTarget: Server
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
     buildTarget: iPhone
     maxTextureSize: 2048
     resizeAlgorithm: 0
@@ -139,12 +126,12 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Title_background_0
+      name: table_1_light_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 2160
+        width: 3840
         height: 3840
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -153,8 +140,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a95954b4ce6da7d20800000000000000
-      internalID: 3277167989228934554
+      spriteID: c56056594730861c0800000000000000
+      internalID: -4510351227554036132
       vertices: []
       indices: 
       edges: []
@@ -170,7 +157,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Title_background_0: 3277167989228934554
+      table_1_light_0: -4510351227554036132
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

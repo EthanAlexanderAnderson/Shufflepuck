@@ -275,6 +275,7 @@ public class LogicScript : MonoBehaviour
     {
         // organize scene
         ClearAllPucks();
+        UI.titleScreenBackground.SetActive(false);
         // reset game variables
         RandomizeCPUPuckSprite();
         difficulty = diff;
@@ -538,6 +539,7 @@ public class LogicScript : MonoBehaviour
         UI.ChangeUI(UI.titleScreen);
         line.isActive = false;
         bar.ChangeBar("none");
+        UI.titleScreenBackground.SetActive(true);
     }
 
     // this is the CPU AI for hard mode

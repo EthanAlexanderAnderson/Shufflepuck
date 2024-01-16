@@ -70,6 +70,7 @@ public class MatchmakerClient : MonoBehaviour
     }
 
     // Tell Unity Matchmaker we are looking for a game
+    //private bool ticketActive;
     private async void CreateATicket( string lobbyID = "PUBLIC" )
     {
         await UnityServices.InitializeAsync();
@@ -121,12 +122,17 @@ public class MatchmakerClient : MonoBehaviour
                     gotAssignement = true;
                     Debug.Log($"Failed to get ticket status. Error: {multiplayAssignment.Message}");
                     UI.SetErrorMessage("Connection error. Please try again.");
+                    await MatchmakerService.Instance.DeleteTicketAsync(ticketId);
                     break;
                 case StatusOptions.Timeout:
                     gotAssignement = true;
                     Debug.Log($"Failed to get ticket status. Timed out");
-                    UI.SetErrorMessage("Connection timed out. Please try again.");
-                    UI.FailedToFindMatch();
+                    if (UI.waitingGif.activeInHierarchy)
+                    {
+                        UI.SetErrorMessage("Connection timed out. Please try again.");
+                        UI.FailedToFindMatch();
+                    }
+                    await MatchmakerService.Instance.DeleteTicketAsync(ticketId);
                     break;
             }
         } while (!gotAssignement);
@@ -301,6 +307,7 @@ public class MatchmakerClient : MonoBehaviour
     // Stop Client
     public void StopClient()
     {
+        serverLogic.AlertDisconnectServerRpc();
         NetworkManager.Singleton.Shutdown();
     }
 }
