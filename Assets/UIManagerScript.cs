@@ -240,18 +240,18 @@ public class UIManagerScript : MonoBehaviour
     public void EnableReadyButton()
     {
         enabledReadyButton = true;
-        CooldownTime = 2.0f;
+        cooldownTime = 2.0f;
         waitingBackButton.SetActive(false);
         // the waiting text & gif also update after cooldown to prevent confusion
     }
 
-    float CooldownTime;
+    float cooldownTime;
     bool enabledReadyButton;
 
     private void Update()
     {
-        CooldownTime -= Time.deltaTime;
-        if (enabledReadyButton && CooldownTime <= 0f)
+        cooldownTime -= Time.deltaTime;
+        if (enabledReadyButton && cooldownTime <= 0f)
         {
             readyButton.SetActive(true);
             waitingText.text = "0/2 Players Ready";
