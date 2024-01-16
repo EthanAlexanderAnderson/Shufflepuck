@@ -37,6 +37,8 @@ public class UIManagerScript : MonoBehaviour
     public Text playerScoreText;
     public Text opponentScoreText;
 
+    public Text shotClockText;
+
     public Text AngleDebugText;
     public Text PowerDebugText;
     public Text SpinDebugText;

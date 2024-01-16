@@ -16,6 +16,7 @@ public class ClientLogicScript : NetworkBehaviour
     private bool isShooting;
 
     private bool isRunning;
+    private float shotTimer;
 
     private int puckCount;
 
@@ -49,6 +50,7 @@ public class ClientLogicScript : NetworkBehaviour
             serverLogic.CreatePuckServerRpc();
             isTurn = false;
             isShooting = true;
+            shotTimer = 18;
         }
 
         if (isShooting && Input.GetMouseButtonDown(0))
@@ -74,6 +76,29 @@ public class ClientLogicScript : NetworkBehaviour
             }
         }
 
+        // update shot clock text under 10 secs
+        if (isShooting && shotTimer <= 10.5 && shotTimer > 0)
+        {
+            UI.shotClockText.text = Mathf.RoundToInt(shotTimer).ToString();
+        }
+        // clear shot clock when not turn
+        else if (!isShooting && !isTurn)
+        {
+            UI.shotClockText.text = "";
+        }
+        // force shot after shot clock
+        else if (isShooting && shotTimer < 0)
+        {
+            angle = Random.Range(20.0f, 80.0f);
+            power = Random.Range(30.0f, 60.0f);
+            power = Random.Range(45.0f, 55.0f);
+            serverLogic.ShootServerRpc(angle, power, spin);
+            activeBar = bar.ChangeBar("none");
+            UI.TurnText = "Opponent's Turn";
+            line.isActive = false;
+            isShooting = false;
+        }
+
         if ((isTurn || isShooting) && isRunning && puckCount <= 0)
         {
             activeBar = bar.ChangeBar("none");
@@ -82,6 +107,7 @@ public class ClientLogicScript : NetworkBehaviour
             isTurn = false;
             isShooting = false;
         }
+        shotTimer -= Time.deltaTime;
     }
 
     // Server tells the client to update in-game UI showing puck counts for each player

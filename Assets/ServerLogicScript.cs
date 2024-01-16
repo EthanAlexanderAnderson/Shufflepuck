@@ -24,13 +24,25 @@ public class ServerLogicScript : NetworkBehaviour
     private List<int> competitorPuckCountList = new();
     private List<int> competitorScoreList = new();
 
-    private GameObject activePuck;
-
     private int activeCompetitorIndex;
+
+    private float shotTimer;
 
     private void OnEnable()
     {
         clientLogic = GameObject.FindGameObjectWithTag("logic").GetComponent<ClientLogicScript>();
+        shotTimer = 60;
+    }
+
+    private void Update()
+    {
+        shotTimer -= Time.deltaTime;
+        if (shotTimer < 0)
+        {
+            Debug.Log("Shot Timer Exceeded");
+            clientLogic.AlertDisconnectClientRpc();
+            shotTimer = 60;
+        }
     }
 
     // When 1 competitor is ready, setup their variables and update the ready text
@@ -105,6 +117,7 @@ public class ServerLogicScript : NetworkBehaviour
 
             clientLogic.RestartGameOnlineClientRpc(competitorList[0].puckSpriteID, competitorList[1].puckSpriteID);
             clientLogic.StartTurnClientRpc(clientRpcParamsList[activeCompetitorIndex]);
+            shotTimer = 21;
         }
         catch (System.Exception e)
         {
@@ -188,6 +201,7 @@ public class ServerLogicScript : NetworkBehaviour
             CleanupDeadPucks();
 
             clientLogic.StartTurnClientRpc(clientRpcParamsList[activeCompetitorIndex]);
+            shotTimer = 21;
         }
         catch (System.Exception e)
         {
