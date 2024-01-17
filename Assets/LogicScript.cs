@@ -528,11 +528,11 @@ public class LogicScript : MonoBehaviour
     public void EasterEgg()
     {
         easterEggCounter++;
-        easterEggBox.position += transform.right * 80.0f;
+        easterEggBox.position += transform.right * 1.4f;
         if (easterEggCounter == 11)
         {
             SelectPlayerPuckSprite(0);
-            easterEggBox.position -= transform.right * 880.0f;
+            easterEggBox.position -= transform.right * 15.4f;
             easterEggCounter = 0;
         }
     }
