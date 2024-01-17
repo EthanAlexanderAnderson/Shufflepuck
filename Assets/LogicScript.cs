@@ -40,6 +40,9 @@ public class LogicScript : MonoBehaviour
     [SerializeField] Sprite puckEye;
     [SerializeField] Sprite puckCamo;
     [SerializeField] Sprite puckYingYang;
+    [SerializeField] Sprite puckCow;
+    [SerializeField] Sprite puckCraft;
+    [SerializeField] Sprite puckPlanet;
 
     [SerializeField] Sprite puckBlueAlt;
     [SerializeField] Sprite puckGreenAlt;
@@ -64,6 +67,9 @@ public class LogicScript : MonoBehaviour
     [SerializeField] Sprite puckEyeAlt;
     [SerializeField] Sprite puckCamoAlt;
     [SerializeField] Sprite puckYingYangAlt;
+    [SerializeField] Sprite puckCowAlt;
+    [SerializeField] Sprite puckCraftAlt;
+    [SerializeField] Sprite puckPlanetAlt;
 
     [SerializeField] GameObject puckHalo;
 
@@ -105,6 +111,9 @@ public class LogicScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //PlayerPrefs.SetInt("easyHighscore", 14);
+        //PlayerPrefs.SetInt("mediumHighscore", 12);
+        //PlayerPrefs.SetInt("hardHighscore", 10);
         // create player objects
         player = new Competitor { isPlayer = true };
         opponent = new Competitor { isPlayer = false };
@@ -428,8 +437,8 @@ public class LogicScript : MonoBehaviour
     // helper with the puck customization buttons
     public Sprite ColorIDtoPuckSprite(int id)
     {
-        Sprite[] puckSprites = { puckFlower, puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain, puckNuke, puckWreath, puckSky, puckDragon, puckNinja, puckEgg, puckMonster, puckEye, puckCamo, puckYingYang };
-        Sprite[] puckAltSprites = { null, puckBlueAlt, puckGreenAlt, puckGreyAlt, puckOrangeAlt, puckPinkAlt, puckPurpleAlt, puckRedAlt, puckYellowAlt, puckRainbowAlt, puckCanadaAlt, puckDonutAlt, puckCaptainAlt, puckNukeAlt, puckWreathAlt, puckSkyAlt, puckDragonAlt, puckNinjaAlt, puckEggAlt, puckMonsterAlt, puckEyeAlt, puckCamoAlt, puckYingYangAlt };
+        Sprite[] puckSprites = { puckFlower, puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain, puckNuke, puckWreath, puckSky, puckDragon, puckNinja, puckEgg, puckMonster, puckEye, puckCamo, puckYingYang, puckCow, puckCraft, puckPlanet };
+        Sprite[] puckAltSprites = { null, puckBlueAlt, puckGreenAlt, puckGreyAlt, puckOrangeAlt, puckPinkAlt, puckPurpleAlt, puckRedAlt, puckYellowAlt, puckRainbowAlt, puckCanadaAlt, puckDonutAlt, puckCaptainAlt, puckNukeAlt, puckWreathAlt, puckSkyAlt, puckDragonAlt, puckNinjaAlt, puckEggAlt, puckMonsterAlt, puckEyeAlt, puckCamoAlt, puckYingYangAlt, puckCowAlt, puckCraftAlt, puckPlanetAlt };
 
         // if out of range, return missing
         if ((id >= puckSprites.Length) || (id <= puckSprites.Length * -1))
@@ -472,7 +481,12 @@ public class LogicScript : MonoBehaviour
         int rng;
         do
         {
-            rng = Random.Range(1, 9);
+            rng = Random.Range(-8, 9);
+            // don't allow dev puck
+            if (rng == 0)
+            {
+                rng = 1;
+            }
             player.puckSpriteID = rng;
             player.puckSprite = ColorIDtoPuckSprite(rng);
         } while (prev == player.puckSprite);
@@ -509,13 +523,17 @@ public class LogicScript : MonoBehaviour
     }
 
     // helper for easter egg button
-    int easterEgg = 0;
+    int easterEggCounter = 0;
+    [SerializeField] Transform easterEggBox;
     public void EasterEgg()
     {
-        easterEgg++;
-        if (easterEgg == 10)
+        easterEggCounter++;
+        easterEggBox.position += transform.right * 80.0f;
+        if (easterEggCounter == 11)
         {
             SelectPlayerPuckSprite(0);
+            easterEggBox.position -= transform.right * 880.0f;
+            easterEggCounter = 0;
         }
     }
 
