@@ -87,6 +87,20 @@ public class UIManagerScript : MonoBehaviour
 
         int scoreDifference = playerScore - opponentScore;
 
+        // generic win/loss/tie playerpref 
+        if (playerScore > opponentScore)
+        {
+            IncrementPlayerPref("win");
+        } 
+        else if (playerScore < opponentScore)
+        {
+            IncrementPlayerPref("loss");
+        }
+        else
+        {
+            IncrementPlayerPref("tie");
+        }
+
         Debug.Log("scoreDifference: " + scoreDifference);
 
         if (isOnline)
@@ -95,19 +109,20 @@ public class UIManagerScript : MonoBehaviour
             {
                 gameResultText.text = "You Win!";
                 gameResultHighscoreMessageText.text = "You won by " + System.Math.Abs(scoreDifference) + " points.";
+                IncrementPlayerPref("onlineWin");
             }
             else if (opponentScore > playerScore)
             {
                 gameResultText.text = "You Lose";
                 gameResultHighscoreMessageText.text = "They won by " + System.Math.Abs(scoreDifference) + " points.";
+                IncrementPlayerPref("onlineLoss");
             }
             else
             {
                 gameResultText.text = "Tie";
                 gameResultHighscoreMessageText.text = "";
-                return;
+                IncrementPlayerPref("onlineTie");
             }
-            
             return;
         }
 
@@ -116,14 +131,17 @@ public class UIManagerScript : MonoBehaviour
             if (opponentScore < playerScore)
             {
                 gameResultText.text = "Player 1 Won!";
+                IncrementPlayerPref("localWin");
             }
             else if (opponentScore > playerScore)
             {
                 gameResultText.text = "Player 2 Won!";
+                IncrementPlayerPref("localLoss");
             }
             else
             {
                 gameResultText.text = "Tie";
+                IncrementPlayerPref("localTie");
                 return;
             }
             gameResultHighscoreMessageText.text = "They won by " + System.Math.Abs(scoreDifference) + " points.";
@@ -131,6 +149,9 @@ public class UIManagerScript : MonoBehaviour
         }
 
         string[] highscoresPlayerPrefsKeys = { "easyHighscore", "mediumHighscore", "hardHighscore" };
+        string[] winPlayerPrefsKeys = { "easyWin", "mediumWin", "hardWin" };
+        string[] lossPlayerPrefsKeys = { "easyLoss", "mediumLoss", "hardLoss" };
+        string[] tiePlayerPrefsKeys = { "easyTie", "mediumTie", "hardTie" };
 
         if (playerScore > opponentScore)
         {
@@ -141,16 +162,19 @@ public class UIManagerScript : MonoBehaviour
                 gameResultHighscoreMessageText.text = gameResultHighscoreMessageText.text + "\nNew Highscore!";
                 OverwriteHighscore(scoreDifference, difficulty);
             }
+            IncrementPlayerPref(winPlayerPrefsKeys[difficulty]);
         }
         else if (playerScore < opponentScore)
         {
             gameResultText.text = "You Lose";
             gameResultHighscoreMessageText.text = "";
+            IncrementPlayerPref(lossPlayerPrefsKeys[difficulty]);
         }
         else
         {
             gameResultText.text = "Tie";
             gameResultHighscoreMessageText.text = "";
+            IncrementPlayerPref(tiePlayerPrefsKeys[difficulty]);
         }
 
     }
@@ -162,6 +186,11 @@ public class UIManagerScript : MonoBehaviour
 
         PlayerPrefs.SetInt(highscoresPlayerPrefsKeys[difficulty], newHighscore);
         UpdateProfileText();
+    }
+
+    public void IncrementPlayerPref(string key)
+    {
+        PlayerPrefs.SetInt(key, (PlayerPrefs.GetInt(key) + 1));
     }
 
     // write highscores from player prefs to profile
@@ -241,7 +270,10 @@ public class UIManagerScript : MonoBehaviour
         activeUI = newUI;
         SetErrorMessage("");
         UpdateLocks();
-        ResetHUD();
+        if (newUI == gameHud)
+        {
+            ResetHUD();
+        }
     }
 
     // reset in-game HUD

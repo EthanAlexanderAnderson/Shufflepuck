@@ -43,6 +43,7 @@ public class LogicScript : MonoBehaviour
     [SerializeField] Sprite puckCow;
     [SerializeField] Sprite puckCraft;
     [SerializeField] Sprite puckPlanet;
+    [SerializeField] Sprite puckLove;
 
     [SerializeField] Sprite puckBlueAlt;
     [SerializeField] Sprite puckGreenAlt;
@@ -70,6 +71,7 @@ public class LogicScript : MonoBehaviour
     [SerializeField] Sprite puckCowAlt;
     [SerializeField] Sprite puckCraftAlt;
     [SerializeField] Sprite puckPlanetAlt;
+    [SerializeField] Sprite puckLoveAlt;
 
     [SerializeField] GameObject puckHalo;
 
@@ -443,8 +445,8 @@ public class LogicScript : MonoBehaviour
     // helper with the puck customization buttons
     public Sprite ColorIDtoPuckSprite(int id)
     {
-        Sprite[] puckSprites = { puckFlower, puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain, puckNuke, puckWreath, puckSky, puckDragon, puckNinja, puckEgg, puckMonster, puckEye, puckCamo, puckYingYang, puckCow, puckCraft, puckPlanet };
-        Sprite[] puckAltSprites = { null, puckBlueAlt, puckGreenAlt, puckGreyAlt, puckOrangeAlt, puckPinkAlt, puckPurpleAlt, puckRedAlt, puckYellowAlt, puckRainbowAlt, puckCanadaAlt, puckDonutAlt, puckCaptainAlt, puckNukeAlt, puckWreathAlt, puckSkyAlt, puckDragonAlt, puckNinjaAlt, puckEggAlt, puckMonsterAlt, puckEyeAlt, puckCamoAlt, puckYingYangAlt, puckCowAlt, puckCraftAlt, puckPlanetAlt };
+        Sprite[] puckSprites = { puckFlower, puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain, puckNuke, puckWreath, puckSky, puckDragon, puckNinja, puckEgg, puckMonster, puckEye, puckCamo, puckYingYang, puckCow, puckCraft, puckPlanet, puckLove};
+        Sprite[] puckAltSprites = { null, puckBlueAlt, puckGreenAlt, puckGreyAlt, puckOrangeAlt, puckPinkAlt, puckPurpleAlt, puckRedAlt, puckYellowAlt, puckRainbowAlt, puckCanadaAlt, puckDonutAlt, puckCaptainAlt, puckNukeAlt, puckWreathAlt, puckSkyAlt, puckDragonAlt, puckNinjaAlt, puckEggAlt, puckMonsterAlt, puckEyeAlt, puckCamoAlt, puckYingYangAlt, puckCowAlt, puckCraftAlt, puckPlanetAlt, puckLoveAlt };
 
         // if out of range, return missing
         if ((id >= puckSprites.Length) || (id <= puckSprites.Length * -1))
