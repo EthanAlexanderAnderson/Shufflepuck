@@ -47,7 +47,7 @@ public class ServerLogicScript : NetworkBehaviour
         }
 
         // If both players have 0 pucks (aka game is over)
-        if (competitorPuckCountList.All(n => n <= 0))
+        if (competitorPuckCountList.Count > 1 && competitorPuckCountList.All(n => n <= 0))
         {
             var allPucks = GameObject.FindGameObjectsWithTag("puck");
             foreach (var puck in allPucks)

@@ -153,8 +153,8 @@ public class ClientLogicScript : NetworkBehaviour
     {
         if (!IsClient) return;
 
-        UI.ChangeUI(UI.gameResultScreen);
         UI.UpdateGameResult(-1, -1, -1, false, true);
+        UI.ChangeUI(UI.gameResultScreen);
     }
 
     // Server tells the client to switch to game scene and start the game.
