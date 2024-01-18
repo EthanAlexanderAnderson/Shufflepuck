@@ -40,8 +40,10 @@ public class LineDrawerTest : MonoBehaviour
         float zPos = 10f;//Since this is 2D. Make sure it is in the front
 
         //Set color and width
-        lineRenderer.SetColors(beginColor, endColor);
-        lineRenderer.SetWidth(hightlightSize, hightlightSize);
+        lineRenderer.startColor = beginColor;
+        lineRenderer.endColor = endColor;
+        lineRenderer.startWidth = hightlightSize;
+        lineRenderer.endWidth = hightlightSize;
 
         if (cpType is PolygonCollider2D)
         {
@@ -55,7 +57,7 @@ public class LineDrawerTest : MonoBehaviour
             }
 
             //5. Set the SetVertexCount of the LineRenderer to the Length of the points
-            lineRenderer.SetVertexCount(pColiderPos.Length + 1);
+            lineRenderer.positionCount = pColiderPos.Length + 1;
             for (int i = 0; i < pColiderPos.Length; i++)
             {
                 //6. Draw the  line
@@ -85,7 +87,7 @@ public class LineDrawerTest : MonoBehaviour
             Vector2[] pColiderPos = { topLeft, topRight, bottomRight, bottomLeft };
 
             //5. Set the SetVertexCount of the LineRenderer to the Length of the points
-            lineRenderer.SetVertexCount(pColiderPos.Length + 1);
+            lineRenderer.positionCount = pColiderPos.Length + 1;
             for (int i = 0; i < pColiderPos.Length; i++)
             {
                 //6. Draw the  line
