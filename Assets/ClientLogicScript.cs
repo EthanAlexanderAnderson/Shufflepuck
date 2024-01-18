@@ -144,8 +144,17 @@ public class ClientLogicScript : NetworkBehaviour
 
         Debug.Log("Game Over");
         isRunning = false;
+        UI.TurnText = "";
+    }
 
-        UI.TurnText = "Game Over";
+    // Server updates us with match result, for now we fetch score local
+    [ClientRpc]
+    public void GameResultClientRpc()
+    {
+        if (!IsClient) return;
+
+        UI.ChangeUI(UI.gameResultScreen);
+        UI.UpdateGameResult(-1, -1, -1, false, true);
     }
 
     // Server tells the client to switch to game scene and start the game.
@@ -156,6 +165,7 @@ public class ClientLogicScript : NetworkBehaviour
         if (!IsClient) return;
 
         UI.titleScreenBackground.SetActive(false);
+        UI.SetReButtons(false);
 
         puckCount = 5;
         isRunning = true;

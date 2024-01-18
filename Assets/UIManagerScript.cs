@@ -4,6 +4,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class UIManagerScript : MonoBehaviour
 {
@@ -43,9 +44,13 @@ public class UIManagerScript : MonoBehaviour
     public Text PowerDebugText;
     public Text SpinDebugText;
 
+    public GameObject restartButton;
+
     // result
     public Text gameResultText;
     public Text gameResultHighscoreMessageText;
+
+    public GameObject rematchButton;
 
     // local
     public GameObject activeUI;
@@ -70,9 +75,41 @@ public class UIManagerScript : MonoBehaviour
         opponentScoreText.text = opponentScore.ToString();
     }
 
-    public void UpdateGameResult(int playerScore, int opponentScore, int difficulty, bool isLocal)
+    public void UpdateGameResult(int playerScore, int opponentScore, int difficulty, bool isLocal, bool isOnline = false)
     {
+        Debug.Log("UpdateGameResult");
+        
+        // for online mode
+        if (playerScore == -1) playerScore = Int32.Parse(playerScoreText.text);
+        if (opponentScore == -1) opponentScore = Int32.Parse(opponentScoreText.text);
+
+        Debug.Log("playerScore: " + playerScore + " opponentScore: " + opponentScore);
+
         int scoreDifference = playerScore - opponentScore;
+
+        Debug.Log("scoreDifference: " + scoreDifference);
+
+        if (isOnline)
+        {
+            if (opponentScore < playerScore)
+            {
+                gameResultText.text = "You Win!";
+                gameResultHighscoreMessageText.text = "You won by " + System.Math.Abs(scoreDifference) + " points.";
+            }
+            else if (opponentScore > playerScore)
+            {
+                gameResultText.text = "You Lose";
+                gameResultHighscoreMessageText.text = "They won by " + System.Math.Abs(scoreDifference) + " points.";
+            }
+            else
+            {
+                gameResultText.text = "Tie";
+                gameResultHighscoreMessageText.text = "";
+                return;
+            }
+            
+            return;
+        }
 
         if (isLocal)
         {
@@ -86,7 +123,7 @@ public class UIManagerScript : MonoBehaviour
             }
             else
             {
-                gameResultText.text = "Tie!";
+                gameResultText.text = "Tie";
                 return;
             }
             gameResultHighscoreMessageText.text = "They won by " + System.Math.Abs(scoreDifference) + " points.";
@@ -222,6 +259,12 @@ public class UIManagerScript : MonoBehaviour
         waitingText.text = waitingTextInput;
         lobbyCodeText.text = "";
         waitingGif.SetActive(true);
+    }
+
+    public void SetReButtons(bool boolean)
+    {
+        restartButton.SetActive(boolean);
+        rematchButton.SetActive(boolean);
     }
 
     public void SetPlayerPuckIcon(Sprite sprite)

@@ -287,13 +287,18 @@ public class LogicScript : MonoBehaviour
         UI.titleScreenBackground.SetActive(false);
         // reset game variables
         RandomizeCPUPuckSprite();
-        difficulty = diff;
+        // if diff is -1, that means this function is called from the rematch button, so don't change the difficulty
+        if (diff >= 0)
+        {
+            difficulty = diff;
+        }
+        Debug.Log(difficulty);
         player.score = 0;
         opponent.score = 0;
         player.puckCount = 5;
         opponent.puckCount = 5;
 
-        if (diff < 2) // for easy & medium
+        if (difficulty < 2) // for easy & medium
         {
             player.isTurn = false;
             player.isShooting = false;
@@ -313,8 +318,9 @@ public class LogicScript : MonoBehaviour
             goingFirst = true;
         }
 
+        UI.SetReButtons(true);
         gameIsRunning = true;
-        puckHalo.SetActive(diff == 0);
+        puckHalo.SetActive(difficulty == 0);
         line.isActive = false;
         bar.ChangeBar("none");
         UI.ChangeUI(UI.gameHud);

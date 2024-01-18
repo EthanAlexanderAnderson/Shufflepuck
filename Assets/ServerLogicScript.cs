@@ -31,17 +31,36 @@ public class ServerLogicScript : NetworkBehaviour
     private void OnEnable()
     {
         clientLogic = GameObject.FindGameObjectWithTag("logic").GetComponent<ClientLogicScript>();
-        shotTimer = 60;
+        shotTimer = 30;
     }
 
     private void Update()
     {
+        if (!IsServer) return;
+
         shotTimer -= Time.deltaTime;
         if (shotTimer < 0)
         {
             Debug.Log("Shot Timer Exceeded");
             clientLogic.AlertDisconnectClientRpc();
             shotTimer = 60;
+        }
+
+        // If both players have 0 pucks (aka game is over)
+        if (competitorPuckCountList.All(n => n <= 0))
+        {
+            var allPucks = GameObject.FindGameObjectsWithTag("puck");
+            foreach (var puck in allPucks)
+            {
+                // If any pucks are not stopped, return
+                if (!puck.GetComponent<PuckScript>().IsStopped())
+                {
+                    return;
+                }
+            }
+            clientLogic.GameResultClientRpc();
+            // do this so server doesn't send this ClientRpc repeatedly forever
+            competitorPuckCountList[0] = 99;
         }
     }
 
