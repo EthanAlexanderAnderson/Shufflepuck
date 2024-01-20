@@ -42,11 +42,11 @@ public class PuckScript : NetworkBehaviour
         logic = GameObject.FindGameObjectWithTag("logic").GetComponent<LogicScript>();
     }
 
-    void Update()
+    void FixedUpdate()
     {
         // change the sliding SFX volume based on velocity
         velocity = rb.velocity.x + rb.velocity.y;
-        noiseSFX.volume = velocity / 25.0f;
+        noiseSFX.volume = (velocity / 25.0f) * logic.GetSFX();
 
         if (IsSafe())
         {
@@ -118,6 +118,7 @@ public class PuckScript : NetworkBehaviour
         // add spin
         rb.AddTorque(spin);
         // SFX
+        shotSFX.volume *= logic.GetSFX();
         shotSFX.Play();
     }
 
@@ -152,10 +153,12 @@ public class PuckScript : NetworkBehaviour
             {
                 if (IsPlayersPuck())
                 {
+                    pointPlayerSFX.volume *= logic.GetSFX();
                     pointPlayerSFX.Play();
                 }
                 else
                 {
+                    pointCPUSFX.volume *= logic.GetSFX();
                     pointCPUSFX.Play();
                 }
             }
@@ -199,10 +202,12 @@ public class PuckScript : NetworkBehaviour
         {
             if (rb.velocity.x + rb.velocity.y > 1)
             {
+                bonkHeavySFX.volume *= logic.GetSFX();
                 bonkHeavySFX.Play();
             }
             else
             {
+                bonkLightSFX.volume *= logic.GetSFX();
                 bonkLightSFX.Play();
             }
             

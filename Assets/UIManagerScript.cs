@@ -22,6 +22,7 @@ public class UIManagerScript : MonoBehaviour
     public GameObject readyButton;
     public GameObject screenLog;
     public GameObject titleScreenBackground;
+    public GameObject FPS30Button;
 
     // Lobby
     public TMP_Text lobbyCodeText;

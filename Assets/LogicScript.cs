@@ -75,6 +75,9 @@ public class LogicScript : MonoBehaviour
 
     [SerializeField] GameObject puckHalo;
 
+    public GameObject SFXParent;
+    public GameObject musicParent;
+
     // bar and line
     BarScript bar;
     LineScript line;
@@ -116,14 +119,23 @@ public class LogicScript : MonoBehaviour
         //PlayerPrefs.SetInt("easyHighscore", 14);
         //PlayerPrefs.SetInt("mediumHighscore", 12);
         //PlayerPrefs.SetInt("hardHighscore", 10);
-        // create player objects
-        player = new Competitor { isPlayer = true };
-        opponent = new Competitor { isPlayer = false };
-        Application.targetFrameRate = 30;
+
         // connect scripts
         bar = GameObject.FindGameObjectWithTag("bar").GetComponent<BarScript>();
         line = GameObject.FindGameObjectWithTag("line").GetComponent<LineScript>();
         UI = GameObject.FindGameObjectWithTag("ui").GetComponent<UIManagerScript>();
+
+        // create player objects
+        player = new Competitor { isPlayer = true };
+        opponent = new Competitor { isPlayer = false };
+        var targetFPS = PlayerPrefs.GetInt("FPS");
+        Application.targetFrameRate = targetFPS == 0 ? 90 : targetFPS;
+        Debug.Log("Target FPS: " + Application.targetFrameRate);
+        if (targetFPS == 30)
+        {
+            UI.FPS30Button.GetComponent<TargetFPSButtonScript>().SetFPS();
+        }
+
         // load play prefs data
         UI.UpdateProfileText();
         UI.UpdateLocks();
@@ -131,6 +143,9 @@ public class LogicScript : MonoBehaviour
         SelectPlayerPuckSprite(PlayerPrefs.GetInt("puck") == 0 && PlayerPrefs.GetInt("hardHighscore") <= 5 ? 1 : PlayerPrefs.GetInt("puck"));
         activeCompetitor = opponent;
         nonActiveCompetitor = player;
+        // apply audio preferences
+        if (PlayerPrefs.GetInt("music") == 2) { musicParent.GetComponent<AudioButtonScript>().ToggleMusic(); }
+        if (PlayerPrefs.GetInt("SFX") == 2) { SFXParent.GetComponent<AudioButtonScript>().ToggleSFX(); }
     }
 
     // Update is called once per frame
@@ -533,16 +548,23 @@ public class LogicScript : MonoBehaviour
     // helper for easter egg button
     int easterEggCounter = 0;
     [SerializeField] Transform easterEggBox;
+    [SerializeField] Transform antiEasterEggBox;
     public void EasterEgg()
     {
         easterEggCounter++;
         easterEggBox.position += transform.right * 1.4f;
+        antiEasterEggBox.position += transform.right * 1.4f;
         if (easterEggCounter == 11)
         {
             SelectPlayerPuckSprite(0);
-            easterEggBox.position -= transform.right * 15.4f;
-            easterEggCounter = 0;
+            ResetEasterEgg();
         }
+    }
+    public void ResetEasterEgg()
+    {
+        easterEggCounter = 0;
+        easterEggBox.position = new Vector3(-7.10f, 14.40f, 0f);
+        antiEasterEggBox.position = new Vector3(2.50f, 14.40f, 0f);
     }
 
     // helper for debug mode button
@@ -601,6 +623,12 @@ public class LogicScript : MonoBehaviour
         }
     }
 
+    // controller for SFX mute
+    // this returns 0 if muted, 1 if not muted
+    public int GetSFX()
+    {
+        return SFXParent.GetComponent<AudioButtonScript>().GetSFX();
+    }
     public void QuitGame()
     {
         Application.Quit();

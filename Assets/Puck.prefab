@@ -210,7 +210,7 @@ MonoBehaviour:
   pointCPUSFX: {fileID: 8097889116060870591}
   powerModifier: 12
   angularVelocity: 0
-  angularVelocityModifier: 0.1
+  angularVelocityModifier: 0.06
   counterForce: 0.3
 --- !u!96 &6188019625278550676
 TrailRenderer:
