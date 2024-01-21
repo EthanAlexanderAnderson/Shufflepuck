@@ -234,6 +234,12 @@ public class UIManagerScript : MonoBehaviour
                 go.SetActive(false);
             }
         }
+
+        // custom locks
+        foreach (GameObject go in GameObject.FindGameObjectsWithTag("customLock"))
+        {
+            go.GetComponent<CustomUnlockScript>().Unlock();
+        }
     }
 
     // profile reset highscores button
