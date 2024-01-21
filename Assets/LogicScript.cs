@@ -2,6 +2,7 @@
  * it controls most things happening in game and directs other scripts.
  */
 
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -503,6 +504,15 @@ public class LogicScript : MonoBehaviour
         RandomizeCPUPuckSprite();
     }
 
+
+    private List<int> unlockedPuckIDs = new List<int> { -8, -7, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7, 8 };
+
+    public void UnlockPuckID(int id)
+    {
+        unlockedPuckIDs.Add(id);
+        Debug.Log(string.Join(", ", unlockedPuckIDs));
+    }
+
     // helper for randomize puck button
     public void RandomizePlayerPuckSprite()
     {
@@ -510,14 +520,10 @@ public class LogicScript : MonoBehaviour
         int rng;
         do
         {
-            rng = Random.Range(-8, 9);
-            // don't allow dev puck
-            if (rng == 0)
-            {
-                rng = 1;
-            }
-            player.puckSpriteID = rng;
-            player.puckSprite = ColorIDtoPuckSprite(rng);
+            rng = Random.Range(0, unlockedPuckIDs.Count);
+
+            player.puckSpriteID = unlockedPuckIDs[rng];
+            player.puckSprite = ColorIDtoPuckSprite(unlockedPuckIDs[rng]);
         } while (prev == player.puckSprite);
         UI.SetPlayerPuckIcon(player.puckSprite);
         PlayerPrefs.SetInt("puck", rng);

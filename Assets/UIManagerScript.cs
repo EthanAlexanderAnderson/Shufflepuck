@@ -65,6 +65,14 @@ public class UIManagerScript : MonoBehaviour
         }
     }
 
+    // TODO: ideally unlink logic eventually
+    private LogicScript logic;
+
+    private void Start()
+    {
+        logic = GameObject.FindGameObjectWithTag("logic").GetComponent<LogicScript>();
+    }
+
     public void PostShotUpdate(int playerPuckCount, int opponentPuckCount)
     {
         playerPuckCountText.text = playerPuckCount.ToString();
@@ -209,6 +217,7 @@ public class UIManagerScript : MonoBehaviour
     {
         string[] highscoresPlayerPrefsKeys = { "easyHighscore", "mediumHighscore", "hardHighscore" };
         string[] difficultyLocksPlayerPrefsKeys = { "easyLock", "mediumLock", "hardLock" };
+        int[] IDs = { 9, 10, 11 };
         int combinedHighscore = 0;
 
         // for each different highscore, if it is greater than zero, unlock all objects of cooresponding type
@@ -220,25 +229,36 @@ public class UIManagerScript : MonoBehaviour
                 foreach (GameObject go in GameObject.FindGameObjectsWithTag(difficultyLocksPlayerPrefsKeys[i]))
                 {
                     go.SetActive(false);
+                    logic.UnlockPuckID(IDs[i]);
+                    logic.UnlockPuckID(IDs[i]*-1);
                 }
 
             combinedHighscore += iHighscore;
         }
 
         // combined highscore locks
-        //string[] combinedHighscoreLocksPlayerPrefsKeys = { "combined20Lock", "combined22Lock" };
         for (int i = 10; i <= combinedHighscore; i += 2)
         {
             foreach (GameObject go in GameObject.FindGameObjectsWithTag(i + "CombinedLock"))
             {
                 go.SetActive(false);
+                //if (i < combinedHighscore)
+                //{
+                    logic.UnlockPuckID(12 + ((i-10) / 2));
+                    logic.UnlockPuckID((12 + ((i-10) / 2)) * -1);
+                //}
             }
         }
 
         // custom locks
         foreach (GameObject go in GameObject.FindGameObjectsWithTag("customLock"))
         {
-            go.GetComponent<CustomUnlockScript>().Unlock();
+            var id = go.GetComponent<CustomUnlockScript>().Unlock();
+            if (id > 0)
+            {
+                logic.UnlockPuckID(id);
+                logic.UnlockPuckID(id * -1);
+            }
         }
     }
 

@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class CustomUnlockScript : MonoBehaviour
 {
+    [SerializeField] int ID;
+
     [SerializeField] int count;
 
     [SerializeField] bool online;
@@ -15,7 +17,7 @@ public class CustomUnlockScript : MonoBehaviour
     {
         Unlock();
     }
-    public void Unlock()
+    public int Unlock()
     {
         if 
         (
@@ -35,6 +37,8 @@ public class CustomUnlockScript : MonoBehaviour
         )
         {
             gameObject.SetActive(false);
-        }   
+            return ID;
+        }
+        return 0;
     }
 }
