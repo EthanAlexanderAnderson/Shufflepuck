@@ -4,6 +4,7 @@
 
 using UnityEngine;
 using Unity.Netcode;
+using TMPro;
 
 public class PuckScript : NetworkBehaviour
 {
@@ -35,6 +36,9 @@ public class PuckScript : NetworkBehaviour
     private int puckBaseValue = 1;
     private int zoneMultiplier = 0;
 
+    // floating text
+    public GameObject floatingTextPrefab;
+
     private LogicScript logic;
 
     void OnEnable()
@@ -46,7 +50,7 @@ public class PuckScript : NetworkBehaviour
     {
         // change the sliding SFX volume based on velocity
         velocity = rb.velocity.x + rb.velocity.y;
-        noiseSFX.volume = (velocity / 25.0f) * logic.GetSFX();
+        noiseSFX.volume = (velocity / 20.0f) * logic.GetSFX();
 
         if (IsSafe())
         {
@@ -102,7 +106,13 @@ public class PuckScript : NetworkBehaviour
     public void Shoot(float angleParameter, float powerParameter, float spinParameter = 50)
     {
         // give high power shots an extra oomf
-        if (powerParameter >= 95) { powerParameter += (powerParameter - 95) * powerModifier; }
+        var volumeBoost = 0f;
+        if (powerParameter >= 95) { 
+            powerParameter += (powerParameter - 95) * powerModifier + 10;
+            gameObject.GetComponent<TrailRenderer>().startColor = new Color(1, 0.8f, 0);
+            gameObject.GetComponent<TrailRenderer>().endColor = Color.yellow;
+            volumeBoost += 0.2f;
+        }
         // normalize power and then scale
         power = (powerParameter - (powerParameter - 50) * 0.5f) * powerModifier;
         // convert angle from 0-100 range to 60-120 range
@@ -118,6 +128,7 @@ public class PuckScript : NetworkBehaviour
         // add spin
         rb.AddTorque(spin);
         // SFX
+        shotSFX.volume += volumeBoost;
         shotSFX.volume *= logic.GetSFX();
         shotSFX.Play();
     }
@@ -161,6 +172,9 @@ public class PuckScript : NetworkBehaviour
                     pointCPUSFX.volume *= logic.GetSFX();
                     pointCPUSFX.Play();
                 }
+                // show floating text
+                var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
+                floatingText.GetComponent<TMP_Text>().text = enteredZoneMultiplier.ToString();
             }
             zoneMultiplier = enteredZoneMultiplier;
         }

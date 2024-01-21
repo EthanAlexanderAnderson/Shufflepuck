@@ -212,6 +212,7 @@ MonoBehaviour:
   angularVelocity: 0
   angularVelocityModifier: 0.06
   counterForce: 0.3
+  floatingTextPrefab: {fileID: 4579905589776270658, guid: a4af9b0b007a49c4ca9fa4d76af0f273, type: 3}
 --- !u!96 &6188019625278550676
 TrailRenderer:
   serializedVersion: 3
@@ -685,7 +686,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: 4000656f388dfc24e95732ad16ef1664, type: 3}
   m_Resource: {fileID: 8300000, guid: 4000656f388dfc24e95732ad16ef1664, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.8
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -782,7 +783,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: ab836d510875ae4469ed32812af66fe7, type: 3}
   m_Resource: {fileID: 8300000, guid: ab836d510875ae4469ed32812af66fe7, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.8
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -879,7 +880,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: 589d840275759a142add34b753e7dc31, type: 3}
   m_Resource: {fileID: 8300000, guid: 589d840275759a142add34b753e7dc31, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.8
   m_Pitch: 1
   Loop: 0
   Mute: 0
