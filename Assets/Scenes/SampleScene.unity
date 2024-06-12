@@ -7145,7 +7145,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Version 0.2.8
+  m_Text: Version 0.2.9
 --- !u!222 &452747633
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -11329,7 +11329,7 @@ GameObject:
   - component: {fileID: 744804907}
   - component: {fileID: 744804906}
   m_Layer: 5
-  m_Name: Ying Yang
+  m_Name: Yin Yang
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11374,7 +11374,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: ying yang
+  m_text: yin yang
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 49d790e490aded44a8ad8765ea27cce6, type: 2}
   m_sharedMaterial: {fileID: -579455787902537155, guid: 49d790e490aded44a8ad8765ea27cce6, type: 2}
@@ -29306,7 +29306,7 @@ GameObject:
   - component: {fileID: 1770641377}
   - component: {fileID: 1770641376}
   m_Layer: 5
-  m_Name: Ying Yang Puck Button
+  m_Name: Yin Yang Puck Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

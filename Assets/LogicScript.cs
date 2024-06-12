@@ -123,9 +123,11 @@ public class LogicScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //PlayerPrefs.SetInt("easyHighscore", 14);
-        //PlayerPrefs.SetInt("mediumHighscore", 12);
-        //PlayerPrefs.SetInt("hardHighscore", 10);
+#if (UNITY_EDITOR)
+        //PlayerPrefs.SetInt("easyHighscore", 8);
+        //PlayerPrefs.SetInt("mediumHighscore", 6);
+        //PlayerPrefs.SetInt("hardHighscore", 4);
+#endif
 
         // connect scripts
         bar = GameObject.FindGameObjectWithTag("bar").GetComponent<BarScript>();
