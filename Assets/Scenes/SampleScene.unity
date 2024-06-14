@@ -13722,7 +13722,7 @@ MonoBehaviour:
   puckHalo: {fileID: 1167867919}
   SFXParent: {fileID: 1284663723}
   musicParent: {fileID: 656067657}
-  soundManager: {fileID: 1933376152}
+  soundManager: {fileID: 1416831209}
   activeBar: none
   CPUShotAngle: 0
   CPUShotPower: 0
@@ -33672,7 +33672,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1933376153}
   - component: {fileID: 1933376154}
-  - component: {fileID: 1933376155}
   m_Layer: 5
   m_Name: Music Volume Slider
   m_TagString: Untagged
@@ -33765,26 +33764,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &1933376155
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1933376152}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b75bd51e9c9540c41b1f305539834dcf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  game_1_Quirkii: {fileID: 0}
-  game_2_Mana_Trail: {fileID: 0}
-  menu_1_Play_It_Cool: {fileID: 0}
-  selectedTrackText: {fileID: 0}
-  musicSlider: {fileID: 1933376154}
-  SFXSlider: {fileID: 2011273556}
-  musicComponent: {fileID: 1416831210}
-  clickSFX: {fileID: 0}
 --- !u!1 &1937495489
 GameObject:
   m_ObjectHideFlags: 0
@@ -35192,7 +35171,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2011273558}
   - component: {fileID: 2011273556}
-  - component: {fileID: 2011273557}
   m_Layer: 5
   m_Name: SFX Volume Slider
   m_TagString: Untagged
@@ -35263,26 +35241,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &2011273557
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2011273555}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b75bd51e9c9540c41b1f305539834dcf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  game_1_Quirkii: {fileID: 0}
-  game_2_Mana_Trail: {fileID: 0}
-  menu_1_Play_It_Cool: {fileID: 0}
-  selectedTrackText: {fileID: 0}
-  musicSlider: {fileID: 1933376154}
-  SFXSlider: {fileID: 2011273556}
-  musicComponent: {fileID: 1416831210}
-  clickSFX: {fileID: 0}
 --- !u!224 &2011273558
 RectTransform:
   m_ObjectHideFlags: 0

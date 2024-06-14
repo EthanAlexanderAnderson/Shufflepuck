@@ -17,6 +17,8 @@ public class PuckScript : NetworkBehaviour
     public AudioSource shotSFX;
     public AudioSource pointPlayerSFX;
     public AudioSource pointCPUSFX;
+    public AudioSource minusPlayerSFX;
+    public AudioSource minusCPUSFX;
 
     // script variables
     private bool shot;
@@ -130,6 +132,7 @@ public class PuckScript : NetworkBehaviour
         // SFX
         shotSFX.volume += volumeBoost;
         shotSFX.volume *= logic.GetSFX();
+        Debug.Log(shotSFX.volume);
         shotSFX.Play();
     }
 
@@ -159,7 +162,7 @@ public class PuckScript : NetworkBehaviour
         safe = isZoneSafe;
         if (enteredZoneMultiplier > zoneMultiplier || enteredZoneMultiplier == 0)
         {
-            // if put moves into higher scoring zone and gains a point play SFX
+            // if puck moves into higher scoring zone and gains a point play SFX
             if (enteredZoneMultiplier > zoneMultiplier && !IsStopped())
             {
                 if (IsPlayersPuck())
@@ -176,6 +179,21 @@ public class PuckScript : NetworkBehaviour
                 var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
                 floatingText.GetComponent<TMP_Text>().text = enteredZoneMultiplier.ToString();
             }
+            // if puck moves into the off zone, play minus sfx
+            else if (enteredZoneMultiplier < zoneMultiplier && !IsStopped())
+            {
+                if (IsPlayersPuck())
+                {
+                    minusCPUSFX.volume *= logic.GetSFX();
+                    minusCPUSFX.Play();
+                }
+                else
+                {
+                    minusPlayerSFX.volume *= logic.GetSFX();
+                    minusPlayerSFX.Play();
+                }
+            }
+            
             zoneMultiplier = enteredZoneMultiplier;
         }
     }

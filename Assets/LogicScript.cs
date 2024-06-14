@@ -177,6 +177,7 @@ public class LogicScript : MonoBehaviour
             // now player may shoot
             if ((Input.GetMouseButtonDown(0)) && gameIsRunning && (player.isShooting || isLocal))
             {
+                soundManager.GetComponent<SoundManagerScript>().PlayClickSFX();
                 // change state on tap depending on current state
                 switch (activeBar)
                 {
@@ -634,7 +635,6 @@ public class LogicScript : MonoBehaviour
     }
 
     // controller for SFX mute
-    // this returns 0 if muted, 1 if not muted
     public float GetSFX()
     {
         return soundManager.GetComponent<SoundManagerScript>().GetSFXVolume();
