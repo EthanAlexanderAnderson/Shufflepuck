@@ -11,6 +11,14 @@ public class TargetFPSButtonScript : MonoBehaviour
     [SerializeField] private int FPS;
     [SerializeField] private bool isSelected;
 
+    private void OnEnable()
+    {
+        if (PlayerPrefs.GetInt("FPS") == FPS)
+        {
+            SetFPS();
+        }
+    }
+
     public void SetFPS()
     {
         if (isSelected == false)
@@ -18,7 +26,15 @@ public class TargetFPSButtonScript : MonoBehaviour
             PlayerPrefs.SetInt("FPS", FPS);
             isSelected = true;
             thisButton.GetComponent<Image>().sprite = selected;
-            otherButton.GetComponent<TargetFPSButtonScript>().Deselect();
+            // for all other buttons with tag FPSButton, deselect them
+            GameObject[] buttons = GameObject.FindGameObjectsWithTag("FPSButton");
+            foreach (GameObject button in buttons)
+            {
+                if (button != thisButton)
+                {
+                    button.GetComponent<TargetFPSButtonScript>().Deselect();
+                }
+            }
         }
     }
 

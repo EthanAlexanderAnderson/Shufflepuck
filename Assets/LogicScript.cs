@@ -84,6 +84,7 @@ public class LogicScript : MonoBehaviour
 
     public GameObject SFXParent;
     public GameObject musicParent;
+    public GameObject soundManager;
 
     // bar and line
     BarScript bar;
@@ -137,13 +138,9 @@ public class LogicScript : MonoBehaviour
         // create player objects
         player = new Competitor { isPlayer = true };
         opponent = new Competitor { isPlayer = false };
-        var targetFPS = PlayerPrefs.GetInt("FPS");
-        Application.targetFrameRate = targetFPS == 0 ? 90 : targetFPS;
+        var targetFPS = PlayerPrefs.GetInt("FPS", 90);
+        Application.targetFrameRate = targetFPS;
         Debug.Log("Target FPS: " + Application.targetFrameRate);
-        if (targetFPS == 30)
-        {
-            UI.FPS30Button.GetComponent<TargetFPSButtonScript>().SetFPS();
-        }
 
         // load play prefs data
         UI.UpdateProfileText();
@@ -153,8 +150,7 @@ public class LogicScript : MonoBehaviour
         activeCompetitor = opponent;
         nonActiveCompetitor = player;
         // apply audio preferences
-        if (PlayerPrefs.GetInt("music") == 2) { musicParent.GetComponent<AudioButtonScript>().ToggleMusic(); }
-        if (PlayerPrefs.GetInt("SFX") == 2) { SFXParent.GetComponent<AudioButtonScript>().ToggleSFX(); }
+        soundManager.GetComponent<SoundManagerScript>().Load();
     }
 
     // Update is called once per frame
@@ -639,9 +635,9 @@ public class LogicScript : MonoBehaviour
 
     // controller for SFX mute
     // this returns 0 if muted, 1 if not muted
-    public int GetSFX()
+    public float GetSFX()
     {
-        return SFXParent.GetComponent<AudioButtonScript>().GetSFX();
+        return soundManager.GetComponent<SoundManagerScript>().GetSFXVolume();
     }
     public void QuitGame()
     {
