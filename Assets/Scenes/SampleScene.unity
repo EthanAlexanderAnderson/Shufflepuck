@@ -7536,7 +7536,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Version 0.2.9
+  m_Text: Version 0.3.0
 --- !u!222 &452747633
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8325,7 +8325,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 21.583073
+  orthographic size: 21.582859
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -33576,10 +33576,10 @@ MonoBehaviour:
 
     Menu Icons: Google Fonts
 
-    Music: Quirkii - HeatleyBros
+    Music: HeatleyBros
 
-    Design
-    Inspo: Mono Golf
+    Design Inspo:
+    Mono Golf
 
 
 
