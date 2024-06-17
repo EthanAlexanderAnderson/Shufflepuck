@@ -105,7 +105,7 @@ public class SoundManagerScript : MonoBehaviour
 
     public void PlayClickSFX()
     {
-        clickSFX.volume = SFXVolumeFromPref;
+        clickSFX.volume = SFXVolumeFromPref * 0.5f;
         clickSFX.Play();
     }
 }

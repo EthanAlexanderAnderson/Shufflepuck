@@ -184,13 +184,13 @@ public class PuckScript : NetworkBehaviour
             {
                 if (IsPlayersPuck())
                 {
-                    minusCPUSFX.volume *= logic.GetSFX();
-                    minusCPUSFX.Play();
+                    minusPlayerSFX.volume *= logic.GetSFX();
+                    minusPlayerSFX.Play();
                 }
                 else
                 {
-                    minusPlayerSFX.volume *= logic.GetSFX();
-                    minusPlayerSFX.Play();
+                    minusCPUSFX.volume *= logic.GetSFX();
+                    minusCPUSFX.Play();
                 }
             }
             
@@ -227,12 +227,14 @@ public class PuckScript : NetworkBehaviour
             ); 
     }
 
+    [SerializeField] ParticleSystem collisionParticleEffectPrefab;
+ 
     // play bonk SFX when pucks collide
     void OnCollisionEnter2D(Collision2D col)
     {
-        if (rb.velocity.x + rb.velocity.y > 0.3)
+        if (rb.velocity.x + rb.velocity.y > 0.3f)
         {
-            if (rb.velocity.x + rb.velocity.y > 1)
+            if (rb.velocity.x + rb.velocity.y > 1f)
             {
                 bonkHeavySFX.volume *= logic.GetSFX();
                 bonkHeavySFX.Play();
@@ -242,7 +244,14 @@ public class PuckScript : NetworkBehaviour
                 bonkLightSFX.volume *= logic.GetSFX();
                 bonkLightSFX.Play();
             }
-            
+            // play collision particle effect
+            ParticleSystem collisionParticleEffect = Instantiate(collisionParticleEffectPrefab, col.GetContact(0).point, Quaternion.identity);
+            collisionParticleEffect.transform.position = col.GetContact(0).point;
+            ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
+            emission.rateOverTime = (rb.velocity.x + rb.velocity.y) * 100f;
+            Debug.Log("collision velocity:" + rb.velocity.x + rb.velocity.y);
+            collisionParticleEffect.Play();
+            Destroy(collisionParticleEffect.gameObject, 5f);
         }
         angularVelocityModifier = 0;
     }
