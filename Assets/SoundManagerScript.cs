@@ -43,10 +43,8 @@ public class SoundManagerScript : MonoBehaviour
 
         musicVolumeFromPref = PlayerPrefs.GetFloat("MusicVolume", 0.8f);
         musicComponent.volume = musicVolumeFromPref;
-        //Debug.Log("Music volume: " + musicVolumeFromPref);
 
         SFXVolumeFromPref = PlayerPrefs.GetFloat("SFXVolume", 0.8f);
-        //Debug.Log("SFX volume: " + SFXVolumeFromPref);
     }
 
     private void OnEnable()
@@ -61,13 +59,11 @@ public class SoundManagerScript : MonoBehaviour
     {
         musicComponent.volume = musicSlider.value;
         PlayerPrefs.SetFloat("MusicVolume", musicSlider.value);
-        //Debug.Log("Set music volume to: " + SFXVolumeFromPref);
     }
 
     public void SetSFXVolume()
     {
         PlayerPrefs.SetFloat("SFXVolume", SFXSlider.value);
-        //Debug.Log("Set SFX volume to: " + SFXVolumeFromPref);
         SFXVolumeFromPref = SFXSlider.value;
     }
 

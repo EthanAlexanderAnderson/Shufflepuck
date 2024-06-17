@@ -326,7 +326,7 @@ public class LogicScript : MonoBehaviour
         {
             difficulty = diff;
         }
-        Debug.Log(difficulty);
+        Debug.Log("Starting match with difficulty: " + difficulty);
         player.score = 0;
         opponent.score = 0;
         player.puckCount = 5;
@@ -520,7 +520,6 @@ public class LogicScript : MonoBehaviour
     public void UnlockPuckID(int id)
     {
         unlockedPuckIDs.Add(id);
-        Debug.Log(string.Join(", ", unlockedPuckIDs));
     }
 
     // helper for randomize puck button

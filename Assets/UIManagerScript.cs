@@ -86,13 +86,9 @@ public class UIManagerScript : MonoBehaviour
 
     public void UpdateGameResult(int playerScore, int opponentScore, int difficulty, bool isLocal, bool isOnline = false)
     {
-        Debug.Log("UpdateGameResult");
-        
         // for online mode
         if (playerScore == -1) playerScore = Int32.Parse(playerScoreText.text);
         if (opponentScore == -1) opponentScore = Int32.Parse(opponentScoreText.text);
-
-        Debug.Log("playerScore: " + playerScore + " opponentScore: " + opponentScore);
 
         int scoreDifference = playerScore - opponentScore;
 
@@ -109,8 +105,6 @@ public class UIManagerScript : MonoBehaviour
         {
             IncrementPlayerPref("tie");
         }
-
-        Debug.Log("scoreDifference: " + scoreDifference);
 
         if (isOnline)
         {
