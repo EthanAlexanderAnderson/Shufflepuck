@@ -166,6 +166,7 @@ public class LogicScript : MonoBehaviour
             if (player.isTurn && !player.isShooting && (goingFirst || opponent.activePuckScript.IsSlowed()))
             {
                 activeBar = bar.ChangeBar("angle");
+                bar.toggleDim(false);
                 line.isActive = true;
                 UI.TurnText = isLocal ? "Player 1's Turn" : "Your Turn";
                 CreatePuck(true);
@@ -212,6 +213,10 @@ public class LogicScript : MonoBehaviour
             if (opponent.isTurn && (player.activePuckScript == null || (player.activePuckScript.IsSlowed() && (AllPucksAreSlowed() && difficulty < 2 || AllPucksAreSlowedMore()))))
             {
                 activeBar = bar.ChangeBar("angle");
+                if (!isLocal)
+                {
+                    bar.toggleDim(true);
+                }
                 line.isActive = true;
                 UI.TurnText = isLocal ? "Player 2's Turn":"CPU's Turn";
                 CreatePuck(false);

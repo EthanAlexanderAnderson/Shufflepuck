@@ -41,4 +41,16 @@ public class BarScript : MonoBehaviour
         }
         return type;
     }
+
+    public void toggleDim(bool dim)
+    {
+        if (dim)
+        {
+            spriteRenderer.color = new Color(1, 1, 1, 0.5f);
+        }
+        else
+        {
+            spriteRenderer.color = new Color(1, 1, 1, 1);
+        }
+    }
 }
