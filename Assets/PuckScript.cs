@@ -132,7 +132,6 @@ public class PuckScript : NetworkBehaviour
         // SFX
         shotSFX.volume += volumeBoost;
         shotSFX.volume *= logic.GetSFX();
-        Debug.Log(shotSFX.volume);
         shotSFX.Play();
     }
 
@@ -249,7 +248,9 @@ public class PuckScript : NetworkBehaviour
             collisionParticleEffect.transform.position = col.GetContact(0).point;
             ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
             emission.rateOverTime = (rb.velocity.x + rb.velocity.y) * 100f;
-            Debug.Log("collision velocity:" + rb.velocity.x + rb.velocity.y);
+            Debug.Log("collision velocity:" + (rb.velocity.x + rb.velocity.y));
+            ParticleSystem.MainModule main = collisionParticleEffect.main;
+            main.startSpeed = (rb.velocity.x + rb.velocity.y) * 4f;
             collisionParticleEffect.Play();
             Destroy(collisionParticleEffect.gameObject, 5f);
         }
