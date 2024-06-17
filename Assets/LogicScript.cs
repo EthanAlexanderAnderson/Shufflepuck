@@ -169,6 +169,9 @@ public class LogicScript : MonoBehaviour
                 bar.toggleDim(false);
                 line.isActive = true;
                 UI.TurnText = isLocal ? "Player 1's Turn" : "Your Turn";
+                if (player.puckCount == 1) {
+                    UI.TurnText = "LAST PUCK";
+                }
                 CreatePuck(true);
                 player.isTurn = false;
                 player.isShooting = true;
@@ -219,6 +222,9 @@ public class LogicScript : MonoBehaviour
                 }
                 line.isActive = true;
                 UI.TurnText = isLocal ? "Player 2's Turn":"CPU's Turn";
+                if (opponent.puckCount == 1 && isLocal) {
+                    UI.TurnText = "LAST PUCK";
+                }
                 CreatePuck(false);
                 opponent.isTurn = false;
                 opponent.isShooting = true;
