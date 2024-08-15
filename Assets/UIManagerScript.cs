@@ -69,10 +69,12 @@ public class UIManagerScript : MonoBehaviour
 
     // TODO: ideally unlink logic eventually
     private LogicScript logic;
+    private SoundManagerScript sound;
 
     private void Start()
     {
         logic = GameObject.FindGameObjectWithTag("logic").GetComponent<LogicScript>();
+        sound = GameObject.FindGameObjectWithTag("sound").GetComponent<SoundManagerScript>();
         puckAlert.SetActive(PlayerPrefs.GetInt("ShowNewSkinAlert", 0) == 1);
     }
 
@@ -99,6 +101,7 @@ public class UIManagerScript : MonoBehaviour
         if (playerScore > opponentScore)
         {
             IncrementPlayerPref("win");
+            sound.PlayWinSFX();
         } 
         else if (playerScore < opponentScore)
         {

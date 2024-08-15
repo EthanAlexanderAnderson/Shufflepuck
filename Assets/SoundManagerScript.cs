@@ -10,11 +10,11 @@ public class SoundManagerScript : MonoBehaviour
     [SerializeField] private AudioClip music_Shufflepuck;
     [SerializeField] private AudioClip game_1_Quirkii;
     [SerializeField] private AudioClip game_2_Mana_Trail;
-    
+
     [SerializeField] private AudioClip menu_1_Play_It_Cool;
-    
+
     private AudioClip[] clips;
-    
+
     private void Awake()
     {
         clips = new AudioClip[] { music_Shufflepuck, game_1_Quirkii, game_2_Mana_Trail, menu_1_Play_It_Cool };
@@ -36,16 +36,20 @@ public class SoundManagerScript : MonoBehaviour
 
     // click sfx
     [SerializeField] private AudioSource clickSFX;
+    // win sfx
+    [SerializeField] private AudioSource winSFX;
+    private bool isInitialized = false;
+
 
     public void Load()
     {
         currentClipIndex = PlayerPrefs.GetInt("SelectedTrack", 0);
         PlayClip(currentClipIndex);
 
-        musicVolumeFromPref = PlayerPrefs.GetFloat("MusicVolume", 0.8f);
+        musicVolumeFromPref = PlayerPrefs.GetFloat("MusicVolume", 0.7f);
         musicComponent.volume = musicVolumeFromPref;
 
-        SFXVolumeFromPref = PlayerPrefs.GetFloat("SFXVolume", 0.8f);
+        SFXVolumeFromPref = PlayerPrefs.GetFloat("SFXVolume", 1.0f);
     }
 
     private void OnEnable()
@@ -54,6 +58,7 @@ public class SoundManagerScript : MonoBehaviour
         musicSlider.value = musicVolumeFromPref;
         SFXSlider.value = SFXVolumeFromPref;
         selectedTrackText.text = clipNames[currentClipIndex];
+        isInitialized = true;
     }
 
     public void SetMusicVolume()
@@ -66,6 +71,11 @@ public class SoundManagerScript : MonoBehaviour
     {
         PlayerPrefs.SetFloat("SFXVolume", SFXSlider.value);
         SFXVolumeFromPref = SFXSlider.value;
+        // Play sound effect only if initialized
+        if (isInitialized)
+        {
+            PlayWinSFX();
+        }
     }
 
     public float GetMusicVolume()
@@ -88,7 +98,7 @@ public class SoundManagerScript : MonoBehaviour
 
         musicComponent.clip = clips[currentClipIndex];
         musicComponent.Play();
-        
+
         selectedTrackText.text = clipNames[currentClipIndex];
 
         PlayerPrefs.SetInt("SelectedTrack", currentClipIndex);
@@ -104,5 +114,11 @@ public class SoundManagerScript : MonoBehaviour
     {
         clickSFX.volume = SFXVolumeFromPref * 0.5f;
         clickSFX.Play();
+    }
+
+    public void PlayWinSFX()
+    {
+        winSFX.volume = SFXVolumeFromPref * 0.5f;
+        winSFX.Play();
     }
 }
