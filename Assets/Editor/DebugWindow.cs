@@ -20,6 +20,8 @@ public class DebugWindow : EditorWindow
 
     public Sprite playerPuckSprite;
 
+    public Toggle allPucks;
+
     [MenuItem("Window/Debug Window")]
     public new static void Show()
     {
@@ -35,19 +37,36 @@ public class DebugWindow : EditorWindow
         puck = logic.puckPrefab;
         FloatField angleFloatField = new FloatField();
         angleFloatField.label = "Angle";
+        angleFloatField.value = 50f;
         rootVisualElement.Add(angleFloatField);
 
         FloatField powerFloatField = new FloatField();
         rootVisualElement.Add(powerFloatField);
+        powerFloatField.value = 50f;
         powerFloatField.label = "Power";
 
         FloatField spinFloatField = new FloatField();
         rootVisualElement.Add(spinFloatField);
+        spinFloatField.value = 50f;
         spinFloatField.label = "Spin";
 
+        // checkbox for if all pucks should be shot
+        allPucks = new Toggle("shoot all pucks");
+        rootVisualElement.Add(allPucks);
+
         Button shoot = new Button { text = "SHOOT" };
-        shoot.clicked += () => DebugShoot(angleFloatField.value, powerFloatField.value, spinFloatField.value);
+        shoot.clicked += () => DebugShootNew(angleFloatField.value, powerFloatField.value, spinFloatField.value);
         rootVisualElement.Add(shoot);
+
+        
+        Button shootall = new Button { text = "SHOOT ALL" };
+        shootall.clicked += () => DebugShootAll(angleFloatField.value, powerFloatField.value, spinFloatField.value);
+        rootVisualElement.Add(shootall);
+
+        // destroy all pucks button
+        Button destroy = new Button { text = "DESTROY ALL PUCKS" };
+        destroy.clicked += () => logic.ClearAllPucks();
+        rootVisualElement.Add(destroy);
 
         //Button shootRpc = new Button { text = "SHOOT RPC" };
         //shootRpc.clicked += () => serverLogic.DebugShootServerRpc(angleFloatField.value, powerFloatField.value, spinFloatField.value);
@@ -60,10 +79,19 @@ public class DebugWindow : EditorWindow
         Button printPlayerPrefs = new Button { text = "printPlayerPrefs" };
         printPlayerPrefs.clicked += () => PrintPlayerPrefs();
         rootVisualElement.Add(printPlayerPrefs);
+
+
     }
 
-    public void DebugShoot(float angleParameter, float powerParameter, float spinParameter)
+    public void DebugShootNew(float angleParameter, float powerParameter, float spinParameter)
     {
+        puckObject = Instantiate(puck, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
+        puckScript = puckObject.GetComponent<PuckScript>();
+        puckScript.InitPuck(true, playerPuckSprite);
+        puckScript.Shoot(angleParameter, powerParameter, spinParameter);
+    }
+
+    public void DebugShootAll(float angleParameter, float powerParameter, float spinParameter) {
         var objects = GameObject.FindGameObjectsWithTag("puck");
         foreach (var obj in objects)
         {
