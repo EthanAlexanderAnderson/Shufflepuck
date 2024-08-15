@@ -7,6 +7,7 @@ using TMPro;
 public class SoundManagerScript : MonoBehaviour
 {
     // music tracks
+    [SerializeField] private AudioClip music_Shufflepuck;
     [SerializeField] private AudioClip game_1_Quirkii;
     [SerializeField] private AudioClip game_2_Mana_Trail;
     
@@ -16,9 +17,9 @@ public class SoundManagerScript : MonoBehaviour
     
     private void Awake()
     {
-        clips = new AudioClip[] { game_1_Quirkii, game_2_Mana_Trail, menu_1_Play_It_Cool };
+        clips = new AudioClip[] { music_Shufflepuck, game_1_Quirkii, game_2_Mana_Trail, menu_1_Play_It_Cool };
     }
-    private string[] clipNames = {"HeatleyBros - Quirkii", "HeatleyBros - Mana Trail", "HeatleyBros - Play It Cool"};
+    private string[] clipNames = { "Ethan Larose - Shufflepuck", "HeatleyBros - Quirkii", "HeatleyBros - Mana Trail", "HeatleyBros - Play It Cool"};
     private int currentClipIndex = 0;
 
     // settings page buttons (move to UI manager?)
