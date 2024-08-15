@@ -23,6 +23,7 @@ public class UIManagerScript : MonoBehaviour
     public GameObject screenLog;
     public GameObject titleScreenBackground;
     public GameObject FPS30Button;
+    public GameObject puckAlert;
 
     // Lobby
     public TMP_Text lobbyCodeText;
@@ -55,6 +56,7 @@ public class UIManagerScript : MonoBehaviour
 
     // local
     public GameObject activeUI;
+    private GameObject previousActiveUI;
 
     public string TurnText
     {
@@ -71,6 +73,7 @@ public class UIManagerScript : MonoBehaviour
     private void Start()
     {
         logic = GameObject.FindGameObjectWithTag("logic").GetComponent<LogicScript>();
+        puckAlert.SetActive(PlayerPrefs.GetInt("ShowNewSkinAlert", 0) == 1);
     }
 
     public void PostShotUpdate(int playerPuckCount, int opponentPuckCount)
@@ -223,10 +226,9 @@ public class UIManagerScript : MonoBehaviour
                 foreach (GameObject go in GameObject.FindGameObjectsWithTag(difficultyLocksPlayerPrefsKeys[i]))
                 {
                     go.SetActive(false);
-                    logic.UnlockPuckID(IDs[i]);
-                    logic.UnlockPuckID(IDs[i]*-1);
                 }
-
+                logic.UnlockPuckID(IDs[i]);
+                logic.UnlockPuckID(IDs[i]*-1);
             combinedHighscore += iHighscore;
         }
 
@@ -236,12 +238,9 @@ public class UIManagerScript : MonoBehaviour
             foreach (GameObject go in GameObject.FindGameObjectsWithTag(i + "CombinedLock"))
             {
                 go.SetActive(false);
-                //if (i < combinedHighscore)
-                //{
-                    logic.UnlockPuckID(12 + ((i-10) / 2));
-                    logic.UnlockPuckID((12 + ((i-10) / 2)) * -1);
-                //}
             }
+            logic.UnlockPuckID(12 + ((i-10) / 2));
+            logic.UnlockPuckID((12 + ((i-10) / 2)) * -1);
         }
 
         // custom locks
@@ -254,6 +253,7 @@ public class UIManagerScript : MonoBehaviour
                 logic.UnlockPuckID(id * -1);
             }
         }
+        puckAlert.SetActive(PlayerPrefs.GetInt("ShowNewSkinAlert", 0) == 1);
     }
 
     // profile reset highscores button
@@ -286,6 +286,7 @@ public class UIManagerScript : MonoBehaviour
     // switch UI to new screen
     public void ChangeUI(GameObject newUI)
     {
+        previousActiveUI = activeUI;
         activeUI.SetActive(false);
         newUI.SetActive(true);
         activeUI = newUI;
@@ -297,6 +298,14 @@ public class UIManagerScript : MonoBehaviour
         }
     }
 
+    // handle android back button / esc key
+    void HandleBackButton()
+    {
+        if (previousActiveUI != gameHud)
+        {
+            ChangeUI(previousActiveUI);
+        }
+    }
     // reset in-game HUD
     public void ResetHUD()
     {
@@ -354,6 +363,12 @@ public class UIManagerScript : MonoBehaviour
             waitingGif.SetActive(false);
             enabledReadyButton = false;
             waitingBackButton.SetActive(true);
+        }
+        // Check if the android back button (Escape key) is pressed
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            // Handle the back button press
+            HandleBackButton();
         }
     }
 

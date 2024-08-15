@@ -120,6 +120,7 @@ public class LogicScript : MonoBehaviour
     public Competitor opponent;
     public Competitor activeCompetitor;
     public Competitor nonActiveCompetitor;
+    private bool playedAGame = false;
 
     // Start is called before the first frame update
     void Start()
@@ -316,6 +317,7 @@ public class LogicScript : MonoBehaviour
 
     public void RestartGame(int diff)
     {
+        playedAGame = true;
         // organize scene
         ClearAllPucks();
         UI.titleScreenBackground.SetActive(false);
@@ -512,6 +514,7 @@ public class LogicScript : MonoBehaviour
         UI.SetPlayerPuckIcon(player.puckSprite);
         PlayerPrefs.SetInt("puck", id);
         RandomizeCPUPuckSprite();
+        PlayerPrefs.SetInt("ShowNewSkinAlert", 0);
     }
 
 
@@ -519,7 +522,14 @@ public class LogicScript : MonoBehaviour
 
     public void UnlockPuckID(int id)
     {
-        unlockedPuckIDs.Add(id);
+        // if not already unlocked, add to list
+        if (!unlockedPuckIDs.Contains(id)) {
+            unlockedPuckIDs.Add(id);
+            if (playedAGame)
+            {
+                PlayerPrefs.SetInt("ShowNewSkinAlert", 1);
+            }
+        }
     }
 
     // helper for randomize puck button
