@@ -166,12 +166,12 @@ public class PuckScript : NetworkBehaviour
             {
                 if (IsPlayersPuck())
                 {
-                    pointPlayerSFX.volume *= logic.GetSFX();
+                    pointPlayerSFX.volume = logic.GetSFX();
                     pointPlayerSFX.Play();
                 }
                 else
                 {
-                    pointCPUSFX.volume *= logic.GetSFX();
+                    pointCPUSFX.volume = logic.GetSFX();
                     pointCPUSFX.Play();
                 }
                 // show floating text
@@ -183,12 +183,12 @@ public class PuckScript : NetworkBehaviour
             {
                 if (IsPlayersPuck())
                 {
-                    minusPlayerSFX.volume *= logic.GetSFX();
+                    minusPlayerSFX.volume = logic.GetSFX();
                     minusPlayerSFX.Play();
                 }
                 else
                 {
-                    minusCPUSFX.volume *= logic.GetSFX();
+                    minusCPUSFX.volume = logic.GetSFX();
                     minusCPUSFX.Play();
                 }
             }
