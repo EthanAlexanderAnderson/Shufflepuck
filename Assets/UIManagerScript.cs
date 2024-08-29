@@ -58,6 +58,8 @@ public class UIManagerScript : MonoBehaviour
     public GameObject activeUI;
     private GameObject previousActiveUI;
 
+    [SerializeField] private TMP_Text wallText;
+
     public string TurnText
     {
         get => turnText.text;
@@ -87,6 +89,16 @@ public class UIManagerScript : MonoBehaviour
     {
         playerScoreText.text = playerScore.ToString();
         opponentScoreText.text = opponentScore.ToString();
+    }
+
+    public void UpdateWallText(int wallCount)
+    {
+        if (wallCount <= 0)
+        {
+            wallText.text = "";
+            return;
+        }
+        wallText.text = "wall drops in " + wallCount;
     }
 
     public void UpdateGameResult(int playerScore, int opponentScore, int difficulty, bool isLocal, bool isOnline = false)
