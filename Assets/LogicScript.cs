@@ -145,7 +145,7 @@ public class LogicScript : MonoBehaviour
         opponent = new Competitor { isPlayer = false };
         var targetFPS = PlayerPrefs.GetInt("FPS", 90);
         Application.targetFrameRate = targetFPS;
-        Debug.Log("Target FPS: " + Application.targetFrameRate);
+        //Debug.Log("Target FPS: " + Application.targetFrameRate);
 
         // load play prefs data
         UI.UpdateProfileText();
@@ -193,7 +193,6 @@ public class LogicScript : MonoBehaviour
                 {
                     wallCount--;
                     if (wallCount > 0) { UI.UpdateWallText(wallCount); }
-                    Debug.Log(wallCount);
                 }
             }
 
@@ -251,7 +250,6 @@ public class LogicScript : MonoBehaviour
                 if (wallCount > 0) {
                     wallCount--;
                     if (wallCount > 0) { UI.UpdateWallText(wallCount); }
-                    Debug.Log(wallCount);
                 }
                 // first turn on med-hard diff, CPU Shoots perfect
                 if (difficulty == 1 && opponent.puckCount == 5)
