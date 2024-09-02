@@ -75,13 +75,7 @@ crashlytics-build.properties
 .utmp
 **/lib_burst_generated.txt
 *DoNotShip*
-/AppleBuild/
-/AppleBuild-0.2.4/
-/AppleBuild-0.2.5/
-/AppleBuild-0.2.6/
-/AppleBuild-0.2.7/
-/AppleBuild-0.2.8/
-/AppleBuild-0.2.9/
+/AppleBuild-0.*.*/
 /LinuxBuild/
 /WindowsBuild/
 /old apple/
