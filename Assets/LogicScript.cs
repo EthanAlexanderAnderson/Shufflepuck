@@ -192,7 +192,7 @@ public class LogicScript : MonoBehaviour
                 if (wallCount > 0)
                 {
                     wallCount--;
-                    UI.UpdateWallText(wallCount);
+                    if (wallCount > 0) { UI.UpdateWallText(wallCount); }
                     Debug.Log(wallCount);
                 }
             }
@@ -250,7 +250,7 @@ public class LogicScript : MonoBehaviour
 
                 if (wallCount > 0) {
                     wallCount--;
-                    UI.UpdateWallText(wallCount);
+                    if (wallCount > 0) { UI.UpdateWallText(wallCount); }
                     Debug.Log(wallCount);
                 }
                 // first turn on med-hard diff, CPU Shoots perfect
