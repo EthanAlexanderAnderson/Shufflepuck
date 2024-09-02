@@ -21,6 +21,7 @@ public class DebugWindow : EditorWindow
     public Sprite playerPuckSprite;
 
     public Toggle allPucks;
+    public Toggle left;
 
     [MenuItem("Window/Debug Window")]
     public new static void Show()
@@ -54,6 +55,10 @@ public class DebugWindow : EditorWindow
         allPucks = new Toggle("shoot all pucks");
         rootVisualElement.Add(allPucks);
 
+        // checkbox for if all pucks should be shot
+        left = new Toggle("shoot from left side");
+        rootVisualElement.Add(left);
+
         Button shoot = new Button { text = "SHOOT" };
         shoot.clicked += () => DebugShootNew(angleFloatField.value, powerFloatField.value, spinFloatField.value);
         rootVisualElement.Add(shoot);
@@ -85,7 +90,7 @@ public class DebugWindow : EditorWindow
 
     public void DebugShootNew(float angleParameter, float powerParameter, float spinParameter)
     {
-        puckObject = Instantiate(puck, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
+        puckObject = Instantiate(puck, new Vector3((left.value ? -3.6f : 3.6f), -10.0f, 0.0f), Quaternion.identity);
         puckScript = puckObject.GetComponent<PuckScript>();
         puckScript.InitPuck(true, playerPuckSprite);
         puckScript.Shoot(angleParameter, powerParameter, spinParameter);
@@ -98,7 +103,7 @@ public class DebugWindow : EditorWindow
             obj.GetComponent<PuckScript>().Shoot(angleParameter, powerParameter, spinParameter);
         }
 
-        puckObject = Instantiate(puck, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
+        puckObject = Instantiate(puck, new Vector3((left.value ? -3.6f : 3.6f), -10.0f, 0.0f), Quaternion.identity);
         puckScript = puckObject.GetComponent<PuckScript>();
         puckScript.InitPuck(true, playerPuckSprite);
         puckScript.Shoot(angleParameter, powerParameter, spinParameter);
