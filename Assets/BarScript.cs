@@ -5,7 +5,9 @@ using UnityEngine;
 public class BarScript : MonoBehaviour
 {
     public SpriteRenderer spriteRenderer;
-    public Sprite angleBar;
+    public Sprite angleBarLeft;
+    public Sprite angleBarRight;
+
     public Sprite powerBar;
     public Sprite spinBar;
 
@@ -16,13 +18,13 @@ public class BarScript : MonoBehaviour
     }
 
     // change bar sprite
-    public string ChangeBar(string type)
+    public string ChangeBar(string type, bool isLeftside = true)
     {
         switch (type)
         {
             case "angle":
                 spriteRenderer.enabled = true;
-                spriteRenderer.sprite = angleBar;
+                spriteRenderer.sprite = (isLeftside ? angleBarLeft : angleBarRight);
                 break;
             case "power":
                 spriteRenderer.enabled = true;

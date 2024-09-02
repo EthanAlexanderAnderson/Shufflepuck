@@ -94,11 +94,15 @@ public class LogicScript : MonoBehaviour
     float power;
     float spin;
 
+    // wall
+    int wallCount = 3;
+    [SerializeField] private GameObject wall;
+
     // game state
     bool gameIsRunning;
     float timer = 0;
     int difficulty; // 0 easy 1 medium 2 hard
-    bool goingFirst;
+    public bool goingFirst;
 
     //public bool isLocal;
     bool isLocal;
@@ -163,10 +167,18 @@ public class LogicScript : MonoBehaviour
             // clear pucks in non-safe zones
             CleanupDeadPucks();
 
-            // start Players turn, do this then start shooting
-            if (player.isTurn && !player.isShooting && (goingFirst || opponent.activePuckScript.IsSlowed()))
+            // update wall status
+            if (wallCount == 0 && AllPucksAreSlowedMore())
             {
-                activeBar = bar.ChangeBar("angle");
+                wall.SetActive(false);
+                UI.UpdateWallText(wallCount);
+                wallCount--;
+            }
+
+            // start Players turn, do this then start shooting
+            if (player.isTurn && !player.isShooting && ((goingFirst && opponent.puckCount == 5) || opponent.activePuckScript.IsSlowed()))
+            {
+                activeBar = bar.ChangeBar("angle", leftsTurn());
                 bar.toggleDim(false);
                 line.isActive = true;
                 UI.TurnText = isLocal ? "Player 1's Turn" : "Your Turn";
@@ -176,7 +188,13 @@ public class LogicScript : MonoBehaviour
                 CreatePuck(true);
                 player.isTurn = false;
                 player.isShooting = true;
-                goingFirst = false;
+                //goingFirst = false;
+                if (wallCount > 0)
+                {
+                    wallCount--;
+                    UI.UpdateWallText(wallCount);
+                    Debug.Log(wallCount);
+                }
             }
 
             // now player may shoot
@@ -188,7 +206,7 @@ public class LogicScript : MonoBehaviour
                 {
                     case "angle":
                         angle = line.value;
-                        activeBar = bar.ChangeBar("power");
+                        activeBar = bar.ChangeBar("power", leftsTurn());
                         break;
                     case "power":
                         power = line.value;
@@ -201,7 +219,7 @@ public class LogicScript : MonoBehaviour
                         // on hard diff, show spin bar
                         else
                         {
-                            activeBar = bar.ChangeBar("spin");
+                            activeBar = bar.ChangeBar("spin", leftsTurn());
                         }
                         break;
                     // if hard, select spin
@@ -216,7 +234,7 @@ public class LogicScript : MonoBehaviour
             // start CPU's turn, do this then start shooting
             if (opponent.isTurn && (player.activePuckScript == null || (player.activePuckScript.IsSlowed() && (AllPucksAreSlowed() && difficulty < 2 || AllPucksAreSlowedMore()))))
             {
-                activeBar = bar.ChangeBar("angle");
+                activeBar = bar.ChangeBar("angle", leftsTurn());
                 if (!isLocal)
                 {
                     bar.toggleDim(true);
@@ -229,16 +247,22 @@ public class LogicScript : MonoBehaviour
                 CreatePuck(false);
                 opponent.isTurn = false;
                 opponent.isShooting = true;
+
+                if (wallCount > 0) {
+                    wallCount--;
+                    UI.UpdateWallText(wallCount);
+                    Debug.Log(wallCount);
+                }
                 // first turn on med-hard diff, CPU Shoots perfect
                 if (difficulty == 1 && opponent.puckCount == 5)
                 {
-                    CPUShotAngle = Random.Range(48.0f, 52.0f);
+                    CPUShotAngle = goingFirst ? Random.Range(33.0f, 38.0f) : Random.Range(62.0f, 67.0f);
                     CPUShotPower = Random.Range(65.0f, 78.0f);
                 }
                 // easy-med regular shots only
                 else if (difficulty < 2)
                 {
-                    CPUShotAngle = Random.Range(20.0f + (difficulty * 5.0f), 80.0f - (difficulty * 5.0f));
+                    CPUShotAngle = goingFirst ? Random.Range(11.0f + (difficulty * 5.0f), 63.0f - (difficulty * 5.0f)) : Random.Range(37.0f + (difficulty * 5.0f), 89.0f - (difficulty * 5.0f));
                     CPUShotPower = Random.Range(30.0f + (difficulty * 5.0f), 90.0f - (difficulty * 5.0f));
                 }
                 // hard uses paths, and random if no path is found
@@ -259,7 +283,7 @@ public class LogicScript : MonoBehaviour
                 // after 1.5 seconds elapsed, CPU selects angle
                 if (Mathf.Abs(line.value - CPUShotAngle) < (timer - (tempTime + 1.5)) && activeBar == "angle")
                 {
-                    activeBar = bar.ChangeBar("power");
+                    activeBar = bar.ChangeBar("power", leftsTurn());
                 }
                 // after 3 seconds elapsed, CPU selects power
                 if (Mathf.Abs(line.value - CPUShotPower) < (timer - (tempTime + 3)) && activeBar == "power")
@@ -271,7 +295,7 @@ public class LogicScript : MonoBehaviour
                     }
                     else
                     {
-                        activeBar = bar.ChangeBar("spin");
+                        activeBar = bar.ChangeBar("spin", leftsTurn());
                     }
                 }
                 // after 4.5 seconds elapsed, CPU selects spin (for hard mode only)
@@ -342,6 +366,7 @@ public class LogicScript : MonoBehaviour
             opponent.isShooting = false;
             activeCompetitor = opponent;
             nonActiveCompetitor = player;
+            goingFirst = false;
         }
         else // for hard
         {
@@ -360,6 +385,8 @@ public class LogicScript : MonoBehaviour
         line.isActive = false;
         bar.ChangeBar("none");
         UI.ChangeUI(UI.gameHud);
+        wall.SetActive(true);
+        wallCount = 3;
     }
 
     // create a puck. bool parameter of if its the player's puck or not so we can set the sprite
@@ -367,13 +394,13 @@ public class LogicScript : MonoBehaviour
     {
         if (isPlayersPuck)
         {
-            player.activePuckObject = Instantiate(puckPrefab, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
+            player.activePuckObject = Instantiate(puckPrefab, new Vector3((goingFirst ? -3.6f : 3.6f), -10.0f, 0.0f), Quaternion.identity);
             player.activePuckScript = player.activePuckObject.GetComponent<PuckScript>();
             player.activePuckScript.InitPuck(true, player.puckSprite);
         }
         else
         {
-            opponent.activePuckObject = Instantiate(puckPrefab, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
+            opponent.activePuckObject = Instantiate(puckPrefab, new Vector3((goingFirst ? 3.6f : -3.6f), -10.0f, 0.0f), Quaternion.identity);
             opponent.activePuckScript = opponent.activePuckObject.GetComponent<PuckScript>();
             opponent.activePuckScript.InitPuck(false, opponent.puckSprite);
         }
@@ -411,6 +438,11 @@ public class LogicScript : MonoBehaviour
         }
         // IF all shot puts are slowed more, return true
         return true;
+    }
+
+    public bool leftsTurn()
+    {
+        return (((player.isTurn || player.isShooting) && goingFirst) || ((opponent.isTurn || opponent.isShooting) && !goingFirst));
     }
 
     // useful helper function for deciding when to allow actions. Returns true when all pucks have stopped moving
