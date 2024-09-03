@@ -320,6 +320,7 @@ public class LogicScript : MonoBehaviour
 
     private void Shoot(float angle, float power, float spin = 50.0f)
     {
+        Debug.Log("Shooting: " + angle + " | " + power + " | " + spin);
         activeBar = bar.ChangeBar("none");
         line.isActive = false;
         activeCompetitor.activePuckScript.Shoot(angle, power, spin);
@@ -328,6 +329,7 @@ public class LogicScript : MonoBehaviour
         UI.PostShotUpdate(player.puckCount, opponent.puckCount);
         nonActiveCompetitor.isTurn = true;
         SwapCompetitors();
+        Debug.Log("Passing turn to: " + (activeCompetitor.isPlayer == true ? "player" : "opponent"));
     }
 
     private void SwapCompetitors()
@@ -350,7 +352,6 @@ public class LogicScript : MonoBehaviour
         {
             difficulty = diff;
         }
-        Debug.Log("Starting match with difficulty: " + difficulty);
         player.score = 0;
         opponent.score = 0;
         player.puckCount = 5;
@@ -385,6 +386,7 @@ public class LogicScript : MonoBehaviour
         UI.ChangeUI(UI.gameHud);
         wall.SetActive(true);
         wallCount = 3;
+        Debug.Log("Starting match with difficulty: " + difficulty);
     }
 
     // create a puck. bool parameter of if its the player's puck or not so we can set the sprite
