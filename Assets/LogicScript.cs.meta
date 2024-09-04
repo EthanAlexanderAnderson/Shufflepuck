@@ -4,11 +4,75 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - puckBlue: {fileID: 1573578925046104636, guid: 523175d1e5f8501469e3832882a7a95d, type: 3}
-  - puckPink: {fileID: 1573578925046104636, guid: f04165ff5dd89264e930f74144e49f66, type: 3}
-  - startButton: {instanceID: 0}
-  - playerScoreText: {instanceID: 0}
-  - CPUScoreText: {instanceID: 0}
+  - puckPrefab: {instanceID: 0}
+  - puckFlower: {instanceID: 0}
+  - puckMissing: {instanceID: 0}
+  - puckBlue: {instanceID: 0}
+  - puckGreen: {instanceID: 0}
+  - puckGrey: {instanceID: 0}
+  - puckOrange: {instanceID: 0}
+  - puckPink: {instanceID: 0}
+  - puckPurple: {instanceID: 0}
+  - puckRed: {instanceID: 0}
+  - puckYellow: {instanceID: 0}
+  - puckRainbow: {instanceID: 0}
+  - puckCanada: {instanceID: 0}
+  - puckDonut: {instanceID: 0}
+  - puckCaptain: {instanceID: 0}
+  - puckNuke: {instanceID: 0}
+  - puckWreath: {instanceID: 0}
+  - puckSky: {instanceID: 0}
+  - puckDragon: {instanceID: 0}
+  - puckNinja: {instanceID: 0}
+  - puckEgg: {instanceID: 0}
+  - puckMonster: {instanceID: 0}
+  - puckEye: {instanceID: 0}
+  - puckCamo: {instanceID: 0}
+  - puckYingYang: {instanceID: 0}
+  - puckCow: {instanceID: 0}
+  - puckCraft: {instanceID: 0}
+  - puckPlanet: {instanceID: 0}
+  - puckLove: {instanceID: 0}
+  - puckAura: {instanceID: 0}
+  - puckCheese: {instanceID: 0}
+  - puckScotia: {instanceID: 0}
+  - puckBlueAlt: {instanceID: 0}
+  - puckGreenAlt: {instanceID: 0}
+  - puckGreyAlt: {instanceID: 0}
+  - puckOrangeAlt: {instanceID: 0}
+  - puckPinkAlt: {instanceID: 0}
+  - puckPurpleAlt: {instanceID: 0}
+  - puckRedAlt: {instanceID: 0}
+  - puckYellowAlt: {instanceID: 0}
+  - puckRainbowAlt: {instanceID: 0}
+  - puckCanadaAlt: {instanceID: 0}
+  - puckDonutAlt: {instanceID: 0}
+  - puckCaptainAlt: {instanceID: 0}
+  - puckNukeAlt: {instanceID: 0}
+  - puckWreathAlt: {instanceID: 0}
+  - puckSkyAlt: {instanceID: 0}
+  - puckDragonAlt: {instanceID: 0}
+  - puckNinjaAlt: {instanceID: 0}
+  - puckEggAlt: {instanceID: 0}
+  - puckMonsterAlt: {instanceID: 0}
+  - puckEyeAlt: {instanceID: 0}
+  - puckCamoAlt: {instanceID: 0}
+  - puckYingYangAlt: {instanceID: 0}
+  - puckCowAlt: {instanceID: 0}
+  - puckCraftAlt: {instanceID: 0}
+  - puckPlanetAlt: {instanceID: 0}
+  - puckLoveAlt: {instanceID: 0}
+  - puckAuraAlt: {instanceID: 0}
+  - puckCheeseAlt: {instanceID: 0}
+  - puckScotiaAlt: {instanceID: 0}
+  - puckHalo: {instanceID: 0}
+  - SFXParent: {instanceID: 0}
+  - musicParent: {instanceID: 0}
+  - soundManager: {instanceID: 0}
+  - wall: {instanceID: 0}
+  - powerupsMenu: {instanceID: 0}
+  - easterEggBox: {instanceID: 0}
+  - antiEasterEggBox: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
