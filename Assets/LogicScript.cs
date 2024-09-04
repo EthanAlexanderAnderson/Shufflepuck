@@ -98,6 +98,10 @@ public class LogicScript : MonoBehaviour
     int wallCount = 3;
     [SerializeField] private GameObject wall;
 
+    // powerups
+    public bool powerupsAreEnabled = false;
+    public GameObject powerupsMenu;
+
     // game state
     bool gameIsRunning;
     float timer = 0;
@@ -178,6 +182,11 @@ public class LogicScript : MonoBehaviour
             // start Players turn, do this then start shooting
             if (player.isTurn && !player.isShooting && ((goingFirst && opponent.puckCount == 5) || opponent.activePuckScript.IsSlowed()))
             {
+                if (difficulty >= 2 && !isLocal)
+                {
+                    powerupsMenu.SetActive(powerupsAreEnabled);
+                }
+                puckHalo.SetActive(difficulty == 0);
                 activeBar = bar.ChangeBar("angle", leftsTurn());
                 bar.toggleDim(false);
                 line.isActive = true;
@@ -197,7 +206,7 @@ public class LogicScript : MonoBehaviour
             }
 
             // now player may shoot
-            if ((Input.GetMouseButtonDown(0)) && gameIsRunning && (player.isShooting || isLocal))
+            if ((Input.GetMouseButtonDown(0)) && gameIsRunning && (player.isShooting || isLocal) && powerupsMenu.activeInHierarchy == false)
             {
                 soundManager.GetComponent<SoundManagerScript>().PlayClickSFX();
                 // change state on tap depending on current state
@@ -694,5 +703,29 @@ public class LogicScript : MonoBehaviour
     public void QuitGame()
     {
         Application.Quit();
+    }
+
+
+    public void SetPowerups(bool value)
+    {
+        powerupsAreEnabled = value;
+    }
+
+    public void PlusOnePowerup()
+    {
+        player.activePuckScript.SetPuckBonusValue(1);
+    }
+
+    public void ForesightPowerup()
+    {
+        puckHalo.SetActive(true);
+    }
+
+    public void BlockPowerup()
+    {
+
+        GameObject blockPuckObject = Instantiate(puckPrefab, new Vector3(Random.Range(2f, 4f), Random.Range(2f, 4f), 0.0f), Quaternion.identity);
+        PuckScript blockPuckScript = blockPuckObject.GetComponent<PuckScript>();
+        blockPuckScript.InitPuck(true, player.puckSprite);
     }
 }

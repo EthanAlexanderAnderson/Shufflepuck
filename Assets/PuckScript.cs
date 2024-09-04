@@ -36,6 +36,7 @@ public class PuckScript : NetworkBehaviour
 
     // scoring
     private int puckBaseValue = 1;
+    private int puckBonusValue = 0;
     private int zoneMultiplier = 0;
 
     // floating text
@@ -149,7 +150,7 @@ public class PuckScript : NetworkBehaviour
     public bool IsSafe() { return safe; }
     public bool IsPastSafeLine() { return pastSafeLine; }
     public bool IsPlayersPuck() { return playersPuck; }
-    public int ComputeValue() { return puckBaseValue * zoneMultiplier; }
+    public int ComputeValue() { return (puckBaseValue * zoneMultiplier) + puckBonusValue; }
     public int GetZoneMultiplier() { return zoneMultiplier; }
     public void SetZoneMultiplier(int ZM) { zoneMultiplier = ZM; }
 
@@ -219,6 +220,7 @@ public class PuckScript : NetworkBehaviour
         return (
             "\n IsPlayersPuck: " + IsPlayersPuck() +
             "\n puckBaseValue: " + puckBaseValue +
+            "\n puckBonusValue: " + puckBonusValue +
             "\n zoneMultiplier: " + zoneMultiplier +
             "\n IsShot: " + IsShot() +
             "\n IsSafe: " + IsSafe() +
@@ -255,5 +257,15 @@ public class PuckScript : NetworkBehaviour
             Destroy(collisionParticleEffect.gameObject, 5f);
         }
         angularVelocityModifier = 0;
+    }
+
+    public void SetPuckBaseValue(int value)
+    {
+        puckBaseValue = value;
+    }
+
+    public void SetPuckBonusValue(int value)
+    {
+        puckBonusValue = value;
     }
 }
