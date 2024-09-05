@@ -75,6 +75,7 @@ crashlytics-build.properties
 .utmp
 **/lib_burst_generated.txt
 *DoNotShip*
+/AppleBuilds/
 /AppleBuild-0.*.*/
 /LinuxBuild/
 /WindowsBuild/
