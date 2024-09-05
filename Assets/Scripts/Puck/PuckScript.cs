@@ -57,8 +57,19 @@ public class PuckScript : NetworkBehaviour
         trail = gameObject.GetComponent<TrailRenderer>();
     }
 
+    private Vector2 shotForceToAdd;
+    private float shotTorqueToAdd;
     void FixedUpdate()
     {
+        // if shot, add the force / torque
+        if (IsShot() && shotForceToAdd != Vector2.zero)
+        {
+            rb.AddForce(shotForceToAdd);
+            rb.AddTorque(shotTorqueToAdd);
+            shotForceToAdd = Vector2.zero;
+            shotTorqueToAdd = 0.0f;
+        }
+
         // change the sliding SFX volume based on velocity
         velocity = rb.velocity.x + rb.velocity.y;
         noiseSFX.volume = (velocity / 20.0f) * SFXvolume;
@@ -116,6 +127,10 @@ public class PuckScript : NetworkBehaviour
     private float spin;
     public void Shoot(float angleParameter, float powerParameter, float spinParameter = 50)
     {
+        if ( angleParameter < -5 || angleParameter > 105 || powerParameter < -5 || powerParameter > 105 || spinParameter < -5 || spinParameter > 105 )
+        {
+            Debug.LogError("Invalid input: One or more parameters are out of the valid range (-5 to 105).");
+        }
         // give high power shots an extra oomf
         var volumeBoost = 0f;
         if (powerParameter >= 95) { 
@@ -134,14 +149,14 @@ public class PuckScript : NetworkBehaviour
         // adjust spin
         spin = (spinParameter - 50) * -10;
         // Shoot
-        rb.AddForce(vector);
+        shotForceToAdd = vector;
+        shotTorqueToAdd = spin;
         shot = true;
-        // add spin
-        rb.AddTorque(spin);
         // SFX
         shotSFX.volume += volumeBoost;
         shotSFX.volume *= SFXvolume;
         shotSFX.Play();
+        Debug.Log("PuckScript shot");
     }
 
     [ServerRpc]
@@ -223,7 +238,7 @@ public class PuckScript : NetworkBehaviour
 
 
     // ---------- OTHER ----------
-    public string toString()
+    public override string ToString()
     {
         return (
             "\n IsPlayersPuck: " + IsPlayersPuck() +
@@ -258,7 +273,6 @@ public class PuckScript : NetworkBehaviour
             collisionParticleEffect.transform.position = col.GetContact(0).point;
             ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
             emission.rateOverTime = (rb.velocity.x + rb.velocity.y) * 100f;
-            //Debug.Log("collision velocity:" + (rb.velocity.x + rb.velocity.y));
             ParticleSystem.MainModule main = collisionParticleEffect.main;
             main.startSpeed = (rb.velocity.x + rb.velocity.y) * 4f;
             collisionParticleEffect.Play();
@@ -267,11 +281,13 @@ public class PuckScript : NetworkBehaviour
         angularVelocityModifier = 0;
     }
 
+    // base value is multplied by score zone value
     public void SetPuckBaseValue(int value)
     {
         puckBaseValue = value;
     }
 
+    // bonus value is added onto base value * score zone value
     public void SetPuckBonusValue(int value)
     {
         puckBonusValue = value;
