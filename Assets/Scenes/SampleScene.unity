@@ -22010,7 +22010,7 @@ GameObject:
   - component: {fileID: 1167867921}
   m_Layer: 0
   m_Name: Halo
-  m_TagString: Untagged
+  m_TagString: halo
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -22045,7 +22045,7 @@ MonoBehaviour:
   angleModifierX: 20
   angleModifierY: 20
   minusY: 10
-  powerModifier: 0.14
+  powerModifier: 0.1396
   power: 0
   angle: 0
 --- !u!212 &1167867922

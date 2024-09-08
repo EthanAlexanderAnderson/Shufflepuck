@@ -6,6 +6,7 @@ public class DebugWindow : EditorWindow
 {
     private LogicScript logic;
     private ServerLogicScript serverLogic;
+    private HaloScript haloScript;
     public GameObject puck;
 
     public float angle;
@@ -32,6 +33,7 @@ public class DebugWindow : EditorWindow
     {
         logic = GameObject.FindGameObjectWithTag("logic").GetComponent<LogicScript>();
         serverLogic = GameObject.FindGameObjectWithTag("logic").GetComponent<ServerLogicScript>();
+        haloScript = GameObject.FindGameObjectWithTag("halo").GetComponent<HaloScript>();
         puck = logic.puckPrefab;
         FloatField angleFloatField = new FloatField();
         angleFloatField.label = "Angle";
@@ -64,6 +66,10 @@ public class DebugWindow : EditorWindow
         Button shootall = new() { text = "SHOOT ALL" };
         shootall.clicked += () => DebugShootAll(angleFloatField.value, powerFloatField.value, spinFloatField.value);
         rootVisualElement.Add(shootall);
+
+        Button sethalo = new() { text = "SET HALO" };
+        sethalo.clicked += () => haloScript.SetHaloPostion(angleFloatField.value, powerFloatField.value, spinFloatField.value);
+        rootVisualElement.Add(sethalo);
 
         // destroy all pucks button
         Button destroy = new() { text = "DESTROY ALL PUCKS" };

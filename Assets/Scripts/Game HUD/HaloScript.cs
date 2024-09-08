@@ -18,6 +18,8 @@ public class HaloScript : MonoBehaviour
     private float sideModifier;
     private float sideModifier2;
 
+    private bool debuggingInProgress = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -35,6 +37,9 @@ public class HaloScript : MonoBehaviour
         //sideModifier = -3.6f;
         //}
         sideModifier2 = logic.LeftsTurn() ? (-3.6f) : (3.6f);
+
+        if (debuggingInProgress) return;
+
         // calculate the pucks estimated position
         if (logic.activeBar == "angle")
         {
@@ -51,5 +56,24 @@ public class HaloScript : MonoBehaviour
             float ycomponent = Mathf.Sin(angle * Mathf.PI / 180) * angleModifierY * (powerModifier * power);
             this.transform.position = new Vector3(xcomponent + sideModifier2, ycomponent - minusY, this.transform.position.z);
         }
+    }
+
+    // for debug menu
+    public void SetHaloPostion(float angle, float power, float spin = 50)
+    {
+        debuggingInProgress = true;
+
+        float haloAngel;
+        this.transform.position = new Vector3(0.0f, -10.0f, 1.0f);
+        haloAngel = (float)((-angle * 0.6) + 120);
+        float angleXcomponent = Mathf.Cos(haloAngel * Mathf.PI / 180) * angleModifierX;
+        float angleYcomponent = Mathf.Sin(haloAngel * Mathf.PI / 180) * angleModifierY;
+        this.transform.position = new Vector3(angleXcomponent + sideModifier2, angleYcomponent - minusY, this.transform.position.z);
+
+        float haloPower;
+        haloPower = (power - (power - 50) * 0.5f) * powerModifier;
+        float powerXcomponent = Mathf.Cos(haloAngel * Mathf.PI / 180) * angleModifierX * (powerModifier * haloPower);
+        float powerYcomponent = Mathf.Sin(haloAngel * Mathf.PI / 180) * angleModifierY * (powerModifier * haloPower);
+        this.transform.position = new Vector3(powerXcomponent + sideModifier2, powerYcomponent - minusY, this.transform.position.z);
     }
 }
