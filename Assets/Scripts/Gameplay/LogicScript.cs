@@ -327,6 +327,7 @@ public class LogicScript : MonoBehaviour
             opponent.isTurn = true;
             activeCompetitor = opponent;
             nonActiveCompetitor = player;
+            player.goingFirst = false;
             opponent.goingFirst = true;
         }
         else // for hard
@@ -336,6 +337,7 @@ public class LogicScript : MonoBehaviour
             activeCompetitor = player;
             nonActiveCompetitor = opponent;
             player.goingFirst = true;
+            opponent.goingFirst = false;
         }
 
         UI.SetReButtons(true);
