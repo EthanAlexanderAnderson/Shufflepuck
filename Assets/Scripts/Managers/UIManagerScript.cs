@@ -8,54 +8,61 @@ using System;
 
 public class UIManagerScript : MonoBehaviour
 {
+    // self
+    public static UIManagerScript Instance;
+
+    // dependancies
+    private LogicScript logic;
+    private SoundManagerScript sound;
+
     // UI Parent Objects
     public GameObject titleScreen;
     public GameObject gameHud;
     public GameObject gameResultScreen;
 
     // title
-    public GameObject playerPuckIcon;
-    public GameObject opponentPuckIcon;
-    public GameObject activePuckIcon;
-    public TMP_Text errorMessage;
-    public TMP_Text profilePopupText;
-    public GameObject readyButton;
-    public GameObject screenLog;
-    public GameObject titleScreenBackground;
-    public GameObject FPS30Button;
-    public GameObject puckAlert;
+    [SerializeField] private GameObject playerPuckIcon;
+    [SerializeField] private GameObject opponentPuckIcon;
+    [SerializeField] private GameObject activePuckIcon;
+    [SerializeField] private TMP_Text errorMessage;
+    [SerializeField] private TMP_Text profilePopupText;
+    [SerializeField] private GameObject readyButton;
+    [SerializeField] private GameObject screenLog;
+    [SerializeField] private GameObject titleScreenBackground;
+    [SerializeField] private GameObject FPS30Button;
+    [SerializeField] private GameObject puckAlert;
 
     // Lobby
     public TMP_Text lobbyCodeText;
     public GameObject waitingGif;
     public TMP_Text waitingText;
-    public GameObject waitingBackButton;
+    [SerializeField] private GameObject waitingBackButton;
 
     // HUD
-    public Text turnText;
+    [SerializeField] private Text turnText;
 
     public Text playerPuckCountText;
     public Text opponentPuckCountText;
 
-    public Text playerScoreText;
-    public Text opponentScoreText;
+    [SerializeField] private Text playerScoreText;
+    [SerializeField] private Text opponentScoreText;
 
     public Text shotClockText;
 
-    public Text AngleDebugText;
-    public Text PowerDebugText;
-    public Text SpinDebugText;
+    [SerializeField] private Text AngleDebugText;
+    [SerializeField] private Text PowerDebugText;
+    [SerializeField] private Text SpinDebugText;
 
-    public GameObject restartButton;
+    [SerializeField] private GameObject restartButton;
 
     // result
-    public Text gameResultText;
-    public Text gameResultHighscoreMessageText;
+    [SerializeField] private Text gameResultText;
+    [SerializeField] private Text gameResultHighscoreMessageText;
 
-    public GameObject rematchButton;
+    [SerializeField] private GameObject rematchButton;
 
     // local
-    public GameObject activeUI;
+    [SerializeField] private GameObject activeUI;
     private GameObject previousActiveUI;
 
     [SerializeField] private TMP_Text wallText;
@@ -69,14 +76,18 @@ public class UIManagerScript : MonoBehaviour
         }
     }
 
-    // TODO: ideally unlink logic eventually
-    private LogicScript logic;
-    private SoundManagerScript sound;
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(Instance);
+    }
 
     private void Start()
     {
-        logic = GameObject.FindGameObjectWithTag("logic").GetComponent<LogicScript>();
-        sound = GameObject.FindGameObjectWithTag("sound").GetComponent<SoundManagerScript>();
+        logic = LogicScript.Instance;
+        sound = SoundManagerScript.Instance;
         puckAlert.SetActive(PlayerPrefs.GetInt("ShowNewSkinAlert", 0) == 1);
     }
 
@@ -312,6 +323,15 @@ public class UIManagerScript : MonoBehaviour
         if (newUI == gameHud)
         {
             ResetHUD();
+            titleScreenBackground.SetActive(false);
+        }
+        else if (newUI == gameResultScreen)
+        {
+            titleScreenBackground.SetActive(false);
+        }
+        else
+        {
+            titleScreenBackground.SetActive(true);
         }
     }
 

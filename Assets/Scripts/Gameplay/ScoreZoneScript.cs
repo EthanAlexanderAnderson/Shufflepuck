@@ -17,7 +17,7 @@ public class ScoreZoneScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        logic = GameObject.FindGameObjectWithTag("logic").GetComponent<LogicScript>();
+        logic = LogicScript.Instance;
     }
 
     // when a puck enters, trigger it's function

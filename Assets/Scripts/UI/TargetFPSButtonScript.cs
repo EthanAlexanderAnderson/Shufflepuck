@@ -6,6 +6,8 @@ public class TargetFPSButtonScript : MonoBehaviour
     public Sprite selected;
     public Sprite deselected;
 
+    [SerializeField] private Image image; 
+
     [SerializeField] private GameObject thisButton;
     [SerializeField] private GameObject otherButton;
     [SerializeField] private int FPS;
@@ -25,7 +27,7 @@ public class TargetFPSButtonScript : MonoBehaviour
         {
             PlayerPrefs.SetInt("FPS", FPS);
             isSelected = true;
-            thisButton.GetComponent<Image>().sprite = selected;
+            image.sprite = selected;
             // for all other buttons with tag FPSButton, deselect them
             GameObject[] buttons = GameObject.FindGameObjectsWithTag("FPSButton");
             foreach (GameObject button in buttons)
@@ -41,7 +43,7 @@ public class TargetFPSButtonScript : MonoBehaviour
     public void Deselect()
     {
         isSelected = false;
-        thisButton.GetComponent<Image>().sprite = deselected;
+        image.sprite = deselected;
     }
 
 }

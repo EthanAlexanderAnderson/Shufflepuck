@@ -6,6 +6,7 @@ public class PuckManager : MonoBehaviour
     public static PuckManager Instance;
 
     private PuckScript pucki;
+    public GameObject puckPrefab; // default puck prefab
 
     void Awake()
     {
@@ -15,9 +16,12 @@ public class PuckManager : MonoBehaviour
             Destroy(Instance);
     }
 
-    public void CreatePuck(bool isPlayersPuck)
+    public void CreatePuck(Competitor competitor)
     {
-        return;
+        float xpos = (competitor.goingFirst ? -3.6f : 3.6f);
+        competitor.activePuckObject = Instantiate(puckPrefab, new Vector3(xpos, -10.0f, 0.0f), Quaternion.identity);
+        competitor.activePuckScript = competitor.activePuckObject.GetComponent<PuckScript>();
+        competitor.activePuckScript.InitPuck(competitor.isPlayer, competitor.puckSprite);
     }
 
     public (int,int) UpdateScores()

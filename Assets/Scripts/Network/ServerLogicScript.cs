@@ -12,10 +12,12 @@ using UnityEngine;
 
 public class ServerLogicScript : NetworkBehaviour
 {
-    
-    public GameObject puck;
+    // self
+    public static ServerLogicScript Instance;
 
+    // dependancies
     private ClientLogicScript clientLogic;
+    public GameObject puck; //prefab
 
     private List<ulong> clients = new(); // List of Client IDs
     private List<Competitor> competitorList = new(); // use this for puck ownership, same indexes as clients
@@ -28,9 +30,17 @@ public class ServerLogicScript : NetworkBehaviour
 
     private float shotTimer;
 
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(Instance);
+    }
+
     private void OnEnable()
     {
-        clientLogic = GameObject.FindGameObjectWithTag("logic").GetComponent<ClientLogicScript>();
+        clientLogic = ClientLogicScript.Instance;
         shotTimer = 30;
     }
 

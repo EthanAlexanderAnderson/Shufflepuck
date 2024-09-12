@@ -4618,9 +4618,33 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 1416831212}
+        m_TargetAssemblyTypeName: SoundManagerScript, Assembly-CSharp
+        m_MethodName: PlayClickSFX
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 817506625}
         m_TargetAssemblyTypeName: LogicScript, Assembly-CSharp
         m_MethodName: ReturnToMenu
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2137903641}
+        m_TargetAssemblyTypeName: PuckManager, Assembly-CSharp
+        m_MethodName: ClearAllPucks
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4657,30 +4681,6 @@ MonoBehaviour:
       - m_Target: {fileID: 31791089}
         m_TargetAssemblyTypeName: MatchmakerClient, Assembly-CSharp
         m_MethodName: ShutdownLobby
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 2137903641}
-        m_TargetAssemblyTypeName: PuckManager, Assembly-CSharp
-        m_MethodName: ClearAllPucks
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1416831212}
-        m_TargetAssemblyTypeName: SoundManagerScript, Assembly-CSharp
-        m_MethodName: PlayClickSFX
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6986,6 +6986,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selected: {fileID: 21300000, guid: 5831954a17fc4944ba5c46afc44b76df, type: 3}
   deselected: {fileID: 21300000, guid: 6961a8ef263da3b43b7b57b98079bce4, type: 3}
+  image: {fileID: 363060397}
   thisButton: {fileID: 363060393}
   otherButton: {fileID: 1575655374}
   FPS: 120
@@ -13537,6 +13538,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selected: {fileID: 21300000, guid: 9a7ca5808d2e19949b5de4c52f8a47a9, type: 3}
   deselected: {fileID: 21300000, guid: 0d4e49e96527caf46bb37927d8d6e219, type: 3}
+  image: {fileID: 663578441}
   thisButton: {fileID: 663578437}
   otherButton: {fileID: 1091482862}
   FPS: 60
@@ -15999,8 +16001,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e5709dfa5e4c7a44919ac805243af6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  puckPrefab: {fileID: 1573578925046104636, guid: 523175d1e5f8501469e3832882a7a95d, type: 3}
   puckHalo: {fileID: 1167867919}
+  puckPrefab: {fileID: 1573578925046104636, guid: 523175d1e5f8501469e3832882a7a95d, type: 3}
   activeBar: none
   wall: {fileID: 474300706}
   powerupsAreEnabled: 0
@@ -18712,7 +18714,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 941852555}
-  value: 50
+  value: 0
   isActive: 0
 --- !u!212 &941852555
 SpriteRenderer:
@@ -21228,6 +21230,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selected: {fileID: 21300000, guid: 6356ddfcff46806449126e4c454ee61b, type: 3}
   deselected: {fileID: 21300000, guid: a3e7522156d3b4d4296aac0e5de615a1, type: 3}
+  image: {fileID: 1091482866}
   thisButton: {fileID: 1091482862}
   otherButton: {fileID: 1575655374}
   FPS: 90
@@ -29369,6 +29372,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selected: {fileID: 21300000, guid: 0b1e0fc2acb6e8041bc955a4fccd09ed, type: 3}
   deselected: {fileID: 21300000, guid: b6a0dca8e105906428ef4512f1e77c43, type: 3}
+  image: {fileID: 1575655378}
   thisButton: {fileID: 1575655374}
   otherButton: {fileID: 1091482862}
   FPS: 30
@@ -37435,6 +37439,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e90006e1a7e62644ca0aa33f4a7db6be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  puckPrefab: {fileID: 1573578925046104636, guid: 523175d1e5f8501469e3832882a7a95d, type: 3}
 --- !u!4 &2137903642
 Transform:
   m_ObjectHideFlags: 0

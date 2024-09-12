@@ -39,9 +39,13 @@ public class MatchmakerClient : MonoBehaviour
     private void OnEnable()
     {
         ServerStartUp.ClientInstance += SignIn;
-        UI = GameObject.FindGameObjectWithTag("ui").GetComponent<UIManagerScript>();
-        logic = GameObject.FindGameObjectWithTag("logic").GetComponent<LogicScript>();
-        serverLogic = GameObject.FindGameObjectWithTag("logic").GetComponent<ServerLogicScript>();
+    }
+
+    private void Start()
+    {
+        logic = LogicScript.Instance;
+        UI = UIManagerScript.Instance;
+        serverLogic = ServerLogicScript.Instance;
     }
 
     private void OnDisable()

@@ -8,6 +8,10 @@ using UnityEngine;
 
 public class ClientLogicScript : NetworkBehaviour
 {
+    // self
+    public static ClientLogicScript Instance;
+
+    // dependancies
     private UIManagerScript UI;
     private LogicScript logic;
     private ServerLogicScript serverLogic;
@@ -30,13 +34,21 @@ public class ClientLogicScript : NetworkBehaviour
     public float spin;
     public GameObject puckHalo;
 
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(Instance);
+    }
+
     private void OnEnable()
     {
-        UI = GameObject.FindGameObjectWithTag("ui").GetComponent<UIManagerScript>();
-        logic = GameObject.FindGameObjectWithTag("logic").GetComponent<LogicScript>();
-        serverLogic = GameObject.FindGameObjectWithTag("logic").GetComponent<ServerLogicScript>();
-        bar = GameObject.FindGameObjectWithTag("bar").GetComponent<BarScript>();
-        line = GameObject.FindGameObjectWithTag("line").GetComponent<LineScript>();
+        UI = UIManagerScript.Instance;
+        logic = LogicScript.Instance;
+        serverLogic = ServerLogicScript.Instance;
+        bar = BarScript.Instance;
+        line = LineScript.Instance;
         puckSkinManager = PuckSkinManager.Instance;
     }
 
@@ -60,15 +72,15 @@ public class ClientLogicScript : NetworkBehaviour
             switch (activeBar)
             {
                 case "angle":
-                    angle = line.value;
+                    angle = line.GetValue();
                     activeBar = bar.ChangeBar("power");
                     break;
                 case "power":
-                    power = line.value;
+                    power = line.GetValue();
                     activeBar = bar.ChangeBar("spin");
                     break;
                 case "spin":
-                    spin = line.value;
+                    spin = line.GetValue();
                     serverLogic.ShootServerRpc(angle, power, spin);
                     activeBar = bar.ChangeBar("none");
                     UI.TurnText = "Opponent's Turn";
@@ -166,7 +178,6 @@ public class ClientLogicScript : NetworkBehaviour
     {
         if (!IsClient) return;
 
-        UI.titleScreenBackground.SetActive(false);
         UI.SetReButtons(false);
 
         puckCount = 5;

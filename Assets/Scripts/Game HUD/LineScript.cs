@@ -4,15 +4,27 @@ using UnityEngine;
 
 public class LineScript : MonoBehaviour
 {
-    [SerializeField] SpriteRenderer spriteRenderer;
+    // self
+    public static LineScript Instance;
+
+    [SerializeField] private SpriteRenderer spriteRenderer;
 
     bool movingLeft;
     const float moveSpeed = 10;
 
-    public float value;
+    [SerializeField] private float value;
     public bool isActive;
 
     // Start is called before the first frame update
+
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(Instance);
+    }
+
     void Start()
     {
         transform.localPosition = new Vector3(Random.Range(-10.0f, 10.0f), 0, -2);
@@ -49,6 +61,22 @@ public class LineScript : MonoBehaviour
         else
         {
             spriteRenderer.enabled = false;
+        }
+    }
+
+    internal float GetValue()
+    {
+        if ( value > 105 )
+        {
+            return 105;
+        }
+        else if ( value < -5 )
+        {
+            return -5;
+        }
+        else
+        {
+            return value;
         }
     }
 }

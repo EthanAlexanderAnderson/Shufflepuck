@@ -10,11 +10,11 @@ public class CPUPathScript : MonoBehaviour
     List<GameObject> pucksInPath = new();
     private List<GameObject> GetPucksInPath() { return pucksInPath; }
 
-    [SerializeField] float angle;
-    [SerializeField] float power;
-    [SerializeField] float spin;
-    [SerializeField] int value;
-    [SerializeField] bool isContactShot;
+    [SerializeField] private float angle;
+    [SerializeField] private float power;
+    [SerializeField] private float spin;
+    [SerializeField] private int value;
+    [SerializeField] private bool isContactShot;
 
     public (float, float, float) GetPath() { return (angle, power, spin); }
 
@@ -53,9 +53,7 @@ public class CPUPathScript : MonoBehaviour
     private bool IsPlayersPuck(GameObject p)
     {
         if (p == null) return false;
-#if (UNITY_EDITOR)
-        p.GetComponent<SpriteRenderer>().color = Color.red;
-#endif
+
         if (p.GetComponent<PuckScript>() == null) return false;
 
         return p.GetComponent<PuckScript>().IsPlayersPuck();

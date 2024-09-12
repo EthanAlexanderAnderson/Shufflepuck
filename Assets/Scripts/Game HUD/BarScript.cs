@@ -4,12 +4,22 @@ using UnityEngine;
 
 public class BarScript : MonoBehaviour
 {
-    public SpriteRenderer spriteRenderer;
-    public Sprite angleBarLeft;
-    public Sprite angleBarRight;
+    // self
+    public static BarScript Instance;
 
-    public Sprite powerBar;
-    public Sprite spinBar;
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private Sprite angleBarLeft;
+    [SerializeField] private Sprite angleBarRight;
+    [SerializeField] private Sprite powerBar;
+    [SerializeField] private Sprite spinBar;
+
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(Instance);
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -44,7 +54,7 @@ public class BarScript : MonoBehaviour
         return type;
     }
 
-    public void toggleDim(bool dim)
+    public void ToggleDim(bool dim)
     {
         if (dim)
         {

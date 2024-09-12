@@ -2,14 +2,14 @@ using UnityEngine;
 
 public class CustomUnlockScript : MonoBehaviour
 {
-    [SerializeField] int ID;
+    [SerializeField] private int ID;
 
-    [SerializeField] int count;
+    [SerializeField] private int count;
 
-    [SerializeField] bool online;
-    [SerializeField] bool easy;
-    [SerializeField] bool medium;
-    [SerializeField] bool hard;
+    [SerializeField] private bool online;
+    [SerializeField] private bool easy;
+    [SerializeField] private bool medium;
+    [SerializeField] private bool hard;
 
     // Start is called before the first frame update
 

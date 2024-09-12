@@ -68,7 +68,7 @@ public class DebugWindow : EditorWindow
         rootVisualElement.Add(shootall);
 
         Button sethalo = new() { text = "SET HALO" };
-        sethalo.clicked += () => haloScript.SetHaloPostion(angleFloatField.value, powerFloatField.value, spinFloatField.value);
+        sethalo.clicked += () => haloScript.SetHaloPostion(angleFloatField.value, powerFloatField.value, spinFloatField.value, left.value);
         rootVisualElement.Add(sethalo);
 
         // destroy all pucks button

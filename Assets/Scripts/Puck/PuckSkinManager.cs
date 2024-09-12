@@ -9,70 +9,70 @@ public class PuckSkinManager : MonoBehaviour
     private UIManagerScript UI;
 
     // sprites
-    [SerializeField] Sprite puckFlower;
-    [SerializeField] Sprite puckMissing;
+    [SerializeField] private Sprite puckFlower;
+    [SerializeField] private Sprite puckMissing;
 
-    [SerializeField] Sprite puckBlue;
-    [SerializeField] Sprite puckGreen;
-    [SerializeField] Sprite puckGrey;
-    [SerializeField] Sprite puckOrange;
-    [SerializeField] Sprite puckPink;
-    [SerializeField] Sprite puckPurple;
-    [SerializeField] Sprite puckRed;
-    [SerializeField] Sprite puckYellow;
+    [SerializeField] private Sprite puckBlue;
+    [SerializeField] private Sprite puckGreen;
+    [SerializeField] private Sprite puckGrey;
+    [SerializeField] private Sprite puckOrange;
+    [SerializeField] private Sprite puckPink;
+    [SerializeField] private Sprite puckPurple;
+    [SerializeField] private Sprite puckRed;
+    [SerializeField] private Sprite puckYellow;
 
-    [SerializeField] Sprite puckRainbow;
-    [SerializeField] Sprite puckCanada;
-    [SerializeField] Sprite puckDonut;
-    [SerializeField] Sprite puckCaptain;
-    [SerializeField] Sprite puckNuke;
-    [SerializeField] Sprite puckWreath;
-    [SerializeField] Sprite puckSky;
-    [SerializeField] Sprite puckDragon;
-    [SerializeField] Sprite puckNinja;
-    [SerializeField] Sprite puckEgg;
-    [SerializeField] Sprite puckMonster;
-    [SerializeField] Sprite puckEye;
-    [SerializeField] Sprite puckCamo;
-    [SerializeField] Sprite puckYingYang;
-    [SerializeField] Sprite puckCow;
-    [SerializeField] Sprite puckCraft;
-    [SerializeField] Sprite puckPlanet;
-    [SerializeField] Sprite puckLove;
-    [SerializeField] Sprite puckAura;
-    [SerializeField] Sprite puckCheese;
-    [SerializeField] Sprite puckScotia;
+    [SerializeField] private Sprite puckRainbow;
+    [SerializeField] private Sprite puckCanada;
+    [SerializeField] private Sprite puckDonut;
+    [SerializeField] private Sprite puckCaptain;
+    [SerializeField] private Sprite puckNuke;
+    [SerializeField] private Sprite puckWreath;
+    [SerializeField] private Sprite puckSky;
+    [SerializeField] private Sprite puckDragon;
+    [SerializeField] private Sprite puckNinja;
+    [SerializeField] private Sprite puckEgg;
+    [SerializeField] private Sprite puckMonster;
+    [SerializeField] private Sprite puckEye;
+    [SerializeField] private Sprite puckCamo;
+    [SerializeField] private Sprite puckYingYang;
+    [SerializeField] private Sprite puckCow;
+    [SerializeField] private Sprite puckCraft;
+    [SerializeField] private Sprite puckPlanet;
+    [SerializeField] private Sprite puckLove;
+    [SerializeField] private Sprite puckAura;
+    [SerializeField] private Sprite puckCheese;
+    [SerializeField] private Sprite puckScotia;
 
-    [SerializeField] Sprite puckBlueAlt;
-    [SerializeField] Sprite puckGreenAlt;
-    [SerializeField] Sprite puckGreyAlt;
-    [SerializeField] Sprite puckOrangeAlt;
-    [SerializeField] Sprite puckPinkAlt;
-    [SerializeField] Sprite puckPurpleAlt;
-    [SerializeField] Sprite puckRedAlt;
-    [SerializeField] Sprite puckYellowAlt;
+    [SerializeField] private Sprite puckBlueAlt;
+    [SerializeField] private Sprite puckGreenAlt;
+    [SerializeField] private Sprite puckGreyAlt;
+    [SerializeField] private Sprite puckOrangeAlt;
+    [SerializeField] private Sprite puckPinkAlt;
+    [SerializeField] private Sprite puckPurpleAlt;
+    [SerializeField] private Sprite puckRedAlt;
+    [SerializeField] private Sprite puckYellowAlt;
 
-    [SerializeField] Sprite puckRainbowAlt;
-    [SerializeField] Sprite puckCanadaAlt;
-    [SerializeField] Sprite puckDonutAlt;
-    [SerializeField] Sprite puckCaptainAlt;
-    [SerializeField] Sprite puckNukeAlt;
-    [SerializeField] Sprite puckWreathAlt;
-    [SerializeField] Sprite puckSkyAlt;
-    [SerializeField] Sprite puckDragonAlt;
-    [SerializeField] Sprite puckNinjaAlt;
-    [SerializeField] Sprite puckEggAlt;
-    [SerializeField] Sprite puckMonsterAlt;
-    [SerializeField] Sprite puckEyeAlt;
-    [SerializeField] Sprite puckCamoAlt;
-    [SerializeField] Sprite puckYingYangAlt;
-    [SerializeField] Sprite puckCowAlt;
-    [SerializeField] Sprite puckCraftAlt;
-    [SerializeField] Sprite puckPlanetAlt;
-    [SerializeField] Sprite puckLoveAlt;
-    [SerializeField] Sprite puckAuraAlt;
-    [SerializeField] Sprite puckCheeseAlt;
-    [SerializeField] Sprite puckScotiaAlt;
+    [SerializeField] private Sprite puckRainbowAlt;
+    [SerializeField] private Sprite puckCanadaAlt;
+    [SerializeField] private Sprite puckDonutAlt;
+    [SerializeField] private Sprite puckCaptainAlt;
+    [SerializeField] private Sprite puckNukeAlt;
+    [SerializeField] private Sprite puckWreathAlt;
+    [SerializeField] private Sprite puckSkyAlt;
+    [SerializeField] private Sprite puckDragonAlt;
+    [SerializeField] private Sprite puckNinjaAlt;
+    [SerializeField] private Sprite puckEggAlt;
+    [SerializeField] private Sprite puckMonsterAlt;
+    [SerializeField] private Sprite puckEyeAlt;
+    [SerializeField] private Sprite puckCamoAlt;
+    [SerializeField] private Sprite puckYingYangAlt;
+    [SerializeField] private Sprite puckCowAlt;
+    [SerializeField] private Sprite puckCraftAlt;
+    [SerializeField] private Sprite puckPlanetAlt;
+    [SerializeField] private Sprite puckLoveAlt;
+    [SerializeField] private Sprite puckAuraAlt;
+    [SerializeField] private Sprite puckCheeseAlt;
+    [SerializeField] private Sprite puckScotiaAlt;
 
     void Awake()
     {
@@ -86,8 +86,8 @@ public class PuckSkinManager : MonoBehaviour
 
     private void OnEnable()
     {
-        logic = GameObject.FindGameObjectWithTag("logic").GetComponent<LogicScript>();
-        UI = GameObject.FindGameObjectWithTag("ui").GetComponent<UIManagerScript>();
+        logic = LogicScript.Instance;
+        UI = UIManagerScript.Instance;
     }
 
     public Sprite ColorIDtoPuckSprite(int id)
@@ -183,8 +183,8 @@ public class PuckSkinManager : MonoBehaviour
 
     // helper variables for easter egg button
     int easterEggCounter = 0;
-    [SerializeField] Transform easterEggBox;
-    [SerializeField] Transform antiEasterEggBox;
+    [SerializeField] private Transform easterEggBox;
+    [SerializeField] private Transform antiEasterEggBox;
 
     // called by easter egg object
     public void EasterEgg()

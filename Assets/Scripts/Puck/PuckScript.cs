@@ -9,16 +9,16 @@ using TMPro;
 public class PuckScript : NetworkBehaviour
 {
     // puck object components
-    [SerializeField] Rigidbody2D rb;
-    [SerializeField] SpriteRenderer spriteRenderer;
-    [SerializeField] AudioSource bonkHeavySFX;
-    [SerializeField] AudioSource bonkLightSFX;
-    [SerializeField] AudioSource noiseSFX;
-    [SerializeField] AudioSource shotSFX;
-    [SerializeField] AudioSource pointPlayerSFX;
-    [SerializeField] AudioSource pointCPUSFX;
-    [SerializeField] AudioSource minusPlayerSFX;
-    [SerializeField] AudioSource minusCPUSFX;
+    [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private AudioSource bonkHeavySFX;
+    [SerializeField] private AudioSource bonkLightSFX;
+    [SerializeField] private AudioSource noiseSFX;
+    [SerializeField] private AudioSource shotSFX;
+    [SerializeField] private AudioSource pointPlayerSFX;
+    [SerializeField] private AudioSource pointCPUSFX;
+    [SerializeField] private AudioSource minusPlayerSFX;
+    [SerializeField] private AudioSource minusCPUSFX;
 
     // script variables
     private bool shot;
@@ -28,11 +28,11 @@ public class PuckScript : NetworkBehaviour
     private float velocity;
 
     // this one actually does stuff
-    [SerializeField] float powerModifier;
+    [SerializeField] private float powerModifier;
 
-    [SerializeField] float angularVelocity;
-    [SerializeField] float angularVelocityModifier;
-    [SerializeField] float counterForce;
+    [SerializeField] private float angularVelocity;
+    [SerializeField] private float angularVelocityModifier;
+    [SerializeField] private float counterForce;
 
     // scoring
     private int puckBaseValue = 1;
@@ -40,7 +40,7 @@ public class PuckScript : NetworkBehaviour
     private int zoneMultiplier = 0;
 
     // floating text
-    [SerializeField] GameObject floatingTextPrefab;
+    [SerializeField] private GameObject floatingTextPrefab;
 
     private LogicScript logic;
     private PuckSkinManager puckSkinManager;
@@ -51,7 +51,7 @@ public class PuckScript : NetworkBehaviour
 
     void OnEnable()
     {
-        logic = GameObject.FindGameObjectWithTag("logic").GetComponent<LogicScript>();
+        logic = LogicScript.Instance;
         SFXvolume = SoundManagerScript.Instance.GetSFXVolume();
         puckSkinManager = PuckSkinManager.Instance;
         trail = gameObject.GetComponent<TrailRenderer>();
@@ -251,7 +251,7 @@ public class PuckScript : NetworkBehaviour
             ); 
     }
 
-    [SerializeField] ParticleSystem collisionParticleEffectPrefab;
+    [SerializeField] private ParticleSystem collisionParticleEffectPrefab;
  
     // play bonk SFX when pucks collide
     void OnCollisionEnter2D(Collision2D col)
