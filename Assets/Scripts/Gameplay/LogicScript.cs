@@ -121,134 +121,24 @@ public class LogicScript : MonoBehaviour
             // start Players turn, do this then start shooting
             if (player.isTurn && !player.isShooting && ((player.goingFirst && opponent.puckCount == 5) || opponent.activePuckScript.IsSlowed()))
             {
-                if (difficulty >= 2 && !isLocal)
-                {
-                    powerupsMenu.SetActive(powerupsAreEnabled);
-                }
-                puckHalo.SetActive(difficulty == 0);
-                activeBar = bar.ChangeBar("angle", LeftsTurn());
-                bar.ToggleDim(false);
-                line.isActive = true;
-                UI.TurnText = isLocal ? "Player 1's Turn" : "Your Turn";
-                if (player.puckCount == 1) {
-                    UI.TurnText = "LAST PUCK";
-                }
-                puckManager.CreatePuck(player);
-                player.isTurn = false;
-                player.isShooting = true;
-                if (wallCount > 0)
-                {
-                    wallCount--;
-                    if (wallCount > 0) { UI.UpdateWallText(wallCount); }
-                }
+                StartingPlayersTurnHelper();
             }
 
             // now player may shoot
             if ((Input.GetMouseButtonDown(0)) && gameIsRunning && (player.isShooting || isLocal) && powerupsMenu.activeInHierarchy == false)
             {
-                soundManager.PlayClickSFX();
-                // change state on tap depending on current state
-                switch (activeBar)
-                {
-                    case "angle":
-                        angle = line.GetValue();
-                        activeBar = bar.ChangeBar("power", LeftsTurn());
-                        break;
-                    case "power":
-                        power = line.GetValue();
-                        // if non-hard diff, end turn
-                        if (difficulty < 2)
-                        {
-                            Shoot(angle, power);
-                            UI.UpdateShotDebugText(angle, power);
-                        }
-                        // on hard diff, show spin bar
-                        else
-                        {
-                            activeBar = bar.ChangeBar("spin", LeftsTurn());
-                        }
-                        break;
-                    // if hard, select spin
-                    case "spin":
-                        spin = line.GetValue();
-                        Shoot(angle, power, spin);
-                        UI.UpdateShotDebugText(angle, power, spin);
-                        break;
-                }
+                PlayerShootingHelper();
             }
 
             // start CPU's turn, do this then start shooting
             if (opponent.isTurn && (player.activePuckScript == null || (player.activePuckScript.IsSlowed() && (puckManager.AllPucksAreSlowed() && difficulty < 2 || puckManager.AllPucksAreSlowedMore()))))
             {
-                activeBar = bar.ChangeBar("angle", LeftsTurn());
-                if (!isLocal)
-                {
-                    bar.ToggleDim(true);
-                }
-                line.isActive = true;
-                UI.TurnText = isLocal ? "Player 2's Turn":"CPU's Turn";
-                if (opponent.puckCount == 1 && isLocal) {
-                    UI.TurnText = "LAST PUCK";
-                }
-                puckManager.CreatePuck(opponent);
-                opponent.isTurn = false;
-                opponent.isShooting = true;
-
-                if (wallCount > 0) {
-                    wallCount--;
-                    if (wallCount > 0) { UI.UpdateWallText(wallCount); }
-                }
-                // first turn on med-hard diff, CPU Shoots perfect
-                if (difficulty == 1 && opponent.puckCount == 5)
-                {
-                    CPUShotAngle = player.goingFirst ? Random.Range(33.0f, 38.0f) : Random.Range(62.0f, 67.0f);
-                    CPUShotPower = Random.Range(65.0f, 78.0f);
-                }
-                // easy-med regular shots only
-                else if (difficulty < 2)
-                {
-                    CPUShotAngle = player.goingFirst ? Random.Range(11.0f + (difficulty * 5.0f), 63.0f - (difficulty * 5.0f)) : Random.Range(37.0f + (difficulty * 5.0f), 89.0f - (difficulty * 5.0f));
-                    CPUShotPower = Random.Range(30.0f + (difficulty * 5.0f), 90.0f - (difficulty * 5.0f));
-                }
-                // hard uses paths, and random if no path is found
-                else
-                {
-                    (CPUShotAngle, CPUShotPower, CPUShotSpin) = FindOpenPath();
-                }
+                StartingOpponentsTurnHelper();
             }
             // now opponent may shoot
             if (opponent.isShooting && !isLocal)
             {
-                // timestamp the beginning of CPU's turn for delays
-                if (tempTime == 0)
-                {
-                    tempTime = timer;
-                }
-
-                // after 1.5 seconds elapsed, CPU selects angle
-                if (Mathf.Abs(line.GetValue() - CPUShotAngle) < (timer - (tempTime + 1.5)) && activeBar == "angle")
-                {
-                    activeBar = bar.ChangeBar("power", LeftsTurn());
-                }
-                // after 3 seconds elapsed, CPU selects power
-                if (Mathf.Abs(line.GetValue() - CPUShotPower) < (timer - (tempTime + 3)) && activeBar == "power")
-                {
-                    if (difficulty < 2)
-                    {
-                        Shoot(CPUShotAngle, CPUShotPower);
-                        tempTime = 0;
-                    }
-                    else
-                    {
-                        activeBar = bar.ChangeBar("spin", LeftsTurn());
-                    }
-                }
-                // after 4.5 seconds elapsed, CPU selects spin (for hard mode only)
-                if (Mathf.Abs(line.GetValue() - CPUShotSpin) < (timer - (tempTime + 4.5)) && activeBar == "spin")
-                {
-                    Shoot(CPUShotAngle, CPUShotPower, CPUShotSpin);
-                    tempTime = 0;
-                }
+                OpponentShootingHelper();
             }
 
             // lastly, increment timer while game is running
@@ -265,6 +155,138 @@ public class LogicScript : MonoBehaviour
         }
     }
 
+    // main gameplay helpers
+    private void StartingPlayersTurnHelper()
+    {
+        if (difficulty >= 2 && !isLocal)
+        {
+            powerupsMenu.SetActive(powerupsAreEnabled);
+        }
+        puckHalo.SetActive(difficulty == 0);
+        activeBar = bar.ChangeBar("angle", LeftsTurn());
+        bar.ToggleDim(false);
+        line.isActive = true;
+        UI.TurnText = isLocal ? "Player 1's Turn" : "Your Turn";
+        if (player.puckCount == 1)
+        {
+            UI.TurnText = "LAST PUCK";
+        }
+        puckManager.CreatePuck(player);
+        player.isTurn = false;
+        player.isShooting = true;
+        if (wallCount > 0)
+        {
+            wallCount--;
+            if (wallCount > 0) { UI.UpdateWallText(wallCount); }
+        }
+    }
+
+    private void PlayerShootingHelper()
+    {
+        soundManager.PlayClickSFX();
+        // change state on tap depending on current state
+        switch (activeBar)
+        {
+            case "angle":
+                angle = line.GetValue();
+                activeBar = bar.ChangeBar("power", LeftsTurn());
+                break;
+            case "power":
+                power = line.GetValue();
+                // if non-hard diff, end turn
+                if (difficulty < 2)
+                {
+                    Shoot(angle, power);
+                }
+                // on hard diff, show spin bar
+                else
+                {
+                    activeBar = bar.ChangeBar("spin", LeftsTurn());
+                }
+                break;
+            // if hard, select spin
+            case "spin":
+                spin = line.GetValue();
+                Shoot(angle, power, spin);
+                break;
+        }
+    }
+
+    private void StartingOpponentsTurnHelper()
+    {
+        activeBar = bar.ChangeBar("angle", LeftsTurn());
+        if (!isLocal)
+        {
+            bar.ToggleDim(true);
+        }
+        line.isActive = true;
+        UI.TurnText = isLocal ? "Player 2's Turn" : "CPU's Turn";
+        if (opponent.puckCount == 1 && isLocal)
+        {
+            UI.TurnText = "LAST PUCK";
+        }
+        puckManager.CreatePuck(opponent);
+        opponent.isTurn = false;
+        opponent.isShooting = true;
+
+        if (wallCount > 0)
+        {
+            wallCount--;
+            if (wallCount > 0) { UI.UpdateWallText(wallCount); }
+        }
+        // first turn on med-hard diff, CPU Shoots perfect
+        if (difficulty == 1 && opponent.puckCount == 5)
+        {
+            CPUShotAngle = player.goingFirst ? Random.Range(33.0f, 38.0f) : Random.Range(62.0f, 67.0f);
+            CPUShotPower = Random.Range(65.0f, 78.0f);
+        }
+        // easy-med regular shots only
+        else if (difficulty < 2)
+        {
+            CPUShotAngle = player.goingFirst ? Random.Range(11.0f + (difficulty * 5.0f), 63.0f - (difficulty * 5.0f)) : Random.Range(37.0f + (difficulty * 5.0f), 89.0f - (difficulty * 5.0f));
+            CPUShotPower = Random.Range(30.0f + (difficulty * 5.0f), 90.0f - (difficulty * 5.0f));
+        }
+        // hard uses paths, and random if no path is found
+        else
+        {
+            (CPUShotAngle, CPUShotPower, CPUShotSpin) = FindOpenPath();
+        }
+    }
+
+    private void OpponentShootingHelper()
+    {
+        // timestamp the beginning of CPU's turn for delays
+        if (tempTime == 0)
+        {
+            tempTime = timer;
+        }
+
+        // after 1.5 seconds elapsed, CPU selects angle
+        if (Mathf.Abs(line.GetValue() - CPUShotAngle) < (timer - (tempTime + 1.5)) && activeBar == "angle")
+        {
+            activeBar = bar.ChangeBar("power", LeftsTurn());
+        }
+        // after 3 seconds elapsed, CPU selects power
+        if (Mathf.Abs(line.GetValue() - CPUShotPower) < (timer - (tempTime + 3)) && activeBar == "power")
+        {
+            if (difficulty < 2)
+            {
+                Shoot(CPUShotAngle, CPUShotPower);
+                tempTime = 0;
+            }
+            else
+            {
+                activeBar = bar.ChangeBar("spin", LeftsTurn());
+            }
+        }
+        // after 4.5 seconds elapsed, CPU selects spin (for hard mode only)
+        if (Mathf.Abs(line.GetValue() - CPUShotSpin) < (timer - (tempTime + 4.5)) && activeBar == "spin")
+        {
+            Shoot(CPUShotAngle, CPUShotPower, CPUShotSpin);
+            tempTime = 0;
+        }
+    }
+
     private void Shoot(float angle, float power, float spin = 50.0f)
     {
         Debug.Log("Shooting: " + angle + " | " + power + " | " + spin);
@@ -272,6 +294,7 @@ public class LogicScript : MonoBehaviour
         line.isActive = false;
         activeCompetitor.ShootActivePuck(angle, power, spin);
         UI.PostShotUpdate(player.puckCount, opponent.puckCount);
+        UI.UpdateShotDebugText(angle, power, spin);
         nonActiveCompetitor.isTurn = true;
         SwapCompetitors();
     }
