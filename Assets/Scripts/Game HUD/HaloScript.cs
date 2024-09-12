@@ -42,7 +42,7 @@ public class HaloScript : MonoBehaviour
     {
         if (debuggingInProgress) return;
 
-        sideModifier = logic.LeftsTurn() ? (-3.6f) : (3.6f);
+        sideModifier = logic.activeCompetitor.isPlayer ? (-3.6f) : (3.6f);
 
         // calculate the pucks estimated position
         if (logic.activeBar == "angle")

@@ -145,7 +145,7 @@ public class LogicScript : MonoBehaviour
             timer += Time.deltaTime;
         }
         // ran out of pucks (game over)
-        else if (gameIsRunning && (player.puckCount <= 0 || opponent.puckCount <= 0) && puckManager.AllPucksAreStopped())
+        else if (gameIsRunning && puckManager.AllPucksAreStopped())
         {
             gameIsRunning = false;
             UpdateScores();
@@ -163,7 +163,7 @@ public class LogicScript : MonoBehaviour
             powerupsMenu.SetActive(powerupsAreEnabled);
         }
         puckHalo.SetActive(difficulty == 0);
-        activeBar = bar.ChangeBar("angle", LeftsTurn());
+        activeBar = bar.ChangeBar("angle", activeCompetitor.isPlayer);
         bar.ToggleDim(false);
         line.isActive = true;
         UI.TurnText = isLocal ? "Player 1's Turn" : "Your Turn";
@@ -189,7 +189,7 @@ public class LogicScript : MonoBehaviour
         {
             case "angle":
                 angle = line.GetValue();
-                activeBar = bar.ChangeBar("power", LeftsTurn());
+                activeBar = bar.ChangeBar("power");
                 break;
             case "power":
                 power = line.GetValue();
@@ -201,7 +201,7 @@ public class LogicScript : MonoBehaviour
                 // on hard diff, show spin bar
                 else
                 {
-                    activeBar = bar.ChangeBar("spin", LeftsTurn());
+                    activeBar = bar.ChangeBar("spin");
                 }
                 break;
             // if hard, select spin
@@ -214,7 +214,7 @@ public class LogicScript : MonoBehaviour
 
     private void StartingOpponentsTurnHelper()
     {
-        activeBar = bar.ChangeBar("angle", LeftsTurn());
+        activeBar = bar.ChangeBar("angle", activeCompetitor.isPlayer);
         if (!isLocal)
         {
             bar.ToggleDim(true);
@@ -237,13 +237,13 @@ public class LogicScript : MonoBehaviour
         // first turn on med-hard diff, CPU Shoots perfect
         if (difficulty == 1 && opponent.puckCount == 5)
         {
-            CPUShotAngle = player.goingFirst ? Random.Range(33.0f, 38.0f) : Random.Range(62.0f, 67.0f);
+            CPUShotAngle = Random.Range(33.0f, 38.0f);
             CPUShotPower = Random.Range(65.0f, 78.0f);
         }
         // easy-med regular shots only
         else if (difficulty < 2)
         {
-            CPUShotAngle = player.goingFirst ? Random.Range(11.0f + (difficulty * 5.0f), 63.0f - (difficulty * 5.0f)) : Random.Range(37.0f + (difficulty * 5.0f), 89.0f - (difficulty * 5.0f));
+            CPUShotAngle = Random.Range(11.0f + (difficulty * 5.0f), 63.0f - (difficulty * 5.0f));
             CPUShotPower = Random.Range(30.0f + (difficulty * 5.0f), 90.0f - (difficulty * 5.0f));
         }
         // hard uses paths, and random if no path is found
@@ -264,7 +264,7 @@ public class LogicScript : MonoBehaviour
         // after 1.5 seconds elapsed, CPU selects angle
         if (Mathf.Abs(line.GetValue() - CPUShotAngle) < (timer - (tempTime + 1.5)) && activeBar == "angle")
         {
-            activeBar = bar.ChangeBar("power", LeftsTurn());
+            activeBar = bar.ChangeBar("power");
         }
         // after 3 seconds elapsed, CPU selects power
         if (Mathf.Abs(line.GetValue() - CPUShotPower) < (timer - (tempTime + 3)) && activeBar == "power")
@@ -276,7 +276,7 @@ public class LogicScript : MonoBehaviour
             }
             else
             {
-                activeBar = bar.ChangeBar("spin", LeftsTurn());
+                activeBar = bar.ChangeBar("spin");
             }
         }
         // after 4.5 seconds elapsed, CPU selects spin (for hard mode only)
@@ -403,7 +403,7 @@ public class LogicScript : MonoBehaviour
         else
         {
             Debug.Log("No path :(");
-            return (Random.Range(35.0f, 65.0f), Random.Range(40.0f, 70.0f), Random.Range(40.0f, 50.0f));
+            return (Random.Range(35.0f, 65.0f), Random.Range(40.0f, 70.0f), Random.Range(45.0f, 55.0f));
         }
     }
 

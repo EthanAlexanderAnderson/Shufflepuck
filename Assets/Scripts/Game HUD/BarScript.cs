@@ -31,13 +31,13 @@ public class BarScript : MonoBehaviour
     }
 
     // change bar sprite
-    public string ChangeBar(string type, bool isLeftside = true)
+    public string ChangeBar(string type, bool isPlayer = true)
     {
         switch (type)
         {
             case "angle":
                 spriteRenderer.enabled = true;
-                spriteRenderer.sprite = (isLeftside ? angleBarLeft : angleBarRight);
+                spriteRenderer.sprite = (isPlayer ? angleBarLeft : angleBarRight);
                 barText.text = "angle";
                 break;
             case "power":
