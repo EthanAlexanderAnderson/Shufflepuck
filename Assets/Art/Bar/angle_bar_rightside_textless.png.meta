@@ -1,12 +1,12 @@
 fileFormatVersion: 2
-guid: 0b04a871cda8bf142a86fdd6720c8f88
+guid: e6d1af4fae8db944ebdf68ad6468dce2
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3245412526862922358
-    second: power_bar_new_0
+      213: -150188944701956826
+    second: angle_bar_rightside_textless_0
   externalObjects: {}
-  serializedVersion: 12
+  serializedVersion: 13
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -80,6 +80,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -92,6 +93,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -104,6 +106,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -116,25 +119,14 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
-    buildTarget: Server
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: power_bar_new_0
+      name: angle_bar_rightside_textless_0
       rect:
         serializedVersion: 2
         x: 0
@@ -148,8 +140,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a8d8bb2708af5f2d0800000000000000
-      internalID: -3245412526862922358
+      spriteID: 62d59d553fb6aedf0800000000000000
+      internalID: -150188944701956826
       vertices: []
       indices: 
       edges: []
@@ -165,7 +157,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      power_bar_new_0: -3245412526862922358
+      angle_bar_rightside_textless_0: -150188944701956826
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -11633,7 +11633,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 19.199999
+  orthographic size: 20.169844
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -15959,7 +15959,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &744582969
 RectTransform:
   m_ObjectHideFlags: 0
@@ -19106,7 +19106,7 @@ SpriteRenderer:
   m_Size: {x: 21.633804, y: 3}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &886532083
@@ -19124,10 +19124,10 @@ MonoBehaviour:
   spriteRenderer: {fileID: 886532082}
   barText: {fileID: 2075260035}
   barTextCanvas: {fileID: 744582968}
-  angleBarLeft: {fileID: 21300000, guid: 2d7a079ec2efa3842895a1e4417ce609, type: 3}
-  angleBarRight: {fileID: 21300000, guid: f8de35afece1e37409d900be6ab28c1e, type: 3}
-  powerBar: {fileID: 21300000, guid: 0b04a871cda8bf142a86fdd6720c8f88, type: 3}
-  spinBar: {fileID: 21300000, guid: acc10bea77e9e5244b2723e429bebec6, type: 3}
+  angleBarLeft: {fileID: 21300000, guid: e4e87b6acd2d1f94dbb3747448bdff4b, type: 3}
+  angleBarRight: {fileID: 21300000, guid: e6d1af4fae8db944ebdf68ad6468dce2, type: 3}
+  powerBar: {fileID: 21300000, guid: 655a149a198d330438fd01bd2fc42ae8, type: 3}
+  spinBar: {fileID: 21300000, guid: 36ef8abdaa30fea4791d149588e3ddd0, type: 3}
 --- !u!222 &886532084
 CanvasRenderer:
   m_ObjectHideFlags: 0

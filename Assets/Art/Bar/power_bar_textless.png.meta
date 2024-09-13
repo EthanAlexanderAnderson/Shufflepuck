@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 2d7a079ec2efa3842895a1e4417ce609
+guid: 655a149a198d330438fd01bd2fc42ae8
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2365702270426224636
-    second: angle_bar2_hard_leftside_0
+      213: 1650546978303074706
+    second: power_bar_textless_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,7 +126,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: angle_bar2_hard_leftside_0
+      name: power_bar_textless_0
       rect:
         serializedVersion: 2
         x: 0
@@ -140,8 +140,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 408e8eea1565b2fd0800000000000000
-      internalID: -2365702270426224636
+      spriteID: 29169d65bbbe7e610800000000000000
+      internalID: 1650546978303074706
       vertices: []
       indices: 
       edges: []
@@ -157,7 +157,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      angle_bar2_hard_leftside_0: -2365702270426224636
+      power_bar_textless_0: 1650546978303074706
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
