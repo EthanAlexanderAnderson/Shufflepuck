@@ -38,6 +38,20 @@ public class UIManagerScript : MonoBehaviour
     public TMP_Text waitingText;
     [SerializeField] private GameObject waitingBackButton;
 
+    // tutorial
+    public GameObject tutorialMenu;
+    private GameObject[] tutorialPages;
+    public int iPage = 0;
+    public GameObject page0;
+    public GameObject page1;
+    public GameObject page2;
+    public GameObject page3;
+    public GameObject page4;
+    public GameObject page5;
+    public GameObject page6;
+    public GameObject page7;
+    public GameObject page8;
+
     // HUD
     [SerializeField] private Text turnText;
 
@@ -82,6 +96,8 @@ public class UIManagerScript : MonoBehaviour
             Instance = this;
         else
             Destroy(Instance);
+
+        tutorialPages = new GameObject[] { page0, page1, page2, page3, page4, page5, page6, page7, page8 };
     }
 
     private void Start()
@@ -89,6 +105,50 @@ public class UIManagerScript : MonoBehaviour
         logic = LogicScript.Instance;
         sound = SoundManagerScript.Instance;
         puckAlert.SetActive(PlayerPrefs.GetInt("ShowNewSkinAlert", 0) == 1);
+    }
+
+    float cooldownTime;
+    bool enabledReadyButton;
+    private void Update()
+    {
+        cooldownTime -= Time.deltaTime;
+        if (enabledReadyButton && cooldownTime <= 0f)
+        {
+            readyButton.SetActive(true);
+            waitingText.text = "0/2 Players Ready";
+            waitingGif.SetActive(false);
+            enabledReadyButton = false;
+            waitingBackButton.SetActive(true);
+        }
+        // Check if the android back button (Escape key) is pressed
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            // Handle the back button press
+            HandleBackButton();
+        }
+
+        if (logic.tutorialActive) { tutorialMenu.SetActive(true);  }
+
+        if ( Input.GetMouseButtonDown(0) && tutorialMenu.activeInHierarchy && iPage != 6)
+        {
+            AdvanceTutorial();
+        }
+    }
+
+    public void AdvanceTutorial()
+    {
+        tutorialPages[iPage].SetActive(false);
+        if (iPage < (tutorialPages.Length - 1))
+        {
+            iPage++;
+            tutorialPages[iPage].SetActive(true);
+        } 
+        else
+        {
+            logic.tutorialActive = false;
+            PlayerPrefs.SetInt("tutorialCompleted", 1);
+        }
+
     }
 
     public void PostShotUpdate(int playerPuckCount, int opponentPuckCount)
@@ -385,28 +445,6 @@ public class UIManagerScript : MonoBehaviour
         cooldownTime = 2.0f;
         waitingBackButton.SetActive(false);
         // the waiting text & gif also update after cooldown to prevent confusion
-    }
-
-    float cooldownTime;
-    bool enabledReadyButton;
-
-    private void Update()
-    {
-        cooldownTime -= Time.deltaTime;
-        if (enabledReadyButton && cooldownTime <= 0f)
-        {
-            readyButton.SetActive(true);
-            waitingText.text = "0/2 Players Ready";
-            waitingGif.SetActive(false);
-            enabledReadyButton = false;
-            waitingBackButton.SetActive(true);
-        }
-        // Check if the android back button (Escape key) is pressed
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            // Handle the back button press
-            HandleBackButton();
-        }
     }
 
     public void FailedToFindMatch()

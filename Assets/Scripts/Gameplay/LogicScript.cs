@@ -61,6 +61,7 @@ public class LogicScript : MonoBehaviour
     public Competitor activeCompetitor;
     public Competitor nonActiveCompetitor;
     public bool playedAGame = false;
+    public bool tutorialActive;
 
     private void Awake()
     {
@@ -74,7 +75,7 @@ public class LogicScript : MonoBehaviour
     void Start()
     {
 #if (UNITY_EDITOR)
-        //PlayerPrefs.SetInt("easyHighscore", 8);
+        //PlayerPrefs.SetInt("easyWin", 0);
         //PlayerPrefs.SetInt("mediumHighscore", 6);
         //PlayerPrefs.SetInt("hardHighscore", 4);
 #endif
@@ -99,11 +100,20 @@ public class LogicScript : MonoBehaviour
         PuckSkinManager.Instance.SelectPlayerPuckSprite(PlayerPrefs.GetInt("puck") == 0 && PlayerPrefs.GetInt("hardHighscore") <= 5 ? 1 : PlayerPrefs.GetInt("puck"));
         activeCompetitor = opponent;
         nonActiveCompetitor = player;
+        // check if tutorial should be active
+        tutorialActive = PlayerPrefs.GetInt("tutorialCompleted") == 0 && PlayerPrefs.GetInt("easyWin") == 0;
+        Debug.Log(tutorialActive);
     }
 
     // Update is called once per frame
     void Update()
     {
+
+        if (tutorialActive && UI.iPage < 6)
+        {
+            return;
+        }
+
         // only do this stuff when game is running (not in menu etc.)
         if (gameIsRunning && (player.puckCount > 0 || opponent.puckCount > 0))
         {
@@ -158,6 +168,11 @@ public class LogicScript : MonoBehaviour
     // main gameplay helpers
     private void StartingPlayersTurnHelper()
     {
+        if (tutorialActive && UI.iPage == 6)
+        {
+            UI.AdvanceTutorial();
+        }
+
         if (difficulty >= 2 && !isLocal)
         {
             powerupsMenu.SetActive(powerupsAreEnabled);
@@ -340,14 +355,23 @@ public class LogicScript : MonoBehaviour
             opponent.goingFirst = false;
         }
 
+        if (difficulty == 0) {
+            wallCount = 0;
+            wall.SetActive(false);
+        }
+        else
+        {
+            wallCount = 3;
+            wall.SetActive(true);
+        }
+        UI.UpdateWallText(wallCount);
+
         UI.SetReButtons(true);
         gameIsRunning = true;
         puckHalo.SetActive(difficulty == 0);
         line.isActive = false;
         bar.ChangeBar("none");
         UI.ChangeUI(UI.gameHud);
-        wall.SetActive(true);
-        wallCount = 3;
         Debug.Log("Starting match with difficulty: " + difficulty);
     }
 
