@@ -56,7 +56,7 @@ public class SoundManagerScript : MonoBehaviour
         currentClipIndex = PlayerPrefs.GetInt("SelectedTrack", 0);
         PlayClip(currentClipIndex);
 
-        musicVolumeFromPref = PlayerPrefs.GetFloat("MusicVolume", 0.7f);
+        musicVolumeFromPref = PlayerPrefs.GetFloat("MusicVolume", 0.5f);
         musicComponent.volume = musicVolumeFromPref;
 
         SFXVolumeFromPref = PlayerPrefs.GetFloat("SFXVolume", 1.0f);
