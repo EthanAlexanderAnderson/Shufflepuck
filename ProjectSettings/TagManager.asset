@@ -35,6 +35,7 @@ TagManager:
   - FPSButton
   - collisionParticleEffect
   - sound
+  - halo
   layers:
   - Default
   - TransparentFX

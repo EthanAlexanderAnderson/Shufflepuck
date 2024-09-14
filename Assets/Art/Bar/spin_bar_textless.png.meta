@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: dce39ebe4c1b6374fbdcab6859c96a7f
+guid: 36ef8abdaa30fea4791d149588e3ddd0
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3019424127853119141
-    second: line_0
+      213: 8966018560593199854
+    second: spin_bar_textless_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,12 +126,12 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: line_0
+      name: spin_bar_textless_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 30
+        width: 2160
         height: 300
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -140,8 +140,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: b593219d0c9d816d0800000000000000
-      internalID: -3019424127853119141
+      spriteID: ee287b97062bd6c70800000000000000
+      internalID: 8966018560593199854
       vertices: []
       indices: 
       edges: []
@@ -157,7 +157,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      line_0: -3019424127853119141
+      spin_bar_textless_0: 8966018560593199854
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

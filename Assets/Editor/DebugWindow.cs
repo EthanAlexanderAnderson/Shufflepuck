@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-//using Unity.Netcode;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -9,6 +6,7 @@ public class DebugWindow : EditorWindow
 {
     private LogicScript logic;
     private ServerLogicScript serverLogic;
+    private HaloScript haloScript;
     public GameObject puck;
 
     public float angle;
@@ -35,6 +33,7 @@ public class DebugWindow : EditorWindow
     {
         logic = GameObject.FindGameObjectWithTag("logic").GetComponent<LogicScript>();
         serverLogic = GameObject.FindGameObjectWithTag("logic").GetComponent<ServerLogicScript>();
+        haloScript = GameObject.FindGameObjectWithTag("halo").GetComponent<HaloScript>();
         puck = logic.puckPrefab;
         FloatField angleFloatField = new FloatField();
         angleFloatField.label = "Angle";
@@ -59,29 +58,29 @@ public class DebugWindow : EditorWindow
         left = new Toggle("shoot from left side");
         rootVisualElement.Add(left);
 
-        Button shoot = new Button { text = "SHOOT" };
+        Button shoot = new() { text = "SHOOT" };
         shoot.clicked += () => DebugShootNew(angleFloatField.value, powerFloatField.value, spinFloatField.value);
         rootVisualElement.Add(shoot);
 
         
-        Button shootall = new Button { text = "SHOOT ALL" };
+        Button shootall = new() { text = "SHOOT ALL" };
         shootall.clicked += () => DebugShootAll(angleFloatField.value, powerFloatField.value, spinFloatField.value);
         rootVisualElement.Add(shootall);
 
+        Button sethalo = new() { text = "SET HALO" };
+        sethalo.clicked += () => haloScript.SetHaloPostion(angleFloatField.value, powerFloatField.value, spinFloatField.value, left.value);
+        rootVisualElement.Add(sethalo);
+
         // destroy all pucks button
-        Button destroy = new Button { text = "DESTROY ALL PUCKS" };
-        destroy.clicked += () => logic.ClearAllPucks();
+        Button destroy = new() { text = "DESTROY ALL PUCKS" };
+        destroy.clicked += () => PuckManager.Instance.ClearAllPucks();
         rootVisualElement.Add(destroy);
 
-        //Button shootRpc = new Button { text = "SHOOT RPC" };
-        //shootRpc.clicked += () => serverLogic.DebugShootServerRpc(angleFloatField.value, powerFloatField.value, spinFloatField.value);
-        //rootVisualElement.Add(shootRpc);
-
-        Button addPlayer = new Button { text = "addPlayer" };
+        Button addPlayer = new() { text = "addPlayer" };
         addPlayer.clicked += () => serverLogic.AddPlayerServerRpc(0);
         rootVisualElement.Add(addPlayer);
 
-        Button printPlayerPrefs = new Button { text = "printPlayerPrefs" };
+        Button printPlayerPrefs = new() { text = "printPlayerPrefs" };
         printPlayerPrefs.clicked += () => PrintPlayerPrefs();
         rootVisualElement.Add(printPlayerPrefs);
 
@@ -140,6 +139,13 @@ public class DebugWindow : EditorWindow
         log += "hardWin: " + PlayerPrefs.GetInt("hardWin") + "\n";
         log += "hardLoss: " + PlayerPrefs.GetInt("hardLoss") + "\n";
         log += "hardTie: " + PlayerPrefs.GetInt("hardTie") + "\n";
+
+        log += "FPS: " + PlayerPrefs.GetInt("FPS") + "\n";
+        log += "Puck: " + PlayerPrefs.GetInt("puck") + "\n";
+        log += "SelectedTrack: " + PlayerPrefs.GetInt("SelectedTrack") + "\n";
+        log += "ShowNewSkinAlert: " + PlayerPrefs.GetInt("ShowNewSkinAlert") + "\n";
+        log += "MusicVolume: " + PlayerPrefs.GetFloat("MusicVolume") + "\n";
+        log += "SFXVolume: " + PlayerPrefs.GetFloat("SFXVolume") + "\n";
 
         Debug.Log(log);
     }
