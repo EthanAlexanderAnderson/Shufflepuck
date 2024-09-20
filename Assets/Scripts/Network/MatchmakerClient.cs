@@ -21,6 +21,9 @@ using Unity.Netcode.Transports.UTP;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using TMPro;
+using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
+using Unity.Networking.Transport.Relay;
 
 public class MatchmakerClient : MonoBehaviour
 { 
@@ -162,28 +165,45 @@ public class MatchmakerClient : MonoBehaviour
     {
         try
         {
-            // lobby settings
             string lobbyName = "MyLobby";
             int maxPlayers = 2;
-            CreateLobbyOptions options = new CreateLobbyOptions();
-            options.IsPrivate = true;
-            // create lobby
+            CreateLobbyOptions options = new CreateLobbyOptions { IsPrivate = true };
+
+            // Create the Lobby
             Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
-            // setup lobby event detector
+
+            // Subscribe to lobby events
             LobbyEventCallbacks callbacks = new LobbyEventCallbacks();
             callbacks.LobbyChanged += OnLobbyChanged;
             ILobbyEvents lobbyEvents = await Lobbies.Instance.SubscribeToLobbyEventsAsync(lobby.Id, callbacks);
-            // change UI
+
+            // Allocate Relay server
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxPlayers);
+            string relayJoinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+
+            // Pass Relay join code to lobby data
+            Dictionary<string, DataObject> data = new Dictionary<string, DataObject> {
+                { "RelayJoinCode", new DataObject(DataObject.VisibilityOptions.Public, relayJoinCode) }
+            };
+
+            await LobbyService.Instance.UpdateLobbyAsync(lobby.Id, new UpdateLobbyOptions { Data = data });
+
+            // Set up UnityTransport to use Relay
+            RelayServerData relayServerData = new RelayServerData(allocation, "dtls");
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+
+            NetworkManager.Singleton.StartHost(); // Start as Host
             hostLobby = lobby;
             isHost = true;
-            Debug.Log("Created Lobby. Code:  " + lobby.LobbyCode);
+
+            Debug.Log("Created Lobby with Relay. Lobby Code: " + lobby.LobbyCode);
             UI.lobbyCodeText.text = "Lobby Code: " + lobby.LobbyCode;
             GUIUtility.systemCopyBuffer = lobby.LobbyCode;
         }
-        catch (LobbyServiceException e)
+        catch (Exception e)
         {
-            Debug.Log(e);
-            UI.SetErrorMessage("Failed to create Lobby. Please try again.");
+            Debug.LogError(e);
+            UI.SetErrorMessage("Failed to create Lobby with Relay.");
         }
     }
 
@@ -203,42 +223,37 @@ public class MatchmakerClient : MonoBehaviour
     // Called by Online -> Join -> Join button (after code is entered)
     public async void JoinLobby()
     {
-        if (lobbyCodeInputField.text.Length != 6)
-        {
-            UI.SetErrorMessage("Invalid lobby code.");
-            return;
-        }
         try
         {
-            // idk why this block is needed but it is
-            UpdatePlayerOptions options = new UpdatePlayerOptions();
-
-            options.Data = new Dictionary<string, PlayerDataObject>()
+            string lobbyCode = lobbyCodeInputField.text;
+            if (lobbyCode.Length != 6)
             {
-                {
-                    "existing data key", new PlayerDataObject(
-                        visibility: PlayerDataObject.VisibilityOptions.Private,
-                        value: "updated data value")
-                },
-                {
-                    "new data key", new PlayerDataObject(
-                        visibility: PlayerDataObject.VisibilityOptions.Public,
-                        value: "new data value")
-                }
-            };
-            // idk block end
-            hostLobby = await Lobbies.Instance.JoinLobbyByCodeAsync(lobbyCodeInputField.text);
+                UI.SetErrorMessage("Invalid lobby code.");
+                return;
+            }
+
+            Lobby lobby = await Lobbies.Instance.JoinLobbyByCodeAsync(lobbyCode);
+
+            // Retrieve Relay join code from lobby data
+            string relayJoinCode = lobby.Data["RelayJoinCode"].Value;
+            JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(relayJoinCode);
+
+            // Set up UnityTransport to use Relay
+            RelayServerData relayServerData = new RelayServerData(joinAllocation, "dtls");
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+
+            NetworkManager.Singleton.StartClient(); // Start as Client
+            hostLobby = lobby;
             isHost = false;
-            Debug.Log("Joined Lobby with code: " + lobbyCodeInputField.text);
-            UI.lobbyCodeText.text = "Lobby Code: " + lobbyCodeInputField.text;
-            Debug.Log(PlayerID());
-            CreateATicket(hostLobby.Id);
+
+            Debug.Log("Joined Lobby with Relay. Lobby Code: " + lobbyCode);
+            UI.lobbyCodeText.text = "Lobby Code: " + lobbyCode;
+            UI.EnableReadyButton();
         }
-        catch (LobbyServiceException e)
+        catch (Exception e)
         {
-            Debug.Log(e);
-            UI.SetErrorMessage("Lobby not found.");
-            UI.FailedToFindMatch();
+            Debug.LogError(e);
+            UI.SetErrorMessage("Failed to join Lobby with Relay.");
         }
     }
 
@@ -250,7 +265,9 @@ public class MatchmakerClient : MonoBehaviour
             Debug.Log("Player Joined");
             Debug.Log("HOST ID: " + PlayerID());
             Debug.Log("JOINER ID: " + changes.PlayerJoined.Value[0].Player.Id);
-            CreateATicket(hostLobby.Id);
+            // CreateATicket(hostLobby.Id); for multiplay
+            // for relay
+            UI.EnableReadyButton();
         }
     }
 

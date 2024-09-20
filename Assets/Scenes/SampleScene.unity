@@ -1466,7 +1466,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &39654169
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1623,7 +1623,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &53472730
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4731,7 +4731,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1890662201}
+  m_Father: {fileID: 789485846}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -9690,7 +9690,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Version 0.3.3
+  m_Text: Version 0.3.4
 --- !u!222 &452747633
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -16873,6 +16873,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 53472730}
+  - {fileID: 212301202}
   - {fileID: 876313472}
   - {fileID: 21590184}
   - {fileID: 1034648923}
@@ -17561,6 +17562,7 @@ MonoBehaviour:
   power: 0
   spin: 0
   puckHalo: {fileID: 1167867919}
+  wall: {fileID: 474300706}
 --- !u!1 &819623329
 GameObject:
   m_ObjectHideFlags: 0
@@ -28309,7 +28311,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1350198930
 RectTransform:
   m_ObjectHideFlags: 0
@@ -37135,7 +37137,6 @@ RectTransform:
   m_Children:
   - {fileID: 39654169}
   - {fileID: 1350198930}
-  - {fileID: 212301202}
   - {fileID: 1303446677}
   - {fileID: 766580787}
   - {fileID: 185408472}

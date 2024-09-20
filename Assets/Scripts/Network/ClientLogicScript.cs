@@ -16,9 +16,11 @@ public class ClientLogicScript : NetworkBehaviour
     private LogicScript logic;
     private ServerLogicScript serverLogic;
     private PuckSkinManager puckSkinManager;
+    private PuckManager puckManager;
 
     private bool isTurn;
     private bool isShooting;
+    private bool isStartingPlayer;
 
     private bool isRunning;
     private float shotTimer;
@@ -34,6 +36,10 @@ public class ClientLogicScript : NetworkBehaviour
     public float spin;
     public GameObject puckHalo;
 
+    // wall
+    private int wallCount = 3;
+    [SerializeField] private GameObject wall; // set in editor
+
     private void Awake()
     {
         if (Instance == null)
@@ -42,7 +48,7 @@ public class ClientLogicScript : NetworkBehaviour
             Destroy(Instance);
     }
 
-    private void OnEnable()
+    private void Start()
     {
         UI = UIManagerScript.Instance;
         logic = LogicScript.Instance;
@@ -50,15 +56,24 @@ public class ClientLogicScript : NetworkBehaviour
         bar = BarScript.Instance;
         line = LineScript.Instance;
         puckSkinManager = PuckSkinManager.Instance;
+        puckManager = PuckManager.Instance;
     }
 
     // Update is called once per frame
     void Update()
     {
-        // start turn, do this once then start shooting
-        if (isTurn && puckCount >= 0)
+        // update wall status
+        if (wallCount == 0)
         {
-            activeBar = bar.ChangeBar("angle");
+            wall.SetActive(false);
+            UI.UpdateWallText(wallCount);
+            wallCount--;
+        }
+
+        // start turn, do this once then start shooting
+        if (isTurn && puckCount >= 0 && puckManager.AllPucksAreSlowed())
+        {
+            activeBar = bar.ChangeBar("angle", isStartingPlayer);
             line.isActive = true;
             UI.TurnText = "Your Turn";
             serverLogic.CreatePuckServerRpc();
@@ -124,6 +139,15 @@ public class ClientLogicScript : NetworkBehaviour
         shotTimer -= Time.deltaTime;
     }
 
+    private void DecrementWallCount()
+    {
+        if (wallCount > 0)
+        {
+            wallCount--;
+            if (wallCount > 0) { UI.UpdateWallText(wallCount); }
+        }
+    }
+
     // Server tells the client to update in-game UI showing puck counts for each player
     [ClientRpc]
     public void UpdatePuckCountClientRpc(bool isPlayer, int count, ClientRpcParams clientRpcParams = default)
@@ -139,6 +163,7 @@ public class ClientLogicScript : NetworkBehaviour
         {
             UI.opponentPuckCountText.text = count.ToString();
         }
+        DecrementWallCount();
     }
 
     // Server tells the client to update online waiting screen to show that a competitor has clicked the ready button
@@ -182,6 +207,9 @@ public class ClientLogicScript : NetworkBehaviour
 
         puckCount = 5;
         isRunning = true;
+        wallCount = 3;
+        wall.SetActive(true);
+        UI.UpdateWallText(wallCount);
 
         Debug.Log("Client: Restarting game");
         Debug.Log($"player : {logic.player.puckSpriteID}     0 : {puckSpriteID_0}   1 : {puckSpriteID_1}");
@@ -205,12 +233,13 @@ public class ClientLogicScript : NetworkBehaviour
 
     // Server tells the client they can begin their turn
     [ClientRpc]
-    public void StartTurnClientRpc(ClientRpcParams clientRpcParams = default)
+    public void StartTurnClientRpc(bool isStartingPlayerParam, ClientRpcParams clientRpcParams = default)
     {
         if (!IsClient) return;
 
         Debug.Log("Client: Starting turn");
         isTurn = true;
+        isStartingPlayer = isStartingPlayerParam;
     }
 
     // Server tells the client to set the error message.
