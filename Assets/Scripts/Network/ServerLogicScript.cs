@@ -30,6 +30,7 @@ public class ServerLogicScript : NetworkBehaviour
     private int startingPlayerIndex;
 
     private float shotTimer;
+    bool gameIsRunning;
 
     private void Awake()
     {
@@ -49,7 +50,7 @@ public class ServerLogicScript : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        shotTimer -= Time.deltaTime;
+        if (gameIsRunning) { shotTimer -= Time.deltaTime; } // decrement timer
         if (shotTimer < 0)
         {
             Debug.Log("Shot Timer Exceeded");
@@ -72,6 +73,11 @@ public class ServerLogicScript : NetworkBehaviour
             clientLogic.GameResultClientRpc();
             // do this so server doesn't send this ClientRpc repeatedly forever
             competitorPuckCountList[0] = 99;
+            clients.Clear();
+            competitorList.Clear();
+            competitorPuckCountList.Clear();
+            competitorScoreList.Clear();
+            gameIsRunning = false;
         }
     }
 
@@ -149,6 +155,7 @@ public class ServerLogicScript : NetworkBehaviour
             clientLogic.RestartGameOnlineClientRpc(competitorList[0].puckSpriteID, competitorList[1].puckSpriteID);
             clientLogic.StartTurnClientRpc(true, clientRpcParamsList[activeCompetitorIndex]);
             shotTimer = 21;
+            gameIsRunning = true;
         }
         catch (System.Exception e)
         {
