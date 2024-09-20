@@ -27,6 +27,7 @@ public class ServerLogicScript : NetworkBehaviour
     private List<int> competitorScoreList = new();
 
     private int activeCompetitorIndex;
+    private int startingPlayerIndex;
 
     private float shotTimer;
 
@@ -38,7 +39,7 @@ public class ServerLogicScript : NetworkBehaviour
             Destroy(Instance);
     }
 
-    private void OnEnable()
+    private void Start()
     {
         clientLogic = ClientLogicScript.Instance;
         shotTimer = 30;
@@ -52,8 +53,8 @@ public class ServerLogicScript : NetworkBehaviour
         if (shotTimer < 0)
         {
             Debug.Log("Shot Timer Exceeded");
-            clientLogic.AlertDisconnectClientRpc();
             shotTimer = 60;
+            clientLogic.AlertDisconnectClientRpc();
         }
 
         // If both players have 0 pucks (aka game is over)
@@ -138,6 +139,7 @@ public class ServerLogicScript : NetworkBehaviour
         try
         {
             activeCompetitorIndex = Random.Range(0, 2);
+            startingPlayerIndex = activeCompetitorIndex;
 
             Debug.Log(
                 $"Selected starting client. \n" +
@@ -145,7 +147,7 @@ public class ServerLogicScript : NetworkBehaviour
                 $"Client ID : {clients[activeCompetitorIndex]}\n");
 
             clientLogic.RestartGameOnlineClientRpc(competitorList[0].puckSpriteID, competitorList[1].puckSpriteID);
-            clientLogic.StartTurnClientRpc(clientRpcParamsList[activeCompetitorIndex]);
+            clientLogic.StartTurnClientRpc(true, clientRpcParamsList[activeCompetitorIndex]);
             shotTimer = 21;
         }
         catch (System.Exception e)
@@ -184,7 +186,8 @@ public class ServerLogicScript : NetworkBehaviour
             Competitor competitor = competitorList[activeCompetitorIndex];
             int puckSpriteID = competitor.puckSpriteID;
 
-            GameObject puckObject = Instantiate(puck, new Vector3(0.0f, -10.0f, 0.0f), Quaternion.identity);
+            float xpos = (startingPlayerIndex == activeCompetitorIndex ? -3.6f : 3.6f);
+            GameObject puckObject = Instantiate(puck, new Vector3(xpos, -10.0f, 0.0f), Quaternion.identity);
             puckObject.GetComponent<NetworkObject>().Spawn();
             competitor.activePuckObject = puckObject;
 
@@ -229,7 +232,7 @@ public class ServerLogicScript : NetworkBehaviour
 
             CleanupDeadPucks();
 
-            clientLogic.StartTurnClientRpc(clientRpcParamsList[activeCompetitorIndex]);
+            clientLogic.StartTurnClientRpc(activeCompetitorIndex == startingPlayerIndex, clientRpcParamsList[activeCompetitorIndex]);
             shotTimer = 21;
         }
         catch (System.Exception e)
