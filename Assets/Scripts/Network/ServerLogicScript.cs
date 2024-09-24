@@ -71,12 +71,15 @@ public class ServerLogicScript : NetworkBehaviour
                 }
             }
             clientLogic.GameResultClientRpc();
-            // do this so server doesn't send this ClientRpc repeatedly forever
+            // reset all server variables
             competitorPuckCountList[0] = 99;
             clients.Clear();
             competitorList.Clear();
+            clientRpcParamsList.Clear();
             competitorPuckCountList.Clear();
             competitorScoreList.Clear();
+            activeCompetitorIndex = 0;
+            startingPlayerIndex = 0;
             gameIsRunning = false;
         }
     }

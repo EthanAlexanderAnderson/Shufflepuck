@@ -192,6 +192,7 @@ public class MatchmakerClient : MonoBehaviour
             RelayServerData relayServerData = new RelayServerData(allocation, "dtls");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
+            //if (NetworkManager.Singleton.IsClient) { NetworkManager.Singleton.Shutdown(); }
             NetworkManager.Singleton.StartHost(); // Start as Host
             hostLobby = lobby;
             isHost = true;
@@ -242,6 +243,7 @@ public class MatchmakerClient : MonoBehaviour
             RelayServerData relayServerData = new RelayServerData(joinAllocation, "dtls");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
+            //if (NetworkManager.Singleton.IsHost) { NetworkManager.Singleton.Shutdown(); }
             NetworkManager.Singleton.StartClient(); // Start as Client
             hostLobby = lobby;
             isHost = false;
@@ -329,6 +331,6 @@ public class MatchmakerClient : MonoBehaviour
     public void StopClient()
     {
         serverLogic.AlertDisconnectServerRpc();
-        NetworkManager.Singleton.Shutdown();
+        //NetworkManager.Singleton.Shutdown();
     }
 }
