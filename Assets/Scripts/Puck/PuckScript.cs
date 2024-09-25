@@ -198,6 +198,14 @@ public class PuckScript : NetworkBehaviour
                     pointCPUSFX.volume = SFXvolume;
                     pointCPUSFX.Play();
                 }
+                // if this puck object already has a floating text, destroy it
+                foreach (Transform child in transform)
+                {
+                    if (child.gameObject.tag == "floatingText")
+                    {
+                        Destroy(child.gameObject);
+                    }
+                }
                 // show floating text
                 var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
                 floatingText.GetComponent<TMP_Text>().text = enteredZoneMultiplier.ToString();
