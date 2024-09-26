@@ -71,16 +71,7 @@ public class ServerLogicScript : NetworkBehaviour
                 }
             }
             clientLogic.GameResultClientRpc();
-            // reset all server variables
-            competitorPuckCountList[0] = 99;
-            clients.Clear();
-            competitorList.Clear();
-            clientRpcParamsList.Clear();
-            competitorPuckCountList.Clear();
-            competitorScoreList.Clear();
-            activeCompetitorIndex = 0;
-            startingPlayerIndex = 0;
-            gameIsRunning = false;
+            ResetSeverVariables();
         }
     }
 
@@ -90,7 +81,6 @@ public class ServerLogicScript : NetworkBehaviour
     public void AddPlayerServerRpc(int puckID, ServerRpcParams serverRpcParams = default)
     {
         if (!IsServer) return;
-
         try
         {
             var clientId = serverRpcParams.Receive.SenderClientId;
@@ -290,5 +280,17 @@ public class ServerLogicScript : NetworkBehaviour
         if (!IsServer) return;
 
         clientLogic.AlertDisconnectClientRpc();
+    }
+
+    public void ResetSeverVariables()
+    {
+        clients.Clear();
+        competitorList.Clear();
+        clientRpcParamsList.Clear();
+        competitorPuckCountList.Clear();
+        competitorScoreList.Clear();
+        activeCompetitorIndex = 0;
+        startingPlayerIndex = 0;
+        gameIsRunning = false;
     }
 }

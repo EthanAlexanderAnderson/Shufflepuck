@@ -252,6 +252,11 @@ public class MatchmakerClient : MonoBehaviour
             UI.lobbyCodeText.text = "Lobby Code: " + lobbyCode;
             UI.EnableReadyButton();
         }
+        catch (LobbyServiceException)
+        {
+            Debug.LogError("LobbyServiceException: Failed to join Lobby (Invalid Join Code or Lobby is full)");
+            UI.SetErrorMessage("Failed to join Lobby with Relay.");
+        }
         catch (Exception e)
         {
             Debug.LogError(e);
@@ -299,7 +304,7 @@ public class MatchmakerClient : MonoBehaviour
     {
         try 
         {
-            if (hostLobby != null)
+            if (hostLobby != null && isHost)
             {
                 await LobbyService.Instance.DeleteLobbyAsync(hostLobby.Id);
             }
@@ -331,6 +336,7 @@ public class MatchmakerClient : MonoBehaviour
     public void StopClient()
     {
         serverLogic.AlertDisconnectServerRpc();
-        //NetworkManager.Singleton.Shutdown();
+        serverLogic.ResetSeverVariables();
+        NetworkManager.Singleton.Shutdown();
     }
 }

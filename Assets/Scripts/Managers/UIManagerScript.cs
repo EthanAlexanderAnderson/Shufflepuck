@@ -450,7 +450,7 @@ public class UIManagerScript : MonoBehaviour
     public void EnableReadyButton()
     {
         enabledReadyButton = true;
-        cooldownTime = 3.0f;
+        cooldownTime = 5.0f;
         waitingBackButton.SetActive(false);
         // the waiting text & gif also update after cooldown to prevent confusion
     }
