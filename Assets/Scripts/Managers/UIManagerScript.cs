@@ -328,12 +328,19 @@ public class UIManagerScript : MonoBehaviour
         // combined highscore locks
         for (int i = 10; i <= combinedHighscore; i += 2)
         {
-            foreach (GameObject go in GameObject.FindGameObjectsWithTag(i + "CombinedLock"))
+            try // this try catch is here for players who have TOO high of a highscore lol
             {
-                go.SetActive(false);
+                foreach (GameObject go in GameObject.FindGameObjectsWithTag(i + "CombinedLock"))
+                {
+                    go.SetActive(false);
+                }
+                PuckSkinManager.Instance.UnlockPuckID(12 + ((i-10) / 2));
+                PuckSkinManager.Instance.UnlockPuckID((12 + ((i-10) / 2)) * -1);
             }
-            PuckSkinManager.Instance.UnlockPuckID(12 + ((i-10) / 2));
-            PuckSkinManager.Instance.UnlockPuckID((12 + ((i-10) / 2)) * -1);
+            catch (UnityException)
+            {
+                continue;
+            }
         }
 
         // custom locks
