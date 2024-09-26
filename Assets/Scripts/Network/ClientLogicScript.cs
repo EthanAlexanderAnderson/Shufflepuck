@@ -63,6 +63,8 @@ public class ClientLogicScript : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!isRunning) { return; }
+
         // update wall status
         if (wallCount == 0)
         {
@@ -264,5 +266,15 @@ public class ClientLogicScript : NetworkBehaviour
     {
         if (!IsClient) return;
         UI.SetErrorMessage("Your opponent has disconnected.");
+    }
+
+    public void StopGame()
+    {
+        isRunning = false;
+        UI.TurnText = "";
+        activeBar = bar.ChangeBar("none");
+        line.isActive = false;
+        isTurn = false;
+        isShooting = false;
     }
 }

@@ -28,9 +28,10 @@ using Unity.Networking.Transport.Relay;
 public class MatchmakerClient : MonoBehaviour
 { 
     private string ticketId;
+    private LogicScript logic;
     private UIManagerScript UI;
     private ServerLogicScript serverLogic;
-    private LogicScript logic;
+    private ClientLogicScript clientLogic;
 
     // Getter
     private string PlayerID()
@@ -49,6 +50,7 @@ public class MatchmakerClient : MonoBehaviour
         logic = LogicScript.Instance;
         UI = UIManagerScript.Instance;
         serverLogic = ServerLogicScript.Instance;
+        clientLogic = ClientLogicScript.Instance;
     }
 
     private void OnDisable()
@@ -335,6 +337,7 @@ public class MatchmakerClient : MonoBehaviour
     // Stop Client
     public void StopClient()
     {
+        clientLogic.StopGame();
         serverLogic.AlertDisconnectServerRpc();
         serverLogic.ResetSeverVariables();
         NetworkManager.Singleton.Shutdown();
