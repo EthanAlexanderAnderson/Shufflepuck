@@ -19,6 +19,7 @@ public class UIManagerScript : MonoBehaviour
     public GameObject titleScreen;
     public GameObject gameHud;
     public GameObject gameResultScreen;
+    public GameObject customizeScreen;
 
     // title
     [SerializeField] private GameObject playerPuckIcon;
@@ -388,6 +389,13 @@ public class UIManagerScript : MonoBehaviour
         else if (newUI == gameResultScreen)
         {
             titleScreenBackground.SetActive(false);
+        }
+        else if (newUI == titleScreen)
+        {
+            titleScreenBackground.SetActive(true);
+            customizeScreen.SetActive(true);
+            UpdateLocks();
+            customizeScreen.SetActive(false);
         }
         else
         {

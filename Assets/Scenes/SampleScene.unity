@@ -14931,6 +14931,7 @@ MonoBehaviour:
   titleScreen: {fileID: 985512549}
   gameHud: {fileID: 638503739}
   gameResultScreen: {fileID: 21467989}
+  customizeScreen: {fileID: 68518742}
   playerPuckIcon: {fileID: 1133283555}
   opponentPuckIcon: {fileID: 1349874435}
   activePuckIcon: {fileID: 731288657}

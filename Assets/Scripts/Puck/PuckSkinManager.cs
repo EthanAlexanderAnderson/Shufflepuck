@@ -126,7 +126,10 @@ public class PuckSkinManager : MonoBehaviour
         UI.SetPlayerPuckIcon(logic.player.puckSprite);
         PlayerPrefs.SetInt("puck", id);
         RandomizeCPUPuckSprite();
-        PlayerPrefs.SetInt("ShowNewSkinAlert", 0);
+        if (logic.activeCompetitor != null)
+        {
+            PlayerPrefs.SetInt("ShowNewSkinAlert", 0);
+        }
     }
 
     public void UnlockPuckID(int id)
