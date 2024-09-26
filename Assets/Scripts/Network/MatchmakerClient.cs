@@ -96,7 +96,7 @@ public class MatchmakerClient : MonoBehaviour
         }
         catch (MatchmakerServiceException e)
         {
-            Debug.Log(e);
+            Debug.LogError(e);
             UI.SetErrorMessage("Failed to connect to server. Please try again.");
             UI.FailedToFindMatch();
         }
@@ -306,7 +306,7 @@ public class MatchmakerClient : MonoBehaviour
         }
         catch (LobbyServiceException e)
         {
-            Debug.Log(e);
+            Debug.LogError(e);
         }
 
         hostLobby = null;
@@ -322,7 +322,7 @@ public class MatchmakerClient : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.Log(e);
+            Debug.LogError(e);
             UI.SetErrorMessage("Server Error: -1 - Contact developer.");
         }
     }

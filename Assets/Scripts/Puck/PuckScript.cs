@@ -156,7 +156,6 @@ public class PuckScript : NetworkBehaviour
         shotSFX.volume += volumeBoost;
         shotSFX.volume *= SFXvolume;
         shotSFX.Play();
-        Debug.Log("PuckScript shot");
     }
 
     [ServerRpc]

@@ -121,7 +121,7 @@ public class ServerLogicScript : NetworkBehaviour
         }
         catch (System.Exception e)
         {
-            Debug.Log(e);
+            Debug.LogError(e);
             clientLogic.SetErrorMessageClientRpc(0);
         }
         try
@@ -135,7 +135,7 @@ public class ServerLogicScript : NetworkBehaviour
         }
         catch (System.Exception e)
         {
-            Debug.Log(e);
+            Debug.LogError(e);
             clientLogic.SetErrorMessageClientRpc(1);
         }
     }
@@ -162,7 +162,7 @@ public class ServerLogicScript : NetworkBehaviour
         }
         catch (System.Exception e)
         {
-            Debug.Log(e);
+            Debug.LogError(e);
             clientLogic.SetErrorMessageClientRpc(2);
         }
     }
@@ -188,7 +188,7 @@ public class ServerLogicScript : NetworkBehaviour
         }
         catch (System.Exception e)
         {
-            Debug.Log(e);
+            Debug.LogError(e);
             clientLogic.SetErrorMessageClientRpc(3);
         }
         try
@@ -218,7 +218,7 @@ public class ServerLogicScript : NetworkBehaviour
         }
         catch (System.Exception e)
         {
-            Debug.Log(e);
+            Debug.LogError(e);
             clientLogic.SetErrorMessageClientRpc(4);
         }
     }
@@ -247,7 +247,7 @@ public class ServerLogicScript : NetworkBehaviour
         }
         catch (System.Exception e)
         {
-            Debug.Log(e);
+            Debug.LogError(e);
             clientLogic.SetErrorMessageClientRpc(5);
         }
     }
@@ -280,7 +280,7 @@ public class ServerLogicScript : NetworkBehaviour
         catch (System.Exception e)
         {
             Debug.Log("CleanupDeadPucks Failed.");
-            Debug.Log(e);
+            Debug.LogError(e);
         }
     }
 

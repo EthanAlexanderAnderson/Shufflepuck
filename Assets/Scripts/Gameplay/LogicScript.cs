@@ -104,7 +104,6 @@ public class LogicScript : MonoBehaviour
         nonActiveCompetitor = player;
         // check if tutorial should be active
         tutorialActive = PlayerPrefs.GetInt("tutorialCompleted") == 0 && PlayerPrefs.GetInt("easyWin") == 0;
-        Debug.Log(tutorialActive);
     }
 
     // Update is called once per frame
