@@ -19236,7 +19236,8 @@ MonoBehaviour:
   barTextCanvas: {fileID: 744582968}
   angleBarLeft: {fileID: 21300000, guid: e4e87b6acd2d1f94dbb3747448bdff4b, type: 3}
   angleBarRight: {fileID: 21300000, guid: e6d1af4fae8db944ebdf68ad6468dce2, type: 3}
-  powerBar: {fileID: 21300000, guid: 655a149a198d330438fd01bd2fc42ae8, type: 3}
+  powerBarMid: {fileID: 21300000, guid: a34a651520f392047bf4b0f090a61c04, type: 3}
+  powerBarOut: {fileID: 21300000, guid: e739ab8ce08aa924eaabcbd999cbccb0, type: 3}
   spinBar: {fileID: 21300000, guid: 36ef8abdaa30fea4791d149588e3ddd0, type: 3}
 --- !u!222 &886532084
 CanvasRenderer:

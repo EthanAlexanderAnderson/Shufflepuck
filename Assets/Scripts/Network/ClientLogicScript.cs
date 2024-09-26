@@ -92,7 +92,7 @@ public class ClientLogicScript : NetworkBehaviour
             {
                 case "angle":
                     angle = line.GetValue();
-                    activeBar = bar.ChangeBar("power");
+                    activeBar = bar.ChangeBar("power", isStartingPlayer);
                     break;
                 case "power":
                     power = line.GetValue();

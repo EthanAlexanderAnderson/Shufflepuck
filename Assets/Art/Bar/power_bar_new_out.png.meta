@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 655a149a198d330438fd01bd2fc42ae8
+guid: e739ab8ce08aa924eaabcbd999cbccb0
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1650546978303074706
-    second: power_bar_textless_0
+      213: 6057052257227369271
+    second: power_bar_new_out_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,7 +126,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: power_bar_textless_0
+      name: power_bar_new_out_0
       rect:
         serializedVersion: 2
         x: 0
@@ -140,8 +140,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 29169d65bbbe7e610800000000000000
-      internalID: 1650546978303074706
+      spriteID: 73be302bfe8fe0450800000000000000
+      internalID: 6057052257227369271
       vertices: []
       indices: 
       edges: []
@@ -157,7 +157,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      power_bar_textless_0: 1650546978303074706
+      power_bar_new_out_0: 6057052257227369271
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -97,7 +97,6 @@ public class LogicScript : MonoBehaviour
 
         // load play prefs data
         UI.UpdateProfileText();
-        UI.UpdateLocks();
         // load puck id, but not dev skin
         PuckSkinManager.Instance.SelectPlayerPuckSprite(PlayerPrefs.GetInt("puck") == 0 && PlayerPrefs.GetInt("hardHighscore") <= 5 ? 1 : PlayerPrefs.GetInt("puck"));
         activeCompetitor = opponent;
@@ -207,7 +206,7 @@ public class LogicScript : MonoBehaviour
         {
             case "angle":
                 angle = line.GetValue();
-                activeBar = bar.ChangeBar("power");
+                activeBar = bar.ChangeBar("power", activeCompetitor.isPlayer);
                 break;
             case "power":
                 power = line.GetValue();
@@ -283,7 +282,7 @@ public class LogicScript : MonoBehaviour
         // after 1.5 seconds elapsed, CPU selects angle
         if (Mathf.Abs(line.GetValue() - CPUShotAngle) < (timer - (tempTime + 1.5)) && activeBar == "angle")
         {
-            activeBar = bar.ChangeBar("power");
+            activeBar = bar.ChangeBar("power", activeCompetitor.isPlayer);
         }
         // after 3 seconds elapsed, CPU selects power
         if (Mathf.Abs(line.GetValue() - CPUShotPower) < (timer - (tempTime + 3)) && activeBar == "power")
