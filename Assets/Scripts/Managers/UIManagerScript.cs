@@ -106,6 +106,10 @@ public class UIManagerScript : MonoBehaviour
         logic = LogicScript.Instance;
         sound = SoundManagerScript.Instance;
         puckAlert.SetActive(PlayerPrefs.GetInt("ShowNewSkinAlert", 0) == 1);
+
+        customizeScreen.SetActive(true);
+        UpdateLocks();
+        customizeScreen.SetActive(false);
     }
 
     float cooldownTime;
