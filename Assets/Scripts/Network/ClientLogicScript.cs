@@ -236,6 +236,7 @@ public class ClientLogicScript : NetworkBehaviour
 
         puckHalo.SetActive(false);
         bar.ToggleDim(false);
+        UI.onlineRematchButton.SetActive(false);
         UI.ChangeUI(UI.gameHud);
         UI.TurnText = "Opponent's Turn";
     }
@@ -276,5 +277,10 @@ public class ClientLogicScript : NetworkBehaviour
         line.isActive = false;
         isTurn = false;
         isShooting = false;
+    }
+
+    public void ShowRematchButton()
+    {
+        UI.onlineRematchButton.SetActive(true);
     }
 }

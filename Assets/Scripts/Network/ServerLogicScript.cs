@@ -32,6 +32,8 @@ public class ServerLogicScript : NetworkBehaviour
     private float shotTimer;
     bool gameIsRunning;
 
+    private int randomlySelectedStartingPlayerIndex = -1;
+
     private void Awake()
     {
         if (Instance == null)
@@ -71,7 +73,8 @@ public class ServerLogicScript : NetworkBehaviour
                 }
             }
             clientLogic.GameResultClientRpc();
-            ResetSeverVariables();
+            // host only, show rematch button
+            clientLogic.ShowRematchButton();
         }
     }
 
@@ -137,7 +140,18 @@ public class ServerLogicScript : NetworkBehaviour
 
         try
         {
-            activeCompetitorIndex = Random.Range(0, 2);
+            // if first match, make random
+            if (randomlySelectedStartingPlayerIndex <= -1)
+            {
+                randomlySelectedStartingPlayerIndex = Random.Range(0, 2);
+            }
+            // if rematch, change 1 to 0, or 0 to 1
+            else
+            {
+                randomlySelectedStartingPlayerIndex ^= 1;
+            }
+
+            activeCompetitorIndex = randomlySelectedStartingPlayerIndex;
             startingPlayerIndex = activeCompetitorIndex;
 
             Debug.Log(
@@ -292,5 +306,21 @@ public class ServerLogicScript : NetworkBehaviour
         activeCompetitorIndex = 0;
         startingPlayerIndex = 0;
         gameIsRunning = false;
+    }
+
+    public void Rematch()
+    {
+        // destroy all network objects with the tag puck
+        foreach (var obj in GameObject.FindGameObjectsWithTag("puck"))
+        {
+            Destroy(obj);
+        }
+        // reset puck count and score
+        for (int i = 0; i < competitorList.Count; i++)
+        {
+            competitorPuckCountList[i] = 5;
+            competitorScoreList[i] = 0;
+        }
+        SelectRandomStartingPlayer();
     }
 }

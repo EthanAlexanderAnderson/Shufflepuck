@@ -75,6 +75,7 @@ public class UIManagerScript : MonoBehaviour
     [SerializeField] private Text gameResultHighscoreMessageText;
 
     [SerializeField] private GameObject rematchButton;
+    public GameObject onlineRematchButton;
 
     // local
     [SerializeField] private GameObject activeUI;
@@ -164,8 +165,9 @@ public class UIManagerScript : MonoBehaviour
     public void UpdateScores(int playerScore, int opponentScore)
     {
         if (!playerScoreText || !opponentScoreText) { return; }
-        playerScoreText.text = playerScore.ToString();
-        opponentScoreText.text = opponentScore.ToString();
+        // if score is negative, display 0
+        playerScoreText.text = Mathf.Max(0, playerScore).ToString();
+        opponentScoreText.text = Mathf.Max(0, opponentScore).ToString();
     }
 
     public void UpdateWallText(int wallCount)
