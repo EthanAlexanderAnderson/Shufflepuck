@@ -42,6 +42,9 @@ public class PuckSkinManager : MonoBehaviour
     [SerializeField] private Sprite puckAura;
     [SerializeField] private Sprite puckCheese;
     [SerializeField] private Sprite puckScotia;
+    [SerializeField] private Sprite puckPoker;
+    [SerializeField] private Sprite puckPumpkin;
+    [SerializeField] private Sprite puckWeb;
 
     [SerializeField] private Sprite puckBlueAlt;
     [SerializeField] private Sprite puckGreenAlt;
@@ -73,6 +76,9 @@ public class PuckSkinManager : MonoBehaviour
     [SerializeField] private Sprite puckAuraAlt;
     [SerializeField] private Sprite puckCheeseAlt;
     [SerializeField] private Sprite puckScotiaAlt;
+    [SerializeField] private Sprite puckPokerAlt;
+    [SerializeField] private Sprite puckPumpkinAlt;
+    [SerializeField] private Sprite puckWebAlt;
 
     void Awake()
     {
@@ -92,8 +98,8 @@ public class PuckSkinManager : MonoBehaviour
 
     public Sprite ColorIDtoPuckSprite(int id)
     {
-        Sprite[] puckSprites = { puckFlower, puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain, puckNuke, puckWreath, puckSky, puckDragon, puckNinja, puckEgg, puckMonster, puckEye, puckCamo, puckYingYang, puckCow, puckCraft, puckPlanet, puckLove, puckAura, puckCheese, puckScotia };
-        Sprite[] puckAltSprites = { null, puckBlueAlt, puckGreenAlt, puckGreyAlt, puckOrangeAlt, puckPinkAlt, puckPurpleAlt, puckRedAlt, puckYellowAlt, puckRainbowAlt, puckCanadaAlt, puckDonutAlt, puckCaptainAlt, puckNukeAlt, puckWreathAlt, puckSkyAlt, puckDragonAlt, puckNinjaAlt, puckEggAlt, puckMonsterAlt, puckEyeAlt, puckCamoAlt, puckYingYangAlt, puckCowAlt, puckCraftAlt, puckPlanetAlt, puckLoveAlt, puckAuraAlt, puckCheeseAlt, puckScotiaAlt };
+        Sprite[] puckSprites = { puckFlower, puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain, puckNuke, puckWreath, puckSky, puckDragon, puckNinja, puckEgg, puckMonster, puckEye, puckCamo, puckYingYang, puckCow, puckCraft, puckPlanet, puckLove, puckAura, puckCheese, puckScotia, puckPoker, puckPumpkin, puckWeb };
+        Sprite[] puckAltSprites = { null, puckBlueAlt, puckGreenAlt, puckGreyAlt, puckOrangeAlt, puckPinkAlt, puckPurpleAlt, puckRedAlt, puckYellowAlt, puckRainbowAlt, puckCanadaAlt, puckDonutAlt, puckCaptainAlt, puckNukeAlt, puckWreathAlt, puckSkyAlt, puckDragonAlt, puckNinjaAlt, puckEggAlt, puckMonsterAlt, puckEyeAlt, puckCamoAlt, puckYingYangAlt, puckCowAlt, puckCraftAlt, puckPlanetAlt, puckLoveAlt, puckAuraAlt, puckCheeseAlt, puckScotiaAlt, puckPokerAlt, puckPumpkinAlt, puckWebAlt };
 
         // if out of range, return missing
         if ((id >= puckSprites.Length) || (id <= puckSprites.Length * -1))
@@ -126,7 +132,10 @@ public class PuckSkinManager : MonoBehaviour
         UI.SetPlayerPuckIcon(logic.player.puckSprite);
         PlayerPrefs.SetInt("puck", id);
         RandomizeCPUPuckSprite();
-        PlayerPrefs.SetInt("ShowNewSkinAlert", 0);
+        if (logic.activeCompetitor != null)
+        {
+            PlayerPrefs.SetInt("ShowNewSkinAlert", 0);
+        }
     }
 
     public void UnlockPuckID(int id)

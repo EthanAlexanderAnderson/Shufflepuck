@@ -22,6 +22,7 @@ public class LogicScript : MonoBehaviour
     // bar and line
     private BarScript bar;
     private LineScript line;
+    public GameObject arrow;
     public string activeBar = "none";
     private float angle;
     private float power;
@@ -36,7 +37,7 @@ public class LogicScript : MonoBehaviour
     [SerializeField] private GameObject powerupsMenu; // set in editor
 
     // game state
-    private bool gameIsRunning;
+    public bool gameIsRunning { get; private set; }
     private float timer = 0;
     private int difficulty; // 0 easy 1 medium 2 hard
 
@@ -75,9 +76,10 @@ public class LogicScript : MonoBehaviour
     void Start()
     {
 #if (UNITY_EDITOR)
-        //PlayerPrefs.SetInt("easyWin", 0);
-        //PlayerPrefs.SetInt("mediumHighscore", 6);
-        //PlayerPrefs.SetInt("hardHighscore", 4);
+        PlayerPrefs.SetInt("easyWin", 0);
+        PlayerPrefs.SetInt("easyHighscore", 14);
+        PlayerPrefs.SetInt("mediumHighscore", 12);
+        PlayerPrefs.SetInt("hardHighscore", 10);
 #endif
 
         // connect scripts
@@ -95,14 +97,12 @@ public class LogicScript : MonoBehaviour
 
         // load play prefs data
         UI.UpdateProfileText();
-        UI.UpdateLocks();
         // load puck id, but not dev skin
         PuckSkinManager.Instance.SelectPlayerPuckSprite(PlayerPrefs.GetInt("puck") == 0 && PlayerPrefs.GetInt("hardHighscore") <= 5 ? 1 : PlayerPrefs.GetInt("puck"));
         activeCompetitor = opponent;
         nonActiveCompetitor = player;
         // check if tutorial should be active
-        tutorialActive = PlayerPrefs.GetInt("tutorialCompleted") == 0 && PlayerPrefs.GetInt("easyWin") == 0;
-        Debug.Log(tutorialActive);
+        tutorialActive = PlayerPrefs.GetInt("tutorialCompleted") == 0 && PlayerPrefs.GetInt("easyWin") == 0 && PlayerPrefs.GetInt("easyHighscore") == 0;
     }
 
     // Update is called once per frame
@@ -162,6 +162,7 @@ public class LogicScript : MonoBehaviour
             UI.ChangeUI(UI.gameResultScreen);
             UI.UpdateGameResult(player.score, opponent.score, difficulty, isLocal);
             isLocal = false;
+            arrow.SetActive(false);
         }
     }
 
@@ -181,6 +182,7 @@ public class LogicScript : MonoBehaviour
         activeBar = bar.ChangeBar("angle", activeCompetitor.isPlayer);
         bar.ToggleDim(false);
         line.isActive = true;
+        arrow.SetActive(true);
         UI.TurnText = isLocal ? "Player 1's Turn" : "Your Turn";
         if (player.puckCount == 1)
         {
@@ -204,7 +206,7 @@ public class LogicScript : MonoBehaviour
         {
             case "angle":
                 angle = line.GetValue();
-                activeBar = bar.ChangeBar("power");
+                activeBar = bar.ChangeBar("power", activeCompetitor.isPlayer);
                 break;
             case "power":
                 power = line.GetValue();
@@ -235,6 +237,7 @@ public class LogicScript : MonoBehaviour
             bar.ToggleDim(true);
         }
         line.isActive = true;
+        arrow.SetActive(true);
         UI.TurnText = isLocal ? "Player 2's Turn" : "CPU's Turn";
         if (opponent.puckCount == 1 && isLocal)
         {
@@ -279,7 +282,7 @@ public class LogicScript : MonoBehaviour
         // after 1.5 seconds elapsed, CPU selects angle
         if (Mathf.Abs(line.GetValue() - CPUShotAngle) < (timer - (tempTime + 1.5)) && activeBar == "angle")
         {
-            activeBar = bar.ChangeBar("power");
+            activeBar = bar.ChangeBar("power", activeCompetitor.isPlayer);
         }
         // after 3 seconds elapsed, CPU selects power
         if (Mathf.Abs(line.GetValue() - CPUShotPower) < (timer - (tempTime + 3)) && activeBar == "power")
@@ -307,6 +310,7 @@ public class LogicScript : MonoBehaviour
         Debug.Log("Shooting: " + angle + " | " + power + " | " + spin);
         activeBar = bar.ChangeBar("none");
         line.isActive = false;
+        arrow.SetActive(false);
         activeCompetitor.ShootActivePuck(angle, power, spin);
         UI.PostShotUpdate(player.puckCount, opponent.puckCount);
         UI.UpdateShotDebugText(angle, power, spin);

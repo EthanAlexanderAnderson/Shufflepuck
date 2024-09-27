@@ -1,7 +1,6 @@
 // Script to control the angle/power/spin bar
 
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
 public class BarScript : MonoBehaviour
@@ -9,12 +8,16 @@ public class BarScript : MonoBehaviour
     // self
     public static BarScript Instance;
 
+    // dependancies
+    private LineScript line;
+
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private TMP_Text barText;
     [SerializeField] private GameObject barTextCanvas;
     [SerializeField] private Sprite angleBarLeft;
     [SerializeField] private Sprite angleBarRight;
-    [SerializeField] private Sprite powerBar;
+    [SerializeField] private Sprite powerBarMid;
+    [SerializeField] private Sprite powerBarOut;
     [SerializeField] private Sprite spinBar;
 
     private void Awake()
@@ -29,6 +32,7 @@ public class BarScript : MonoBehaviour
     void Start()
     {
         spriteRenderer.enabled = false;
+        line = LineScript.Instance;
     }
 
     // change bar sprite
@@ -44,7 +48,9 @@ public class BarScript : MonoBehaviour
                 break;
             case "power":
                 spriteRenderer.enabled = true;
-                spriteRenderer.sprite = powerBar;
+                var lineValue = line.GetValue();
+                var notPlayerAngleModifier = (isPlayer ? 0 : 27);
+                spriteRenderer.sprite = (lineValue > (50 - notPlayerAngleModifier) && lineValue < (77 - notPlayerAngleModifier) ? powerBarMid : powerBarOut);
                 barText.text = "power";
                 barTextCanvas.SetActive(true);
                 break;

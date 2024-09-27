@@ -19,6 +19,7 @@ public class UIManagerScript : MonoBehaviour
     public GameObject titleScreen;
     public GameObject gameHud;
     public GameObject gameResultScreen;
+    public GameObject customizeScreen;
 
     // title
     [SerializeField] private GameObject playerPuckIcon;
@@ -74,6 +75,7 @@ public class UIManagerScript : MonoBehaviour
     [SerializeField] private Text gameResultHighscoreMessageText;
 
     [SerializeField] private GameObject rematchButton;
+    public GameObject onlineRematchButton;
 
     // local
     [SerializeField] private GameObject activeUI;
@@ -105,6 +107,10 @@ public class UIManagerScript : MonoBehaviour
         logic = LogicScript.Instance;
         sound = SoundManagerScript.Instance;
         puckAlert.SetActive(PlayerPrefs.GetInt("ShowNewSkinAlert", 0) == 1);
+
+        customizeScreen.SetActive(true);
+        UpdateLocks();
+        customizeScreen.SetActive(false);
     }
 
     float cooldownTime;
@@ -159,8 +165,9 @@ public class UIManagerScript : MonoBehaviour
     public void UpdateScores(int playerScore, int opponentScore)
     {
         if (!playerScoreText || !opponentScoreText) { return; }
-        playerScoreText.text = playerScore.ToString();
-        opponentScoreText.text = opponentScore.ToString();
+        // if score is negative, display 0
+        playerScoreText.text = Mathf.Max(0, playerScore).ToString();
+        opponentScoreText.text = Mathf.Max(0, opponentScore).ToString();
     }
 
     public void UpdateWallText(int wallCount)
@@ -323,12 +330,19 @@ public class UIManagerScript : MonoBehaviour
         // combined highscore locks
         for (int i = 10; i <= combinedHighscore; i += 2)
         {
-            foreach (GameObject go in GameObject.FindGameObjectsWithTag(i + "CombinedLock"))
+            try // this try catch is here for players who have TOO high of a highscore lol
             {
-                go.SetActive(false);
+                foreach (GameObject go in GameObject.FindGameObjectsWithTag(i + "CombinedLock"))
+                {
+                    go.SetActive(false);
+                }
+                PuckSkinManager.Instance.UnlockPuckID(12 + ((i-10) / 2));
+                PuckSkinManager.Instance.UnlockPuckID((12 + ((i-10) / 2)) * -1);
             }
-            PuckSkinManager.Instance.UnlockPuckID(12 + ((i-10) / 2));
-            PuckSkinManager.Instance.UnlockPuckID((12 + ((i-10) / 2)) * -1);
+            catch (UnityException)
+            {
+                continue;
+            }
         }
 
         // custom locks
@@ -389,6 +403,13 @@ public class UIManagerScript : MonoBehaviour
         {
             titleScreenBackground.SetActive(false);
         }
+        else if (newUI == titleScreen)
+        {
+            titleScreenBackground.SetActive(true);
+            customizeScreen.SetActive(true);
+            UpdateLocks();
+            customizeScreen.SetActive(false);
+        }
         else
         {
             titleScreenBackground.SetActive(true);
@@ -442,7 +463,7 @@ public class UIManagerScript : MonoBehaviour
     public void EnableReadyButton()
     {
         enabledReadyButton = true;
-        cooldownTime = 3.0f;
+        cooldownTime = 5.0f;
         waitingBackButton.SetActive(false);
         // the waiting text & gif also update after cooldown to prevent confusion
     }

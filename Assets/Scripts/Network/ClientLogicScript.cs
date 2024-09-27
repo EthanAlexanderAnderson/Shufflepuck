@@ -20,9 +20,9 @@ public class ClientLogicScript : NetworkBehaviour
 
     private bool isTurn;
     private bool isShooting;
-    private bool isStartingPlayer;
+    public bool isStartingPlayer { get; private set; }
 
-    private bool isRunning;
+    public bool isRunning { get; private set; }
     private float shotTimer;
 
     private int puckCount;
@@ -30,6 +30,7 @@ public class ClientLogicScript : NetworkBehaviour
     // bar and line
     private BarScript bar;
     private LineScript line;
+    public GameObject arrow;
     public string activeBar = "none";
     public float angle;
     public float power;
@@ -62,6 +63,8 @@ public class ClientLogicScript : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!isRunning) { return; }
+
         // update wall status
         if (wallCount == 0)
         {
@@ -71,10 +74,11 @@ public class ClientLogicScript : NetworkBehaviour
         }
 
         // start turn, do this once then start shooting
-        if (isTurn && puckCount >= 0 && puckManager.AllPucksAreSlowed())
+        if (isTurn && puckCount > 0 && puckManager.AllPucksAreSlowed())
         {
             activeBar = bar.ChangeBar("angle", isStartingPlayer);
             line.isActive = true;
+            arrow.SetActive(true);
             UI.TurnText = "Your Turn";
             serverLogic.CreatePuckServerRpc();
             isTurn = false;
@@ -88,7 +92,7 @@ public class ClientLogicScript : NetworkBehaviour
             {
                 case "angle":
                     angle = line.GetValue();
-                    activeBar = bar.ChangeBar("power");
+                    activeBar = bar.ChangeBar("power", isStartingPlayer);
                     break;
                 case "power":
                     power = line.GetValue();
@@ -100,6 +104,7 @@ public class ClientLogicScript : NetworkBehaviour
                     activeBar = bar.ChangeBar("none");
                     UI.TurnText = "Opponent's Turn";
                     line.isActive = false;
+                    arrow.SetActive(false);
                     isShooting = false;
                     break;
             }
@@ -125,6 +130,7 @@ public class ClientLogicScript : NetworkBehaviour
             activeBar = bar.ChangeBar("none");
             UI.TurnText = "Opponent's Turn";
             line.isActive = false;
+            arrow.SetActive(false);
             isShooting = false;
         }
 
@@ -132,6 +138,7 @@ public class ClientLogicScript : NetworkBehaviour
         {
             activeBar = bar.ChangeBar("none");
             line.isActive = false;
+            arrow.SetActive(false);
             UI.TurnText = "";
             isTurn = false;
             isShooting = false;
@@ -194,6 +201,7 @@ public class ClientLogicScript : NetworkBehaviour
 
         UI.UpdateGameResult(-1, -1, -1, false, true);
         UI.ChangeUI(UI.gameResultScreen);
+        arrow.SetActive(false);
     }
 
     // Server tells the client to switch to game scene and start the game.
@@ -227,6 +235,8 @@ public class ClientLogicScript : NetworkBehaviour
         }
 
         puckHalo.SetActive(false);
+        bar.ToggleDim(false);
+        UI.onlineRematchButton.SetActive(false);
         UI.ChangeUI(UI.gameHud);
         UI.TurnText = "Opponent's Turn";
     }
@@ -257,5 +267,20 @@ public class ClientLogicScript : NetworkBehaviour
     {
         if (!IsClient) return;
         UI.SetErrorMessage("Your opponent has disconnected.");
+    }
+
+    public void StopGame()
+    {
+        isRunning = false;
+        UI.TurnText = "";
+        activeBar = bar.ChangeBar("none");
+        line.isActive = false;
+        isTurn = false;
+        isShooting = false;
+    }
+
+    public void ShowRematchButton()
+    {
+        UI.onlineRematchButton.SetActive(true);
     }
 }

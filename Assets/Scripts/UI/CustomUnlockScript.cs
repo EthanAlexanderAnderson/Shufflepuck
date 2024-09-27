@@ -4,6 +4,7 @@ public class CustomUnlockScript : MonoBehaviour
 {
     [SerializeField] private int ID;
 
+    [SerializeField] private int type;
     [SerializeField] private int count;
 
     [SerializeField] private bool online;
@@ -19,25 +20,47 @@ public class CustomUnlockScript : MonoBehaviour
     }
     public int Unlock()
     {
-        if 
-        (
+        if (type == 0){
+            if
             (
-                // " Win {count} online matches to unlock. "
-                ( !online || PlayerPrefs.GetInt( "onlineWin" ) >= count ) &&
-                // " Win {count} easy matches to unlock. "
-                ( !easy || PlayerPrefs.GetInt( "easyWin" ) >= count ) &&
-                // " Win {count} medium matches to unlock. "
-                ( !medium || PlayerPrefs.GetInt("mediumWin") >= count ) &&
-                // " Win {count} hard matches to unlock. "
-                ( !hard || PlayerPrefs.GetInt("hardWin") >= count ) 
-            ) 
-            ||
-            // " Win {count} matches to unlock. "
-            ( online && easy && medium && hard && ( PlayerPrefs.GetInt("onlineWin") + PlayerPrefs.GetInt("easyWin") + PlayerPrefs.GetInt("mediumWin") + PlayerPrefs.GetInt("hardWin") ) >= count)
-        )
-        {
-            gameObject.SetActive(false);
-            return ID;
+                (
+                    // " Win {count} online matches to unlock. "
+                    ( !online || PlayerPrefs.GetInt( "onlineWin" ) >= count ) &&
+                    // " Win {count} easy matches to unlock. "
+                    ( !easy || PlayerPrefs.GetInt( "easyWin" ) >= count ) &&
+                    // " Win {count} medium matches to unlock. "
+                    ( !medium || PlayerPrefs.GetInt("mediumWin") >= count ) &&
+                    // " Win {count} hard matches to unlock. "
+                    ( !hard || PlayerPrefs.GetInt("hardWin") >= count )
+                )
+                ||
+                // " Win {count} matches to unlock. "
+                ( online && easy && medium && hard && ( PlayerPrefs.GetInt("onlineWin") + PlayerPrefs.GetInt("easyWin") + PlayerPrefs.GetInt("mediumWin") + PlayerPrefs.GetInt("hardWin") ) >= count)
+            )
+            {
+                gameObject.SetActive(false);
+                return ID;
+            }
+        }
+        else if (type == 1){
+            if
+            (
+                (
+                    // " Reach an easy highscore of {count} to unlock. "
+                    ( !easy || PlayerPrefs.GetInt( "easyHighscore" ) >= count ) &&
+                    // " Reach a medium highscore of {count} to unlock. "
+                    ( !medium || PlayerPrefs.GetInt("mediumHighscore") >= count ) &&
+                    // " Reach a hard highscore of {count} to unlock. "
+                    ( !hard || PlayerPrefs.GetInt("hardHighscore") >= count )
+                )
+                ||
+                // " Reach a combined highscore of {count} to unlock. "
+                ( easy && medium && hard && ( PlayerPrefs.GetInt("easyHighscore") + PlayerPrefs.GetInt("mediumHighscore") + PlayerPrefs.GetInt("hardHighscore") ) >= count)
+            )
+            {
+                gameObject.SetActive(false);
+                return ID;
+            }
         }
         return 0;
     }

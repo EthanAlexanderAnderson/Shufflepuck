@@ -28,9 +28,10 @@ using Unity.Networking.Transport.Relay;
 public class MatchmakerClient : MonoBehaviour
 { 
     private string ticketId;
+    private LogicScript logic;
     private UIManagerScript UI;
     private ServerLogicScript serverLogic;
-    private LogicScript logic;
+    private ClientLogicScript clientLogic;
 
     // Getter
     private string PlayerID()
@@ -49,6 +50,7 @@ public class MatchmakerClient : MonoBehaviour
         logic = LogicScript.Instance;
         UI = UIManagerScript.Instance;
         serverLogic = ServerLogicScript.Instance;
+        clientLogic = ClientLogicScript.Instance;
     }
 
     private void OnDisable()
@@ -96,7 +98,7 @@ public class MatchmakerClient : MonoBehaviour
         }
         catch (MatchmakerServiceException e)
         {
-            Debug.Log(e);
+            Debug.LogError(e);
             UI.SetErrorMessage("Failed to connect to server. Please try again.");
             UI.FailedToFindMatch();
         }
@@ -192,6 +194,7 @@ public class MatchmakerClient : MonoBehaviour
             RelayServerData relayServerData = new RelayServerData(allocation, "dtls");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
+            //if (NetworkManager.Singleton.IsClient) { NetworkManager.Singleton.Shutdown(); }
             NetworkManager.Singleton.StartHost(); // Start as Host
             hostLobby = lobby;
             isHost = true;
@@ -242,6 +245,7 @@ public class MatchmakerClient : MonoBehaviour
             RelayServerData relayServerData = new RelayServerData(joinAllocation, "dtls");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
+            //if (NetworkManager.Singleton.IsHost) { NetworkManager.Singleton.Shutdown(); }
             NetworkManager.Singleton.StartClient(); // Start as Client
             hostLobby = lobby;
             isHost = false;
@@ -249,6 +253,11 @@ public class MatchmakerClient : MonoBehaviour
             Debug.Log("Joined Lobby with Relay. Lobby Code: " + lobbyCode);
             UI.lobbyCodeText.text = "Lobby Code: " + lobbyCode;
             UI.EnableReadyButton();
+        }
+        catch (LobbyServiceException)
+        {
+            Debug.LogError("LobbyServiceException: Failed to join Lobby (Invalid Join Code or Lobby is full)");
+            UI.SetErrorMessage("Failed to join Lobby with Relay.");
         }
         catch (Exception e)
         {
@@ -297,14 +306,14 @@ public class MatchmakerClient : MonoBehaviour
     {
         try 
         {
-            if (hostLobby != null)
+            if (hostLobby != null && isHost)
             {
                 await LobbyService.Instance.DeleteLobbyAsync(hostLobby.Id);
             }
         }
         catch (LobbyServiceException e)
         {
-            Debug.Log(e);
+            Debug.LogError(e);
         }
 
         hostLobby = null;
@@ -320,7 +329,7 @@ public class MatchmakerClient : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.Log(e);
+            Debug.LogError(e);
             UI.SetErrorMessage("Server Error: -1 - Contact developer.");
         }
     }
@@ -328,7 +337,9 @@ public class MatchmakerClient : MonoBehaviour
     // Stop Client
     public void StopClient()
     {
+        clientLogic.StopGame();
         serverLogic.AlertDisconnectServerRpc();
+        serverLogic.ResetSeverVariables();
         NetworkManager.Singleton.Shutdown();
     }
 }
