@@ -14,6 +14,7 @@ public class UIManagerScript : MonoBehaviour
     // dependancies
     private LogicScript logic;
     private SoundManagerScript sound;
+    private DailyChallengeManagerScript dailyChallenge;
 
     // UI Parent Objects
     public GameObject titleScreen;
@@ -32,6 +33,8 @@ public class UIManagerScript : MonoBehaviour
     [SerializeField] private GameObject titleScreenBackground;
     [SerializeField] private GameObject FPS30Button;
     [SerializeField] private GameObject puckAlert;
+    [SerializeField] private GameObject profileAlert;
+    [SerializeField] private GameObject profileScreen;
 
     // Lobby
     public TMP_Text lobbyCodeText;
@@ -106,7 +109,9 @@ public class UIManagerScript : MonoBehaviour
     {
         logic = LogicScript.Instance;
         sound = SoundManagerScript.Instance;
+        dailyChallenge = DailyChallengeManagerScript.Instance;
         puckAlert.SetActive(PlayerPrefs.GetInt("ShowNewSkinAlert", 0) == 1);
+        profileAlert.SetActive(PlayerPrefs.GetInt("DailyChallenge1", 0) < 0 || PlayerPrefs.GetInt("DailyChallenge2", 0) < 0);
 
         customizeScreen.SetActive(true);
         UpdateLocks();
@@ -210,6 +215,7 @@ public class UIManagerScript : MonoBehaviour
                 gameResultText.text = "You Win!";
                 gameResultHighscoreMessageText.text = "You won by " + System.Math.Abs(scoreDifference) + " points.";
                 IncrementPlayerPref("onlineWin");
+                dailyChallenge.EvaluateChallenge(2, scoreDifference, 1);
             }
             else if (opponentScore > playerScore)
             {
@@ -260,10 +266,11 @@ public class UIManagerScript : MonoBehaviour
             if (logic.powerupsAreEnabled) { return; }
             if (scoreDifference > PlayerPrefs.GetInt(highscoresPlayerPrefsKeys[difficulty]) && !logic.powerupsAreEnabled)
             {
-                gameResultHighscoreMessageText.text = gameResultHighscoreMessageText.text + "\nNew Highscore!";
+                gameResultHighscoreMessageText.text += "\nNew Highscore!";
                 OverwriteHighscore(scoreDifference, difficulty);
             }
             IncrementPlayerPref(winPlayerPrefsKeys[difficulty]);
+            gameResultHighscoreMessageText.text += dailyChallenge.EvaluateChallenge(difficulty, scoreDifference, 0);
         }
         else if (playerScore < opponentScore)
         {
@@ -277,7 +284,6 @@ public class UIManagerScript : MonoBehaviour
             gameResultHighscoreMessageText.text = "";
             IncrementPlayerPref(tiePlayerPrefsKeys[difficulty]);
         }
-
     }
 
     // write highscore to file and profile
@@ -298,8 +304,7 @@ public class UIManagerScript : MonoBehaviour
     public void UpdateProfileText()
     {
         profilePopupText.text =
-            "Highscores: \n\n" +
-            "\nEasy: " + PlayerPrefs.GetInt("easyHighscore") +
+            "Easy: " + PlayerPrefs.GetInt("easyHighscore") +
             "\nMedium: " + PlayerPrefs.GetInt("mediumHighscore") +
             "\nHard: " + PlayerPrefs.GetInt("hardHighscore");
     }
@@ -406,9 +411,15 @@ public class UIManagerScript : MonoBehaviour
         else if (newUI == titleScreen)
         {
             titleScreenBackground.SetActive(true);
+            // blink puck screen for unlocks
             customizeScreen.SetActive(true);
             UpdateLocks();
             customizeScreen.SetActive(false);
+        }
+        else if (newUI == profileScreen)
+        {
+            titleScreenBackground.SetActive(true);
+            dailyChallenge.SetText();
         }
         else
         {
