@@ -415,19 +415,16 @@ public class UIManagerScript : MonoBehaviour
         activeUI = newUI;
         SetErrorMessage("");
         UpdateLocks();
-        if (newUI.tag == "mainMenu") 
-        {
-            ApplyDarkMode();
-        }
         if (newUI == gameHud)
         {
             ResetHUD();
             titleScreenBackground.SetActive(false);
-            ApplyDarkMode();
+            //ApplyDarkMode();
         }
         else if (newUI == gameResultScreen)
         {
             titleScreenBackground.SetActive(false);
+            //ApplyDarkMode();
         }
         else if (newUI == titleScreen)
         {
@@ -446,6 +443,7 @@ public class UIManagerScript : MonoBehaviour
         {
             titleScreenBackground.SetActive(true);
         }
+        ApplyDarkMode();
     }
 
     // handle android back button / esc key
@@ -523,10 +521,12 @@ public class UIManagerScript : MonoBehaviour
         if (activeUI == gameHud)
         {
             table.GetComponent<SpriteRenderer>().sprite = darkMode ? tableDark : tableLight;
-            return;
         }
-        titleScreenBackground.GetComponent<Image>().sprite = darkMode ? titleScreenBackgroundDark : titleScreenBackgroundLight;
-        activeUI.GetComponent<Image>().sprite = darkMode ? titleScreenDark : titleScreenLight;
+        else if (activeUI.tag == "mainMenu")
+        {
+            titleScreenBackground.GetComponent<Image>().sprite = darkMode ? titleScreenBackgroundDark : titleScreenBackgroundLight;
+            activeUI.GetComponent<Image>().sprite = darkMode ? titleScreenDark : titleScreenLight;
+        }
         // swap text color to white for all children TMP objects with the blackText tag
         foreach (TMP_Text text in activeUI.GetComponentsInChildren<TMP_Text>())
         {
@@ -534,21 +534,13 @@ public class UIManagerScript : MonoBehaviour
             {
                 text.color = darkMode ? Color.white : Color.black;
             }
-            else if (text.tag == "whiteText")
-            {
-                text.color = darkMode ? Color.black : Color.white;
-            }
         }
-        // swap block color to black for all children TMP objects with the blackBlock tag
-        foreach (Image img in activeUI.GetComponentsInChildren<Image>())
+        // swap text color to white for all children Text objects with the blackText tag
+        foreach (Text text in activeUI.GetComponentsInChildren<Text>())
         {
-            if (img.tag == "blackBlock")
+            if (text.tag == "blackText")
             {
-                img.color = darkMode ? Color.white : Color.black;
-            }
-            else if (img.tag == "whiteBlock")
-            {
-                img.color = darkMode ? Color.black : Color.white;
+                text.color = darkMode ? Color.white : Color.black;
             }
         }
     }
