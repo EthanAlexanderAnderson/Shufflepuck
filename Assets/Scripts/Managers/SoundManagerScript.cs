@@ -73,13 +73,15 @@ public class SoundManagerScript : MonoBehaviour
 
     public void SetMusicVolume()
     {
-        musicComponent.volume = musicSlider.value;
-        PlayerPrefs.SetFloat("MusicVolume", musicSlider.value);
+        float roundedMusic = Mathf.Round(musicSlider.value * 100f) / 100f;
+        musicComponent.volume = roundedMusic;
+        PlayerPrefs.SetFloat("MusicVolume", roundedMusic);
     }
 
     public void SetSFXVolume()
     {
-        PlayerPrefs.SetFloat("SFXVolume", SFXSlider.value);
+        float roundedSFX = Mathf.Round(SFXSlider.value * 100f) / 100f;
+        PlayerPrefs.SetFloat("SFXVolume", roundedSFX);
         SFXVolumeFromPref = SFXSlider.value;
         // Play sound effect only if initialized
         if (isInitialized)

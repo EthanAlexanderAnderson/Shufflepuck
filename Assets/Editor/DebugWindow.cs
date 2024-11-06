@@ -149,6 +149,9 @@ public class DebugWindow : EditorWindow
         log += "ShowNewSkinAlert: " + PlayerPrefs.GetInt("ShowNewSkinAlert") + "\n";
         log += "MusicVolume: " + PlayerPrefs.GetFloat("MusicVolume") + "\n";
         log += "SFXVolume: " + PlayerPrefs.GetFloat("SFXVolume") + "\n";
+        log += "darkMode: " + PlayerPrefs.GetInt("darkMode") + "\n";
+
+        log += "tutorialCompleted: " + PlayerPrefs.GetInt("tutorialCompleted") + "\n";
 
         log += "LastChallengeDate: " + PlayerPrefs.GetString("LastChallengeDate") + "\n";
         log += "DailyChallenge1: " + PlayerPrefs.GetInt("DailyChallenge1") + "\n";

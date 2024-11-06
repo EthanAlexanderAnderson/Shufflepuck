@@ -89,6 +89,7 @@ public class UIManagerScript : MonoBehaviour
 
     // dark / light mode assets
     private bool darkMode = false;
+    [SerializeField] private GameObject darkModeToggle;
     [SerializeField] private Sprite titleScreenLight;
     [SerializeField] private Sprite titleScreenDark;
     [SerializeField] private Sprite titleScreenBackgroundLight;
@@ -131,6 +132,7 @@ public class UIManagerScript : MonoBehaviour
         {
             darkMode = true;
             ApplyDarkMode();
+            darkModeToggle.GetComponent<Toggle>().isOn = true;
         }
     }
 
