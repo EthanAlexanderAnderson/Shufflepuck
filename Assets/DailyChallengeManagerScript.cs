@@ -9,6 +9,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
     public static DailyChallengeManagerScript Instance;
     // dependencies
     private LevelManager levelManager;
+    private SoundManagerScript sound;
 
     [SerializeField] private TMP_Text countdownText;
 
@@ -39,6 +40,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
     void Start()
     {
         levelManager = LevelManager.Instance;
+        sound = SoundManagerScript.Instance;
     }
 
     private void OnEnable()
@@ -166,6 +168,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
             Debug.Log("Claimed reward 1!");
             PlayerPrefs.SetInt("DailyChallenge1", 0); // 0 means the reward is claimed
             SetText();
+            sound.PlayWinSFX();
         }
     }
 
@@ -180,6 +183,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
             Debug.Log("Claimed reward 2!");
             PlayerPrefs.SetInt("DailyChallenge2", 0); // 0 means the reward is claimed
             SetText();
+            sound.PlayWinSFX();
         }
     }
 }
