@@ -21,6 +21,7 @@ public class UIManagerScript : MonoBehaviour
     public GameObject gameHud;
     public GameObject gameResultScreen;
     public GameObject customizeScreen;
+    public GameObject profileScreen;
 
     // title
     [SerializeField] private GameObject playerPuckIcon;
@@ -34,7 +35,7 @@ public class UIManagerScript : MonoBehaviour
     [SerializeField] private GameObject FPS30Button;
     [SerializeField] private GameObject puckAlert;
     [SerializeField] private GameObject profileAlert;
-    [SerializeField] private GameObject profileScreen;
+
 
     // Lobby
     public TMP_Text lobbyCodeText;
@@ -86,6 +87,15 @@ public class UIManagerScript : MonoBehaviour
 
     [SerializeField] private TMP_Text wallText;
 
+    // dark / light mode assets
+    private bool darkMode = false;
+    [SerializeField] private Sprite titleScreenLight;
+    [SerializeField] private Sprite titleScreenDark;
+    [SerializeField] private Sprite titleScreenBackgroundLight;
+    [SerializeField] private Sprite titleScreenBackgroundDark;
+    [SerializeField] private GameObject table;
+    [SerializeField] private Sprite tableLight;
+    [SerializeField] private Sprite tableDark;
     public string TurnText
     {
         get => turnText.text;
@@ -116,6 +126,12 @@ public class UIManagerScript : MonoBehaviour
         customizeScreen.SetActive(true);
         UpdateLocks();
         customizeScreen.SetActive(false);
+
+        if (PlayerPrefs.GetInt("darkMode", 0) == 1)
+        {
+            darkMode = true;
+            ApplyDarkMode();
+        }
     }
 
     float cooldownTime;
@@ -399,10 +415,15 @@ public class UIManagerScript : MonoBehaviour
         activeUI = newUI;
         SetErrorMessage("");
         UpdateLocks();
+        if (newUI.tag == "mainMenu") 
+        {
+            ApplyDarkMode();
+        }
         if (newUI == gameHud)
         {
             ResetHUD();
             titleScreenBackground.SetActive(false);
+            ApplyDarkMode();
         }
         else if (newUI == gameResultScreen)
         {
@@ -488,6 +509,48 @@ public class UIManagerScript : MonoBehaviour
     public void Toggle(GameObject gameObject)
     {
         gameObject.SetActive(!gameObject.activeInHierarchy);
+    }
+
+    public void SetDarkMode(bool booly)
+    {
+        darkMode = booly;
+        ApplyDarkMode();
+        PlayerPrefs.SetInt("darkMode", darkMode ? 1 : 0);
+    }
+
+    private void ApplyDarkMode()
+    {
+        if (activeUI == gameHud)
+        {
+            table.GetComponent<SpriteRenderer>().sprite = darkMode ? tableDark : tableLight;
+            return;
+        }
+        titleScreenBackground.GetComponent<Image>().sprite = darkMode ? titleScreenBackgroundDark : titleScreenBackgroundLight;
+        activeUI.GetComponent<Image>().sprite = darkMode ? titleScreenDark : titleScreenLight;
+        // swap text color to white for all children TMP objects with the blackText tag
+        foreach (TMP_Text text in activeUI.GetComponentsInChildren<TMP_Text>())
+        {
+            if (text.tag == "blackText")
+            {
+                text.color = darkMode ? Color.white : Color.black;
+            }
+            else if (text.tag == "whiteText")
+            {
+                text.color = darkMode ? Color.black : Color.white;
+            }
+        }
+        // swap block color to black for all children TMP objects with the blackBlock tag
+        foreach (Image img in activeUI.GetComponentsInChildren<Image>())
+        {
+            if (img.tag == "blackBlock")
+            {
+                img.color = darkMode ? Color.white : Color.black;
+            }
+            else if (img.tag == "whiteBlock")
+            {
+                img.color = darkMode ? Color.black : Color.white;
+            }
+        }
     }
 
     // helper for debug mode button

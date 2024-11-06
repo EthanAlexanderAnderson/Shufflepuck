@@ -37,6 +37,8 @@ TagManager:
   - sound
   - halo
   - floatingText
+  - mainMenu
+  - blackText
   layers:
   - Default
   - TransparentFX
