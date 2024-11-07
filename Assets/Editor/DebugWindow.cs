@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -84,7 +85,9 @@ public class DebugWindow : EditorWindow
         printPlayerPrefs.clicked += () => PrintPlayerPrefs();
         rootVisualElement.Add(printPlayerPrefs);
 
-
+        Button resetDailyChallenges = new() { text = "resetDailyChallenges" };
+        resetDailyChallenges.clicked += () => ResetDailyChallenges();
+        rootVisualElement.Add(resetDailyChallenges);
     }
 
     public void DebugShootNew(float angleParameter, float powerParameter, float spinParameter)
@@ -146,7 +149,19 @@ public class DebugWindow : EditorWindow
         log += "ShowNewSkinAlert: " + PlayerPrefs.GetInt("ShowNewSkinAlert") + "\n";
         log += "MusicVolume: " + PlayerPrefs.GetFloat("MusicVolume") + "\n";
         log += "SFXVolume: " + PlayerPrefs.GetFloat("SFXVolume") + "\n";
+        log += "darkMode: " + PlayerPrefs.GetInt("darkMode") + "\n";
+
+        log += "tutorialCompleted: " + PlayerPrefs.GetInt("tutorialCompleted") + "\n";
+
+        log += "LastChallengeDate: " + PlayerPrefs.GetString("LastChallengeDate") + "\n";
+        log += "DailyChallenge1: " + PlayerPrefs.GetInt("DailyChallenge1") + "\n";
+        log += "DailyChallenge2: " + PlayerPrefs.GetInt("DailyChallenge2") + "\n";
 
         Debug.Log(log);
+    }
+
+    private void ResetDailyChallenges()
+    {
+        PlayerPrefs.SetString("LastChallengeDate", "0001-01-01");
     }
 }

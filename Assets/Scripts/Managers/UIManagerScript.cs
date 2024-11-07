@@ -14,12 +14,14 @@ public class UIManagerScript : MonoBehaviour
     // dependancies
     private LogicScript logic;
     private SoundManagerScript sound;
+    private DailyChallengeManagerScript dailyChallenge;
 
     // UI Parent Objects
     public GameObject titleScreen;
     public GameObject gameHud;
     public GameObject gameResultScreen;
     public GameObject customizeScreen;
+    public GameObject profileScreen;
 
     // title
     [SerializeField] private GameObject playerPuckIcon;
@@ -32,6 +34,8 @@ public class UIManagerScript : MonoBehaviour
     [SerializeField] private GameObject titleScreenBackground;
     [SerializeField] private GameObject FPS30Button;
     [SerializeField] private GameObject puckAlert;
+    [SerializeField] private GameObject profileAlert;
+
 
     // Lobby
     public TMP_Text lobbyCodeText;
@@ -83,6 +87,16 @@ public class UIManagerScript : MonoBehaviour
 
     [SerializeField] private TMP_Text wallText;
 
+    // dark / light mode assets
+    private bool darkMode = false;
+    [SerializeField] private GameObject darkModeToggle;
+    [SerializeField] private Sprite titleScreenLight;
+    [SerializeField] private Sprite titleScreenDark;
+    [SerializeField] private Sprite titleScreenBackgroundLight;
+    [SerializeField] private Sprite titleScreenBackgroundDark;
+    [SerializeField] private GameObject table;
+    [SerializeField] private Sprite tableLight;
+    [SerializeField] private Sprite tableDark;
     public string TurnText
     {
         get => turnText.text;
@@ -106,11 +120,20 @@ public class UIManagerScript : MonoBehaviour
     {
         logic = LogicScript.Instance;
         sound = SoundManagerScript.Instance;
+        dailyChallenge = DailyChallengeManagerScript.Instance;
         puckAlert.SetActive(PlayerPrefs.GetInt("ShowNewSkinAlert", 0) == 1);
+        profileAlert.SetActive(PlayerPrefs.GetInt("DailyChallenge1", 0) < 0 || PlayerPrefs.GetInt("DailyChallenge2", 0) < 0);
 
         customizeScreen.SetActive(true);
         UpdateLocks();
         customizeScreen.SetActive(false);
+
+        if (PlayerPrefs.GetInt("darkMode", 0) == 1)
+        {
+            darkMode = true;
+            ApplyDarkMode();
+            darkModeToggle.GetComponent<Toggle>().isOn = true;
+        }
     }
 
     float cooldownTime;
@@ -210,6 +233,7 @@ public class UIManagerScript : MonoBehaviour
                 gameResultText.text = "You Win!";
                 gameResultHighscoreMessageText.text = "You won by " + System.Math.Abs(scoreDifference) + " points.";
                 IncrementPlayerPref("onlineWin");
+                dailyChallenge.EvaluateChallenge(2, scoreDifference, 1);
             }
             else if (opponentScore > playerScore)
             {
@@ -260,10 +284,11 @@ public class UIManagerScript : MonoBehaviour
             if (logic.powerupsAreEnabled) { return; }
             if (scoreDifference > PlayerPrefs.GetInt(highscoresPlayerPrefsKeys[difficulty]) && !logic.powerupsAreEnabled)
             {
-                gameResultHighscoreMessageText.text = gameResultHighscoreMessageText.text + "\nNew Highscore!";
+                gameResultHighscoreMessageText.text += "\nNew Highscore!";
                 OverwriteHighscore(scoreDifference, difficulty);
             }
             IncrementPlayerPref(winPlayerPrefsKeys[difficulty]);
+            gameResultHighscoreMessageText.text += dailyChallenge.EvaluateChallenge(difficulty, scoreDifference, 0);
         }
         else if (playerScore < opponentScore)
         {
@@ -277,7 +302,6 @@ public class UIManagerScript : MonoBehaviour
             gameResultHighscoreMessageText.text = "";
             IncrementPlayerPref(tiePlayerPrefsKeys[difficulty]);
         }
-
     }
 
     // write highscore to file and profile
@@ -298,8 +322,7 @@ public class UIManagerScript : MonoBehaviour
     public void UpdateProfileText()
     {
         profilePopupText.text =
-            "Highscores: \n\n" +
-            "\nEasy: " + PlayerPrefs.GetInt("easyHighscore") +
+            "Easy: " + PlayerPrefs.GetInt("easyHighscore") +
             "\nMedium: " + PlayerPrefs.GetInt("mediumHighscore") +
             "\nHard: " + PlayerPrefs.GetInt("hardHighscore");
     }
@@ -398,22 +421,31 @@ public class UIManagerScript : MonoBehaviour
         {
             ResetHUD();
             titleScreenBackground.SetActive(false);
+            //ApplyDarkMode();
         }
         else if (newUI == gameResultScreen)
         {
             titleScreenBackground.SetActive(false);
+            //ApplyDarkMode();
         }
         else if (newUI == titleScreen)
         {
             titleScreenBackground.SetActive(true);
+            // blink puck screen for unlocks
             customizeScreen.SetActive(true);
             UpdateLocks();
             customizeScreen.SetActive(false);
+        }
+        else if (newUI == profileScreen)
+        {
+            titleScreenBackground.SetActive(true);
+            dailyChallenge.SetText();
         }
         else
         {
             titleScreenBackground.SetActive(true);
         }
+        ApplyDarkMode();
     }
 
     // handle android back button / esc key
@@ -477,6 +509,42 @@ public class UIManagerScript : MonoBehaviour
     public void Toggle(GameObject gameObject)
     {
         gameObject.SetActive(!gameObject.activeInHierarchy);
+    }
+
+    public void SetDarkMode(bool booly)
+    {
+        darkMode = booly;
+        ApplyDarkMode();
+        PlayerPrefs.SetInt("darkMode", darkMode ? 1 : 0);
+    }
+
+    private void ApplyDarkMode()
+    {
+        if (activeUI == gameHud)
+        {
+            table.GetComponent<SpriteRenderer>().sprite = darkMode ? tableDark : tableLight;
+        }
+        else if (activeUI.tag == "mainMenu")
+        {
+            titleScreenBackground.GetComponent<Image>().sprite = darkMode ? titleScreenBackgroundDark : titleScreenBackgroundLight;
+            activeUI.GetComponent<Image>().sprite = darkMode ? titleScreenDark : titleScreenLight;
+        }
+        // swap text color to white for all children TMP objects with the blackText tag
+        foreach (TMP_Text text in activeUI.GetComponentsInChildren<TMP_Text>())
+        {
+            if (text.tag == "blackText")
+            {
+                text.color = darkMode ? Color.white : Color.black;
+            }
+        }
+        // swap text color to white for all children Text objects with the blackText tag
+        foreach (Text text in activeUI.GetComponentsInChildren<Text>())
+        {
+            if (text.tag == "blackText")
+            {
+                text.color = darkMode ? Color.white : Color.black;
+            }
+        }
     }
 
     // helper for debug mode button
