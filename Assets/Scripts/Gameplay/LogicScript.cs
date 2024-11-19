@@ -400,6 +400,7 @@ public class LogicScript : MonoBehaviour
         UI.ChangeUI(UI.titleScreen);
         line.isActive = false;
         bar.ChangeBar("none");
+        arrow.SetActive(false);
     }
 
     // this is the CPU AI for hard mode
