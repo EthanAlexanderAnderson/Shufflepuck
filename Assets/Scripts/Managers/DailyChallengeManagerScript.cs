@@ -58,6 +58,15 @@ public class DailyChallengeManagerScript : MonoBehaviour
         // if the challenge is completed, the value is negative
         claim1.interactable = DC1 < 0;
         claim2.interactable = DC2 < 0;
+        // assert the challenge ID is within range, prevent index error
+        if (DC1 >= easyChallengeReward.Length || DC1 <= (easyChallengeReward.Length * -1))
+        {
+            DC1 = 0;
+        }
+        if (DC2 >= easyChallengeReward.Length || DC2 <= (easyChallengeReward.Length * -1))
+        {
+            DC2 = 0;
+        }
 
         challenge1Text.text = easyChallengeText[Mathf.Abs(DC1)];
         challenge2Text.text = hardChallengeText[Mathf.Abs(DC2)];
@@ -119,7 +128,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
     {
         PlayerPrefs.SetString("LastChallengeDate", DateTime.Today.ToString("yyyy-MM-dd"));
 
-        // don't overwrite the challenge if it's already completed
+        // only overwrite the challenge if it's not already completed (not a negative int id)
         if (PlayerPrefs.GetInt("DailyChallenge1", 0) >= 0)
         {
             PlayerPrefs.SetInt("DailyChallenge1", UnityEngine.Random.Range(1, easyChallengeText.Length));
