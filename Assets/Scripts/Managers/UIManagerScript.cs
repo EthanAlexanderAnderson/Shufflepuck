@@ -371,7 +371,9 @@ public class UIManagerScript : MonoBehaviour
         // custom locks
         foreach (GameObject go in GameObject.FindGameObjectsWithTag("customLock"))
         {
-            var id = go.GetComponent<CustomUnlockScript>().Unlock();
+            var CUS = go.GetComponent<CustomUnlockScript>();
+            if (CUS == null) { break; }
+            var id = CUS.Unlock();
             if (id > 0)
             {
                 PuckSkinManager.Instance.UnlockPuckID(id);

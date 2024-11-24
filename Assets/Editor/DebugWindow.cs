@@ -156,6 +156,8 @@ public class DebugWindow : EditorWindow
         log += "LastChallengeDate: " + PlayerPrefs.GetString("LastChallengeDate") + "\n";
         log += "DailyChallenge1: " + PlayerPrefs.GetInt("DailyChallenge1") + "\n";
         log += "DailyChallenge2: " + PlayerPrefs.GetInt("DailyChallenge2") + "\n";
+        log += "LastPlinkoRewardDate: " + PlayerPrefs.GetInt("LastPlinkoRewardDate") + "\n";
+        log += "PlinkoReward: " + PlayerPrefs.GetInt("PlinkoReward") + "\n";
 
         Debug.Log(log);
     }
@@ -163,5 +165,6 @@ public class DebugWindow : EditorWindow
     private void ResetDailyChallenges()
     {
         PlayerPrefs.SetString("LastChallengeDate", "0001-01-01");
+        PlayerPrefs.SetString("LastPlinkoRewardDate", "0001-01-01");
     }
 }

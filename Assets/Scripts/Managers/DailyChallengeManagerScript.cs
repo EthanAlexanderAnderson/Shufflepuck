@@ -68,6 +68,26 @@ public class DailyChallengeManagerScript : MonoBehaviour
     {
         UpdateCountdown();
     }
+    private void UpdateCountdown()
+    {
+        // Calculate the time remaining until midnight
+        DateTime now = DateTime.Now;
+        DateTime tomorrow = DateTime.Today.AddDays(1);
+        TimeSpan timeUntilMidnight = tomorrow - now;
+
+        if (countdownText != null)
+        {
+            // Update countdown text
+            countdownText.text = string.Format("{0:D2}:{1:D2}:{2:D2}",
+                timeUntilMidnight.Hours, timeUntilMidnight.Minutes, timeUntilMidnight.Seconds);
+        }
+
+        // Check if the countdown has reached zero
+        if (timeUntilMidnight.TotalSeconds <= 0)
+        {
+            AssignNewChallenge();
+        }
+    }
 
     private void CheckForNewDailyChallenge()
     {
@@ -108,27 +128,6 @@ public class DailyChallengeManagerScript : MonoBehaviour
         }
 
         Debug.Log($"New daily challenges assigned. " + PlayerPrefs.GetInt("DailyChallenge1", 0) + " " + PlayerPrefs.GetInt("DailyChallenge2", 0));
-    }
-
-    private void UpdateCountdown()
-    {
-        // Calculate the time remaining until midnight
-        DateTime now = DateTime.Now;
-        DateTime tomorrow = DateTime.Today.AddDays(1);
-        TimeSpan timeUntilMidnight = tomorrow - now;
-
-        if (countdownText != null)
-        {
-            // Update countdown text
-            countdownText.text = string.Format("{0:D2}:{1:D2}:{2:D2}", 
-                timeUntilMidnight.Hours, timeUntilMidnight.Minutes, timeUntilMidnight.Seconds);
-        }
-
-        // Check if the countdown has reached zero
-        if (timeUntilMidnight.TotalSeconds <= 0)
-        {
-            AssignNewChallenge();
-        }
     }
 
     public string EvaluateChallenge(int difficulty, int scoreDifference, int isOnline)

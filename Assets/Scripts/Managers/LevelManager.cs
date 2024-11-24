@@ -40,6 +40,18 @@ public class LevelManager : MonoBehaviour
 
     public void SetText()
     {
+        int XPiterator;
+        (XPiterator, level) = GetXPAndLevel();
+
+        currentLevelText.text = level.ToString();
+        nextLevelText.text = (level + 1).ToString();
+        xpText.text = (XPiterator + 100 + 10 * level).ToString() + "/" + (100 + 10 * level).ToString();
+        levelProgressBarValue = (((float)XPiterator + 100 + 10 * (float)level) / (100 + 10 * (float)level) * 100);
+    }
+
+    // gets current XP progress (not total XP) and current level
+    public (int, int) GetXPAndLevel()
+    {
         int XPiterator = XP;
         int leveliterator = -1;
         while (XPiterator >= 0)
@@ -47,12 +59,7 @@ public class LevelManager : MonoBehaviour
             leveliterator++;
             XPiterator -= 100 + 10 * leveliterator;
         }
-        level = leveliterator;
-
-        currentLevelText.text = level.ToString();
-        nextLevelText.text = (level + 1).ToString();
-        xpText.text = (XPiterator + 100 + 10 * leveliterator).ToString() + "/" + (100 + 10 * leveliterator).ToString();
-        levelProgressBarValue = (((float)XPiterator + 100 + 10 * (float)leveliterator) / (100 + 10 * (float)leveliterator) * 100);
+        return (XPiterator, leveliterator);
     }
 
     private void Update()

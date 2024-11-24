@@ -5,6 +5,7 @@
 using UnityEngine;
 using Unity.Netcode;
 using TMPro;
+using System;
 
 public class PuckScript : NetworkBehaviour
 {
@@ -263,25 +264,26 @@ public class PuckScript : NetworkBehaviour
     // play bonk SFX when pucks collide
     void OnCollisionEnter2D(Collision2D col)
     {
-        if (rb.velocity.x + rb.velocity.y > 0.3f)
+        float totalVelocity = Math.Abs(rb.velocity.x) + Math.Abs(rb.velocity.y);
+        if (totalVelocity > 1f)
         {
-            if (rb.velocity.x + rb.velocity.y > 1f)
+            if (totalVelocity > 5f)
             {
-                bonkHeavySFX.volume *= SFXvolume;
+                bonkHeavySFX.volume = SFXvolume;
                 bonkHeavySFX.Play();
             }
             else
             {
-                bonkLightSFX.volume *= SFXvolume;
+                bonkLightSFX.volume = (SFXvolume * totalVelocity) / 5f;
                 bonkLightSFX.Play();
             }
             // play collision particle effect
             ParticleSystem collisionParticleEffect = Instantiate(collisionParticleEffectPrefab, col.GetContact(0).point, Quaternion.identity);
             collisionParticleEffect.transform.position = col.GetContact(0).point;
             ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
-            emission.rateOverTime = (rb.velocity.x + rb.velocity.y) * 100f;
+            emission.rateOverTime = (totalVelocity) * 100f;
             ParticleSystem.MainModule main = collisionParticleEffect.main;
-            main.startSpeed = (rb.velocity.x + rb.velocity.y) * 4f;
+            main.startSpeed = (totalVelocity) * 4f;
             collisionParticleEffect.Play();
             Destroy(collisionParticleEffect.gameObject, 5f);
         }
