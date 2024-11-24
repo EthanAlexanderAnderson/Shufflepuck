@@ -550,6 +550,14 @@ public class UIManagerScript : MonoBehaviour
                 text.color = darkMode ? Color.white : Color.black;
             }
         }
+        // swap color to white for all children sprite renderer objects with the blackText tag
+        foreach (SpriteRenderer sr in activeUI.GetComponentsInChildren<SpriteRenderer>())
+        {
+            if (sr.tag == "blackText")
+            {
+                sr.color = darkMode ? Color.white : Color.black;
+            }
+        }
     }
 
     // helper for debug mode button

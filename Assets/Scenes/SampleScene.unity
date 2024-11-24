@@ -1756,7 +1756,7 @@ GameObject:
   - component: {fileID: 41840204}
   m_Layer: 5
   m_Name: Spike Wall L
-  m_TagString: Untagged
+  m_TagString: blackText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2183,7 +2183,6 @@ GameObject:
   - component: {fileID: 68708045}
   - component: {fileID: 68708044}
   - component: {fileID: 68708043}
-  - component: {fileID: 68708042}
   m_Layer: 5
   m_Name: Peg TR1
   m_TagString: Untagged
@@ -2210,21 +2209,6 @@ RectTransform:
   m_AnchoredPosition: {x: 1150, y: 300}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &68708042
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 68708040}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &68708043
 Rigidbody2D:
   serializedVersion: 4
@@ -2354,7 +2338,6 @@ GameObject:
   - component: {fileID: 73465041}
   - component: {fileID: 73465040}
   - component: {fileID: 73465039}
-  - component: {fileID: 73465038}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -2381,21 +2364,6 @@ RectTransform:
   m_AnchoredPosition: {x: -600, y: -100}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &73465038
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 73465036}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &73465039
 Rigidbody2D:
   serializedVersion: 4
@@ -3276,7 +3244,7 @@ GameObject:
   - component: {fileID: 100288592}
   m_Layer: 5
   m_Name: Spike Wall L
-  m_TagString: Untagged
+  m_TagString: blackText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5949,7 +5917,6 @@ GameObject:
   - component: {fileID: 219824355}
   - component: {fileID: 219824354}
   - component: {fileID: 219824353}
-  - component: {fileID: 219824352}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -5976,21 +5943,6 @@ RectTransform:
   m_AnchoredPosition: {x: -1050, y: 200}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &219824352
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 219824350}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &219824353
 Rigidbody2D:
   serializedVersion: 4
@@ -7107,7 +7059,7 @@ GameObject:
   - component: {fileID: 264661968}
   m_Layer: 5
   m_Name: Wall L
-  m_TagString: Untagged
+  m_TagString: blackText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7566,7 +7518,7 @@ GameObject:
   - component: {fileID: 270769567}
   m_Layer: 5
   m_Name: Spike Wall R
-  m_TagString: Untagged
+  m_TagString: blackText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10152,7 +10104,7 @@ GameObject:
   - component: {fileID: 386776923}
   m_Layer: 5
   m_Name: Spike Wall R
-  m_TagString: Untagged
+  m_TagString: blackText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11359,7 +11311,7 @@ GameObject:
   - component: {fileID: 427058132}
   m_Layer: 5
   m_Name: Wall R
-  m_TagString: Untagged
+  m_TagString: blackText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12498,7 +12450,6 @@ GameObject:
   - component: {fileID: 441698663}
   - component: {fileID: 441698662}
   - component: {fileID: 441698661}
-  - component: {fileID: 441698660}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -12525,21 +12476,6 @@ RectTransform:
   m_AnchoredPosition: {x: -900, y: -700}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &441698660
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 441698658}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &441698661
 Rigidbody2D:
   serializedVersion: 4
@@ -13042,7 +12978,6 @@ GameObject:
   - component: {fileID: 454791693}
   - component: {fileID: 454791692}
   - component: {fileID: 454791691}
-  - component: {fileID: 454791690}
   m_Layer: 5
   m_Name: Peg TR2
   m_TagString: Untagged
@@ -13069,21 +13004,6 @@ RectTransform:
   m_AnchoredPosition: {x: 1250, y: 400}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &454791690
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 454791688}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &454791691
 Rigidbody2D:
   serializedVersion: 4
@@ -14184,7 +14104,6 @@ GameObject:
   - component: {fileID: 483377616}
   - component: {fileID: 483377615}
   - component: {fileID: 483377614}
-  - component: {fileID: 483377617}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -14328,21 +14247,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &483377617
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 483377612}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!1 &487418048
 GameObject:
   m_ObjectHideFlags: 0
@@ -14487,7 +14391,6 @@ GameObject:
   - component: {fileID: 489666377}
   - component: {fileID: 489666376}
   - component: {fileID: 489666375}
-  - component: {fileID: 489666374}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -14514,21 +14417,6 @@ RectTransform:
   m_AnchoredPosition: {x: 600, y: -100}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &489666374
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 489666372}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &489666375
 Rigidbody2D:
   serializedVersion: 4
@@ -15883,7 +15771,7 @@ GameObject:
   - component: {fileID: 528196788}
   m_Layer: 5
   m_Name: +100XP Text (TMP)
-  m_TagString: Untagged
+  m_TagString: blackText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -16018,7 +15906,6 @@ GameObject:
   - component: {fileID: 528394785}
   - component: {fileID: 528394784}
   - component: {fileID: 528394783}
-  - component: {fileID: 528394782}
   m_Layer: 5
   m_Name: Peg BR1
   m_TagString: Untagged
@@ -16045,21 +15932,6 @@ RectTransform:
   m_AnchoredPosition: {x: 1150, y: -300}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &528394782
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 528394780}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &528394783
 Rigidbody2D:
   serializedVersion: 4
@@ -17078,7 +16950,6 @@ GameObject:
   - component: {fileID: 543153971}
   - component: {fileID: 543153970}
   - component: {fileID: 543153969}
-  - component: {fileID: 543153968}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -17105,21 +16976,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -700}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &543153968
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 543153966}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &543153969
 Rigidbody2D:
   serializedVersion: 4
@@ -18216,7 +18072,7 @@ GameObject:
   - component: {fileID: 602288248}
   m_Layer: 5
   m_Name: +100XP Text (TMP)
-  m_TagString: Untagged
+  m_TagString: blackText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -20612,7 +20468,6 @@ GameObject:
   - component: {fileID: 679517353}
   - component: {fileID: 679517352}
   - component: {fileID: 679517351}
-  - component: {fileID: 679517350}
   m_Layer: 5
   m_Name: Peg BL1
   m_TagString: Untagged
@@ -20639,21 +20494,6 @@ RectTransform:
   m_AnchoredPosition: {x: -1150, y: -300}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &679517350
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 679517348}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &679517351
 Rigidbody2D:
   serializedVersion: 4
@@ -21231,7 +21071,6 @@ GameObject:
   - component: {fileID: 704913201}
   - component: {fileID: 704913200}
   - component: {fileID: 704913199}
-  - component: {fileID: 704913198}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -21258,21 +21097,6 @@ RectTransform:
   m_AnchoredPosition: {x: -150, y: -400}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &704913198
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 704913196}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &704913199
 Rigidbody2D:
   serializedVersion: 4
@@ -21495,7 +21319,6 @@ GameObject:
   - component: {fileID: 712590471}
   - component: {fileID: 712590470}
   - component: {fileID: 712590469}
-  - component: {fileID: 712590468}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -21522,21 +21345,6 @@ RectTransform:
   m_AnchoredPosition: {x: 1050, y: -400}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &712590468
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 712590466}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &712590469
 Rigidbody2D:
   serializedVersion: 4
@@ -22210,7 +22018,6 @@ GameObject:
   - component: {fileID: 735715150}
   - component: {fileID: 735715149}
   - component: {fileID: 735715148}
-  - component: {fileID: 735715147}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -22237,21 +22044,6 @@ RectTransform:
   m_AnchoredPosition: {x: -450, y: -400}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &735715147
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 735715145}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &735715148
 Rigidbody2D:
   serializedVersion: 4
@@ -24135,7 +23927,6 @@ GameObject:
   - component: {fileID: 806937355}
   - component: {fileID: 806937354}
   - component: {fileID: 806937353}
-  - component: {fileID: 806937352}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -24162,21 +23953,6 @@ RectTransform:
   m_AnchoredPosition: {x: -750, y: 200}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &806937352
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 806937350}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &806937353
 Rigidbody2D:
   serializedVersion: 4
@@ -24466,7 +24242,7 @@ GameObject:
   - component: {fileID: 814771355}
   m_Layer: 5
   m_Name: Wall R
-  m_TagString: Untagged
+  m_TagString: blackText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -24742,7 +24518,7 @@ GameObject:
   - component: {fileID: 818918194}
   m_Layer: 5
   m_Name: Spike Wall R
-  m_TagString: Untagged
+  m_TagString: blackText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -25275,7 +25051,6 @@ GameObject:
   - component: {fileID: 830554221}
   - component: {fileID: 830554220}
   - component: {fileID: 830554219}
-  - component: {fileID: 830554218}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -25302,21 +25077,6 @@ RectTransform:
   m_AnchoredPosition: {x: -450, y: 200}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &830554218
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 830554216}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &830554219
 Rigidbody2D:
   serializedVersion: 4
@@ -25922,7 +25682,6 @@ GameObject:
   - component: {fileID: 837692443}
   - component: {fileID: 837692442}
   - component: {fileID: 837692441}
-  - component: {fileID: 837692440}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -25949,21 +25708,6 @@ RectTransform:
   m_AnchoredPosition: {x: -900, y: 500}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &837692440
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 837692438}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &837692441
 Rigidbody2D:
   serializedVersion: 4
@@ -26271,7 +26015,6 @@ GameObject:
   - component: {fileID: 839156790}
   - component: {fileID: 839156789}
   - component: {fileID: 839156788}
-  - component: {fileID: 839156787}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -26298,21 +26041,6 @@ RectTransform:
   m_AnchoredPosition: {x: 750, y: -400}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &839156787
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 839156785}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &839156788
 Rigidbody2D:
   serializedVersion: 4
@@ -26731,7 +26459,6 @@ GameObject:
   - component: {fileID: 868004223}
   - component: {fileID: 868004222}
   - component: {fileID: 868004221}
-  - component: {fileID: 868004220}
   m_Layer: 5
   m_Name: Rail TL2
   m_TagString: Untagged
@@ -26758,21 +26485,6 @@ RectTransform:
   m_AnchoredPosition: {x: -1150, y: 300}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &868004220
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 868004218}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &868004221
 Rigidbody2D:
   serializedVersion: 4
@@ -27145,7 +26857,6 @@ GameObject:
   - component: {fileID: 880192965}
   - component: {fileID: 880192964}
   - component: {fileID: 880192963}
-  - component: {fileID: 880192962}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -27172,21 +26883,6 @@ RectTransform:
   m_AnchoredPosition: {x: 750, y: 200}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &880192962
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 880192960}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &880192963
 Rigidbody2D:
   serializedVersion: 4
@@ -27316,7 +27012,6 @@ GameObject:
   - component: {fileID: 880399555}
   - component: {fileID: 880399554}
   - component: {fileID: 880399553}
-  - component: {fileID: 880399552}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -27343,21 +27038,6 @@ RectTransform:
   m_AnchoredPosition: {x: 600, y: -700}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &880399552
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 880399550}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &880399553
 Rigidbody2D:
   serializedVersion: 4
@@ -28994,7 +28674,6 @@ GameObject:
   - component: {fileID: 928103656}
   - component: {fileID: 928103655}
   - component: {fileID: 928103654}
-  - component: {fileID: 928103653}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -29021,21 +28700,6 @@ RectTransform:
   m_AnchoredPosition: {x: 900, y: -700}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &928103653
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 928103651}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &928103654
 Rigidbody2D:
   serializedVersion: 4
@@ -30045,7 +29709,6 @@ GameObject:
   - component: {fileID: 954587106}
   - component: {fileID: 954587105}
   - component: {fileID: 954587104}
-  - component: {fileID: 954587103}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -30072,21 +29735,6 @@ RectTransform:
   m_AnchoredPosition: {x: 600, y: 500}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &954587103
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 954587101}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &954587104
 Rigidbody2D:
   serializedVersion: 4
@@ -31289,7 +30937,7 @@ GameObject:
   - component: {fileID: 994344932}
   m_Layer: 5
   m_Name: Floor
-  m_TagString: Untagged
+  m_TagString: blackText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -32356,7 +32004,6 @@ GameObject:
   - component: {fileID: 1030300126}
   - component: {fileID: 1030300125}
   - component: {fileID: 1030300124}
-  - component: {fileID: 1030300123}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -32383,21 +32030,6 @@ RectTransform:
   m_AnchoredPosition: {x: -750, y: -400}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1030300123
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1030300121}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &1030300124
 Rigidbody2D:
   serializedVersion: 4
@@ -34168,7 +33800,7 @@ GameObject:
   - component: {fileID: 1111792867}
   m_Layer: 5
   m_Name: Wall R
-  m_TagString: Untagged
+  m_TagString: blackText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -34658,7 +34290,6 @@ GameObject:
   - component: {fileID: 1137710447}
   - component: {fileID: 1137710446}
   - component: {fileID: 1137710445}
-  - component: {fileID: 1137710444}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -34685,21 +34316,6 @@ RectTransform:
   m_AnchoredPosition: {x: 150, y: -400}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1137710444
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1137710442}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &1137710445
 Rigidbody2D:
   serializedVersion: 4
@@ -35183,7 +34799,6 @@ GameObject:
   - component: {fileID: 1153446766}
   - component: {fileID: 1153446765}
   - component: {fileID: 1153446764}
-  - component: {fileID: 1153446763}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -35210,21 +34825,6 @@ RectTransform:
   m_AnchoredPosition: {x: -1050, y: -400}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1153446763
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1153446761}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &1153446764
 Rigidbody2D:
   serializedVersion: 4
@@ -35354,7 +34954,6 @@ GameObject:
   - component: {fileID: 1154169993}
   - component: {fileID: 1154169992}
   - component: {fileID: 1154169991}
-  - component: {fileID: 1154169990}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -35381,21 +34980,6 @@ RectTransform:
   m_AnchoredPosition: {x: -300, y: -100}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1154169990
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1154169988}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &1154169991
 Rigidbody2D:
   serializedVersion: 4
@@ -36045,7 +35629,6 @@ GameObject:
   - component: {fileID: 1180448637}
   - component: {fileID: 1180448636}
   - component: {fileID: 1180448635}
-  - component: {fileID: 1180448634}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -36072,21 +35655,6 @@ RectTransform:
   m_AnchoredPosition: {x: 300, y: -700}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1180448634
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1180448632}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &1180448635
 Rigidbody2D:
   serializedVersion: 4
@@ -36488,7 +36056,6 @@ GameObject:
   - component: {fileID: 1203060280}
   - component: {fileID: 1203060279}
   - component: {fileID: 1203060278}
-  - component: {fileID: 1203060277}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -36515,21 +36082,6 @@ RectTransform:
   m_AnchoredPosition: {x: -300, y: -700}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1203060277
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1203060275}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &1203060278
 Rigidbody2D:
   serializedVersion: 4
@@ -40075,7 +39627,6 @@ GameObject:
   - component: {fileID: 1309276873}
   - component: {fileID: 1309276872}
   - component: {fileID: 1309276871}
-  - component: {fileID: 1309276870}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -40102,21 +39653,6 @@ RectTransform:
   m_AnchoredPosition: {x: 450, y: -400}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1309276870
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1309276868}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &1309276871
 Rigidbody2D:
   serializedVersion: 4
@@ -40405,7 +39941,6 @@ GameObject:
   - component: {fileID: 1338019732}
   - component: {fileID: 1338019731}
   - component: {fileID: 1338019730}
-  - component: {fileID: 1338019729}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -40432,21 +39967,6 @@ RectTransform:
   m_AnchoredPosition: {x: 450, y: 200}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1338019729
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1338019727}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &1338019730
 Rigidbody2D:
   serializedVersion: 4
@@ -40709,7 +40229,7 @@ GameObject:
   - component: {fileID: 1340994454}
   m_Layer: 5
   m_Name: Text (TMP)
-  m_TagString: Untagged
+  m_TagString: blackText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -41561,7 +41081,7 @@ GameObject:
   - component: {fileID: 1372766067}
   m_Layer: 5
   m_Name: Spike Wall L
-  m_TagString: Untagged
+  m_TagString: blackText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -45456,7 +44976,7 @@ GameObject:
   - component: {fileID: 1516716834}
   m_Layer: 5
   m_Name: Wall L
-  m_TagString: Untagged
+  m_TagString: blackText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -46991,7 +46511,6 @@ GameObject:
   - component: {fileID: 1587201084}
   - component: {fileID: 1587201083}
   - component: {fileID: 1587201082}
-  - component: {fileID: 1587201085}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -47135,21 +46654,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &1587201085
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1587201080}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!1 &1590420374
 GameObject:
   m_ObjectHideFlags: 0
@@ -47162,7 +46666,6 @@ GameObject:
   - component: {fileID: 1590420378}
   - component: {fileID: 1590420377}
   - component: {fileID: 1590420376}
-  - component: {fileID: 1590420379}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -47306,21 +46809,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &1590420379
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1590420374}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!1 &1596321423
 GameObject:
   m_ObjectHideFlags: 0
@@ -48488,7 +47976,6 @@ GameObject:
   - component: {fileID: 1618289335}
   - component: {fileID: 1618289334}
   - component: {fileID: 1618289333}
-  - component: {fileID: 1618289332}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -48515,21 +48002,6 @@ RectTransform:
   m_AnchoredPosition: {x: -600, y: -700}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1618289332
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1618289330}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &1618289333
 Rigidbody2D:
   serializedVersion: 4
@@ -48809,7 +48281,6 @@ GameObject:
   - component: {fileID: 1628329389}
   - component: {fileID: 1628329388}
   - component: {fileID: 1628329387}
-  - component: {fileID: 1628329386}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -48836,21 +48307,6 @@ RectTransform:
   m_AnchoredPosition: {x: 900, y: 500}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1628329386
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1628329384}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &1628329387
 Rigidbody2D:
   serializedVersion: 4
@@ -49264,7 +48720,7 @@ GameObject:
   - component: {fileID: 1647289572}
   m_Layer: 5
   m_Name: Wall L
-  m_TagString: Untagged
+  m_TagString: blackText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -50370,7 +49826,6 @@ GameObject:
   - component: {fileID: 1687544466}
   - component: {fileID: 1687544465}
   - component: {fileID: 1687544464}
-  - component: {fileID: 1687544463}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -50397,21 +49852,6 @@ RectTransform:
   m_AnchoredPosition: {x: -900, y: -100}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1687544463
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1687544461}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &1687544464
 Rigidbody2D:
   serializedVersion: 4
@@ -50618,7 +50058,7 @@ GameObject:
   - component: {fileID: 1695446363}
   m_Layer: 5
   m_Name: Floor
-  m_TagString: Untagged
+  m_TagString: blackText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -51533,7 +50973,6 @@ GameObject:
   - component: {fileID: 1727316996}
   - component: {fileID: 1727316995}
   - component: {fileID: 1727316994}
-  - component: {fileID: 1727316993}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -51560,21 +50999,6 @@ RectTransform:
   m_AnchoredPosition: {x: 300, y: -100}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1727316993
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1727316991}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &1727316994
 Rigidbody2D:
   serializedVersion: 4
@@ -52476,7 +51900,6 @@ GameObject:
   - component: {fileID: 1763500445}
   - component: {fileID: 1763500444}
   - component: {fileID: 1763500443}
-  - component: {fileID: 1763500442}
   m_Layer: 5
   m_Name: Peg BL2
   m_TagString: Untagged
@@ -52503,21 +51926,6 @@ RectTransform:
   m_AnchoredPosition: {x: -1250, y: -200}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1763500442
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1763500440}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &1763500443
 Rigidbody2D:
   serializedVersion: 4
@@ -53063,7 +52471,6 @@ GameObject:
   - component: {fileID: 1773937736}
   - component: {fileID: 1773937735}
   - component: {fileID: 1773937734}
-  - component: {fileID: 1773937733}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -53090,21 +52497,6 @@ RectTransform:
   m_AnchoredPosition: {x: 900, y: -100}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1773937733
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1773937731}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &1773937734
 Rigidbody2D:
   serializedVersion: 4
@@ -54076,7 +53468,6 @@ GameObject:
   - component: {fileID: 1812159863}
   - component: {fileID: 1812159862}
   - component: {fileID: 1812159861}
-  - component: {fileID: 1812159860}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -54103,21 +53494,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -100}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1812159860
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1812159858}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &1812159861
 Rigidbody2D:
   serializedVersion: 4
@@ -54647,7 +54023,6 @@ GameObject:
   - component: {fileID: 1828930528}
   - component: {fileID: 1828930527}
   - component: {fileID: 1828930526}
-  - component: {fileID: 1828930525}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -54674,21 +54049,6 @@ RectTransform:
   m_AnchoredPosition: {x: 1050, y: 200}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1828930525
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1828930523}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &1828930526
 Rigidbody2D:
   serializedVersion: 4
@@ -54942,7 +54302,6 @@ GameObject:
   - component: {fileID: 1856552998}
   - component: {fileID: 1856552997}
   - component: {fileID: 1856552996}
-  - component: {fileID: 1856552995}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -54969,21 +54328,6 @@ RectTransform:
   m_AnchoredPosition: {x: 150, y: 200}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1856552995
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1856552993}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &1856552996
 Rigidbody2D:
   serializedVersion: 4
@@ -55115,7 +54459,7 @@ GameObject:
   - component: {fileID: 1856679015}
   m_Layer: 5
   m_Name: Floor
-  m_TagString: Untagged
+  m_TagString: blackText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -59947,7 +59291,6 @@ GameObject:
   - component: {fileID: 2062945573}
   - component: {fileID: 2062945572}
   - component: {fileID: 2062945571}
-  - component: {fileID: 2062945570}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -59974,21 +59317,6 @@ RectTransform:
   m_AnchoredPosition: {x: -150, y: 200}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2062945570
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2062945568}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &2062945571
 Rigidbody2D:
   serializedVersion: 4
@@ -60262,7 +59590,6 @@ GameObject:
   - component: {fileID: 2067957376}
   - component: {fileID: 2067957375}
   - component: {fileID: 2067957374}
-  - component: {fileID: 2067957373}
   m_Layer: 5
   m_Name: Rail TL1
   m_TagString: Untagged
@@ -60289,21 +59616,6 @@ RectTransform:
   m_AnchoredPosition: {x: -1250, y: 400}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2067957373
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2067957371}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &2067957374
 Rigidbody2D:
   serializedVersion: 4
@@ -61409,7 +60721,6 @@ GameObject:
   - component: {fileID: 2117500576}
   - component: {fileID: 2117500575}
   - component: {fileID: 2117500574}
-  - component: {fileID: 2117500573}
   m_Layer: 5
   m_Name: Peg BR2
   m_TagString: Untagged
@@ -61436,21 +60747,6 @@ RectTransform:
   m_AnchoredPosition: {x: 1250, y: -200}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2117500573
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2117500571}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &2117500574
 Rigidbody2D:
   serializedVersion: 4
@@ -61677,7 +60973,6 @@ GameObject:
   - component: {fileID: 2135396332}
   - component: {fileID: 2135396331}
   - component: {fileID: 2135396330}
-  - component: {fileID: 2135396329}
   m_Layer: 5
   m_Name: Peg
   m_TagString: Untagged
@@ -61704,21 +60999,6 @@ RectTransform:
   m_AnchoredPosition: {x: -600, y: 500}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2135396329
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2135396327}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bce4ab0c455749948b5b12f832f56540, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  dir: 0
 --- !u!50 &2135396330
 Rigidbody2D:
   serializedVersion: 4
