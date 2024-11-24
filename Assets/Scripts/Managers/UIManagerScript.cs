@@ -22,6 +22,7 @@ public class UIManagerScript : MonoBehaviour
     public GameObject gameResultScreen;
     public GameObject customizeScreen;
     public GameObject profileScreen;
+    public GameObject plinkoScreen;
 
     // title
     [SerializeField] private GameObject playerPuckIcon;
@@ -341,12 +342,14 @@ public class UIManagerScript : MonoBehaviour
             int iHighscore = PlayerPrefs.GetInt(highscoresPlayerPrefsKeys[i]);
 
             if (iHighscore > 0)
+            {
                 foreach (GameObject go in GameObject.FindGameObjectsWithTag(difficultyLocksPlayerPrefsKeys[i]))
                 {
                     go.SetActive(false);
                 }
                 PuckSkinManager.Instance.UnlockPuckID(IDs[i]);
                 PuckSkinManager.Instance.UnlockPuckID(IDs[i]*-1);
+            }
             combinedHighscore += iHighscore;
         }
 
@@ -371,7 +374,9 @@ public class UIManagerScript : MonoBehaviour
         // custom locks
         foreach (GameObject go in GameObject.FindGameObjectsWithTag("customLock"))
         {
-            var id = go.GetComponent<CustomUnlockScript>().Unlock();
+            var CUS = go.GetComponent<CustomUnlockScript>();
+            if (CUS == null) { break; }
+            var id = CUS.Unlock();
             if (id > 0)
             {
                 PuckSkinManager.Instance.UnlockPuckID(id);
@@ -451,7 +456,7 @@ public class UIManagerScript : MonoBehaviour
     // handle android back button / esc key
     void HandleBackButton()
     {
-        if (previousActiveUI != gameHud)
+        if (previousActiveUI != gameHud && activeUI != plinkoScreen)
         {
             ChangeUI(previousActiveUI);
         }

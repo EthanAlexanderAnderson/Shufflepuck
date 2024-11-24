@@ -18,6 +18,8 @@ public class ArrowScript : MonoBehaviour
     private float sideModifier;
     private string activeBar;
 
+    private bool darkMode;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -25,6 +27,12 @@ public class ArrowScript : MonoBehaviour
         logic = LogicScript.Instance;
         clientLogic = ClientLogicScript.Instance;
     }
+
+    private void OnEnable()
+    {
+        darkMode = PlayerPrefs.GetInt("darkMode", 0) == 1;
+    }
+
     //Assign a GameObject in the Inspector to rotate around
     void Update()
     {
@@ -71,5 +79,6 @@ public class ArrowScript : MonoBehaviour
 
             spriteRenderer.flipX = (line.GetValue() < 50);
         }
+        spriteRenderer.color = darkMode ? Color.white : Color.black;
     }
 }

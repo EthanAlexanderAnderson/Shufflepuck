@@ -45,6 +45,10 @@ public class PuckSkinManager : MonoBehaviour
     [SerializeField] private Sprite puckPoker;
     [SerializeField] private Sprite puckPumpkin;
     [SerializeField] private Sprite puckWeb;
+    [SerializeField] private Sprite puckCoin;
+    [SerializeField] private Sprite puckMagic;
+    [SerializeField] private Sprite puckStar;
+    [SerializeField] private Sprite puckSnake;
 
     [SerializeField] private Sprite puckBlueAlt;
     [SerializeField] private Sprite puckGreenAlt;
@@ -79,6 +83,10 @@ public class PuckSkinManager : MonoBehaviour
     [SerializeField] private Sprite puckPokerAlt;
     [SerializeField] private Sprite puckPumpkinAlt;
     [SerializeField] private Sprite puckWebAlt;
+    [SerializeField] private Sprite puckCoinAlt;
+    [SerializeField] private Sprite puckMagicAlt;
+    [SerializeField] private Sprite puckStarAlt;
+    [SerializeField] private Sprite puckSnakeAlt;
 
     void Awake()
     {
@@ -98,8 +106,8 @@ public class PuckSkinManager : MonoBehaviour
 
     public Sprite ColorIDtoPuckSprite(int id)
     {
-        Sprite[] puckSprites = { puckFlower, puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain, puckNuke, puckWreath, puckSky, puckDragon, puckNinja, puckEgg, puckMonster, puckEye, puckCamo, puckYingYang, puckCow, puckCraft, puckPlanet, puckLove, puckAura, puckCheese, puckScotia, puckPoker, puckPumpkin, puckWeb };
-        Sprite[] puckAltSprites = { null, puckBlueAlt, puckGreenAlt, puckGreyAlt, puckOrangeAlt, puckPinkAlt, puckPurpleAlt, puckRedAlt, puckYellowAlt, puckRainbowAlt, puckCanadaAlt, puckDonutAlt, puckCaptainAlt, puckNukeAlt, puckWreathAlt, puckSkyAlt, puckDragonAlt, puckNinjaAlt, puckEggAlt, puckMonsterAlt, puckEyeAlt, puckCamoAlt, puckYingYangAlt, puckCowAlt, puckCraftAlt, puckPlanetAlt, puckLoveAlt, puckAuraAlt, puckCheeseAlt, puckScotiaAlt, puckPokerAlt, puckPumpkinAlt, puckWebAlt };
+        Sprite[] puckSprites = { puckFlower, puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain, puckNuke, puckWreath, puckSky, puckDragon, puckNinja, puckEgg, puckMonster, puckEye, puckCamo, puckYingYang, puckCow, puckCraft, puckPlanet, puckLove, puckAura, puckCheese, puckScotia, puckPoker, puckPumpkin, puckWeb, puckCoin, puckMagic, puckStar, puckSnake };
+        Sprite[] puckAltSprites = { null, puckBlueAlt, puckGreenAlt, puckGreyAlt, puckOrangeAlt, puckPinkAlt, puckPurpleAlt, puckRedAlt, puckYellowAlt, puckRainbowAlt, puckCanadaAlt, puckDonutAlt, puckCaptainAlt, puckNukeAlt, puckWreathAlt, puckSkyAlt, puckDragonAlt, puckNinjaAlt, puckEggAlt, puckMonsterAlt, puckEyeAlt, puckCamoAlt, puckYingYangAlt, puckCowAlt, puckCraftAlt, puckPlanetAlt, puckLoveAlt, puckAuraAlt, puckCheeseAlt, puckScotiaAlt, puckPokerAlt, puckPumpkinAlt, puckWebAlt, puckCoinAlt, puckMagicAlt, puckStarAlt, puckSnakeAlt };
 
         // if out of range, return missing
         if ((id >= puckSprites.Length) || (id <= puckSprites.Length * -1))
