@@ -11,6 +11,8 @@ public class DailyChallengeManagerScript : MonoBehaviour
     private LevelManager levelManager;
     private SoundManagerScript sound;
 
+    [SerializeField] private GameObject titleScreen;
+    //
     [SerializeField] private TMP_Text countdownText;
 
     [SerializeField] private TMP_Text challenge1Text;
@@ -22,12 +24,12 @@ public class DailyChallengeManagerScript : MonoBehaviour
     [SerializeField] private Button claim1;
     [SerializeField] private Button claim2;
 
-    private string[] easyChallengeText = { "Claimed", "Beat any CPU", "Beat the easy CPU", "Beat the medium CPU", "Beat the easy CPU by 3 or more points", "Beat the medium CPU by 3 or more points", "Beat the easy CPU by 5 or more points" };
-    private int[] easyChallengeReward = { 0, 10, 10, 20, 20, 30, 30 };
-    private int[,] easyChallengeCondition = { { 0, 0, 0 }, { 0, 1, 0 }, { 0, 1, 0 }, { 1, 1, 0 }, { 0, 3, 0 }, { 1, 3, 0 }, { 0, 5, 0 } }; // {difficulty, score difference, isOnline}
-    private string[] hardChallengeText = { "Claimed", "Beat the hard CPU", "Beat the medium CPU by 5 or more points", "Beat the hard CPU by 3 or more points", "Beat the medium CPU by 5 or more points", "Beat the hard CPU by 5 or more points", "Win an online match" };
-    private int[] hardChallengeReward = { 0, 40, 40, 50, 50, 60, 100 };
-    private int[,] hardChallengeCondition = { { 0, 0, 0 }, { 2, 1, 0 }, { 1, 5, 0 }, { 2, 3, 0 }, { 1, 5, 0 }, { 2, 5, 0 }, { 2, 1, 1 } }; // {difficulty, score difference, isOnline}
+    private string[] easyChallengeText = { "Claimed", "Beat the easy CPU", "Beat the medium CPU", "Beat the easy CPU by 3 or more points", "Beat the medium CPU by 3 or more points", "Beat the easy CPU by 5 or more points" };
+    private int[] easyChallengeReward = { 0, 40, 60, 60, 80, 80 };
+    private int[,] easyChallengeCondition = { { 0, 0, 0 }, { 0, 1, 0 }, { 1, 1, 0 }, { 0, 3, 0 }, { 1, 3, 0 }, { 0, 5, 0 } }; // {difficulty, score difference, isOnline}
+    private string[] hardChallengeText = { "Claimed", "Beat the hard CPU", "Beat the hard CPU by 3 or more points", "Beat the medium CPU by 5 or more points", "Beat the hard CPU by 5 or more points", "Win an online match" };
+    private int[] hardChallengeReward = { 0, 80, 100, 100, 120, 200 };
+    private int[,] hardChallengeCondition = { { 0, 0, 0 }, { 2, 1, 0 }, { 2, 3, 0 }, { 1, 5, 0 }, { 2, 5, 0 }, { 2, 1, 1 } }; // {difficulty, score difference, isOnline}
 
     private void Awake()
     {
@@ -107,7 +109,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
                 Debug.Log("Today's challenge is already assigned. " + PlayerPrefs.GetInt("DailyChallenge1", 0) + " " + PlayerPrefs.GetInt("DailyChallenge2", 0));
             }
         }
-        else
+        else // no date ever written
         {
             AssignNewChallenge();
         }
@@ -121,10 +123,14 @@ public class DailyChallengeManagerScript : MonoBehaviour
         if (PlayerPrefs.GetInt("DailyChallenge1", 0) >= 0)
         {
             PlayerPrefs.SetInt("DailyChallenge1", UnityEngine.Random.Range(1, easyChallengeText.Length));
+            // early game override
+            if (PlayerPrefs.GetInt("easyHighscore", 0) == 0) { PlayerPrefs.SetInt("DailyChallenge1", 1); }
         }
         if (PlayerPrefs.GetInt("DailyChallenge2", 0) >= 0)
         {
             PlayerPrefs.SetInt("DailyChallenge2", UnityEngine.Random.Range(1, hardChallengeText.Length));
+            // early game override
+            if (PlayerPrefs.GetInt("hardHighscore", 0) == 0) { PlayerPrefs.SetInt("DailyChallenge2", 1); }
         }
 
         Debug.Log($"New daily challenges assigned. " + PlayerPrefs.GetInt("DailyChallenge1", 0) + " " + PlayerPrefs.GetInt("DailyChallenge2", 0));
@@ -132,7 +138,32 @@ public class DailyChallengeManagerScript : MonoBehaviour
 
     public string EvaluateChallenge(int difficulty, int scoreDifference, int isOnline)
     {
+        // base XP for winning
         string[] xpFeedback = { "\nEasy Win +10XP", "\nMedium Win +20XP", "\nHard Win +30XP", };
+
+        // bonus XP for first win of the day
+        string dailyWin = "";
+        string lastSavedDate = PlayerPrefs.GetString("LastDailyWinDate", string.Empty);
+        DateTime lastChallengeDate;
+
+        if (DateTime.TryParse(lastSavedDate, out lastChallengeDate))
+        {
+            // Compare the last saved date to today's date
+            if (lastChallengeDate.Date != DateTime.Today)
+            {
+                dailyWin += "\nDaily Win +50XP";
+                levelManager.AddXP(50);
+                PlayerPrefs.SetString("LastDailyWinDate", DateTime.Today.ToString("yyyy-MM-dd"));
+            }
+        } 
+        else // no date ever written
+        {
+            dailyWin += "\nDaily Win +50XP";
+            levelManager.AddXP(50);
+            PlayerPrefs.SetString("LastDailyWinDate", DateTime.Today.ToString("yyyy-MM-dd"));
+        }
+
+        // Evaluate daily challenges
         int challenge1 = PlayerPrefs.GetInt("DailyChallenge1", 0);
         int challenge2 = PlayerPrefs.GetInt("DailyChallenge2", 0);
 
@@ -148,7 +179,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         if (scoreDifference > 0 && isOnline == 0)
         {
             levelManager.AddXP((difficulty + 1) * 10);
-            return xpFeedback[difficulty];
+            return xpFeedback[difficulty] + dailyWin;
         } 
         else
         {
@@ -169,6 +200,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
             SetText();
             sound.PlayWinSFX();
         }
+        titleScreen.GetComponent<TitleScreenScript>().UpdateAlerts();
     }
 
     // called by claim button
@@ -184,5 +216,6 @@ public class DailyChallengeManagerScript : MonoBehaviour
             SetText();
             sound.PlayWinSFX();
         }
+        titleScreen.GetComponent<TitleScreenScript>().UpdateAlerts();
     }
 }

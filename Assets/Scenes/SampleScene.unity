@@ -9143,9 +9143,9 @@ RectTransform:
   - {fileID: 985512550}
   - {fileID: 68518743}
   - {fileID: 1315445591}
-  - {fileID: 839140265}
   - {fileID: 657988160}
   - {fileID: 1498383607}
+  - {fileID: 839140265}
   - {fileID: 1890662201}
   - {fileID: 164624467}
   - {fileID: 789485846}
@@ -20534,6 +20534,7 @@ MonoBehaviour:
   gameResultScreen: {fileID: 21467989}
   customizeScreen: {fileID: 68518742}
   profileScreen: {fileID: 1498383606}
+  plinkoScreen: {fileID: 839140264}
   playerPuckIcon: {fileID: 1133283555}
   opponentPuckIcon: {fileID: 1349874435}
   activePuckIcon: {fileID: 731288657}
@@ -29256,6 +29257,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07856939400c5464b904fab5b213bc33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  titleScreen: {fileID: 985512549}
   countdownText: {fileID: 716221025}
   challenge1Text: {fileID: 2085873118}
   challenge2Text: {fileID: 1561633235}
@@ -30970,6 +30972,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa816de3a1c28ca4080d592e887f544b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  plinkoAlert: {fileID: 237802250}
   puckAlert: {fileID: 297520251}
   profileAlert: {fileID: 1025698266}
 --- !u!1 &986119703
@@ -33686,6 +33689,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b48a059835c298b40826baf531ec783f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  count: 0
+  successCount: 0
 --- !u!1 &1091482862
 GameObject:
   m_ObjectHideFlags: 0
@@ -44305,7 +44310,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -1100}
-  m_SizeDelta: {x: 1200, y: 400}
+  m_SizeDelta: {x: 1200, y: 600}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1473060149
 GameObject:

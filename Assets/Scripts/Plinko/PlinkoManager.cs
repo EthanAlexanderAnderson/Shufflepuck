@@ -80,9 +80,6 @@ public class PlinkoManager : MonoBehaviour
 
     private void CheckForNewDailyPlinkoReward()
     {
-        // TODO: uncomment
-        //PlayerPrefs.SetString("LastPlinkoRewardDate", DateTime.Today.ToString("yyyy-MM-dd"));
-
         // Get the last saved date or use a default if it's the first time
         string lastSavedDate = PlayerPrefs.GetString("LastPlinkoRewardDate", string.Empty);
         DateTime lastChallengeDate;
@@ -99,7 +96,7 @@ public class PlinkoManager : MonoBehaviour
                 Debug.Log("Today's Plinko Reward is already assigned. " + PlayerPrefs.GetInt("PlinkoReward"));
             }
         }
-        else
+        else // no date ever written
         {
             AssignNewPlinkoReward();
         }
@@ -107,6 +104,8 @@ public class PlinkoManager : MonoBehaviour
 
     private void AssignNewPlinkoReward()
     {
+        PlayerPrefs.SetString("LastPlinkoRewardDate", DateTime.Today.ToString("yyyy-MM-dd"));
+
         int currentReward = PlayerPrefs.GetInt("PlinkoReward", 100);
         float rand = Random.Range(0f, 1f);
 

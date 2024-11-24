@@ -48,20 +48,20 @@ public class PlinkoDropButtonScript : MonoBehaviour
             if (puck.transform.position.y < -20f)
             {
                 Destroy(puck);
+                SetDropButtonText();
             }
 
             // if any single puck exists (if this loop is entered at least once) then the back button should be disabled
             backButton.interactable = false;
         }
         // if cooldown is active, disable button
-        dropButton.interactable = ((Time.time - cooldown) > 2);
+        dropButton.interactable = ((Time.time - cooldown) > 2 && drops > 0);
     }
 
     private void SetDropButtonText()
     {
         (int XP, int level) = levelManager.GetXPAndLevel();
-        // TODO: reenable this
-        //dropped = PlayerPrefs.GetInt("PlinkoPegsDropped", 0);
+        dropped = PlayerPrefs.GetInt("PlinkoPegsDropped", 0);
         drops = level - dropped;
         count.text = drops.ToString();
     }
@@ -86,8 +86,7 @@ public class PlinkoDropButtonScript : MonoBehaviour
         // diable the child object circle collider 2d (this prevents point sfx)
         puckObject.transform.GetChild(0).GetComponent<CircleCollider2D>().enabled = false;
 
-        // TODO: reenable this
-        //PlayerPrefs.SetInt("PlinkoPegsDropped", PlayerPrefs.GetInt("PlinkoPegsDropped") + 1);
+        PlayerPrefs.SetInt("PlinkoPegsDropped", PlayerPrefs.GetInt("PlinkoPegsDropped") + 1);
         dropped += 1;
         SetDropButtonText();
     }
