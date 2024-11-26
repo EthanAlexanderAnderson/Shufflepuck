@@ -5,7 +5,6 @@
 using UnityEngine;
 using Unity.Netcode;
 using TMPro;
-using System;
 
 public class PuckScript : NetworkBehaviour
 {
@@ -71,9 +70,9 @@ public class PuckScript : NetworkBehaviour
             shotTorqueToAdd = 0.0f;
         }
 
-        // change the sliding SFX volume based on velocity
-        velocity = rb.velocity.x + rb.velocity.y;
-        noiseSFX.volume = (velocity / 20.0f) * SFXvolume;
+        // Calculate the magnitude of the velocity vector to determine the sliding noise volume
+        velocity = Mathf.Sqrt(rb.velocity.x * rb.velocity.x + rb.velocity.y * rb.velocity.y);
+        noiseSFX.volume = logic.gameIsRunning ? (velocity / 15.0f) * SFXvolume : 0f; // only play noise if game is running (not plinko)
 
         if (IsSafe())
         {
@@ -264,26 +263,28 @@ public class PuckScript : NetworkBehaviour
     // play bonk SFX when pucks collide
     void OnCollisionEnter2D(Collision2D col)
     {
-        float totalVelocity = Math.Abs(rb.velocity.x) + Math.Abs(rb.velocity.y);
-        if (totalVelocity > 1f)
+        // Calculate the magnitude of the velocity vector to determine the bonk volume
+        velocity = Mathf.Sqrt(rb.velocity.x * rb.velocity.x + rb.velocity.y * rb.velocity.y);
+
+        if (velocity > 0.5f)
         {
-            if (totalVelocity > 5f)
+            if (velocity > 3f)
             {
                 bonkHeavySFX.volume = SFXvolume;
                 bonkHeavySFX.Play();
             }
             else
             {
-                bonkLightSFX.volume = (SFXvolume * totalVelocity) / 5f;
+                bonkLightSFX.volume = (SFXvolume * velocity) / 3f;
                 bonkLightSFX.Play();
             }
             // play collision particle effect
             ParticleSystem collisionParticleEffect = Instantiate(collisionParticleEffectPrefab, col.GetContact(0).point, Quaternion.identity);
             collisionParticleEffect.transform.position = col.GetContact(0).point;
             ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
-            emission.rateOverTime = (totalVelocity) * 100f;
+            emission.rateOverTime = (velocity) * 100f;
             ParticleSystem.MainModule main = collisionParticleEffect.main;
-            main.startSpeed = (totalVelocity) * 4f;
+            main.startSpeed = (velocity) * 4f;
             collisionParticleEffect.Play();
             Destroy(collisionParticleEffect.gameObject, 5f);
         }
