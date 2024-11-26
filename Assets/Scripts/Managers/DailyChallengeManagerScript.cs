@@ -59,13 +59,15 @@ public class DailyChallengeManagerScript : MonoBehaviour
         claim1.interactable = DC1 < 0;
         claim2.interactable = DC2 < 0;
         // assert the challenge ID is within range, prevent index error
-        if (DC1 >= easyChallengeReward.Length || DC1 <= (easyChallengeReward.Length * -1))
+        if (DC1 >= easyChallengeText.Length || DC1 <= (easyChallengeText.Length * -1) || DC1 <= (easyChallengeReward.Length * -1) || DC1 <= (easyChallengeReward.Length * -1))
         {
             DC1 = 0;
+            PlayerPrefs.SetInt("DailyChallenge1", 0);
         }
-        if (DC2 >= easyChallengeReward.Length || DC2 <= (easyChallengeReward.Length * -1))
+        if (DC2 >= hardChallengeText.Length || DC2 <= (hardChallengeText.Length * -1) || DC2 >= hardChallengeReward.Length || DC2 <= (hardChallengeReward.Length * -1))
         {
             DC2 = 0;
+            PlayerPrefs.SetInt("DailyChallenge2", 0);
         }
 
         challenge1Text.text = easyChallengeText[Mathf.Abs(DC1)];
@@ -172,10 +174,21 @@ public class DailyChallengeManagerScript : MonoBehaviour
             PlayerPrefs.SetString("LastDailyWinDate", DateTime.Today.ToString("yyyy-MM-dd"));
         }
 
-        // Evaluate daily challenges
+        // assert the daily challenges IDs are within range, prevent index error
         int challenge1 = PlayerPrefs.GetInt("DailyChallenge1", 0);
         int challenge2 = PlayerPrefs.GetInt("DailyChallenge2", 0);
+        if (challenge1 >= easyChallengeCondition.Length || challenge1 <= (easyChallengeCondition.Length * -1))
+        {
+            challenge1 = 0;
+            PlayerPrefs.SetInt("DailyChallenge1", 0);
+        }
+        if (challenge2 >= hardChallengeCondition.Length || challenge2 <= (hardChallengeCondition.Length * -1))
+        {
+            challenge2 = 0;
+            PlayerPrefs.SetInt("DailyChallenge2", 0);
+        }
 
+        // Evaluate daily challenges
         if (difficulty == easyChallengeCondition[challenge1, 0] && scoreDifference >= easyChallengeCondition[challenge1, 1] && isOnline == easyChallengeCondition[challenge1, 2] && challenge1 > 0)
         {
             PlayerPrefs.SetInt("DailyChallenge1", -challenge1);
@@ -203,7 +216,8 @@ public class DailyChallengeManagerScript : MonoBehaviour
         // Check if the reward is complete (negative value)
         if (DC1 < 0)
         {
-            levelManager.AddXP(easyChallengeReward[Mathf.Abs(DC1)]); // add the reward to the player's XP
+            try { levelManager.AddXP(easyChallengeReward[Mathf.Abs(DC1)]); } // add the reward to the player's XP
+            catch (IndexOutOfRangeException e) { levelManager.AddXP(50); } 
             Debug.Log("Claimed reward 1!");
             PlayerPrefs.SetInt("DailyChallenge1", 0); // 0 means the reward is claimed
             SetText();
@@ -219,7 +233,8 @@ public class DailyChallengeManagerScript : MonoBehaviour
         // Check if the reward is complete (negative value)
         if (DC2 < 0)
         {
-            levelManager.AddXP(hardChallengeReward[Mathf.Abs(DC2)]); // add the reward to the player's XP
+            try { levelManager.AddXP(easyChallengeReward[Mathf.Abs(DC2)]); } // add the reward to the player's XP
+            catch (IndexOutOfRangeException e) { levelManager.AddXP(100); }
             Debug.Log("Claimed reward 2!");
             PlayerPrefs.SetInt("DailyChallenge2", 0); // 0 means the reward is claimed
             SetText();
