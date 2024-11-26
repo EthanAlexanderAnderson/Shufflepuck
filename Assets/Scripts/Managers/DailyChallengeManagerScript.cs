@@ -217,7 +217,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         if (DC1 < 0)
         {
             try { levelManager.AddXP(easyChallengeReward[Mathf.Abs(DC1)]); } // add the reward to the player's XP
-            catch (IndexOutOfRangeException e) { levelManager.AddXP(50); } 
+            catch (IndexOutOfRangeException e) { levelManager.AddXP(50); Debug.Log(e); }
             Debug.Log("Claimed reward 1!");
             PlayerPrefs.SetInt("DailyChallenge1", 0); // 0 means the reward is claimed
             SetText();
@@ -234,7 +234,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         if (DC2 < 0)
         {
             try { levelManager.AddXP(easyChallengeReward[Mathf.Abs(DC2)]); } // add the reward to the player's XP
-            catch (IndexOutOfRangeException e) { levelManager.AddXP(100); }
+            catch (IndexOutOfRangeException e) { levelManager.AddXP(100); Debug.Log(e); }
             Debug.Log("Claimed reward 2!");
             PlayerPrefs.SetInt("DailyChallenge2", 0); // 0 means the reward is claimed
             SetText();
