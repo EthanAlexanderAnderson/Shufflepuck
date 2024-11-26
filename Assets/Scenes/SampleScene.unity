@@ -20435,9 +20435,9 @@ MonoBehaviour:
   wallText: {fileID: 1423397450}
   darkModeToggle: {fileID: 1905894108}
   titleScreenLight: {fileID: 21300000, guid: 16c947e242398e84cb42268dc2744c94, type: 3}
-  titleScreenDark: {fileID: 21300000, guid: d06c8d33d8ea6f74cb4354b2693aeb82, type: 3}
+  titleScreenDark: {fileID: 21300000, guid: fc4e4ffa63d7bb24a8aad70f6516debe, type: 3}
   titleScreenBackgroundLight: {fileID: 21300000, guid: 206fd689bf7f6a0448c25b0e6d100f2d, type: 3}
-  titleScreenBackgroundDark: {fileID: 21300000, guid: 4b630cf14d4b49949b9909aacf09f5a7, type: 3}
+  titleScreenBackgroundDark: {fileID: 21300000, guid: 6b28bb025f7f111409bf7ad46fffaf8e, type: 3}
   table: {fileID: 16345473}
   tableLight: {fileID: 21300000, guid: d83fa14700396b34ba9c9f093fd12cbd, type: 3}
   tableDark: {fileID: 21300000, guid: c6abc355049ccfe428afb80f1080acbc, type: 3}
