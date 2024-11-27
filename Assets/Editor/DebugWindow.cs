@@ -94,7 +94,7 @@ public class DebugWindow : EditorWindow
     {
         puckObject = Instantiate(puck, new Vector3((left.value ? -3.6f : 3.6f), -10.0f, 0.0f), Quaternion.identity);
         puckScript = puckObject.GetComponent<PuckScript>();
-        puckScript.InitPuck(true, playerPuckSprite);
+        puckScript.InitPuck(true, 1);
         puckScript.Shoot(angleParameter, powerParameter, spinParameter);
     }
 
@@ -107,7 +107,7 @@ public class DebugWindow : EditorWindow
 
         puckObject = Instantiate(puck, new Vector3((left.value ? -3.6f : 3.6f), -10.0f, 0.0f), Quaternion.identity);
         puckScript = puckObject.GetComponent<PuckScript>();
-        puckScript.InitPuck(true, playerPuckSprite);
+        puckScript.InitPuck(true, 1);
         puckScript.Shoot(angleParameter, powerParameter, spinParameter);
     }
 

@@ -76,13 +76,12 @@ public class PlinkoDropButtonScript : MonoBehaviour
         cooldown = Time.time;
 
         GameObject puckObject = Instantiate(puck, new Vector3(Random.Range(-8f, 7.66f) + 0.333f, 8f, 0.0f), Quaternion.identity);
+        PuckScript puckScript = puckObject.GetComponent<PuckScript>();
+        puckScript.InitPuck(true, logic.player.puckSpriteID);
         // set gravity scale to 1 on puckObject
         puckObject.GetComponent<Rigidbody2D>().gravityScale = 1;
         // set order in layer to 3
         puckObject.GetComponent<SpriteRenderer>().sortingOrder = 3;
-        // set skin
-        Sprite puckSprite = puckSkinManager.ColorIDtoPuckSprite(logic.player.puckSpriteID);
-        puckObject.GetComponent<SpriteRenderer>().sprite = puckSprite;
         // diable the child object circle collider 2d (this prevents point sfx)
         puckObject.transform.GetChild(0).GetComponent<CircleCollider2D>().enabled = false;
 

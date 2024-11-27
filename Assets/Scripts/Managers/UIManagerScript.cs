@@ -282,8 +282,8 @@ public class UIManagerScript : MonoBehaviour
         {
             gameResultText.text = "You Win!";
             gameResultHighscoreMessageText.text = "You won by " + scoreDifference + " points.";
-            if (logic.powerupsAreEnabled) { return; }
-            if (scoreDifference > PlayerPrefs.GetInt(highscoresPlayerPrefsKeys[difficulty]) && !logic.powerupsAreEnabled)
+            if (logic.powerupsAreEnabled && difficulty >= 2) { return; }
+            if (scoreDifference > PlayerPrefs.GetInt(highscoresPlayerPrefsKeys[difficulty]))
             {
                 gameResultHighscoreMessageText.text += "\nNew Highscore!";
                 OverwriteHighscore(scoreDifference, difficulty);

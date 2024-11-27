@@ -107,10 +107,10 @@ public class PuckSkinManager : MonoBehaviour
     public Sprite ColorIDtoPuckSprite(int id)
     {
         Sprite[] puckSprites = { puckFlower, puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain, puckNuke, puckWreath, puckSky, puckDragon, puckNinja, puckEgg, puckMonster, puckEye, puckCamo, puckYingYang, puckCow, puckCraft, puckPlanet, puckLove, puckAura, puckCheese, puckScotia, puckPoker, puckPumpkin, puckWeb, puckCoin, puckMagic, puckStar, puckSnake };
-        Sprite[] puckAltSprites = { null, puckBlueAlt, puckGreenAlt, puckGreyAlt, puckOrangeAlt, puckPinkAlt, puckPurpleAlt, puckRedAlt, puckYellowAlt, puckRainbowAlt, puckCanadaAlt, puckDonutAlt, puckCaptainAlt, puckNukeAlt, puckWreathAlt, puckSkyAlt, puckDragonAlt, puckNinjaAlt, puckEggAlt, puckMonsterAlt, puckEyeAlt, puckCamoAlt, puckYingYangAlt, puckCowAlt, puckCraftAlt, puckPlanetAlt, puckLoveAlt, puckAuraAlt, puckCheeseAlt, puckScotiaAlt, puckPokerAlt, puckPumpkinAlt, puckWebAlt, puckCoinAlt, puckMagicAlt, puckStarAlt, puckSnakeAlt };
+        Sprite[] puckAltSprites = { puckMissing, puckBlueAlt, puckGreenAlt, puckGreyAlt, puckOrangeAlt, puckPinkAlt, puckPurpleAlt, puckRedAlt, puckYellowAlt, puckRainbowAlt, puckCanadaAlt, puckDonutAlt, puckCaptainAlt, puckNukeAlt, puckWreathAlt, puckSkyAlt, puckDragonAlt, puckNinjaAlt, puckEggAlt, puckMonsterAlt, puckEyeAlt, puckCamoAlt, puckYingYangAlt, puckCowAlt, puckCraftAlt, puckPlanetAlt, puckLoveAlt, puckAuraAlt, puckCheeseAlt, puckScotiaAlt, puckPokerAlt, puckPumpkinAlt, puckWebAlt, puckCoinAlt, puckMagicAlt, puckStarAlt, puckSnakeAlt };
 
         // if out of range, return missing
-        if ((id >= puckSprites.Length) || (id <= puckSprites.Length * -1))
+        if ((id >= puckSprites.Length) || (id <= puckAltSprites.Length * -1))
         {
             return puckMissing;
         }
@@ -130,6 +130,35 @@ public class PuckSkinManager : MonoBehaviour
         catch (System.IndexOutOfRangeException)
         {
             return puckMissing;
+        }
+    }
+
+    public Color ColorIDtoColor(int id)
+    {
+        Color[] puckColors = { new Color(0f, 0f, 0f), new Color(0f, 0.7490196f, 0.9529412f), new Color(0.4862745f, 0.7725491f, 0.4627451f), new Color(0.5019608f, 0.5019608f, 0.5019608f), new Color(0.9647059f, 0.5568628f, 0.3372549f), new Color(0.9411765f, 0.4313726f, 0.6666667f), new Color(0.5215687f, 0.3764706f, 0.6588235f), new Color(0.9490197f, 0.4235294f, 0.3098039f), new Color(1f, 0.9607844f, 0.4078432f) };
+        Color[] puckAltColors = { new Color(0f, 0f, 0f), new Color(0f, 0.7490196f, 0.9529412f), new Color(0.4862745f, 0.7725491f, 0.4627451f), new Color(0.5019608f, 0.5019608f, 0.5019608f), new Color(0.9647059f, 0.5568628f, 0.3372549f), new Color(0.9411765f, 0.4313726f, 0.6666667f), new Color(0.5215687f, 0.3764706f, 0.6588235f), new Color(0.9490197f, 0.4235294f, 0.3098039f), new Color(1f, 0.9607844f, 0.4078432f) };
+
+        // if out of range, return grey
+        if ((id >= puckColors.Length) || (id <= puckAltColors.Length * -1))
+        {
+            return new Color(0.5f, 0.5f, 0.5f);
+        }
+
+        // if postitive, return regular, else return alt
+        try
+        {
+            if (id >= 0)
+            {
+                return (puckColors[id]);
+            }
+            else
+            {
+                return (puckAltColors[id * -1]);
+            }
+        }
+        catch (System.IndexOutOfRangeException)
+        {
+            return new Color(0.5f, 0.5f, 0.5f);
         }
     }
 
@@ -179,7 +208,9 @@ public class PuckSkinManager : MonoBehaviour
     {
         do
         {
-            logic.opponent.puckSprite = ColorIDtoPuckSprite(Random.Range(1, 9));
+            int rand = Random.Range(1, 9);
+            logic.opponent.puckSprite = ColorIDtoPuckSprite(rand);
+            logic.opponent.puckSpriteID = rand;
         } while (logic.opponent.puckSprite == logic.player.puckSprite);
         UI.SetOpponentPuckIcon(logic.opponent.puckSprite);
     }

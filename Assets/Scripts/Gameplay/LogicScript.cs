@@ -460,6 +460,6 @@ public class LogicScript : MonoBehaviour
     {
         GameObject blockPuckObject = Instantiate(puckPrefab, new Vector3(Random.Range(2f, 4f), Random.Range(2f, 4f), 0.0f), Quaternion.identity);
         PuckScript blockPuckScript = blockPuckObject.GetComponent<PuckScript>();
-        blockPuckScript.InitPuck(true, player.puckSprite);
+        blockPuckScript.InitPuck(true, player.puckSpriteID);
     }
 }
