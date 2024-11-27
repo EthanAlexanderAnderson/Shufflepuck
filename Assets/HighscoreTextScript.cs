@@ -9,7 +9,8 @@ public class HighscoreTextScript : MonoBehaviour
 
     private void OnEnable()
     {
-        highscoreText.text = PlayerPrefs.GetInt(highscoresPlayerPrefsKeys[difficulty]).ToString();
+        int highscore = PlayerPrefs.GetInt(highscoresPlayerPrefsKeys[difficulty]);
+        highscoreText.text = highscore > 0 ? highscore.ToString() : "";
         highscoreText.fontWeight = FontWeight.Black;
         highscoreText.outlineWidth = 0.3f;
         highscoreText.outlineColor = new Color32(0, 0, 0, 255);
