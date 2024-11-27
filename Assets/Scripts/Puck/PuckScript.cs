@@ -49,6 +49,8 @@ public class PuckScript : NetworkBehaviour
 
     private TrailRenderer trail;
 
+    private Color color = new Color(0.5f, 0.5f, 0.5f);
+
     void OnEnable()
     {
         logic = LogicScript.Instance;
@@ -101,9 +103,10 @@ public class PuckScript : NetworkBehaviour
     }
 
     // initiate a new puck
-    public PuckScript InitPuck(bool IsPlayersPuckParameter, Sprite sprite)
+    public PuckScript InitPuck(bool IsPlayersPuckParameter, int puckSpriteID)
     {
-        spriteRenderer.sprite = sprite;
+        spriteRenderer.sprite = puckSkinManager.ColorIDtoPuckSprite(puckSpriteID);
+        color = puckSkinManager.ColorIDtoColor(puckSpriteID);
         playersPuck = IsPlayersPuckParameter;
         return this;
     }
@@ -117,6 +120,7 @@ public class PuckScript : NetworkBehaviour
 
         Sprite puckSprite = puckSkinManager.ColorIDtoPuckSprite(puckSpriteID * swapAlt);
         spriteRenderer.sprite = puckSprite;
+        color = puckSkinManager.ColorIDtoColor(puckSpriteID * swapAlt);
         playersPuck = IsPlayersPuckParameter;
 
         Debug.Log($"Puck initialized. IsPlayersPuckParameter: {IsPlayersPuckParameter}. PuckSpriteID: {puckSpriteID}");
@@ -282,9 +286,10 @@ public class PuckScript : NetworkBehaviour
             ParticleSystem collisionParticleEffect = Instantiate(collisionParticleEffectPrefab, col.GetContact(0).point, Quaternion.identity);
             collisionParticleEffect.transform.position = col.GetContact(0).point;
             ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
-            emission.rateOverTime = (velocity) * 100f;
+            emission.rateOverTime = (velocity) * 50f;
             ParticleSystem.MainModule main = collisionParticleEffect.main;
             main.startSpeed = (velocity) * 4f;
+            main.startColor = color;
             collisionParticleEffect.Play();
             Destroy(collisionParticleEffect.gameObject, 5f);
         }
