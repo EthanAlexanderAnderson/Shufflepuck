@@ -3181,6 +3181,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Win 15 matches.'
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &90167698
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4290,6 +4302,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Reach a combined highscore of 30.'
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &141686839
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4688,6 +4712,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Reach a combined highscore of 26.'
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &143022375
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5029,6 +5065,18 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: SoundManagerScript, Assembly-CSharp
         m_MethodName: PlayClickSFX
         m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -8222,7 +8270,7 @@ MonoBehaviour:
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 256
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -10402,7 +10450,8 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Reach a combined highscore of 30 to unlock.
+          m_StringArgument: 'Reach a combined highscore of 30 to unlock. Currently:
+            {combined}'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &385953811
@@ -11634,6 +11683,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Reach a combined highscore of 24.'
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &414208570
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11826,6 +11887,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Reach an easy highscore of 12.'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &419232781
@@ -12366,6 +12439,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Win a match on easy difficulty.'
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &431748847
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12522,6 +12607,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Reach an medium highscore of 8.'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &432555603
@@ -13539,6 +13636,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Win a match on hard difficulty.'
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &453761647
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14035,6 +14144,18 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: SoundManagerScript, Assembly-CSharp
         m_MethodName: PlayClickSFX
         m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -15041,7 +15162,8 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Reach a combined highscore of 36 to unlock.
+          m_StringArgument: 'Reach a combined highscore of 36 to unlock. Currently:
+            {combined}'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &487418051
@@ -15960,6 +16082,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Reach a combined highscore of 14.'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &506741322
@@ -17072,7 +17206,8 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Reach a combined highscore of 16 to unlock.
+          m_StringArgument: 'Reach a combined highscore of 16 to unlock. Currently:
+            {combined}'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &534914341
@@ -17368,6 +17503,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &540438999
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17517,6 +17664,18 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: SoundManagerScript, Assembly-CSharp
         m_MethodName: PlayClickSFX
         m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -18764,7 +18923,8 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Reach a combined highscore of 22 to unlock.
+          m_StringArgument: 'Reach a combined highscore of 22 to unlock. Currently:
+            {combined}'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &574973823
@@ -20346,6 +20506,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Shuffleplink.'
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &649573276
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21872,6 +22044,18 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: SoundManagerScript, Assembly-CSharp
         m_MethodName: PlayClickSFX
         m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -25011,7 +25195,8 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Reach a combined highscore of 24 to unlock.
+          m_StringArgument: 'Reach a combined highscore of 24 to unlock. Currently:
+            {combined}'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &795642867
@@ -25143,7 +25328,8 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Reach a combined highscore of 14 to unlock.
+          m_StringArgument: 'Reach a combined highscore of 14 to unlock. Currently:
+            {combined}'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &796660694
@@ -25567,6 +25753,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Win 5 matches on hard difficulty.'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &809873526
@@ -26001,6 +26199,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Shuffleplink.'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &818546381
@@ -27169,6 +27379,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Shuffleplink.'
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &837596594
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27826,6 +28048,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &843858663
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27955,7 +28189,8 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Reach a combined highscore of 32 to unlock.
+          m_StringArgument: 'Reach a combined highscore of 32 to unlock. Currently:
+            {combined}'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &850867516
@@ -30030,6 +30265,18 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: SoundManagerScript, Assembly-CSharp
         m_MethodName: PlayClickSFX
         m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -32116,6 +32363,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Reach a combined highscore of 36.'
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &964245528
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32645,18 +32904,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 671090517}
-        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
-        m_MethodName: ChangeUI
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 1498383606}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
       - m_Target: {fileID: 1416831212}
         m_TargetAssemblyTypeName: SoundManagerScript, Assembly-CSharp
         m_MethodName: PlayClickSFX
@@ -32664,6 +32911,30 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: ChangeUI
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 985512549}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: ChangeUI
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 1498383606}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -32825,6 +33096,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Shuffleplink.'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &993998083
@@ -33448,6 +33731,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Win a match on medium difficulty.'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1013138053
@@ -37267,7 +37562,8 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Reach a combined highscore of 28 to unlock.
+          m_StringArgument: 'Reach a combined highscore of 28 to unlock. Currently:
+            {combined}'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1144055729
@@ -37399,7 +37695,8 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Reach a combined highscore of 18 to unlock.
+          m_StringArgument: 'Reach a combined highscore of 18 to unlock. Currently:
+            {combined}'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1148727659
@@ -40172,6 +40469,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Win an online match.'
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1239359023
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -41052,6 +41361,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Reach a combined highscore of 22.'
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1251645765
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -41711,6 +42032,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Reach a combined highscore of 10.'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1265067238
@@ -43707,7 +44040,8 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Reach a combined highscore of 34 to unlock.
+          m_StringArgument: 'Reach a combined highscore of 34 to unlock. Currently:
+            {combined}'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1338256133
@@ -44127,7 +44461,8 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Reach a combined highscore of 20 to unlock.
+          m_StringArgument: 'Reach a combined highscore of 20 to unlock. Currently:
+            {combined}'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1344363471
@@ -45633,6 +45968,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Reach a combined highscore of 12.'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1397520739
@@ -47252,6 +47599,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Win 3 matches.'
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1433696250
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -47578,6 +47937,18 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: SoundManagerScript, Assembly-CSharp
         m_MethodName: PlayClickSFX
         m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -48850,6 +49221,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Reach a combined highscore of 28.'
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1505746509
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -49006,6 +49389,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Shuffleplink.'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1506451995
@@ -49685,6 +50080,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Reach a combined highscore of 20.'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1521935352
@@ -56890,6 +57297,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Reach a combined highscore of 34.'
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1741165935
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58438,6 +58857,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Reach a combined highscore of 32.'
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1792302256
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -59047,6 +59478,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Reach a combined highscore of 16.'
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1808859131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -59362,6 +59805,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Shuffleplink.'
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1816286053
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -59434,7 +59889,7 @@ GameObject:
   - component: {fileID: 1816739740}
   - component: {fileID: 1816739739}
   m_Layer: 5
-  m_Name: Error
+  m_Name: Error Message
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -59457,7 +59912,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -1330}
-  m_SizeDelta: {x: 1680, y: 220}
+  m_SizeDelta: {x: 1900, y: 220}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1816739739
 MonoBehaviour:
@@ -59676,6 +60131,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Shuffleplink.'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1817149122
@@ -61094,7 +61561,8 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Reach a combined highscore of 10 to unlock.
+          m_StringArgument: 'Reach a combined highscore of 10 to unlock. Currently:
+            {combined}'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1867923255
@@ -61657,7 +62125,7 @@ MonoBehaviour:
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 256
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -61953,6 +62421,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Shuffleplink.'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1909323190
@@ -62515,7 +62995,8 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Reach a combined highscore of 12 to unlock.
+          m_StringArgument: 'Reach a combined highscore of 12 to unlock. Currently:
+            {combined}'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1920418121
@@ -62908,6 +63389,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Reach a combined highscore of 18.'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1923537355
@@ -63488,7 +63981,8 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Reach a combined highscore of 26 to unlock.
+          m_StringArgument: 'Reach a combined highscore of 26 to unlock. Currently:
+            {combined}'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1952500787
@@ -64290,6 +64784,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 671090517}
+        m_TargetAssemblyTypeName: UIManagerScript, Assembly-CSharp
+        m_MethodName: SetErrorMessage
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 'Unlocked: Reach a hard highscore of 4.'
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1984089752
