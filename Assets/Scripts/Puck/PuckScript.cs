@@ -5,6 +5,7 @@
 using UnityEngine;
 using Unity.Netcode;
 using TMPro;
+using System;
 
 public class PuckScript : NetworkBehaviour
 {
@@ -19,6 +20,7 @@ public class PuckScript : NetworkBehaviour
     [SerializeField] private AudioSource pointCPUSFX;
     [SerializeField] private AudioSource minusPlayerSFX;
     [SerializeField] private AudioSource minusCPUSFX;
+    [SerializeField] private GameObject animationLayer;
 
     // script variables
     private bool shot;
@@ -108,6 +110,8 @@ public class PuckScript : NetworkBehaviour
         spriteRenderer.sprite = puckSkinManager.ColorIDtoPuckSprite(puckSpriteID);
         color = puckSkinManager.ColorIDtoColor(puckSpriteID);
         playersPuck = IsPlayersPuckParameter;
+        // enable animation for atom
+        animationLayer.SetActive(Math.Abs(puckSpriteID) == 40);
         return this;
     }
 
@@ -122,6 +126,8 @@ public class PuckScript : NetworkBehaviour
         spriteRenderer.sprite = puckSprite;
         color = puckSkinManager.ColorIDtoColor(puckSpriteID * swapAlt);
         playersPuck = IsPlayersPuckParameter;
+        // enable animation for atom
+        animationLayer.SetActive(Math.Abs(puckSpriteID) == 40);
 
         Debug.Log($"Puck initialized. IsPlayersPuckParameter: {IsPlayersPuckParameter}. PuckSpriteID: {puckSpriteID}");
     }

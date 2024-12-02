@@ -26,8 +26,11 @@ public class UIManagerScript : MonoBehaviour
 
     // title
     [SerializeField] private GameObject playerPuckIcon;
+    [SerializeField] private GameObject playerPuckIconAnimation;
     [SerializeField] private GameObject opponentPuckIcon;
+    [SerializeField] private GameObject opponentPuckIconAnimation;
     [SerializeField] private GameObject activePuckIcon;
+    [SerializeField] private GameObject activePuckIconAnimation;
     [SerializeField] private TMP_Text errorMessage;
     [SerializeField] private TMP_Text profilePopupText;
     [SerializeField] private GameObject readyButton;
@@ -484,15 +487,18 @@ public class UIManagerScript : MonoBehaviour
         rematchButton.SetActive(boolean);
     }
 
-    public void SetPlayerPuckIcon(Sprite sprite)
+    public void SetPlayerPuckIcon(Sprite sprite, bool enableAnimation = false)
     {
         playerPuckIcon.GetComponent<Image>().sprite = sprite;
         activePuckIcon.GetComponent<Image>().sprite = sprite;
+        playerPuckIconAnimation.SetActive(enableAnimation);
+        activePuckIconAnimation.SetActive(enableAnimation);
     }
 
-    public void SetOpponentPuckIcon(Sprite sprite)
+    public void SetOpponentPuckIcon(Sprite sprite, bool enableAnimation = false)
     {
         opponentPuckIcon.GetComponent<Image>().sprite = sprite;
+        opponentPuckIconAnimation.SetActive(enableAnimation);
     }
     
 

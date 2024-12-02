@@ -3,6 +3,7 @@
 *  Functions with "ClientRpcParams clientRpcParams = default" as a parameter are only executed by 1 of the 2 competitors.
 */
 
+using System;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -123,9 +124,9 @@ public class ClientLogicScript : NetworkBehaviour
         // force shot after shot clock
         else if (isShooting && shotTimer < 0)
         {
-            angle = Random.Range(20.0f, 80.0f);
-            power = Random.Range(30.0f, 60.0f);
-            power = Random.Range(45.0f, 55.0f);
+            angle = UnityEngine.Random.Range(20.0f, 80.0f);
+            power = UnityEngine.Random.Range(30.0f, 60.0f);
+            power = UnityEngine.Random.Range(45.0f, 55.0f);
             serverLogic.ShootServerRpc(angle, power, spin);
             activeBar = bar.ChangeBar("none");
             UI.TurnText = "Opponent's Turn";
@@ -226,12 +227,12 @@ public class ClientLogicScript : NetworkBehaviour
         if (puckSpriteID_0 == logic.player.puckSpriteID)
         {
             var swapAlt = puckSpriteID_0 == puckSpriteID_1 ? -1 : 1;
-            UI.SetOpponentPuckIcon(puckSkinManager.ColorIDtoPuckSprite(puckSpriteID_1 * swapAlt));
+            UI.SetOpponentPuckIcon(puckSkinManager.ColorIDtoPuckSprite(puckSpriteID_1 * swapAlt), Math.Abs(puckSpriteID_1) == 40);
         }
         else
         {
             var swapAlt = puckSpriteID_0 == puckSpriteID_1 ? -1 : 1;
-            UI.SetOpponentPuckIcon(puckSkinManager.ColorIDtoPuckSprite(puckSpriteID_0 * swapAlt));
+            UI.SetOpponentPuckIcon(puckSkinManager.ColorIDtoPuckSprite(puckSpriteID_0 * swapAlt), Math.Abs(puckSpriteID_0) == 40);
         }
 
         puckHalo.SetActive(false);

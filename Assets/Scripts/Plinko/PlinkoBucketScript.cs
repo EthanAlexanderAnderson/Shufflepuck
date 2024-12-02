@@ -14,13 +14,18 @@ public class PlinkoBucketScript : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (plinkoManager == null)
+        {
+            plinkoManager = PlinkoManager.Instance;
+        }
+
         if (isMainReward)
         {
-            plinkoManager.MainReward();
+            plinkoManager.MainReward(transform);
         }
         else
         {
-            plinkoManager.SideReward();
+            plinkoManager.SideReward(transform);
         }
     }
 }
