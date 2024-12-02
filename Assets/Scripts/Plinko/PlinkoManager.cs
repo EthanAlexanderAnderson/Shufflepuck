@@ -20,6 +20,8 @@ public class PlinkoManager : MonoBehaviour
     [SerializeField] private GameObject rewardImageAnimation;
     [SerializeField] private TMP_Text rewardText;
     [SerializeField] private TMP_Text countdownText;
+    [SerializeField] private GameObject bonusBucketLeft;
+    [SerializeField] private GameObject bonusBucketRight;
 
     // floating text
     [SerializeField] private GameObject floatingTextPrefab;
@@ -96,6 +98,12 @@ public class PlinkoManager : MonoBehaviour
             if (lastChallengeDate.Date != DateTime.Today)
             {
                 AssignNewPlinkoReward();
+                // if the lastChallengeDate is 7 or more days ago, enable welcome back bonus buckets
+                if (DateTime.Today.Subtract(lastChallengeDate).Days >= 7)
+                {
+                    bonusBucketLeft.SetActive(true);
+                    bonusBucketRight.SetActive(true);
+                }
             }
             else
             {
@@ -105,6 +113,8 @@ public class PlinkoManager : MonoBehaviour
         else // no date ever written
         {
             AssignNewPlinkoReward();
+            bonusBucketLeft.SetActive(true);
+            bonusBucketRight.SetActive(true);
         }
     }
 
