@@ -19665,6 +19665,7 @@ MonoBehaviour:
   backButton: {fileID: 991657956}
   puck: {fileID: 1573578925046104636, guid: 523175d1e5f8501469e3832882a7a95d, type: 3}
   count: {fileID: 1500811081}
+  floatingTextPrefab: {fileID: 4579905589776270658, guid: a4af9b0b007a49c4ca9fa4d76af0f273, type: 3}
 --- !u!1 &624776132
 GameObject:
   m_ObjectHideFlags: 0

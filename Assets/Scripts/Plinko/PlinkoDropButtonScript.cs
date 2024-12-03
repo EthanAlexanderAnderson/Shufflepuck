@@ -8,7 +8,6 @@ public class PlinkoDropButtonScript : MonoBehaviour
 {
     //dependacies
     private LevelManager levelManager;
-    private PuckSkinManager puckSkinManager;
     private LogicScript logic;
 
     // imports
@@ -16,17 +15,20 @@ public class PlinkoDropButtonScript : MonoBehaviour
     public Button backButton;
     public GameObject puck;
     [SerializeField] private TMP_Text count;
+    [SerializeField] private GameObject floatingTextPrefab;
 
     // local variables
     private float cooldown = -2f;
     int dropped = 0;
     int drops = 0;
+    int previousDropsValue = -1;
+    [SerializeField] float floatingTextLocation = 3.5f;
 
     private void OnEnable()
     {
         levelManager = LevelManager.Instance;
-        puckSkinManager = PuckSkinManager.Instance;
         logic = LogicScript.Instance;
+        previousDropsValue = -1;
         SetDropButtonText();
     }
 
@@ -64,6 +66,14 @@ public class PlinkoDropButtonScript : MonoBehaviour
         dropped = PlayerPrefs.GetInt("PlinkoPegsDropped", 0);
         drops = level - dropped;
         count.text = drops.ToString();
+        // if we gain a drop while plinko screen is active OTHER THAN when it's enabled, show +1 floating text visual feedback
+        if (previousDropsValue >= 0 && drops > previousDropsValue)
+        {
+            var floatingText = Instantiate(floatingTextPrefab, transform.position + new Vector3(floatingTextLocation, 0, 0), Quaternion.identity, transform);
+            floatingText.GetComponent<FloatingTextScript>().Initialize(0.25f, 25);
+            floatingText.GetComponent<TMP_Text>().text = "+" + (drops - previousDropsValue).ToString();
+        }
+        previousDropsValue = drops;
     }
 
     public void Drop()
