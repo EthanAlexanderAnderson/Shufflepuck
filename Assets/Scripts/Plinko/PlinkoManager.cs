@@ -98,16 +98,16 @@ public class PlinkoManager : MonoBehaviour
             if (DateTime.Today.Subtract(lastChallengeDate).Days >= 1)
             {
                 AssignNewPlinkoReward();
-                // if the lastChallengeDate is 7 or more days ago, enable welcome back bonus buckets
-                if (DateTime.Today.Subtract(lastChallengeDate).Days >= 7)
-                {
-                    bonusBucketLeft.SetActive(true);
-                    bonusBucketRight.SetActive(true);
-                }
             }
             else
             {
                 Debug.Log("Today's Plinko Reward is already assigned. " + PlayerPrefs.GetInt("PlinkoReward"));
+            }
+            // if the lastChallengeDate is 7 or more days ago or XP is under 200, enable welcome back bonus buckets
+            if (DateTime.Today.Subtract(lastChallengeDate).Days >= 7 || PlayerPrefs.GetInt("XP") < 200)
+            {
+                bonusBucketLeft.SetActive(true);
+                bonusBucketRight.SetActive(true);
             }
         }
         else // no date ever written
