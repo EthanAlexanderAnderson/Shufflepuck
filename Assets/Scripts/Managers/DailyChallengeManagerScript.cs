@@ -12,7 +12,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
     private SoundManagerScript sound;
 
     [SerializeField] private GameObject titleScreen;
-    //
+
     [SerializeField] private TMP_Text countdownText;
 
     [SerializeField] private TMP_Text challenge1Text;
@@ -31,6 +31,17 @@ public class DailyChallengeManagerScript : MonoBehaviour
     private int[] hardChallengeReward = { 0, 80, 100, 100, 120, 200 };
     private int[,] hardChallengeCondition = { { 0, 0, 0 }, { 2, 1, 0 }, { 2, 3, 0 }, { 1, 5, 0 }, { 2, 5, 0 }, { 2, 1, 1 } }; // {difficulty, score difference, isOnline}
 
+    // Daily streak stuff
+    [SerializeField] private GameObject streakCounter1;
+    [SerializeField] private GameObject streakCounter2;
+    [SerializeField] private GameObject streakCounter3;
+    [SerializeField] private GameObject streakCounter4;
+    [SerializeField] private GameObject streakCounter5;
+    [SerializeField] private GameObject streakCounter6;
+    [SerializeField] private GameObject streakCounter7;
+    [SerializeField] private GameObject[] streakCounters;
+    [SerializeField] private TMP_Text streakRewardText;
+
     private void Awake()
     {
         if (Instance == null)
@@ -45,13 +56,9 @@ public class DailyChallengeManagerScript : MonoBehaviour
         sound = SoundManagerScript.Instance;
     }
 
-    private void OnEnable()
-    {
-        CheckForNewDailyChallenge();
-    }
-
     public void SetText()
     {
+        IncrementStreak();
         CheckForNewDailyChallenge();
         int DC1 = PlayerPrefs.GetInt("DailyChallenge1", 0);
         int DC2 = PlayerPrefs.GetInt("DailyChallenge2", 0);
@@ -245,5 +252,69 @@ public class DailyChallengeManagerScript : MonoBehaviour
             sound.PlayWinSFX();
         }
         titleScreen.GetComponent<TitleScreenScript>().UpdateAlerts();
+    }
+
+    private void IncrementStreak()
+    {
+        var streak = PlayerPrefs.GetInt("Streak", 0);
+
+        // Get the last saved date or use a default if it's the first time
+        string lastSavedDate = PlayerPrefs.GetString("LastChallengeDate", string.Empty);
+        DateTime lastChallengeDate;
+
+        if (DateTime.TryParse(lastSavedDate, out lastChallengeDate))
+        {
+            // If the last recored date is yesterday, increment the streak
+            if (lastChallengeDate.Date == DateTime.Today.AddDays(-1))
+            {
+                PlayerPrefs.SetInt("Streak", streak + 1);
+                streak++;
+                // TODO: if streak is divisible by 7, grant the drops reward
+                if (((streak % 7) == 0 && streak > 0))
+                {
+                    var reward = ((streak - 1) / 7 + 1);
+                    var dropped = PlayerPrefs.GetInt("PlinkoPegsDropped", 0);
+                    PlayerPrefs.SetInt("PlinkoPegsDropped", dropped - reward);
+                    Debug.Log("Dropped " + reward + " pegs for streak reward!");
+                }
+            }
+            // If the last recorded date is not yesterday or today, reset the streak
+            else if (lastChallengeDate.Date != DateTime.Today)
+            {
+                PlayerPrefs.SetInt("Streak", 1);
+                streak = 1;
+            }
+        }
+        else // no date ever written
+        {
+            PlayerPrefs.SetInt("Streak", 1);
+        }
+
+        Debug.Log("Streak: " + streak);
+        // set the correct number of streak counters to green, 1-7 for a week
+        for (int i = 0; i < streakCounters.Length; i++)
+        {
+            // since our streak is weekly, we mod the streak by 7. If the streak is divisible by 7 (a full week), we set all counters to green
+            var streakModded = ((streak % 7) == 0 && streak > 0) ? 7 : streak % 7;
+            if (i < streakModded)
+            {
+                streakCounters[i].GetComponent<Image>().color = new Color(0.4862745f, 0.7725491f, 0.4627451f);
+            }
+            else
+            {
+                streakCounters[i].GetComponent<Image>().color = new Color(1, 1, 1);
+            }
+        }
+
+        // set the streak reward text, +1 drop for each 7 days of streak, rounded up
+        var dropDrops = streak > 7 ? " Drops" : " Drop";
+        streakRewardText.text = "+" + ((streak - 1) / 7 + 1) + dropDrops;
+
+        // if streak is divisible by 7, set the streak reward text to green to indicate a reward was granted
+        // NOTE: this doesn't work right now because of darkmode text color switching, may or may not fix this later if i feel like it
+        if (((streak % 7) == 0 && streak > 0))
+        {
+            streakRewardText.color = new Color(0.4862745f, 0.7725491f, 0.4627451f);
+        }
     }
 }
