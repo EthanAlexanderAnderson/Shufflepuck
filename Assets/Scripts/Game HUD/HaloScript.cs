@@ -56,6 +56,12 @@ public class HaloScript : MonoBehaviour
         else if (logic.activeBar == "power")
         {
             power = (line.GetValue() - (line.GetValue() - 50) * 0.5f) * powerModifier;
+            if (line.GetValue() >= 95)
+            {
+                // TODO: get feedback and uncomment this
+                //power += (line.GetValue() - 95) * tempBoostPowerMod + tempBoostPowerModBase;
+            }
+
             float xcomponent = Mathf.Cos(angle * Mathf.PI / 180) * angleModifierX * (powerModifier * power);
             float ycomponent = Mathf.Sin(angle * Mathf.PI / 180) * angleModifierY * (powerModifier * power);
             this.transform.position = new Vector3(xcomponent + sideModifier, ycomponent - minusY, this.transform.position.z);
@@ -78,8 +84,15 @@ public class HaloScript : MonoBehaviour
 
         float haloPower;
         haloPower = (power - (power - 50) * 0.5f) * powerModifier;
+        if (power >= 95)
+        {
+            haloPower += (power - 95) * tempBoostPowerMod + tempBoostPowerModBase;
+        }
         float powerXcomponent = Mathf.Cos(haloAngel * Mathf.PI / 180) * angleModifierX * (powerModifier * haloPower);
         float powerYcomponent = Mathf.Sin(haloAngel * Mathf.PI / 180) * angleModifierY * (powerModifier * haloPower);
         this.transform.position = new Vector3(powerXcomponent + sideModifier, powerYcomponent - minusY, this.transform.position.z);
     }
+
+    public float tempBoostPowerMod; // 0.85
+    public float tempBoostPowerModBase; // 0.7
 }

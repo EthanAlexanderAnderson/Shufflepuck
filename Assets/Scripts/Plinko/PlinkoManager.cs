@@ -95,6 +95,7 @@ public class PlinkoManager : MonoBehaviour
         if (DateTime.TryParse(lastSavedDate, out lastChallengeDate))
         {
             // Compare the last saved date to today's date
+            // TODO: make sure current date is NEWER than lastChallengeDate to prevent device time tampering
             if (lastChallengeDate.Date != DateTime.Today)
             {
                 AssignNewPlinkoReward();
@@ -134,7 +135,6 @@ public class PlinkoManager : MonoBehaviour
 
         int currentReward = PlayerPrefs.GetInt("PlinkoReward", 100);
         int randMax = (int)Math.Pow(2, plinkoUnlockableIDs.Length);
-        //Debug.Log("randMax: " + randMax);
         int rand = Random.Range(0, (randMax-1));
         int count = 0;
 
@@ -155,8 +155,6 @@ public class PlinkoManager : MonoBehaviour
                 // set the new reward if it's not the current reward and not already unlocked
                 if (currentReward != plinkoUnlockableIDs[i] && Array.IndexOf(plinkoUnlockedIDs, plinkoUnlockableIDs[i]) == -1)
                 {
-                    Debug.Log(rand + " < " + threshold);
-                    Debug.Log(currentReward + "  ->  " + plinkoUnlockableIDs[i]);
                     PlayerPrefs.SetInt("PlinkoReward", plinkoUnlockableIDs[i]);
                     return;
                 }
@@ -179,7 +177,7 @@ public class PlinkoManager : MonoBehaviour
                             }
                         }
                         // if all skins are unlocked, XP reward
-                        Debug.Log("count exceeded");
+                        Debug.Log("No puck skin rewards remain.");
                         PlayerPrefs.SetInt("PlinkoReward", 999);
                         return;
                     }

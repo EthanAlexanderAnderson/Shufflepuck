@@ -38316,6 +38316,8 @@ MonoBehaviour:
   powerModifier: 0.1396
   power: 0
   angle: 0
+  tempBoostPowerMod: 0.85
+  tempBoostPowerModBase: 0.7
 --- !u!212 &1167867922
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -46616,7 +46618,7 @@ AudioSource:
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 128
+  Priority: 0
   DopplerLevel: 1
   MinDistance: 1
   MaxDistance: 500
