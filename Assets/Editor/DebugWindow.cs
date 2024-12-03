@@ -92,6 +92,10 @@ public class DebugWindow : EditorWindow
         Button setDateAsYesterday = new() { text = "setDateAsYesterday" };
         setDateAsYesterday.clicked += () => SetDateAsYesterday();
         rootVisualElement.Add(setDateAsYesterday);
+
+        Button setDateAsTomorrow = new() { text = "setDateAsTomorrow" };
+        setDateAsTomorrow.clicked += () => SetDateAsTomorrow();
+        rootVisualElement.Add(setDateAsTomorrow);
     }
 
     public void DebugShootNew(float angleParameter, float powerParameter, float spinParameter)
@@ -176,5 +180,13 @@ public class DebugWindow : EditorWindow
     {
         PlayerPrefs.SetString("LastChallengeDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
         PlayerPrefs.SetString("LastPlinkoRewardDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
+    }
+
+    private void SetDateAsTomorrow()
+    {
+        var currentSavedDate = PlayerPrefs.GetString("LastChallengeDate", DateTime.Today.ToString("yyyy-MM-dd"));
+        var tomorrow = DateTime.Parse(currentSavedDate).AddDays(1);
+        PlayerPrefs.SetString("LastChallengeDate", tomorrow.ToString("yyyy-MM-dd"));
+        PlayerPrefs.SetString("LastPlinkoRewardDate", tomorrow.ToString("yyyy-MM-dd"));
     }
 }

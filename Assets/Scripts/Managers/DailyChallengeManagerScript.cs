@@ -88,6 +88,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
     {
         UpdateCountdown();
     }
+
     private void UpdateCountdown()
     {
         // Calculate the time remaining until midnight
@@ -117,8 +118,8 @@ public class DailyChallengeManagerScript : MonoBehaviour
 
         if (DateTime.TryParse(lastSavedDate, out lastChallengeDate))
         {
-            // Compare the last saved date to today's date
-            if (lastChallengeDate.Date != DateTime.Today)
+            // Compare the last saved date to today's date & make sure current date is NEWER than lastChallengeDate to prevent device time tampering
+            if (DateTime.Today.Subtract(lastChallengeDate).Days >= 1)
             {
                 AssignNewChallenge();
             }
@@ -169,8 +170,8 @@ public class DailyChallengeManagerScript : MonoBehaviour
 
         if (DateTime.TryParse(lastSavedDate, out lastChallengeDate))
         {
-            // Compare the last saved date to today's date
-            if (lastChallengeDate.Date != DateTime.Today)
+            // Compare the last saved date to today's date & make sure current date is NEWER than lastChallengeDate to prevent device time tampering
+            if (DateTime.Today.Subtract(lastChallengeDate).Days >= 1)
             {
                 dailyWin += "\nDaily Win +50XP";
                 levelManager.AddXP(50);
@@ -269,7 +270,6 @@ public class DailyChallengeManagerScript : MonoBehaviour
             {
                 PlayerPrefs.SetInt("Streak", streak + 1);
                 streak++;
-                // TODO: if streak is divisible by 7, grant the drops reward
                 if (((streak % 7) == 0 && streak > 0))
                 {
                     var reward = ((streak - 1) / 7 + 1);

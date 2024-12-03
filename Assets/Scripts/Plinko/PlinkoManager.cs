@@ -94,9 +94,8 @@ public class PlinkoManager : MonoBehaviour
 
         if (DateTime.TryParse(lastSavedDate, out lastChallengeDate))
         {
-            // Compare the last saved date to today's date
-            // TODO: make sure current date is NEWER than lastChallengeDate to prevent device time tampering
-            if (lastChallengeDate.Date != DateTime.Today)
+            // Compare the last saved date to today's date & make sure current date is NEWER than lastChallengeDate to prevent device time tampering
+            if (DateTime.Today.Subtract(lastChallengeDate).Days >= 1)
             {
                 AssignNewPlinkoReward();
                 // if the lastChallengeDate is 7 or more days ago, enable welcome back bonus buckets
@@ -190,35 +189,46 @@ public class PlinkoManager : MonoBehaviour
     {
         int plinkoreward = PlayerPrefs.GetInt("PlinkoReward");
 
-        // create floating text and initialize it with speed rate and scale
-        var floatingText = Instantiate(floatingTextPrefab, self.position, Quaternion.identity, transform);
-        floatingText.GetComponent<FloatingTextScript>().Initialize(0.5f, 15);
+        // input checking
+        if (self == null || plinkoreward == 0)
+        {
+            Debug.LogError("PlinkoManager.MainReward() : Error : Plinko Reward not given.");
+            UI.SetErrorMessage("Error: Plinko Reward not given.");
+            return;
+        }
 
-        // give the reward to the player & set the floating text TEXT & play SFX
+        // give the reward to the player
         if (plinkoreward >= 100) // XP reward
         {
             levelManager.AddXP(plinkoreward);
-            floatingText.GetComponent<TMP_Text>().text = "+" + plinkoreward + "XP";
         }
         else // skin reward
         {
             puckSkinManager.UnlockPuckID(plinkoreward);
             PlayerPrefs.SetInt("puck" + plinkoreward.ToString() + "unlocked", 1);
             UI.SetErrorMessage("New puck unlocked!");
-            floatingText.GetComponent<TMP_Text>().text = "UNLOCKED!";
         }
+
+        // SFX for auditory feedback
         sound.PlayWinSFX();
+
+        // floating text for visual feedback
+        var floatingText = Instantiate(floatingTextPrefab, self.position, Quaternion.identity, transform);
+        floatingText.GetComponent<FloatingTextScript>().Initialize(0.5f, 15);
+        floatingText.GetComponent<TMP_Text>().text = (plinkoreward >= 100) ? "+" + plinkoreward + "XP" : "UNLOCKED!";
     }
 
     public void SideReward( Transform self )
     {
-        // create floating text and initialize it with speed rate, scale, and text
+        // give the reward to the player
+        levelManager.AddXP(100);
+
+        // SFX for auditory feedback
+        sound.PlayWinSFX();
+
+        // floating text for visual feedback
         var floatingText = Instantiate(floatingTextPrefab, self.position, Quaternion.identity, transform);
         floatingText.GetComponent<FloatingTextScript>().Initialize(0.5f, 15);
         floatingText.GetComponent<TMP_Text>().text = "+100XP";
-
-        // give the reward to the player & play SFX
-        levelManager.AddXP(100);
-        sound.PlayWinSFX();
     }
 }
