@@ -237,7 +237,7 @@ public class UIManagerScript : MonoBehaviour
                 gameResultText.text = "You Win!";
                 gameResultHighscoreMessageText.text = "You won by " + System.Math.Abs(scoreDifference) + " points.";
                 IncrementPlayerPref("onlineWin");
-                dailyChallenge.EvaluateChallenge(2, scoreDifference, 1);
+                gameResultHighscoreMessageText.text += dailyChallenge.EvaluateChallenge(2, scoreDifference, 1);
             }
             else if (opponentScore > playerScore)
             {

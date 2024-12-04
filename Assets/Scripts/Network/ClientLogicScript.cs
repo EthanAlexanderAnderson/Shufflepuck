@@ -28,6 +28,8 @@ public class ClientLogicScript : NetworkBehaviour
 
     private int puckCount;
 
+    private bool receivedGameResult = false;
+
     // bar and line
     private BarScript bar;
     private LineScript line;
@@ -199,10 +201,12 @@ public class ClientLogicScript : NetworkBehaviour
     public void GameResultClientRpc()
     {
         if (!IsClient) return;
+        if (receivedGameResult) return;
 
         UI.UpdateGameResult(-1, -1, -1, false, true);
         UI.ChangeUI(UI.gameResultScreen);
         arrow.SetActive(false);
+        receivedGameResult = true;
     }
 
     // Server tells the client to switch to game scene and start the game.
@@ -219,6 +223,7 @@ public class ClientLogicScript : NetworkBehaviour
         wallCount = 3;
         wall.SetActive(true);
         UI.UpdateWallText(wallCount);
+        receivedGameResult = false;
 
         Debug.Log("Client: Restarting game");
         Debug.Log($"player : {logic.player.puckSpriteID}     0 : {puckSpriteID_0}   1 : {puckSpriteID_1}");

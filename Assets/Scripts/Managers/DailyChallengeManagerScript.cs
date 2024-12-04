@@ -10,6 +10,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
     // dependencies
     private LevelManager levelManager;
     private SoundManagerScript sound;
+    private UIManagerScript UI;
 
     [SerializeField] private GameObject titleScreen;
 
@@ -54,6 +55,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
     {
         levelManager = LevelManager.Instance;
         sound = SoundManagerScript.Instance;
+        UI = UIManagerScript.Instance;
     }
 
     public void SetText()
@@ -200,11 +202,11 @@ public class DailyChallengeManagerScript : MonoBehaviour
         }
 
         // Evaluate daily challenges
-        if (difficulty == easyChallengeCondition[challenge1, 0] && scoreDifference >= easyChallengeCondition[challenge1, 1] && isOnline == easyChallengeCondition[challenge1, 2] && challenge1 > 0)
+        if (challenge1 > 0 && difficulty == easyChallengeCondition[challenge1, 0] && scoreDifference >= easyChallengeCondition[challenge1, 1] && isOnline == easyChallengeCondition[challenge1, 2])
         {
             PlayerPrefs.SetInt("DailyChallenge1", -challenge1);
         }
-        if (difficulty == hardChallengeCondition[challenge2, 0] && scoreDifference >= hardChallengeCondition[challenge2, 1] && isOnline == hardChallengeCondition[challenge2, 2] && challenge2 > 0)
+        if (challenge2 > 0 && difficulty == hardChallengeCondition[challenge2, 0] && scoreDifference >= hardChallengeCondition[challenge2, 1] && isOnline == hardChallengeCondition[challenge2, 2])
         {
             PlayerPrefs.SetInt("DailyChallenge2", -challenge2);
         }
@@ -214,7 +216,11 @@ public class DailyChallengeManagerScript : MonoBehaviour
             levelManager.AddXP((difficulty + 1) * 10);
             levelManager.AddXP(scoreDifference);
             return xpFeedback[difficulty] + pointBonus + dailyWin;
-        } 
+        }
+        else if (scoreDifference > 0 && isOnline == 1)
+        {
+            return dailyWin;
+        }
         else
         {
             return string.Empty;
@@ -229,7 +235,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         if (DC1 < 0)
         {
             try { levelManager.AddXP(easyChallengeReward[Mathf.Abs(DC1)]); } // add the reward to the player's XP
-            catch (IndexOutOfRangeException e) { levelManager.AddXP(50); Debug.Log(e); }
+            catch (IndexOutOfRangeException e) { levelManager.AddXP(50); Debug.LogError(e); }
             Debug.Log("Claimed reward 1!");
             PlayerPrefs.SetInt("DailyChallenge1", 0); // 0 means the reward is claimed
             SetText();
@@ -245,8 +251,8 @@ public class DailyChallengeManagerScript : MonoBehaviour
         // Check if the reward is complete (negative value)
         if (DC2 < 0)
         {
-            try { levelManager.AddXP(easyChallengeReward[Mathf.Abs(DC2)]); } // add the reward to the player's XP
-            catch (IndexOutOfRangeException e) { levelManager.AddXP(100); Debug.Log(e); }
+            try { levelManager.AddXP(hardChallengeReward[Mathf.Abs(DC2)]); } // add the reward to the player's XP
+            catch (IndexOutOfRangeException e) { levelManager.AddXP(100); Debug.LogError(e); }
             Debug.Log("Claimed reward 2!");
             PlayerPrefs.SetInt("DailyChallenge2", 0); // 0 means the reward is claimed
             SetText();
@@ -275,7 +281,8 @@ public class DailyChallengeManagerScript : MonoBehaviour
                     var reward = ((streak - 1) / 7 + 1);
                     var dropped = PlayerPrefs.GetInt("PlinkoPegsDropped", 0);
                     PlayerPrefs.SetInt("PlinkoPegsDropped", dropped - reward);
-                    Debug.Log("Dropped " + reward + " pegs for streak reward!");
+                    Debug.Log("Unlocked: +" + reward + " drops for streak reward!");
+                    UI.SetErrorMessage("Unlocked: +" + reward + " drops for streak reward!");
                 }
             }
             // If the last recorded date is not yesterday or today, reset the streak
