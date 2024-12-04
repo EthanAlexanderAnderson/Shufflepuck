@@ -257,7 +257,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
 
     private void IncrementStreak()
     {
-        var streak = PlayerPrefs.GetInt("Streak", 0);
+        var streak = PlayerPrefs.GetInt("Streak", 1);
 
         // Get the last saved date or use a default if it's the first time
         string lastSavedDate = PlayerPrefs.GetString("LastChallengeDate", string.Empty);
