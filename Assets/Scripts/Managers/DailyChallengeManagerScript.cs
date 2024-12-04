@@ -200,11 +200,11 @@ public class DailyChallengeManagerScript : MonoBehaviour
         }
 
         // Evaluate daily challenges
-        if (difficulty == easyChallengeCondition[challenge1, 0] && scoreDifference >= easyChallengeCondition[challenge1, 1] && isOnline == easyChallengeCondition[challenge1, 2] && challenge1 > 0)
+        if (challenge1 > 0 && difficulty == easyChallengeCondition[challenge1, 0] && scoreDifference >= easyChallengeCondition[challenge1, 1] && isOnline == easyChallengeCondition[challenge1, 2])
         {
             PlayerPrefs.SetInt("DailyChallenge1", -challenge1);
         }
-        if (difficulty == hardChallengeCondition[challenge2, 0] && scoreDifference >= hardChallengeCondition[challenge2, 1] && isOnline == hardChallengeCondition[challenge2, 2] && challenge2 > 0)
+        if (challenge2 > 0 && difficulty == hardChallengeCondition[challenge2, 0] && scoreDifference >= hardChallengeCondition[challenge2, 1] && isOnline == hardChallengeCondition[challenge2, 2])
         {
             PlayerPrefs.SetInt("DailyChallenge2", -challenge2);
         }
@@ -214,7 +214,11 @@ public class DailyChallengeManagerScript : MonoBehaviour
             levelManager.AddXP((difficulty + 1) * 10);
             levelManager.AddXP(scoreDifference);
             return xpFeedback[difficulty] + pointBonus + dailyWin;
-        } 
+        }
+        else if (scoreDifference > 0 && isOnline == 1)
+        {
+            return dailyWin;
+        }
         else
         {
             return string.Empty;
@@ -245,7 +249,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         // Check if the reward is complete (negative value)
         if (DC2 < 0)
         {
-            try { levelManager.AddXP(easyChallengeReward[Mathf.Abs(DC2)]); } // add the reward to the player's XP
+            try { levelManager.AddXP(hardChallengeReward[Mathf.Abs(DC2)]); } // add the reward to the player's XP
             catch (IndexOutOfRangeException e) { levelManager.AddXP(100); Debug.Log(e); }
             Debug.Log("Claimed reward 2!");
             PlayerPrefs.SetInt("DailyChallenge2", 0); // 0 means the reward is claimed
