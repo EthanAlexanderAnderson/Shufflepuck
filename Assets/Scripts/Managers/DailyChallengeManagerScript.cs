@@ -10,6 +10,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
     // dependencies
     private LevelManager levelManager;
     private SoundManagerScript sound;
+    private UIManagerScript UI;
 
     [SerializeField] private GameObject titleScreen;
 
@@ -54,6 +55,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
     {
         levelManager = LevelManager.Instance;
         sound = SoundManagerScript.Instance;
+        UI = UIManagerScript.Instance;
     }
 
     public void SetText()
@@ -233,7 +235,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         if (DC1 < 0)
         {
             try { levelManager.AddXP(easyChallengeReward[Mathf.Abs(DC1)]); } // add the reward to the player's XP
-            catch (IndexOutOfRangeException e) { levelManager.AddXP(50); Debug.Log(e); }
+            catch (IndexOutOfRangeException e) { levelManager.AddXP(50); Debug.LogError(e); }
             Debug.Log("Claimed reward 1!");
             PlayerPrefs.SetInt("DailyChallenge1", 0); // 0 means the reward is claimed
             SetText();
@@ -250,7 +252,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         if (DC2 < 0)
         {
             try { levelManager.AddXP(hardChallengeReward[Mathf.Abs(DC2)]); } // add the reward to the player's XP
-            catch (IndexOutOfRangeException e) { levelManager.AddXP(100); Debug.Log(e); }
+            catch (IndexOutOfRangeException e) { levelManager.AddXP(100); Debug.LogError(e); }
             Debug.Log("Claimed reward 2!");
             PlayerPrefs.SetInt("DailyChallenge2", 0); // 0 means the reward is claimed
             SetText();
@@ -279,7 +281,8 @@ public class DailyChallengeManagerScript : MonoBehaviour
                     var reward = ((streak - 1) / 7 + 1);
                     var dropped = PlayerPrefs.GetInt("PlinkoPegsDropped", 0);
                     PlayerPrefs.SetInt("PlinkoPegsDropped", dropped - reward);
-                    Debug.Log("Dropped " + reward + " pegs for streak reward!");
+                    Debug.Log("Unlocked: +" + reward + " drops for streak reward!");
+                    UI.SetErrorMessage("Unlocked: +" + reward + " drops for streak reward!");
                 }
             }
             // If the last recorded date is not yesterday or today, reset the streak
