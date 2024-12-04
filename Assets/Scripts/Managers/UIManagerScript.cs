@@ -26,8 +26,11 @@ public class UIManagerScript : MonoBehaviour
 
     // title
     [SerializeField] private GameObject playerPuckIcon;
+    [SerializeField] private GameObject playerPuckIconAnimation;
     [SerializeField] private GameObject opponentPuckIcon;
+    [SerializeField] private GameObject opponentPuckIconAnimation;
     [SerializeField] private GameObject activePuckIcon;
+    [SerializeField] private GameObject activePuckIconAnimation;
     [SerializeField] private TMP_Text errorMessage;
     [SerializeField] private TMP_Text profilePopupText;
     [SerializeField] private GameObject readyButton;
@@ -410,6 +413,20 @@ public class UIManagerScript : MonoBehaviour
     // shows up when you click something locked
     public void SetErrorMessage(string msg)
     {
+        // modifiers here are for puck select screen
+        if (msg.Contains("Unlocked"))
+        {
+            errorMessage.color = new Color(0.4862745f, 0.7725491f, 0.4627451f);
+        }
+        else
+        {
+            errorMessage.color = new Color(0.9490197f, 0.4235294f, 0.3098039f);
+        }
+        if (msg.Contains("{combined}"))
+        {
+            msg = msg.Replace("{combined}", (PlayerPrefs.GetInt("easyHighscore") + PlayerPrefs.GetInt("mediumHighscore") + PlayerPrefs.GetInt("hardHighscore")).ToString());
+        }
+        // the REAL point of this function
         errorMessage.text = msg;
     }
   
@@ -484,15 +501,18 @@ public class UIManagerScript : MonoBehaviour
         rematchButton.SetActive(boolean);
     }
 
-    public void SetPlayerPuckIcon(Sprite sprite)
+    public void SetPlayerPuckIcon(Sprite sprite, bool enableAnimation = false)
     {
         playerPuckIcon.GetComponent<Image>().sprite = sprite;
         activePuckIcon.GetComponent<Image>().sprite = sprite;
+        playerPuckIconAnimation.SetActive(enableAnimation);
+        activePuckIconAnimation.SetActive(enableAnimation);
     }
 
-    public void SetOpponentPuckIcon(Sprite sprite)
+    public void SetOpponentPuckIcon(Sprite sprite, bool enableAnimation = false)
     {
         opponentPuckIcon.GetComponent<Image>().sprite = sprite;
+        opponentPuckIconAnimation.SetActive(enableAnimation);
     }
     
 

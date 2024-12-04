@@ -20,6 +20,10 @@ public class ArrowScript : MonoBehaviour
 
     private bool darkMode;
 
+    // moving parameters
+    [SerializeField] private float angleParameter = 0.6f;
+    [SerializeField] private float powerParameter = 5f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -50,14 +54,15 @@ public class ArrowScript : MonoBehaviour
         // calculate the pucks estimated position
         if (activeBar == "angle")
         {
+            transform.localPosition = new Vector3(0, 18, 0);
             // Spin the object around the target at 20 degrees/second.
-            anchorPoint.transform.rotation = Quaternion.Euler(0, 0, (-line.GetValue() + 50f) * 0.6f);
+            anchorPoint.transform.rotation = Quaternion.Euler(0, 0, (-line.GetValue() + 50f) * angleParameter);
             anchorPoint.transform.localPosition = new Vector3(sideModifier, 7f, 1);
             spriteRenderer.sprite = noSpin;
         }
         else if (activeBar == "power")
         {
-            transform.localPosition = new Vector3(0, (line.GetValue()/50f) + 0.3f, 0);
+            transform.localPosition = new Vector3(0, (line.GetValue()/powerParameter) + 3f, 0);
             spriteRenderer.sprite = noSpin;
         }
         else if (activeBar == "spin")

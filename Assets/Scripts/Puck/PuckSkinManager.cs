@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -49,6 +50,10 @@ public class PuckSkinManager : MonoBehaviour
     [SerializeField] private Sprite puckMagic;
     [SerializeField] private Sprite puckStar;
     [SerializeField] private Sprite puckSnake;
+    [SerializeField] private Sprite puckHexagon;
+    [SerializeField] private Sprite puckShuriken;
+    [SerializeField] private Sprite puckLifesaver;
+    [SerializeField] private Sprite puckAtom;
 
     [SerializeField] private Sprite puckBlueAlt;
     [SerializeField] private Sprite puckGreenAlt;
@@ -87,6 +92,10 @@ public class PuckSkinManager : MonoBehaviour
     [SerializeField] private Sprite puckMagicAlt;
     [SerializeField] private Sprite puckStarAlt;
     [SerializeField] private Sprite puckSnakeAlt;
+    [SerializeField] private Sprite puckHexagonAlt;
+    [SerializeField] private Sprite puckShurikenAlt;
+    [SerializeField] private Sprite puckLifesaverAlt;
+    [SerializeField] private Sprite puckAtomAlt;
 
     void Awake()
     {
@@ -106,8 +115,8 @@ public class PuckSkinManager : MonoBehaviour
 
     public Sprite ColorIDtoPuckSprite(int id)
     {
-        Sprite[] puckSprites = { puckFlower, puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain, puckNuke, puckWreath, puckSky, puckDragon, puckNinja, puckEgg, puckMonster, puckEye, puckCamo, puckYingYang, puckCow, puckCraft, puckPlanet, puckLove, puckAura, puckCheese, puckScotia, puckPoker, puckPumpkin, puckWeb, puckCoin, puckMagic, puckStar, puckSnake };
-        Sprite[] puckAltSprites = { puckMissing, puckBlueAlt, puckGreenAlt, puckGreyAlt, puckOrangeAlt, puckPinkAlt, puckPurpleAlt, puckRedAlt, puckYellowAlt, puckRainbowAlt, puckCanadaAlt, puckDonutAlt, puckCaptainAlt, puckNukeAlt, puckWreathAlt, puckSkyAlt, puckDragonAlt, puckNinjaAlt, puckEggAlt, puckMonsterAlt, puckEyeAlt, puckCamoAlt, puckYingYangAlt, puckCowAlt, puckCraftAlt, puckPlanetAlt, puckLoveAlt, puckAuraAlt, puckCheeseAlt, puckScotiaAlt, puckPokerAlt, puckPumpkinAlt, puckWebAlt, puckCoinAlt, puckMagicAlt, puckStarAlt, puckSnakeAlt };
+        Sprite[] puckSprites = { puckFlower, puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain, puckNuke, puckWreath, puckSky, puckDragon, puckNinja, puckEgg, puckMonster, puckEye, puckCamo, puckYingYang, puckCow, puckCraft, puckPlanet, puckLove, puckAura, puckCheese, puckScotia, puckPoker, puckPumpkin, puckWeb, puckCoin, puckMagic, puckStar, puckSnake, puckHexagon, puckShuriken, puckLifesaver, puckAtom };
+        Sprite[] puckAltSprites = { puckMissing, puckBlueAlt, puckGreenAlt, puckGreyAlt, puckOrangeAlt, puckPinkAlt, puckPurpleAlt, puckRedAlt, puckYellowAlt, puckRainbowAlt, puckCanadaAlt, puckDonutAlt, puckCaptainAlt, puckNukeAlt, puckWreathAlt, puckSkyAlt, puckDragonAlt, puckNinjaAlt, puckEggAlt, puckMonsterAlt, puckEyeAlt, puckCamoAlt, puckYingYangAlt, puckCowAlt, puckCraftAlt, puckPlanetAlt, puckLoveAlt, puckAuraAlt, puckCheeseAlt, puckScotiaAlt, puckPokerAlt, puckPumpkinAlt, puckWebAlt, puckCoinAlt, puckMagicAlt, puckStarAlt, puckSnakeAlt, puckHexagonAlt, puckShurikenAlt, puckLifesaverAlt, puckAtomAlt };
 
         // if out of range, return missing
         if ((id >= puckSprites.Length) || (id <= puckAltSprites.Length * -1))
@@ -166,7 +175,7 @@ public class PuckSkinManager : MonoBehaviour
     {
         logic.player.puckSpriteID = id;
         logic.player.puckSprite = ColorIDtoPuckSprite(id);
-        UI.SetPlayerPuckIcon(logic.player.puckSprite);
+        UI.SetPlayerPuckIcon(logic.player.puckSprite, Math.Abs(logic.player.puckSpriteID) == 40);
         PlayerPrefs.SetInt("puck", id);
         RandomizeCPUPuckSprite();
         if (logic.activeCompetitor != null)
@@ -194,12 +203,12 @@ public class PuckSkinManager : MonoBehaviour
         int rng;
         do
         {
-            rng = Random.Range(0, unlockedPuckIDs.Count);
+            rng = UnityEngine.Random.Range(0, unlockedPuckIDs.Count);
 
             logic.player.puckSpriteID = unlockedPuckIDs[rng];
             logic.player.puckSprite = ColorIDtoPuckSprite(unlockedPuckIDs[rng]);
         } while (prev == logic.player.puckSprite);
-        UI.SetPlayerPuckIcon(logic.player.puckSprite);
+        UI.SetPlayerPuckIcon(logic.player.puckSprite, Math.Abs(logic.player.puckSpriteID) == 40);
         PlayerPrefs.SetInt("puck", rng);
         RandomizeCPUPuckSprite();
     }
@@ -208,11 +217,11 @@ public class PuckSkinManager : MonoBehaviour
     {
         do
         {
-            int rand = Random.Range(1, 9);
+            int rand = UnityEngine.Random.Range(1, 9);
             logic.opponent.puckSprite = ColorIDtoPuckSprite(rand);
             logic.opponent.puckSpriteID = rand;
         } while (logic.opponent.puckSprite == logic.player.puckSprite);
-        UI.SetOpponentPuckIcon(logic.opponent.puckSprite);
+        UI.SetOpponentPuckIcon(logic.opponent.puckSprite, Math.Abs(logic.opponent.puckSpriteID) == 40);
     }
 
     // called by puck select menu pucks

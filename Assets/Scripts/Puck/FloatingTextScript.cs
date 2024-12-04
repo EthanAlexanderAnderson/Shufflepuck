@@ -8,6 +8,9 @@ public class FloatingTextScript : MonoBehaviour
     public float destroyTime = 3f;
     public Vector3 offset = new Vector3(0, -20, 0);
 
+    private float speedUp = 0.05f;
+    private float speedShrink = 0.005f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -22,11 +25,18 @@ public class FloatingTextScript : MonoBehaviour
     void FixedUpdate()
     {
         transform.rotation = Quaternion.identity;
-        transform.position += transform.up * 0.05f;
+        transform.position += transform.up * speedUp;
         if (expo < 0.9)
         {
             transform.localScale *= 0.99f - expo;
-            expo += 0.005f;
+            expo += speedShrink;
         }
+    }
+
+    public void Initialize(float rate, float scale)
+    {
+        speedUp = speedUp * rate;
+        speedShrink = speedShrink * rate;
+        transform.localScale = new Vector3(scale, scale, scale);
     }
 }

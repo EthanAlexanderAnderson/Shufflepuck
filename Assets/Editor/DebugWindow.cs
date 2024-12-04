@@ -88,6 +88,14 @@ public class DebugWindow : EditorWindow
         Button resetDailyChallenges = new() { text = "resetDailyChallenges" };
         resetDailyChallenges.clicked += () => ResetDailyChallenges();
         rootVisualElement.Add(resetDailyChallenges);
+
+        Button setDateAsYesterday = new() { text = "setDateAsYesterday" };
+        setDateAsYesterday.clicked += () => SetDateAsYesterday();
+        rootVisualElement.Add(setDateAsYesterday);
+
+        Button setDateAsTomorrow = new() { text = "setDateAsTomorrow" };
+        setDateAsTomorrow.clicked += () => SetDateAsTomorrow();
+        rootVisualElement.Add(setDateAsTomorrow);
     }
 
     public void DebugShootNew(float angleParameter, float powerParameter, float spinParameter)
@@ -166,5 +174,19 @@ public class DebugWindow : EditorWindow
     {
         PlayerPrefs.SetString("LastChallengeDate", "0001-01-01");
         PlayerPrefs.SetString("LastPlinkoRewardDate", "0001-01-01");
+    }
+
+    private void SetDateAsYesterday()
+    {
+        PlayerPrefs.SetString("LastChallengeDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
+        PlayerPrefs.SetString("LastPlinkoRewardDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
+    }
+
+    private void SetDateAsTomorrow()
+    {
+        var currentSavedDate = PlayerPrefs.GetString("LastChallengeDate", DateTime.Today.ToString("yyyy-MM-dd"));
+        var tomorrow = DateTime.Parse(currentSavedDate).AddDays(1);
+        PlayerPrefs.SetString("LastChallengeDate", tomorrow.ToString("yyyy-MM-dd"));
+        PlayerPrefs.SetString("LastPlinkoRewardDate", tomorrow.ToString("yyyy-MM-dd"));
     }
 }
