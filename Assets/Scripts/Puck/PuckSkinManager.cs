@@ -142,15 +142,12 @@ public class PuckSkinManager : MonoBehaviour
         }
     }
 
-    public Color ColorIDtoColor(int id)
+    public Color[] ColorIDtoColor(int id)
     {
-        Color[] puckColors = { new Color(0f, 0f, 0f), new Color(0f, 0.7490196f, 0.9529412f), new Color(0.4862745f, 0.7725491f, 0.4627451f), new Color(0.5019608f, 0.5019608f, 0.5019608f), new Color(0.9647059f, 0.5568628f, 0.3372549f), new Color(0.9411765f, 0.4313726f, 0.6666667f), new Color(0.5215687f, 0.3764706f, 0.6588235f), new Color(0.9490197f, 0.4235294f, 0.3098039f), new Color(1f, 0.9607844f, 0.4078432f) };
-        Color[] puckAltColors = { new Color(0f, 0f, 0f), new Color(0f, 0.7490196f, 0.9529412f), new Color(0.4862745f, 0.7725491f, 0.4627451f), new Color(0.5019608f, 0.5019608f, 0.5019608f), new Color(0.9647059f, 0.5568628f, 0.3372549f), new Color(0.9411765f, 0.4313726f, 0.6666667f), new Color(0.5215687f, 0.3764706f, 0.6588235f), new Color(0.9490197f, 0.4235294f, 0.3098039f), new Color(1f, 0.9607844f, 0.4078432f) };
-
         // if out of range, return grey
         if ((id >= puckColors.Length) || (id <= puckAltColors.Length * -1))
         {
-            return new Color(0.5f, 0.5f, 0.5f);
+            return new Color[] { new Color(0.5f, 0.5f, 0.5f) };
         }
 
         // if postitive, return regular, else return alt
@@ -158,16 +155,16 @@ public class PuckSkinManager : MonoBehaviour
         {
             if (id >= 0)
             {
-                return (puckColors[id]);
+                return puckColors[id];
             }
             else
             {
-                return (puckAltColors[id * -1]);
+                return puckAltColors[id * -1];
             }
         }
         catch (System.IndexOutOfRangeException)
         {
-            return new Color(0.5f, 0.5f, 0.5f);
+            return new Color[] { new Color(0.5f, 0.5f, 0.5f) };
         }
     }
 
@@ -263,4 +260,30 @@ public class PuckSkinManager : MonoBehaviour
         easterEggBox.position = new Vector3(-7.10f, 14.40f, 0f);
         antiEasterEggBox.position = new Vector3(2.50f, 14.40f, 0f);
     }
+
+    // yep. y'know im putting the big variables at the bottom. idgaf
+    // Maximum colors is 8 btw
+    Color[][] puckColors = {
+        new Color[] { new Color(0.5215687f, 0.3764706f, 0.6588235f), new Color(0.9411765f, 0.4313726f, 0.6666667f), new Color(0.9647059f, 0.5568628f, 0.3372549f), new Color(0.4862745f, 0.7725491f, 0.4627451f), new Color(0f, 0.7490196f, 0.9529412f), new Color(1f, 0.9607844f, 0.4078432f), new Color(0.9490197f, 0.4235294f, 0.3098039f) }, // flower
+        new Color[] { new Color(0.0000000f, 0.7490196f, 0.9529412f) }, // blue
+        new Color[] { new Color(0.4862745f, 0.7725491f, 0.4627451f) }, // green
+        new Color[] { new Color(0.5019608f, 0.5019608f, 0.5019608f) }, // grey
+        new Color[] { new Color(0.9647059f, 0.5568628f, 0.3372549f) }, // orange
+        new Color[] { new Color(0.9411765f, 0.4313726f, 0.6666667f) }, // pink
+        new Color[] { new Color(0.5215687f, 0.3764706f, 0.6588235f) }, // purple
+        new Color[] { new Color(0.9490197f, 0.4235294f, 0.3098039f) }, // red
+        new Color[] { new Color(1.0000000f, 0.9607844f, 0.4078432f) } // yellow
+    };
+
+    Color[][] puckAltColors = {
+        new Color[] { new Color(0.9411765f, 0.6f, 1f), new Color(0f, 1f, 0.6745098f), new Color(1f, 0.8313726f, 0.3686275f) }, // ignore this for now
+        new Color[] { new Color(0.0000000f, 0.7490196f, 0.9529412f) }, // blue
+        new Color[] { new Color(0.4862745f, 0.7725491f, 0.4627451f) }, // green
+        new Color[] { new Color(0.5019608f, 0.5019608f, 0.5019608f) }, // grey
+        new Color[] { new Color(0.9647059f, 0.5568628f, 0.3372549f) }, // orange
+        new Color[] { new Color(0.9411765f, 0.4313726f, 0.6666667f) }, // pink
+        new Color[] { new Color(0.5215687f, 0.3764706f, 0.6588235f) }, // purple
+        new Color[] { new Color(0.9490197f, 0.4235294f, 0.3098039f) }, // red
+        new Color[] { new Color(1.0000000f, 0.9607844f, 0.4078432f) }  // yellow
+    };
 }

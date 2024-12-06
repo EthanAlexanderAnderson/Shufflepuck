@@ -51,7 +51,7 @@ public class PuckScript : NetworkBehaviour
 
     private TrailRenderer trail;
 
-    private Color color = new Color(0.5f, 0.5f, 0.5f);
+    private Color[] color = {new Color(0.5f, 0.5f, 0.5f)};
 
     void OnEnable()
     {
@@ -295,7 +295,21 @@ public class PuckScript : NetworkBehaviour
             emission.rateOverTime = (velocity) * 50f;
             ParticleSystem.MainModule main = collisionParticleEffect.main;
             main.startSpeed = (velocity) * 4f;
-            main.startColor = color;
+
+            // set color of particle effect to puck color
+            if (color == null || color.Length <= 0) // handle null color
+            {
+                main.startColor = new ParticleSystem.MinMaxGradient(Color.grey);
+            }
+            else if (color.Length == 1 ) // handle one color
+            {
+                main.startColor = color[0];
+            }
+            else // handle two or more colors
+            {
+                main.startColor = new ParticleSystem.MinMaxGradient(CreateRandomGradient());
+            }
+
             collisionParticleEffect.Play();
             Destroy(collisionParticleEffect.gameObject, 5f);
         }
@@ -312,5 +326,24 @@ public class PuckScript : NetworkBehaviour
     public void SetPuckBonusValue(int value)
     {
         puckBonusValue = value;
+    }
+
+    Gradient CreateRandomGradient()
+    {
+        Gradient gradient = new Gradient();
+        GradientColorKey[] colorKeys = new GradientColorKey[color.Length];
+        GradientAlphaKey[] alphaKeys = new GradientAlphaKey[1]; // One alpha key for consistent transparency
+
+        for (int i = 0; i < color.Length; i++)
+        {
+            // Each color is mapped to a specific point in the gradient
+            float time = i / (float)(color.Length - 1);
+            colorKeys[i] = new GradientColorKey(color[i], time);
+        }
+
+        alphaKeys[0] = new GradientAlphaKey(1f, 0f); // Set constant alpha
+
+        gradient.SetKeys(colorKeys, alphaKeys);
+        return gradient;
     }
 }
