@@ -151,6 +151,9 @@ public class UIManagerScript : MonoBehaviour
             waitingText.text = "0/2 Players Ready";
             waitingGif.SetActive(false);
             enabledReadyButton = false;
+        }
+        if (!enabledReadyButton && cooldownTime <= -5f)
+        {
             waitingBackButton.SetActive(true);
         }
         // Check if the android back button (Escape key) is pressed

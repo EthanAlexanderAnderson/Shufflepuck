@@ -49,7 +49,6 @@ public class PlinkoManager : MonoBehaviour
         if (PlinkoReward >= 100) // 100+ = XP REWARD
         {
             rewardText.text = "+" + PlinkoReward.ToString() + "XP";
-            rewardImage.sprite = null;
         }
         else // skin reward
         {
@@ -57,6 +56,7 @@ public class PlinkoManager : MonoBehaviour
             rewardImage.sprite = puckSkinManager.ColorIDtoPuckSprite(PlinkoReward);
             rewardImageAnimation.SetActive(PlinkoReward == 40);
         }
+        rewardImage.enabled = PlinkoReward < 100; // reward image should be disabled if the reward is XP
     }
 
     // Update is called once per frame
@@ -178,6 +178,7 @@ public class PlinkoManager : MonoBehaviour
                         // if all skins are unlocked, XP reward
                         Debug.Log("No puck skin rewards remain.");
                         PlayerPrefs.SetInt("PlinkoReward", 999);
+                        rewardImage.enabled = false;
                         return;
                     }
                 }
