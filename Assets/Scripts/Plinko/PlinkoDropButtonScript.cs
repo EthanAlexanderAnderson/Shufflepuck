@@ -23,6 +23,8 @@ public class PlinkoDropButtonScript : MonoBehaviour
     int drops = 0;
     int previousDropsValue = -1;
     [SerializeField] float floatingTextLocation = 3.5f;
+    int playerXPonEnable = 0;
+    [SerializeField] private float xAxisRandomRange = 8f;
 
     private void OnEnable()
     {
@@ -30,6 +32,7 @@ public class PlinkoDropButtonScript : MonoBehaviour
         logic = LogicScript.Instance;
         previousDropsValue = -1;
         SetDropButtonText();
+        playerXPonEnable = PlayerPrefs.GetInt("XP");
     }
 
     // Update is called once per frame
@@ -85,7 +88,9 @@ public class PlinkoDropButtonScript : MonoBehaviour
         }
         cooldown = Time.time;
 
-        GameObject puckObject = Instantiate(puck, new Vector3(Random.Range(-8f, 7.66f) + 0.333f, 8f, 0.0f), Quaternion.identity);
+        xAxisRandomRange = (playerXPonEnable >= 100 && playerXPonEnable < 460) ? 3f : 8f; // Greater than level 1 (gets first drop) and less than level 4. Thus boosted odds for first 3 drops.
+
+        GameObject puckObject = Instantiate(puck, new Vector3(Random.Range(-xAxisRandomRange, xAxisRandomRange), 8f, 0.0f), Quaternion.identity);
         PuckScript puckScript = puckObject.GetComponent<PuckScript>();
         puckScript.InitPuck(true, logic.player.puckSpriteID);
         // set gravity scale to 1 on puckObject

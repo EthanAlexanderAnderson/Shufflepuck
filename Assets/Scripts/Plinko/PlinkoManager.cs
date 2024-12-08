@@ -205,9 +205,19 @@ public class PlinkoManager : MonoBehaviour
         }
         else // skin reward
         {
-            puckSkinManager.UnlockPuckID(plinkoreward);
-            PlayerPrefs.SetInt("puck" + plinkoreward.ToString() + "unlocked", 1);
-            UI.SetErrorMessage("New puck unlocked!");
+            // if the puck has not been unlocked already, unlock it. otherwise it is a duplicate and we should grant XP
+            if (PlayerPrefs.GetInt("puck" + plinkoreward.ToString() + "unlocked", 0) == 0)
+            {
+                puckSkinManager.UnlockPuckID(plinkoreward);
+                PlayerPrefs.SetInt("puck" + plinkoreward.ToString() + "unlocked", 1);
+                UI.SetErrorMessage("New puck unlocked!");
+            }
+            else
+            {
+                plinkoreward = 100;
+                levelManager.AddXP(plinkoreward);
+                UI.SetErrorMessage("Duplicate reward. Adding +100XP instead.");
+            }
         }
 
         // SFX for auditory feedback
