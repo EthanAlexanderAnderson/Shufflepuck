@@ -131,6 +131,8 @@ public class UIManagerScript : MonoBehaviour
         customizeScreen.SetActive(true);
         UpdateLocks();
         customizeScreen.SetActive(false);
+        if (!PlayerPrefs.HasKey("DailyChallenge1")) { PlayerPrefs.SetInt("DailyChallenge1", 1); }
+        if (!PlayerPrefs.HasKey("DailyChallenge2")) { PlayerPrefs.SetInt("DailyChallenge2", 1); }
 
         if (PlayerPrefs.GetInt("darkMode", 0) == 1)
         {
