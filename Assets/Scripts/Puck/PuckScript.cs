@@ -185,7 +185,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public bool IsSafe() { return safe; }
     public bool IsPastSafeLine() { return pastSafeLine; }
     public bool IsPlayersPuck() { return playersPuck; }
-    public int ComputeValue() { return (puckBaseValue * zoneMultiplier) + puckBonusValue; }
+    public int ComputeValue() { return (puckBaseValue * zoneMultiplier) + (zoneMultiplier > 0 ? puckBonusValue : 0); }
     public int GetZoneMultiplier() { return zoneMultiplier; }
     public void SetZoneMultiplier(int ZM) { zoneMultiplier = ZM; }
 
@@ -218,9 +218,10 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                         Destroy(child.gameObject);
                     }
                 }
+                zoneMultiplier = enteredZoneMultiplier;
                 // show floating text
                 var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
-                floatingText.GetComponent<TMP_Text>().text = enteredZoneMultiplier.ToString();
+                floatingText.GetComponent<TMP_Text>().text = ComputeValue().ToString();
             }
             // if puck moves into the off zone, play minus sfx
             else if (enteredZoneMultiplier < zoneMultiplier && !IsStopped())
@@ -235,9 +236,8 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                     minusCPUSFX.volume = SFXvolume;
                     minusCPUSFX.Play();
                 }
+                zoneMultiplier = enteredZoneMultiplier;
             }
-            
-            zoneMultiplier = enteredZoneMultiplier;
         }
     }
 
@@ -364,6 +364,9 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        // show puck score when clicked
+        var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
+        floatingText.GetComponent<TMP_Text>().text = ComputeValue().ToString();
         // if powerupText has been set, show it
         if (powerupText != null)
         {

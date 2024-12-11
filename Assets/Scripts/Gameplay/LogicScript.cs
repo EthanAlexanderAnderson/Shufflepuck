@@ -137,7 +137,11 @@ public class LogicScript : MonoBehaviour
             // now player may shoot
             if ((Input.GetMouseButtonDown(0)) && gameIsRunning && (player.isShooting || isLocal) && powerupsMenu.activeInHierarchy == false)
             {
-                PlayerShootingHelper();
+                // make sure click is on the bottom half of the screen
+                if (Input.mousePosition.y < Screen.height / 2)
+                {
+                    PlayerShootingHelper();
+                }
             }
 
             // start CPU's turn, do this then start shooting
@@ -476,9 +480,12 @@ public class LogicScript : MonoBehaviour
     public void BlockPowerup()
     {
         int swap = activeCompetitor.isPlayer ? 1 : -1;
-        GameObject blockPuckObject = Instantiate(puckPrefab, new Vector3(Random.Range(2f * swap, 4f * swap), Random.Range(2f, 4f), 0.0f), Quaternion.identity);
+        GameObject blockPuckObject = Instantiate(puckPrefab, new Vector3(Random.Range(2f * swap, 4f * swap), Random.Range(2f, 4f), -1.0f), Quaternion.identity);
         PuckScript blockPuckScript = blockPuckObject.GetComponent<PuckScript>();
         blockPuckScript.InitPuck(activeCompetitor.isPlayer, activeCompetitor.puckSpriteID);
+        blockPuckScript.SetPuckBaseValue(0);
+        blockPuckScript.SetPowerupText("valueless");
+        blockPuckScript.CreatePowerupFloatingText();
         activeCompetitor.activePuckScript.SetPowerupText("block");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
     }
