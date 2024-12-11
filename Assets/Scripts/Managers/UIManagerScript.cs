@@ -165,9 +165,12 @@ public class UIManagerScript : MonoBehaviour
 
         if (logic.tutorialActive) { tutorialMenu.SetActive(true);  }
 
-        if ( Input.GetMouseButtonDown(0) && tutorialMenu.activeInHierarchy && iPage != 6)
+        if (Input.GetMouseButtonDown(0) && tutorialMenu.activeInHierarchy && iPage != 6)
         {
-            AdvanceTutorial();
+            if (Input.mousePosition.y < Screen.height / 2)
+            {
+                AdvanceTutorial();
+            }
         }
     }
 

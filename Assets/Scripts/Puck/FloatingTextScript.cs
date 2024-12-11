@@ -5,12 +5,11 @@ public class FloatingTextScript : MonoBehaviour
 {
     [SerializeField] TMP_Text TMPtext;
 
-    public float destroyTime; // 1.5
-    public Vector3 offset = new Vector3(0, -20, 0);
+    public float destroyTime; // 3
 
     [SerializeField] private float speedUp; // 0.05
     [SerializeField] private float speedShrink; // 0.005f;
-    [SerializeField] private float speedFade; // 0.01f;
+    [SerializeField] private float speedFade; // 0.005
 
     // Start is called before the first frame update
     void Start()
@@ -19,16 +18,16 @@ public class FloatingTextScript : MonoBehaviour
         textmeshPro.outlineWidth = 0.2f;
         textmeshPro.outlineColor = new Color32(0, 0, 0, 255);
         Destroy(gameObject, destroyTime);
-        transform.localPosition += offset;
     }
 
     private float expoShrink;
     private float expoFade;
     void FixedUpdate()
     {
-        transform.rotation = Quaternion.identity;
+        // move up and shrink
         transform.position += transform.up * speedUp;
         transform.localScale *= 1f - expoShrink;
+
         if (expoShrink < 0.99)
         {
             expoShrink += speedShrink;
@@ -38,6 +37,12 @@ public class FloatingTextScript : MonoBehaviour
         {
             expoFade += speedFade + expoFade/10; // +expofade (make speedfade less)
         }
+    }
+
+    private void Update()
+    {
+        transform.position = new Vector3(transform.parent.position.x, transform.position.y, transform.position.z);
+        transform.rotation = Quaternion.identity;
     }
 
     public void Initialize(string text)
