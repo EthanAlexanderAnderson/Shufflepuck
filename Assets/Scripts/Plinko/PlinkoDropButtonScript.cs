@@ -73,8 +73,7 @@ public class PlinkoDropButtonScript : MonoBehaviour
         if (previousDropsValue >= 0 && drops > previousDropsValue)
         {
             var floatingText = Instantiate(floatingTextPrefab, transform.position + new Vector3(floatingTextLocation, 0, 0), Quaternion.identity, transform);
-            floatingText.GetComponent<FloatingTextScript>().Initialize(0.25f, 25);
-            floatingText.GetComponent<TMP_Text>().text = "+" + (drops - previousDropsValue).ToString();
+            floatingText.GetComponent<FloatingTextScript>().Initialize("+" + (drops - previousDropsValue).ToString(), 0.25f, 25);
         }
         previousDropsValue = drops;
     }

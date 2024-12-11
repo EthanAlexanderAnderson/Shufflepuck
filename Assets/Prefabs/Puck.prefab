@@ -107,7 +107,7 @@ SpriteRenderer:
   m_Size: {x: 10, y: 10}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!58 &812162480707345899
@@ -185,7 +185,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3569049060
+  GlobalObjectIdHash: 3563702670
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -216,6 +216,7 @@ MonoBehaviour:
   minusPlayerSFX: {fileID: 6667287289108452097}
   minusCPUSFX: {fileID: -916678449169613619}
   animationLayer: {fileID: 3448663806602933473}
+  trail: {fileID: 6188019625278550676}
   powerModifier: 12
   angularVelocity: 0
   angularVelocityModifier: 0.06

@@ -225,8 +225,7 @@ public class PlinkoManager : MonoBehaviour
 
         // floating text for visual feedback
         var floatingText = Instantiate(floatingTextPrefab, self.position, Quaternion.identity, transform);
-        floatingText.GetComponent<FloatingTextScript>().Initialize(0.5f, 15);
-        floatingText.GetComponent<TMP_Text>().text = (plinkoreward >= 100) ? "+" + plinkoreward + "XP" : "UNLOCKED!";
+        floatingText.GetComponent<FloatingTextScript>().Initialize((plinkoreward >= 100) ? "+" + plinkoreward + "XP" : "UNLOCKED!", 0.5f, 15);
     }
 
     public void SideReward( Transform self )
@@ -239,7 +238,6 @@ public class PlinkoManager : MonoBehaviour
 
         // floating text for visual feedback
         var floatingText = Instantiate(floatingTextPrefab, self.position, Quaternion.identity, transform);
-        floatingText.GetComponent<FloatingTextScript>().Initialize(0.5f, 15);
-        floatingText.GetComponent<TMP_Text>().text = "+100XP";
+        floatingText.GetComponent<FloatingTextScript>().Initialize("+100XP", 0.5f, 15);
     }
 }

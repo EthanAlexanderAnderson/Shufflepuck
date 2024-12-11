@@ -247,6 +247,19 @@ public class LogicScript : MonoBehaviour
         opponent.isTurn = false;
         opponent.isShooting = true;
 
+        // use powerup
+        if (difficulty >= 2 && !isLocal && powerupsAreEnabled)
+        {
+            if (opponent.puckCount > 3) // first two shots use block
+            {
+                BlockPowerup();
+            }
+            else // last three, use plus one
+            {
+                PlusOnePowerup();
+            }
+        }
+
         if (wallCount > 0)
         {
             wallCount--;
@@ -448,18 +461,25 @@ public class LogicScript : MonoBehaviour
 
     public void PlusOnePowerup()
     {
-        player.activePuckScript.SetPuckBonusValue(1);
+        activeCompetitor.activePuckScript.SetPuckBonusValue(1);
+        activeCompetitor.activePuckScript.SetPowerupText("plus one");
+        activeCompetitor.activePuckScript.CreatePowerupFloatingText();
     }
 
     public void ForesightPowerup()
     {
         puckHalo.SetActive(true);
+        activeCompetitor.activePuckScript.SetPowerupText("foresight");
+        activeCompetitor.activePuckScript.CreatePowerupFloatingText();
     }
 
     public void BlockPowerup()
     {
-        GameObject blockPuckObject = Instantiate(puckPrefab, new Vector3(Random.Range(2f, 4f), Random.Range(2f, 4f), 0.0f), Quaternion.identity);
+        int swap = activeCompetitor.isPlayer ? 1 : -1;
+        GameObject blockPuckObject = Instantiate(puckPrefab, new Vector3(Random.Range(2f * swap, 4f * swap), Random.Range(2f, 4f), 0.0f), Quaternion.identity);
         PuckScript blockPuckScript = blockPuckObject.GetComponent<PuckScript>();
-        blockPuckScript.InitPuck(true, player.puckSpriteID);
+        blockPuckScript.InitPuck(activeCompetitor.isPlayer, activeCompetitor.puckSpriteID);
+        activeCompetitor.activePuckScript.SetPowerupText("block");
+        activeCompetitor.activePuckScript.CreatePowerupFloatingText();
     }
 }

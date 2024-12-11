@@ -139,7 +139,7 @@ MonoBehaviour:
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
-  m_characterSpacing: 0
+  m_characterSpacing: -5
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -151,7 +151,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
-  m_ActiveFontFeatures: 6e72656b
+  m_ActiveFontFeatures: 
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -188,5 +188,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74e49349dd3f3e345a73fdd66abf88ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyTime: 1.5
+  TMPtext: {fileID: 2156688029158535987}
+  destroyTime: 3
   offset: {x: 0, y: 0, z: 0}
+  speedUp: 0.05
+  speedShrink: 0.005
+  speedFade: 0.005

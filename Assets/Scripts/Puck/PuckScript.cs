@@ -3,12 +3,17 @@
  */
 
 using UnityEngine;
+using UnityEngine.EventSystems;
 using Unity.Netcode;
 using TMPro;
 using System;
 
-public class PuckScript : NetworkBehaviour
+public class PuckScript : NetworkBehaviour, IPointerClickHandler
 {
+    // dependacies
+    private LogicScript logic;
+    private PuckSkinManager puckSkinManager;
+
     // puck object components
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private SpriteRenderer spriteRenderer;
@@ -21,6 +26,7 @@ public class PuckScript : NetworkBehaviour
     [SerializeField] private AudioSource minusPlayerSFX;
     [SerializeField] private AudioSource minusCPUSFX;
     [SerializeField] private GameObject animationLayer;
+    [SerializeField] private TrailRenderer trail;
 
     // script variables
     private bool shot;
@@ -43,14 +49,12 @@ public class PuckScript : NetworkBehaviour
 
     // floating text
     [SerializeField] private GameObject floatingTextPrefab;
+    private string powerupText;
 
-    private LogicScript logic;
-    private PuckSkinManager puckSkinManager;
-
+    // sound effect volume
     private float SFXvolume;
 
-    private TrailRenderer trail;
-
+    // particle colors
     private Color[] color = {new Color(0.5f, 0.5f, 0.5f)};
 
     void OnEnable()
@@ -58,7 +62,6 @@ public class PuckScript : NetworkBehaviour
         logic = LogicScript.Instance;
         SFXvolume = SoundManagerScript.Instance.GetSFXVolume();
         puckSkinManager = PuckSkinManager.Instance;
-        trail = gameObject.GetComponent<TrailRenderer>();
     }
 
     private Vector2 shotForceToAdd;
@@ -345,5 +348,27 @@ public class PuckScript : NetworkBehaviour
 
         gradient.SetKeys(colorKeys, alphaKeys);
         return gradient;
+    }
+
+    public void SetPowerupText(string text)
+    {
+        powerupText = text;
+    }
+
+    // text to show what powerup was used under the puck. Only fades, no up/shrink.
+    public void CreatePowerupFloatingText()
+    {
+        var floatingText = Instantiate(floatingTextPrefab, transform.position + new Vector3(0, -1.5f, 0), Quaternion.identity, transform);
+        floatingText.GetComponent<FloatingTextScript>().Initialize(powerupText, 0, 0, 0.1f, 1);
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        // if powerupText has been set, show it
+        if (powerupText != null)
+        {
+            CreatePowerupFloatingText();
+        }
+
     }
 }
