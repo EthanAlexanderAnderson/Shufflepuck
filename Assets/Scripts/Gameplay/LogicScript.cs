@@ -32,6 +32,9 @@ public class LogicScript : MonoBehaviour
     private int wallCount = 3;
     [SerializeField] private GameObject wall; // set in editor
 
+    // Hard CPU shot paths
+    GameObject[] CPUPaths;
+
     // powerups
     public bool powerupsAreEnabled = false;
     [SerializeField] private GameObject powerupsMenu; // set in editor
@@ -41,7 +44,6 @@ public class LogicScript : MonoBehaviour
     private float timer = 0;
     private int difficulty; // 0 easy 1 medium 2 hard
 
-    //public bool isLocal;
     private bool isLocal;
     public bool IsLocal
     {
@@ -103,6 +105,8 @@ public class LogicScript : MonoBehaviour
         nonActiveCompetitor = player;
         // check if tutorial should be active
         tutorialActive = PlayerPrefs.GetInt("tutorialCompleted") == 0 && PlayerPrefs.GetInt("easyWin") == 0 && PlayerPrefs.GetInt("easyHighscore") == 0;
+        // initialize CPU paths
+        CPUPaths = GameObject.FindGameObjectsWithTag("cpu_path");
     }
 
     // Update is called once per frame
@@ -423,7 +427,6 @@ public class LogicScript : MonoBehaviour
     // this is the CPU AI for hard mode
     private (float, float, float) FindOpenPath()
     {
-        GameObject[] CPUPaths = GameObject.FindGameObjectsWithTag("cpu_path");
         CPUPathScript best = null;
         int highestValue = 0;
         // check all paths to see which are unblocked
