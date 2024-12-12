@@ -359,7 +359,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public void CreatePowerupFloatingText()
     {
         var floatingText = Instantiate(floatingTextPrefab, transform.position + new Vector3(0, -1.5f, 0), Quaternion.identity, transform);
-        floatingText.GetComponent<FloatingTextScript>().Initialize(powerupText, 0, 0, 0.1f, 1);
+        floatingText.GetComponent<FloatingTextScript>().Initialize(powerupText, 0, 0, 0.1f, 1, true);
     }
 
     public void OnPointerClick(PointerEventData eventData)
