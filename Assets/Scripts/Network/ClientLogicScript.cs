@@ -91,25 +91,29 @@ public class ClientLogicScript : NetworkBehaviour
 
         if (isShooting && Input.GetMouseButtonDown(0))
         {
-            switch (activeBar)
+            // make sure click is on the bottom half of the screen
+            if (Input.mousePosition.y < Screen.height / 2)
             {
-                case "angle":
-                    angle = line.GetValue();
-                    activeBar = bar.ChangeBar("power", isStartingPlayer);
-                    break;
-                case "power":
-                    power = line.GetValue();
-                    activeBar = bar.ChangeBar("spin");
-                    break;
-                case "spin":
-                    spin = line.GetValue();
-                    serverLogic.ShootServerRpc(angle, power, spin);
-                    activeBar = bar.ChangeBar("none");
-                    UI.TurnText = "Opponent's Turn";
-                    line.isActive = false;
-                    arrow.SetActive(false);
-                    isShooting = false;
-                    break;
+                switch (activeBar)
+                {
+                    case "angle":
+                        angle = line.GetValue();
+                        activeBar = bar.ChangeBar("power", isStartingPlayer);
+                        break;
+                    case "power":
+                        power = line.GetValue();
+                        activeBar = bar.ChangeBar("spin");
+                        break;
+                    case "spin":
+                        spin = line.GetValue();
+                        serverLogic.ShootServerRpc(angle, power, spin);
+                        activeBar = bar.ChangeBar("none");
+                        UI.TurnText = "Opponent's Turn";
+                        line.isActive = false;
+                        arrow.SetActive(false);
+                        isShooting = false;
+                        break;
+                }
             }
         }
 

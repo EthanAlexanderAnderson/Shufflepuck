@@ -131,6 +131,8 @@ public class UIManagerScript : MonoBehaviour
         customizeScreen.SetActive(true);
         UpdateLocks();
         customizeScreen.SetActive(false);
+        if (!PlayerPrefs.HasKey("DailyChallenge1")) { PlayerPrefs.SetInt("DailyChallenge1", 1); }
+        if (!PlayerPrefs.HasKey("DailyChallenge2")) { PlayerPrefs.SetInt("DailyChallenge2", 1); }
 
         if (PlayerPrefs.GetInt("darkMode", 0) == 1)
         {
@@ -151,6 +153,9 @@ public class UIManagerScript : MonoBehaviour
             waitingText.text = "0/2 Players Ready";
             waitingGif.SetActive(false);
             enabledReadyButton = false;
+        }
+        if (!enabledReadyButton && cooldownTime <= -5f)
+        {
             waitingBackButton.SetActive(true);
         }
         // Check if the android back button (Escape key) is pressed
@@ -162,9 +167,12 @@ public class UIManagerScript : MonoBehaviour
 
         if (logic.tutorialActive) { tutorialMenu.SetActive(true);  }
 
-        if ( Input.GetMouseButtonDown(0) && tutorialMenu.activeInHierarchy && iPage != 6)
+        if (Input.GetMouseButtonDown(0) && tutorialMenu.activeInHierarchy && iPage != 6)
         {
-            AdvanceTutorial();
+            if (Input.mousePosition.y < Screen.height / 2)
+            {
+                AdvanceTutorial();
+            }
         }
     }
 

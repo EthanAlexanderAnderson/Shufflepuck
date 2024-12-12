@@ -19,7 +19,7 @@ public class PuckManager : MonoBehaviour
     public void CreatePuck(Competitor competitor)
     {
         float xpos = (competitor.isPlayer ? -3.6f : 3.6f);
-        competitor.activePuckObject = Instantiate(puckPrefab, new Vector3(xpos, -10.0f, 0.0f), Quaternion.identity);
+        competitor.activePuckObject = Instantiate(puckPrefab, new Vector3(xpos, -10.0f, -1.0f), Quaternion.identity);
         competitor.activePuckScript = competitor.activePuckObject.GetComponent<PuckScript>();
         competitor.activePuckScript.InitPuck(competitor.isPlayer, competitor.puckSpriteID);
     }

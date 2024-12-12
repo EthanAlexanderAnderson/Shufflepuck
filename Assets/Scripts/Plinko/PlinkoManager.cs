@@ -49,7 +49,6 @@ public class PlinkoManager : MonoBehaviour
         if (PlinkoReward >= 100) // 100+ = XP REWARD
         {
             rewardText.text = "+" + PlinkoReward.ToString() + "XP";
-            rewardImage.sprite = null;
         }
         else // skin reward
         {
@@ -57,6 +56,7 @@ public class PlinkoManager : MonoBehaviour
             rewardImage.sprite = puckSkinManager.ColorIDtoPuckSprite(PlinkoReward);
             rewardImageAnimation.SetActive(PlinkoReward == 40);
         }
+        rewardImage.enabled = PlinkoReward < 100; // reward image should be disabled if the reward is XP
     }
 
     // Update is called once per frame
@@ -178,6 +178,7 @@ public class PlinkoManager : MonoBehaviour
                         // if all skins are unlocked, XP reward
                         Debug.Log("No puck skin rewards remain.");
                         PlayerPrefs.SetInt("PlinkoReward", 999);
+                        rewardImage.enabled = false;
                         return;
                     }
                 }
@@ -204,9 +205,19 @@ public class PlinkoManager : MonoBehaviour
         }
         else // skin reward
         {
-            puckSkinManager.UnlockPuckID(plinkoreward);
-            PlayerPrefs.SetInt("puck" + plinkoreward.ToString() + "unlocked", 1);
-            UI.SetErrorMessage("New puck unlocked!");
+            // if the puck has not been unlocked already, unlock it. otherwise it is a duplicate and we should grant XP
+            if (PlayerPrefs.GetInt("puck" + plinkoreward.ToString() + "unlocked", 0) == 0)
+            {
+                puckSkinManager.UnlockPuckID(plinkoreward);
+                PlayerPrefs.SetInt("puck" + plinkoreward.ToString() + "unlocked", 1);
+                UI.SetErrorMessage("New puck unlocked!");
+            }
+            else
+            {
+                plinkoreward = 100;
+                levelManager.AddXP(plinkoreward);
+                UI.SetErrorMessage("Duplicate reward. Adding +100XP instead.");
+            }
         }
 
         // SFX for auditory feedback
@@ -214,8 +225,7 @@ public class PlinkoManager : MonoBehaviour
 
         // floating text for visual feedback
         var floatingText = Instantiate(floatingTextPrefab, self.position, Quaternion.identity, transform);
-        floatingText.GetComponent<FloatingTextScript>().Initialize(0.5f, 15);
-        floatingText.GetComponent<TMP_Text>().text = (plinkoreward >= 100) ? "+" + plinkoreward + "XP" : "UNLOCKED!";
+        floatingText.GetComponent<FloatingTextScript>().Initialize((plinkoreward >= 100) ? "+" + plinkoreward + "XP" : "UNLOCKED!", 0.5f, 15);
     }
 
     public void SideReward( Transform self )
@@ -228,7 +238,6 @@ public class PlinkoManager : MonoBehaviour
 
         // floating text for visual feedback
         var floatingText = Instantiate(floatingTextPrefab, self.position, Quaternion.identity, transform);
-        floatingText.GetComponent<FloatingTextScript>().Initialize(0.5f, 15);
-        floatingText.GetComponent<TMP_Text>().text = "+100XP";
+        floatingText.GetComponent<FloatingTextScript>().Initialize("+100XP", 0.5f, 15);
     }
 }

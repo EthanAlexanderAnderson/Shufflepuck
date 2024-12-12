@@ -3,12 +3,17 @@
  */
 
 using UnityEngine;
+using UnityEngine.EventSystems;
 using Unity.Netcode;
 using TMPro;
 using System;
 
-public class PuckScript : NetworkBehaviour
+public class PuckScript : NetworkBehaviour, IPointerClickHandler
 {
+    // dependacies
+    private LogicScript logic;
+    private PuckSkinManager puckSkinManager;
+
     // puck object components
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private SpriteRenderer spriteRenderer;
@@ -21,6 +26,7 @@ public class PuckScript : NetworkBehaviour
     [SerializeField] private AudioSource minusPlayerSFX;
     [SerializeField] private AudioSource minusCPUSFX;
     [SerializeField] private GameObject animationLayer;
+    [SerializeField] private TrailRenderer trail;
 
     // script variables
     private bool shot;
@@ -43,22 +49,19 @@ public class PuckScript : NetworkBehaviour
 
     // floating text
     [SerializeField] private GameObject floatingTextPrefab;
+    private string powerupText;
 
-    private LogicScript logic;
-    private PuckSkinManager puckSkinManager;
-
+    // sound effect volume
     private float SFXvolume;
 
-    private TrailRenderer trail;
-
-    private Color color = new Color(0.5f, 0.5f, 0.5f);
+    // particle colors
+    private Color[] color = {new Color(0.5f, 0.5f, 0.5f)};
 
     void OnEnable()
     {
         logic = LogicScript.Instance;
         SFXvolume = SoundManagerScript.Instance.GetSFXVolume();
         puckSkinManager = PuckSkinManager.Instance;
-        trail = gameObject.GetComponent<TrailRenderer>();
     }
 
     private Vector2 shotForceToAdd;
@@ -182,7 +185,7 @@ public class PuckScript : NetworkBehaviour
     public bool IsSafe() { return safe; }
     public bool IsPastSafeLine() { return pastSafeLine; }
     public bool IsPlayersPuck() { return playersPuck; }
-    public int ComputeValue() { return (puckBaseValue * zoneMultiplier) + puckBonusValue; }
+    public int ComputeValue() { return (puckBaseValue * zoneMultiplier) + (zoneMultiplier > 0 ? puckBonusValue : 0); }
     public int GetZoneMultiplier() { return zoneMultiplier; }
     public void SetZoneMultiplier(int ZM) { zoneMultiplier = ZM; }
 
@@ -215,9 +218,10 @@ public class PuckScript : NetworkBehaviour
                         Destroy(child.gameObject);
                     }
                 }
+                zoneMultiplier = enteredZoneMultiplier;
                 // show floating text
                 var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
-                floatingText.GetComponent<TMP_Text>().text = enteredZoneMultiplier.ToString();
+                floatingText.GetComponent<TMP_Text>().text = ComputeValue().ToString();
             }
             // if puck moves into the off zone, play minus sfx
             else if (enteredZoneMultiplier < zoneMultiplier && !IsStopped())
@@ -232,9 +236,8 @@ public class PuckScript : NetworkBehaviour
                     minusCPUSFX.volume = SFXvolume;
                     minusCPUSFX.Play();
                 }
+                zoneMultiplier = enteredZoneMultiplier;
             }
-            
-            zoneMultiplier = enteredZoneMultiplier;
         }
     }
 
@@ -295,7 +298,21 @@ public class PuckScript : NetworkBehaviour
             emission.rateOverTime = (velocity) * 50f;
             ParticleSystem.MainModule main = collisionParticleEffect.main;
             main.startSpeed = (velocity) * 4f;
-            main.startColor = color;
+
+            // set color of particle effect to puck color
+            if (color == null || color.Length <= 0) // handle null color
+            {
+                main.startColor = new ParticleSystem.MinMaxGradient(Color.grey);
+            }
+            else if (color.Length == 1 ) // handle one color
+            {
+                main.startColor = color[0];
+            }
+            else // handle two or more colors
+            {
+                main.startColor = new ParticleSystem.MinMaxGradient(CreateRandomGradient());
+            }
+
             collisionParticleEffect.Play();
             Destroy(collisionParticleEffect.gameObject, 5f);
         }
@@ -312,5 +329,49 @@ public class PuckScript : NetworkBehaviour
     public void SetPuckBonusValue(int value)
     {
         puckBonusValue = value;
+    }
+
+    Gradient CreateRandomGradient()
+    {
+        Gradient gradient = new Gradient();
+        GradientColorKey[] colorKeys = new GradientColorKey[color.Length];
+        GradientAlphaKey[] alphaKeys = new GradientAlphaKey[1]; // One alpha key for consistent transparency
+
+        for (int i = 0; i < color.Length; i++)
+        {
+            // Each color is mapped to a specific point in the gradient
+            float time = i / (float)(color.Length - 1);
+            colorKeys[i] = new GradientColorKey(color[i], time);
+        }
+
+        alphaKeys[0] = new GradientAlphaKey(1f, 0f); // Set constant alpha
+
+        gradient.SetKeys(colorKeys, alphaKeys);
+        return gradient;
+    }
+
+    public void SetPowerupText(string text)
+    {
+        powerupText = text;
+    }
+
+    // text to show what powerup was used under the puck. Only fades, no up/shrink.
+    public void CreatePowerupFloatingText()
+    {
+        var floatingText = Instantiate(floatingTextPrefab, transform.position + new Vector3(0, -1.5f, 0), Quaternion.identity, transform);
+        floatingText.GetComponent<FloatingTextScript>().Initialize(powerupText, 0, 0, 0.1f, 1);
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        // show puck score when clicked
+        var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
+        floatingText.GetComponent<TMP_Text>().text = ComputeValue().ToString();
+        // if powerupText has been set, show it
+        if (powerupText != null)
+        {
+            CreatePowerupFloatingText();
+        }
+
     }
 }
