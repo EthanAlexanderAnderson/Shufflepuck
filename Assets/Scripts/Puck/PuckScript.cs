@@ -176,8 +176,11 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         var volumeBoost = 0f;
         if (powerParameter >= 95) { 
             powerParameter += (powerParameter - 95) * powerModifier + 10;
-            trail.startColor = new Color(1, 0.8f, 0);
-            trail.endColor = Color.yellow;
+            if (trail != null)
+            {
+                trail.startColor = new Color(1, 0.8f, 0);
+                trail.endColor = Color.yellow;
+            }
             volumeBoost += 0.2f;
         }
         // normalize power and then scale
@@ -208,7 +211,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     // ---------- GETTERS AND SETTERS ----------
     public bool IsSlowed() { return rb.velocity.x < 2 && rb.velocity.y < 2 && IsShot() && transform.position.y > -9; }
     public bool IsSlowedMore() { return rb.velocity.x < 0.4 && rb.velocity.y < 0.4 && IsShot() && transform.position.y > -9; }
-    public bool IsStopped() { return rb.velocity.x < 0.01 && rb.velocity.y < 0.01 && IsShot() && transform.position.y > -9; }
+    public bool IsStopped() { return rb.velocity.x < 0.05 && rb.velocity.y < 0.05 && IsShot() && transform.position.y > -9; }
     public bool IsShot() { return shot; }
     public bool IsSafe() { return safe; }
     public bool IsPastSafeLine() { return pastSafeLine; }
@@ -226,7 +229,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         if (enteredZoneMultiplier > zoneMultiplier || enteredZoneMultiplier == 0)
         {
             // if puck moves into higher scoring zone and gains a point play SFX
-            if (enteredZoneMultiplier > zoneMultiplier && !IsStopped())
+            if (enteredZoneMultiplier > zoneMultiplier)
             {
                 if (IsPlayersPuck())
                 {
