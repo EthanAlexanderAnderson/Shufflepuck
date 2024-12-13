@@ -42,6 +42,7 @@ public class ScoreZoneScript : MonoBehaviour
         }
     }
 
+    /* I really don't know why this is here, but I'm not going to delete it, just comment it out for now
     // set the puck multiplier in the zone 
     private void OnTriggerStay2D(Collider2D collision)
     {
@@ -54,4 +55,5 @@ public class ScoreZoneScript : MonoBehaviour
             }
         }
     }
+    */
 }

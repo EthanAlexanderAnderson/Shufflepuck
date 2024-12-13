@@ -208,7 +208,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     // ---------- GETTERS AND SETTERS ----------
     public bool IsSlowed() { return rb.velocity.x < 2 && rb.velocity.y < 2 && IsShot() && transform.position.y > -9; }
     public bool IsSlowedMore() { return rb.velocity.x < 0.4 && rb.velocity.y < 0.4 && IsShot() && transform.position.y > -9; }
-    public bool IsStopped() { return rb.velocity.x < 0.1 && rb.velocity.y < 0.1 && IsShot() && transform.position.y > -9; }
+    public bool IsStopped() { return rb.velocity.x < 0.01 && rb.velocity.y < 0.01 && IsShot() && transform.position.y > -9; }
     public bool IsShot() { return shot; }
     public bool IsSafe() { return safe; }
     public bool IsPastSafeLine() { return pastSafeLine; }
