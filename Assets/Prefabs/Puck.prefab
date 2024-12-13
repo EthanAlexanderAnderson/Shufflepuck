@@ -26,8 +26,8 @@ GameObject:
   - component: {fileID: -916678449169613619}
   - component: {fileID: 696029730207819321}
   - component: {fileID: 6360673706678546538}
-  - component: {fileID: -3870782949703756376}
   - component: {fileID: 9025995369667402402}
+  - component: {fileID: -3870782949703756376}
   m_Layer: 0
   m_Name: Puck
   m_TagString: puck
@@ -207,6 +207,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 4782324925009279097}
   spriteRenderer: {fileID: 1972403881367431252}
+  puckCollider: {fileID: 812162480707345899}
   bonkHeavySFX: {fileID: -1720343804028173522}
   bonkLightSFX: {fileID: 2336552304587371605}
   noiseSFX: {fileID: 315911944426652229}
@@ -222,6 +223,7 @@ MonoBehaviour:
   angularVelocityModifier: 0.06
   counterForce: 0.3
   floatingTextPrefab: {fileID: 4579905589776270658, guid: a4af9b0b007a49c4ca9fa4d76af0f273, type: 3}
+  phase: 0
   collisionParticleEffectPrefab: {fileID: 4929346313033784861, guid: 9f76c534760375c468d38282f074644f, type: 3}
 --- !u!96 &6188019625278550676
 TrailRenderer:
@@ -6178,7 +6180,7 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0

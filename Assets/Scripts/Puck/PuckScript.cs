@@ -17,6 +17,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     // puck object components
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private Collider2D puckCollider;
     [SerializeField] private AudioSource bonkHeavySFX;
     [SerializeField] private AudioSource bonkLightSFX;
     [SerializeField] private AudioSource noiseSFX;
@@ -57,6 +58,9 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     // particle colors
     private Color[] color = {new Color(0.5f, 0.5f, 0.5f)};
 
+    // for powerups
+    [SerializeField] private bool phase = false;
+
     void OnEnable()
     {
         logic = LogicScript.Instance;
@@ -75,6 +79,11 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             rb.AddTorque(shotTorqueToAdd);
             shotForceToAdd = Vector2.zero;
             shotTorqueToAdd = 0.0f;
+            if (phase)
+            {
+                spriteRenderer.color = new Color(1f, 1f, 1f, 0.5f);
+                puckCollider.isTrigger = true;
+            }
         }
 
         // Calculate the magnitude of the velocity vector to determine the sliding noise volume
@@ -104,6 +113,25 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             {
                 rb.AddForce((up * angularVelocity * angularVelocityModifier * counterForce) * 0.03f);
             }
+        }
+
+        // for phase powerup
+        if (phase && IsShot() && pastSafeLine && IsStopped()) // is slowed & shot & past safeline
+        {
+            // if this puck is within 2 units of the nearest puck, destroy it
+            var pucks = GameObject.FindGameObjectsWithTag("puck");
+            foreach (var puck in pucks)
+            {
+                if (puck != gameObject && Vector2.Distance(puck.transform.position, transform.position) < 2)
+                {
+                    DestroyPuck();
+                    return;
+                }
+            }
+            // othewrise, unphase it (make it visible again)
+            spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+            puckCollider.isTrigger = false;
+            phase = false;
         }
     }
 
@@ -373,5 +401,36 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             CreatePowerupFloatingText();
         }
 
+    }
+
+    public void DestroyPuck() // Destroys the puck with a particle and sound effect
+    {
+        ParticleSystem collisionParticleEffect = Instantiate(collisionParticleEffectPrefab, transform.position, Quaternion.identity);
+        ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
+        emission.rateOverTime = 1000f;
+        ParticleSystem.MainModule main = collisionParticleEffect.main;
+        main.startSpeed = 100f;
+        // set color of particle effect to puck color
+        if (color == null || color.Length <= 0) // handle null color
+        {
+            main.startColor = new ParticleSystem.MinMaxGradient(Color.grey);
+        }
+        else if (color.Length == 1 ) // handle one color
+        {
+            main.startColor = color[0];
+        }
+        else // handle two or more colors
+        {
+            main.startColor = new ParticleSystem.MinMaxGradient(CreateRandomGradient());
+        }
+        collisionParticleEffect.Play();
+        Destroy(collisionParticleEffect.gameObject, 10f);
+        Destroy(gameObject, 0.1f);
+        logic.playDestroyPuckSFX(SFXvolume);
+    }
+
+    public void SetPhase(bool isPhase)
+    {
+        phase = isPhase;
     }
 }
