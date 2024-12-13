@@ -266,9 +266,33 @@ public class LogicScript : MonoBehaviour
             {
                 BlockPowerup();
             }
-            else // last three, use plus one
+            else // last three, use plus one or bolt
             {
-                PlusOnePowerup();
+                // if the ratio of player pucks to opponent pucks is greater than 2, use bolt
+                var allPucks = GameObject.FindGameObjectsWithTag("puck");
+                float playerPucks = 0;
+                float opponentPucks = 0.001f; // so we don't divide by zero
+                foreach (var puck in allPucks)
+                {
+                    var puckScript = puck.GetComponent<PuckScript>();
+                    if (puckScript.IsPlayersPuck() && puckScript.ComputeValue() > 0)
+                    {
+                        playerPucks++;
+                    }
+                    else if (!puckScript.IsPlayersPuck() && puckScript.ComputeValue() > 0)
+                    {
+                        opponentPucks++;
+                    }
+                }
+                if (playerPucks / opponentPucks > 2)
+                {
+                    BoltPowerup();
+                }
+                // otherwise, use plus one
+                else
+                {
+                    PlusOnePowerup();
+                }
             }
         }
 
