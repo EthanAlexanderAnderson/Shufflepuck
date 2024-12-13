@@ -249,7 +249,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 zoneMultiplier = enteredZoneMultiplier;
                 // show floating text
                 var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
-                floatingText.GetComponent<TMP_Text>().text = ComputeValue().ToString();
+                floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f, true);
             }
             // if puck moves into the off zone, play minus sfx
             else if (enteredZoneMultiplier < zoneMultiplier && !IsStopped())
@@ -394,7 +394,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     {
         // show puck score when clicked
         var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
-        floatingText.GetComponent<TMP_Text>().text = ComputeValue().ToString();
+        floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f, true);
         // if powerupText has been set, show it
         if (powerupText != null)
         {
