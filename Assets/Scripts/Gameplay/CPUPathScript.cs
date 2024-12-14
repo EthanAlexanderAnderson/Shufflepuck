@@ -15,8 +15,11 @@ public class CPUPathScript : MonoBehaviour
     [SerializeField] private float spin;
     [SerializeField] private int value;
     [SerializeField] private bool isContactShot;
+    [SerializeField] private bool requiresPhasePowerup;
 
     public (float, float, float) GetPath() { return (angle, power, spin); }
+
+    public bool DoesPathRequirePhasePowerup() { return requiresPhasePowerup; }
 
     public int CalculateValue()
     {

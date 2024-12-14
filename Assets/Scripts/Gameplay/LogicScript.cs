@@ -41,6 +41,7 @@ public class LogicScript : MonoBehaviour
     // powerups
     public bool powerupsAreEnabled = false;
     [SerializeField] private GameObject powerupsMenu; // set in editor
+    private bool powerupHasBeenUsedThisTurn = false;
 
     // game state
     public bool gameIsRunning { get; private set; }
@@ -189,6 +190,7 @@ public class LogicScript : MonoBehaviour
         {
             powerupsMenu.SetActive(powerupsAreEnabled);
             if (powerupsAreEnabled) { ShufflePowerups(); }
+            powerupHasBeenUsedThisTurn = false;
         }
         puckHalo.SetActive(difficulty == 0);
         activeBar = bar.ChangeBar("angle", activeCompetitor.isPlayer);
@@ -243,6 +245,7 @@ public class LogicScript : MonoBehaviour
 
     private void StartingOpponentsTurnHelper()
     {
+        powerupHasBeenUsedThisTurn = false;
         activeBar = bar.ChangeBar("angle", activeCompetitor.isPlayer);
         if (!isLocal)
         {
@@ -259,8 +262,31 @@ public class LogicScript : MonoBehaviour
         opponent.isTurn = false;
         opponent.isShooting = true;
 
-        // use powerup
-        if (difficulty >= 2 && !isLocal && powerupsAreEnabled)
+        if (wallCount > 0)
+        {
+            wallCount--;
+            if (wallCount > 0) { UI.UpdateWallText(wallCount); }
+        }
+        // first turn on med-hard diff, CPU Shoots perfect
+        if (difficulty == 1 && opponent.puckCount == 5)
+        {
+            CPUShotAngle = Random.Range(33.0f, 38.0f);
+            CPUShotPower = Random.Range(65.0f, 78.0f);
+        }
+        // easy-med regular shots only
+        else if (difficulty < 2)
+        {
+            CPUShotAngle = Random.Range(11.0f + (difficulty * 5.0f), 63.0f - (difficulty * 5.0f));
+            CPUShotPower = Random.Range(30.0f + (difficulty * 5.0f), 90.0f - (difficulty * 5.0f));
+        }
+        // hard uses paths, and random if no path is found
+        else
+        {
+            (CPUShotAngle, CPUShotPower, CPUShotSpin) = FindOpenPath();
+        }
+
+        // use powerup (this must be after CPU find path, to not double-use powerups after a phase shot path has been selected)
+        if (difficulty >= 2 && !isLocal && powerupsAreEnabled && !powerupHasBeenUsedThisTurn)
         {
             if (opponent.puckCount > 3) // first two shots use block
             {
@@ -294,29 +320,6 @@ public class LogicScript : MonoBehaviour
                     PlusOnePowerup();
                 }
             }
-        }
-
-        if (wallCount > 0)
-        {
-            wallCount--;
-            if (wallCount > 0) { UI.UpdateWallText(wallCount); }
-        }
-        // first turn on med-hard diff, CPU Shoots perfect
-        if (difficulty == 1 && opponent.puckCount == 5)
-        {
-            CPUShotAngle = Random.Range(33.0f, 38.0f);
-            CPUShotPower = Random.Range(65.0f, 78.0f);
-        }
-        // easy-med regular shots only
-        else if (difficulty < 2)
-        {
-            CPUShotAngle = Random.Range(11.0f + (difficulty * 5.0f), 63.0f - (difficulty * 5.0f));
-            CPUShotPower = Random.Range(30.0f + (difficulty * 5.0f), 90.0f - (difficulty * 5.0f));
-        }
-        // hard uses paths, and random if no path is found
-        else
-        {
-            (CPUShotAngle, CPUShotPower, CPUShotSpin) = FindOpenPath();
         }
     }
 
@@ -469,6 +472,12 @@ public class LogicScript : MonoBehaviour
             var pathiShotValue = pathi.CalculateValue();
             if (pathiShotValue > highestValue)
             {
+                // handle phase powerup shots
+                if (!powerupsAreEnabled && pathi.DoesPathRequirePhasePowerup())
+                {
+                    continue;
+                }
+
                 best = pathi;
                 highestValue = pathiShotValue;
             }
@@ -478,6 +487,13 @@ public class LogicScript : MonoBehaviour
         {
             Debug.Log("Found path with highest value " + highestValue);
             best.EnablePathVisualization();
+
+            // handle phase powerup shots
+            if (best.DoesPathRequirePhasePowerup())
+            {
+                PhasePowerup();
+            }
+
             return best.GetPath();
         }
         // otherwise, Shoot random
@@ -547,6 +563,7 @@ public class LogicScript : MonoBehaviour
         activeCompetitor.activePuckScript.SetPuckBonusValue(1);
         activeCompetitor.activePuckScript.SetPowerupText("plus one");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
+        powerupHasBeenUsedThisTurn = true;
     }
 
     public void ForesightPowerup() // enable the shot predicted location halo
@@ -554,6 +571,7 @@ public class LogicScript : MonoBehaviour
         puckHalo.SetActive(true);
         activeCompetitor.activePuckScript.SetPowerupText("foresight");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
+        powerupHasBeenUsedThisTurn = true;
     }
 
     public void BlockPowerup() // create a valueless blocking puck
@@ -567,6 +585,7 @@ public class LogicScript : MonoBehaviour
         blockPuckScript.CreatePowerupFloatingText();
         activeCompetitor.activePuckScript.SetPowerupText("block");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
+        powerupHasBeenUsedThisTurn = true;
     }
 
     private PuckScript pucki;
@@ -588,6 +607,7 @@ public class LogicScript : MonoBehaviour
         }
         activeCompetitor.activePuckScript.SetPowerupText("bolt");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
+        powerupHasBeenUsedThisTurn = true;
     }
 
     [SerializeField] private ForcefieldScript forcefieldScript;
@@ -596,6 +616,7 @@ public class LogicScript : MonoBehaviour
         activeCompetitor.activePuckScript.SetPowerupText("force field");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         forcefieldScript.EnableForcefield(activeCompetitor.isPlayer);
+        powerupHasBeenUsedThisTurn = true;
     }
 
     public void PhasePowerup()
@@ -603,6 +624,7 @@ public class LogicScript : MonoBehaviour
         activeCompetitor.activePuckScript.SetPowerupText("phase");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         activeCompetitor.activePuckScript.SetPhase(true);
+        powerupHasBeenUsedThisTurn = true;
     }
 
     [SerializeField] private AudioSource puckDestroySFX;
