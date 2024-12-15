@@ -541,7 +541,7 @@ public class LogicScript : MonoBehaviour
             PhasePowerup
         };
         // generate 3 unique random powerups
-        int[] randomPowerups = new int[3];
+        int[] randomPowerups = {-1, -1, -1};
         for (int i = 0; i < 3; i++)
         {
             int randomPowerup = Random.Range(0, methodArray.Length);
