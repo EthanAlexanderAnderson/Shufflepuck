@@ -281,7 +281,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             safe = false;
         }
         // decrement score unless exiting a zero zone
-        if (zoneMultiplier > 0)
+        if (zoneMultiplier > 0 && exitedZoneMultiplier == zoneMultiplier)
         {
             zoneMultiplier = exitedZoneMultiplier - 1;
         }

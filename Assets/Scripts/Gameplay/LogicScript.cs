@@ -432,6 +432,7 @@ public class LogicScript : MonoBehaviour
         line.isActive = false;
         bar.ChangeBar("none");
         UI.ChangeUI(UI.gameHud);
+        forcefieldScript.DisableForcefield();
         Debug.Log("Starting match with difficulty: " + difficulty);
     }
 
@@ -488,10 +489,14 @@ public class LogicScript : MonoBehaviour
             Debug.Log("Found path with highest value " + highestValue);
             best.EnablePathVisualization();
 
-            // handle phase powerup shots
+            // handle powerup shots
             if (best.DoesPathRequirePhasePowerup())
             {
                 PhasePowerup();
+            }
+            else if (best.IsPathAContactShot())
+            {
+                ForceFieldPowerup();
             }
 
             return best.GetPath();
@@ -541,13 +546,17 @@ public class LogicScript : MonoBehaviour
             PhasePowerup
         };
         // generate 3 unique random powerups
-        int[] randomPowerups = {-1, -1, -1};
+        int[] randomPowerups = {0, 1, 2};
         for (int i = 0; i < 3; i++)
         {
-            int randomPowerup = Random.Range(0, methodArray.Length);
-            while (Array.Exists(randomPowerups, element => element == randomPowerup))
+            int randomPowerup = i;
+            if (player.puckCount != 5) // first hand is predetermined
             {
                 randomPowerup = Random.Range(0, methodArray.Length);
+                while (Array.Exists(randomPowerups, element => element == randomPowerup))
+                {
+                    randomPowerup = Random.Range(0, methodArray.Length);
+                }
             }
             randomPowerups[i] = randomPowerup;
             powerupButtons[i].image.sprite = powerupSprites[randomPowerup];

@@ -21,6 +21,8 @@ public class CPUPathScript : MonoBehaviour
 
     public bool DoesPathRequirePhasePowerup() { return requiresPhasePowerup; }
 
+    public bool IsPathAContactShot() { return isContactShot; }
+
     public int CalculateValue()
     {
         List<GameObject> pucksCurrentlyInPath = GetPucksInPath();
