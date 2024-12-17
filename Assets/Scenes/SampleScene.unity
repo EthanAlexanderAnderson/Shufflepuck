@@ -26433,16 +26433,6 @@ MonoBehaviour:
   CPUShotSpin: 50
   playedAGame: 0
   tutorialActive: 0
-  powerupButton1: {fileID: 508192274}
-  powerupButton2: {fileID: 233410804}
-  powerupButton3: {fileID: 1062224065}
-  plusOneImage: {fileID: 21300000, guid: bd2a310a40921dd44865acc9ee7e150c, type: 3}
-  foresightImage: {fileID: 21300000, guid: 16fabfde1fb9e15479957ea4d237ba0e, type: 3}
-  blockImage: {fileID: 21300000, guid: e4bea8fe10000a0439ea3664e9c2b613, type: 3}
-  boltImage: {fileID: 21300000, guid: d81136647aa57f844aa890782705126f, type: 3}
-  forceFieldImage: {fileID: 21300000, guid: 1c7818fa93676a545ae68c085140ac35, type: 3}
-  phaseImage: {fileID: 21300000, guid: f30acaa61d3105c4fad1bf8be9e47cf0, type: 3}
-  forcefieldScript: {fileID: 553278802}
   puckDestroySFX: {fileID: 817506630}
 --- !u!4 &817506626
 Transform:
@@ -53715,6 +53705,63 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1593171483
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1593171485}
+  - component: {fileID: 1593171484}
+  m_Layer: 0
+  m_Name: PowerupManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1593171484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1593171483}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9da01b7555f10dc46ae4f775e8ac994f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  puckPrefab: {fileID: 1573578925046104636, guid: 523175d1e5f8501469e3832882a7a95d, type: 3}
+  puckHalo: {fileID: 1167867919}
+  powerupsMenu: {fileID: 1793697537}
+  powerupButton1: {fileID: 508192274}
+  powerupButton2: {fileID: 233410804}
+  powerupButton3: {fileID: 1062224065}
+  plusOneImage: {fileID: 21300000, guid: bd2a310a40921dd44865acc9ee7e150c, type: 3}
+  foresightImage: {fileID: 21300000, guid: 16fabfde1fb9e15479957ea4d237ba0e, type: 3}
+  blockImage: {fileID: 21300000, guid: e4bea8fe10000a0439ea3664e9c2b613, type: 3}
+  boltImage: {fileID: 21300000, guid: d81136647aa57f844aa890782705126f, type: 3}
+  forceFieldImage: {fileID: 21300000, guid: 1c7818fa93676a545ae68c085140ac35, type: 3}
+  phaseImage: {fileID: 21300000, guid: f30acaa61d3105c4fad1bf8be9e47cf0, type: 3}
+  forcefieldScript: {fileID: 553278802}
+--- !u!4 &1593171485
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1593171483}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1596321423
 GameObject:
   m_ObjectHideFlags: 0
@@ -71328,6 +71375,7 @@ SceneRoots:
   - {fileID: 817506626}
   - {fileID: 2137903642}
   - {fileID: 1155770395}
+  - {fileID: 1593171485}
   - {fileID: 937131858}
   - {fileID: 238704260}
   - {fileID: 1551789568}
