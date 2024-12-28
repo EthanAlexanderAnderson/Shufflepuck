@@ -45,7 +45,7 @@ public class LevelManager : MonoBehaviour
 
         currentLevelText.text = level.ToString();
         nextLevelText.text = (level + 1).ToString();
-        xpText.text = (XPiterator + 100 + 10 * level).ToString() + "/" + (100 + 10 * level).ToString();
+        xpText.text = (XPiterator + 100 + 10 * level).ToString() + "/" + (100 + 10 * level).ToString() + " XP";
         levelProgressBarValue = (((float)XPiterator + 100 + 10 * (float)level) / (100 + 10 * (float)level) * 100);
     }
 

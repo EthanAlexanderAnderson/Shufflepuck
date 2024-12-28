@@ -9453,7 +9453,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_RaycastPadding: {x: -40, y: -40, z: -40, w: -440}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -13213,7 +13213,7 @@ GameObject:
   - component: {fileID: 440489163}
   - component: {fileID: 440489162}
   m_Layer: 5
-  m_Name: XP
+  m_Name: XP Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13258,7 +13258,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 0/0
+  m_text: 0/0 XP
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 49d790e490aded44a8ad8765ea27cce6, type: 2}
   m_sharedMaterial: {fileID: -579455787902537155, guid: 49d790e490aded44a8ad8765ea27cce6, type: 2}
@@ -16781,7 +16781,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 23.41374
+  orthographic size: 19.199999
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -18737,7 +18737,6 @@ MonoBehaviour:
   boxCollider: {fileID: 553278800}
   forcefieldIsEnabled: 0
   playersPuck: 0
-  clientID: 0
 --- !u!1 &553335993
 GameObject:
   m_ObjectHideFlags: 0
@@ -51505,7 +51504,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_RaycastPadding: {x: -40, y: -40, z: -40, w: -440}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
