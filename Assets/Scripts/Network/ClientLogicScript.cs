@@ -96,7 +96,7 @@ public class ClientLogicScript : NetworkBehaviour
         if (client.isShooting && Input.GetMouseButtonDown(0) && powerupsMenu.activeInHierarchy == false)
         {
             // make sure click is on the bottom half of the screen
-            if (Input.mousePosition.y < Screen.height / 2)
+            if (logic.ClickNotOnPuck())
             {
                 switch (activeBar)
                 {

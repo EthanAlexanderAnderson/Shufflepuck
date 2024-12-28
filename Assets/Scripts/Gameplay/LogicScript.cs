@@ -145,8 +145,8 @@ public class LogicScript : MonoBehaviour
             // now player may shoot
             if ((Input.GetMouseButtonDown(0)) && gameIsRunning && (player.isShooting || isLocal) && powerupsMenu.activeInHierarchy == false)
             {
-                // make sure click is on the bottom half of the screen
-                if (Input.mousePosition.y < Screen.height / 2)
+                // make sure click is not on a puck
+                if (ClickNotOnPuck())
                 {
                     PlayerShootingHelper();
                 }
@@ -527,4 +527,27 @@ public class LogicScript : MonoBehaviour
         puckDestroySFX.volume = SFXvolume;
         puckDestroySFX.Play();
     }
+
+    // O(n) + O(m) where n is gameobjects in the scene and m is pucks
+    public bool ClickNotOnPuck()
+    {
+        Vector3 mousePosition = Input.mousePosition; // Get mouse position in screen space
+        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition); // Convert to world space
+
+        var allPucks = GameObject.FindGameObjectsWithTag("puck");
+        foreach (var puck in allPucks)
+        {
+            worldPosition.z = puck.transform.position.z; // Ensure the z-coordinate is set as the same as the puck to compare
+            // Calculate the distance between the mouse click position and the puck position
+            float distance = Vector3.Distance(worldPosition, puck.transform.position);
+
+            // If the distance is less than or equal to 1 unit, the click is on or near a puck
+            if (distance <= 1f)
+            {
+                return false; // Click is too close to a puck
+            }
+        }
+        return true; // Click is not near any puck
+    }
+
 }
