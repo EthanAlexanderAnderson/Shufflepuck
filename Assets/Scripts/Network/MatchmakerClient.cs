@@ -325,7 +325,7 @@ public class MatchmakerClient : MonoBehaviour
     {
         try
         {
-            serverLogic.AddPlayerServerRpc(logic.player.puckSpriteID);
+            serverLogic.AddPlayerServerRpc(logic.player.puckSpriteID, logic.powerupsAreEnabled);
         }
         catch (Exception e)
         {

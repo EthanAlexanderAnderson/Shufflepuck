@@ -15,12 +15,15 @@ public class ForcefieldScript : MonoBehaviour
         foreach (Collider2D collider in colliders)
         {
             // if the collider is a puck
-            if (collider.CompareTag("puck") && collider.GetComponent<PuckScript>().IsPlayersPuck() == playersPuck)
+            if (collider.CompareTag("puck"))
             {
-                // get the puck's rigidbody
-                Rigidbody2D rb = collider.GetComponent<Rigidbody2D>();
-                // apply a force to the puck in the direction of the forcefield
-                rb.AddForce(Vector3.down * 5);
+                if (collider.GetComponent<PuckScript>().IsPlayersPuck() == playersPuck)
+                {
+                    // get the puck's rigidbody
+                    Rigidbody2D rb = collider.GetComponent<Rigidbody2D>();
+                    // apply a force to the puck in the direction of the forcefield
+                    rb.AddForce(Vector3.down * 5);
+                }
             }
         }
     }

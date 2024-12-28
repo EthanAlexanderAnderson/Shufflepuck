@@ -160,6 +160,13 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         // enable animation for atom
         animationLayer.SetActive(Math.Abs(puckSpriteID) == 40);
 
+        if (transform.position.y < 0f)
+        {
+            ClientLogicScript.Instance.client.activePuckScript = this;
+            ClientLogicScript.Instance.client.activePuckObject = gameObject;
+        }
+        ClientLogicScript.Instance.client.isPlayer = IsPlayersPuckParameter;
+
         Debug.Log($"Puck initialized. IsPlayersPuckParameter: {IsPlayersPuckParameter}. PuckSpriteID: {puckSpriteID}");
     }
 
@@ -403,7 +410,6 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         {
             CreatePowerupFloatingText();
         }
-
     }
 
     public void DestroyPuck() // Destroys the puck with a particle and sound effect
@@ -430,6 +436,13 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         Destroy(collisionParticleEffect.gameObject, 10f);
         Destroy(gameObject, 0.1f);
         logic.playDestroyPuckSFX(SFXvolume);
+    }
+
+    [ServerRpc]
+    public void DestroyPuckServerRpc()
+    {
+        if (!IsServer) return;
+        DestroyPuck();
     }
 
     public void SetPhase(bool isPhase)

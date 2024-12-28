@@ -78,7 +78,7 @@ public class DebugWindow : EditorWindow
         rootVisualElement.Add(destroy);
 
         Button addPlayer = new() { text = "addPlayer" };
-        addPlayer.clicked += () => serverLogic.AddPlayerServerRpc(0);
+        addPlayer.clicked += () => serverLogic.AddPlayerServerRpc(0, true);
         rootVisualElement.Add(addPlayer);
 
         Button printPlayerPrefs = new() { text = "printPlayerPrefs" };

@@ -47,7 +47,7 @@ public class ArrowScript : MonoBehaviour
         } 
         else
         {
-            sideModifier = clientLogic.isStartingPlayer ? (-3.6f) : (3.6f);
+            sideModifier = clientLogic.IsStartingPlayer() ? (-3.6f) : (3.6f);
             activeBar = clientLogic.activeBar;
         }
 

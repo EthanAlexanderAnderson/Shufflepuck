@@ -2,8 +2,9 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
+using Unity.Netcode;
 
-public class PowerupManager : MonoBehaviour
+public class PowerupManager : NetworkBehaviour
 {
     // self
     public static PowerupManager Instance;
@@ -26,6 +27,8 @@ public class PowerupManager : MonoBehaviour
     [SerializeField] private Sprite phaseImage;
 
     private Competitor activeCompetitor;
+    Action[] methodArray;
+    private bool fromClientRpc;
 
     private void Awake()
     {
@@ -35,17 +38,9 @@ public class PowerupManager : MonoBehaviour
             Destroy(Instance);
     }
 
-    private void Update()
+    private void Start()
     {
-        activeCompetitor = LogicScript.Instance.activeCompetitor;
-    }
-
-    public void ShufflePowerups()
-    {
-        Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
-        Sprite[] powerupSprites = { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage };
-
-        Action[] methodArray = new Action[]
+        methodArray = new Action[]
         {
             PlusOnePowerup,
             ForesightPowerup,
@@ -54,6 +49,30 @@ public class PowerupManager : MonoBehaviour
             ForceFieldPowerup,
             PhasePowerup
         };
+    }
+
+    private void Update()
+    {
+        activeCompetitor = LogicScript.Instance.activeCompetitor;
+    }
+
+    private void GetActiveCompetitor()
+    {
+        if (!ClientLogicScript.Instance.isRunning) // offline
+        {
+            activeCompetitor = LogicScript.Instance.activeCompetitor;
+        }
+        else // online
+        {
+            activeCompetitor = ClientLogicScript.Instance.client;
+        }
+    }
+
+    public void ShufflePowerups()
+    {
+        Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
+        Sprite[] powerupSprites = { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage };
+
         // generate 3 unique random powerups
         int[] randomPowerups = { 0, 1, 2 };
         for (int i = 0; i < 3; i++)
@@ -78,6 +97,14 @@ public class PowerupManager : MonoBehaviour
 
     public void PlusOnePowerup() // give active puck +1 value
     {
+        if (!fromClientRpc && ClientLogicScript.Instance.isRunning)
+        {
+            PowerupServerRpc(0);
+            return;
+        }
+        fromClientRpc = false;
+        GetActiveCompetitor();
+
         activeCompetitor.activePuckScript.SetPuckBonusValue(1);
         activeCompetitor.activePuckScript.SetPowerupText("plus one");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
@@ -85,6 +112,13 @@ public class PowerupManager : MonoBehaviour
 
     public void ForesightPowerup() // enable the shot predicted location halo
     {
+        if (!fromClientRpc && ClientLogicScript.Instance.isRunning)
+        {
+            PowerupServerRpc(1);
+            return;
+        }
+        fromClientRpc = false;
+
         puckHalo.SetActive(true);
         activeCompetitor.activePuckScript.SetPowerupText("foresight");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
@@ -92,8 +126,17 @@ public class PowerupManager : MonoBehaviour
 
     public void BlockPowerup() // create a valueless blocking puck
     {
-        int swap = activeCompetitor.isPlayer ? 1 : -1;
+        if (!fromClientRpc && ClientLogicScript.Instance.isRunning)
+        {
+            PowerupServerRpc(2);
+            return;
+        }
+        fromClientRpc = false;
+        GetActiveCompetitor();
+
+        int swap = activeCompetitor.isPlayer || (ClientLogicScript.Instance.isRunning && activeCompetitor.goingFirst) ? 1 : -1;
         GameObject blockPuckObject = Instantiate(puckPrefab, new Vector3(Random.Range(2f * swap, 4f * swap), Random.Range(2f, 4f), -1.0f), Quaternion.identity);
+        if (ClientLogicScript.Instance.isRunning) { blockPuckObject.GetComponent<NetworkObject>().Spawn(); }
         PuckScript blockPuckScript = blockPuckObject.GetComponent<PuckScript>();
         blockPuckScript.InitPuck(activeCompetitor.isPlayer, activeCompetitor.puckSpriteID);
         blockPuckScript.SetPuckBaseValue(0);
@@ -106,6 +149,14 @@ public class PowerupManager : MonoBehaviour
     private PuckScript pucki;
     public void BoltPowerup() // destroy a random puck with value greater than or equal to 1
     {
+        if (!fromClientRpc && ClientLogicScript.Instance.isRunning)
+        {
+            PowerupServerRpc(3);
+            return;
+        }
+        fromClientRpc = false;
+        GetActiveCompetitor();
+
         var allPucks = GameObject.FindGameObjectsWithTag("puck");
         int randomPuckIndex = Random.Range(0, allPucks.Length);
         pucki = allPucks[randomPuckIndex].GetComponent<PuckScript>();
@@ -118,15 +169,30 @@ public class PowerupManager : MonoBehaviour
         }
         if (pucki != null && pucki.ComputeValue() > 0)
         {
-            pucki.DestroyPuck();
+            if (ClientLogicScript.Instance.isRunning)
+            {
+                pucki.DestroyPuckServerRpc(); // for online
+            }
+            else
+            {
+                pucki.DestroyPuck();
+            }
+            activeCompetitor.activePuckScript.SetPowerupText("bolt");
+            activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         }
-        activeCompetitor.activePuckScript.SetPowerupText("bolt");
-        activeCompetitor.activePuckScript.CreatePowerupFloatingText();
     }
 
     [SerializeField] private ForcefieldScript forcefieldScript;
     public void ForceFieldPowerup()
     {
+        if (!fromClientRpc && ClientLogicScript.Instance.isRunning)
+        {
+            PowerupServerRpc(4);
+            return;
+        }
+        fromClientRpc = false;
+        GetActiveCompetitor();
+
         activeCompetitor.activePuckScript.SetPowerupText("force field");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         forcefieldScript.EnableForcefield(activeCompetitor.isPlayer);
@@ -134,10 +200,17 @@ public class PowerupManager : MonoBehaviour
 
     public void PhasePowerup()
     {
+        if (!fromClientRpc && ClientLogicScript.Instance.isRunning)
+        {
+            PowerupServerRpc(5);
+            return;
+        }
+        fromClientRpc = false;
+        GetActiveCompetitor();
+
         activeCompetitor.activePuckScript.SetPowerupText("phase");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         activeCompetitor.activePuckScript.SetPhase(true);
-
     }
 
     public void DisableForceFieldIfNecessary()
@@ -146,5 +219,22 @@ public class PowerupManager : MonoBehaviour
         {
             forcefieldScript.DisableForcefield();
         }
+    }
+
+    // Sending chosen powerup to server
+    [ServerRpc(RequireOwnership = false)]
+    public void PowerupServerRpc(int powerupActionIndex)
+    {
+        if (!IsServer) return;
+        PowerupClientRpc(powerupActionIndex);
+    }
+
+    // receive chosen powerup from server
+    [ClientRpc]
+    public void PowerupClientRpc(int powerupActionIndex)
+    {
+        if (!IsClient) return;
+        fromClientRpc = true;
+        methodArray[powerupActionIndex].Invoke();
     }
 }

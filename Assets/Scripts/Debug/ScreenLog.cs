@@ -15,6 +15,19 @@ public class ScreenLog : MonoBehaviour
     void OnEnable()
     {
         Application.logMessageReceived += HandleLog;
+        if (PlayerPrefs.GetInt("tutorialCompleted") == 0)    
+        {
+            PlayerPrefs.SetInt("tutorialCompleted", 1);
+        }
+        if (PlayerPrefs.GetInt("easyWin") == 0)
+        {
+            PlayerPrefs.SetInt("easyWin", 1);
+
+        }
+        if (PlayerPrefs.GetInt("easyHighscore") == 0)
+        {
+            PlayerPrefs.SetInt("easyHighscore", 1);
+        }
     }
 
     void OnDisable()

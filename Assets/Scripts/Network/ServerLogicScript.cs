@@ -23,6 +23,7 @@ public class ServerLogicScript : NetworkBehaviour
     private List<Competitor> competitorList = new(); // use this for puck ownership, same indexes as clients
     private List<ClientRpcParams> clientRpcParamsList = new(); // use this for targeted rpc, same indexes as clients
 
+    // TODO: move these into competitorList
     private List<int> competitorPuckCountList = new();
     private List<int> competitorScoreList = new();
 
@@ -33,6 +34,9 @@ public class ServerLogicScript : NetworkBehaviour
     bool gameIsRunning;
 
     private int randomlySelectedStartingPlayerIndex = -1;
+
+    private bool player1powerupsenabled = false;
+    private bool player2powerupsenabled = false;
 
     private void Awake()
     {
@@ -45,7 +49,7 @@ public class ServerLogicScript : NetworkBehaviour
     private void Start()
     {
         clientLogic = ClientLogicScript.Instance;
-        shotTimer = 30;
+        shotTimer = 42;
     }
 
     private void Update()
@@ -78,10 +82,15 @@ public class ServerLogicScript : NetworkBehaviour
         }
     }
 
+    public Competitor GetActiveCompetitor()
+    {
+        return competitorList[activeCompetitorIndex];
+    }
+
     // When 1 competitor is ready, setup their variables and update the ready text
     // When both are ready, start the game
     [ServerRpc(RequireOwnership = false)]
-    public void AddPlayerServerRpc(int puckID, ServerRpcParams serverRpcParams = default)
+    public void AddPlayerServerRpc(int puckID, bool powerupsEnabled, ServerRpcParams serverRpcParams = default)
     {
         if (!IsServer) return;
         try
@@ -105,6 +114,9 @@ public class ServerLogicScript : NetworkBehaviour
 
             competitorPuckCountList.Add(5);
             competitorScoreList.Add(0);
+
+            if (powerupsEnabled && player1powerupsenabled) { player2powerupsenabled = true; }
+            if (powerupsEnabled) { player1powerupsenabled = true; }
 
             Debug.Log(
                 $"Client added to client list. \n" +
@@ -153,15 +165,16 @@ public class ServerLogicScript : NetworkBehaviour
 
             activeCompetitorIndex = randomlySelectedStartingPlayerIndex;
             startingPlayerIndex = activeCompetitorIndex;
+            competitorList[startingPlayerIndex].goingFirst = true;
 
             Debug.Log(
                 $"Selected starting client. \n" +
                 $"Client Index #{activeCompetitorIndex} \n" +
                 $"Client ID : {clients[activeCompetitorIndex]}\n");
 
-            clientLogic.RestartGameOnlineClientRpc(competitorList[0].puckSpriteID, competitorList[1].puckSpriteID);
+            clientLogic.RestartGameOnlineClientRpc(competitorList[0].puckSpriteID, competitorList[1].puckSpriteID, player1powerupsenabled && player2powerupsenabled);
             clientLogic.StartTurnClientRpc(true, clientRpcParamsList[activeCompetitorIndex]);
-            shotTimer = 21;
+            shotTimer = (player1powerupsenabled && player2powerupsenabled) ? 42 : 21;
             gameIsRunning = true;
         }
         catch (System.Exception e)
@@ -247,7 +260,7 @@ public class ServerLogicScript : NetworkBehaviour
             CleanupDeadPucks();
 
             clientLogic.StartTurnClientRpc(activeCompetitorIndex == startingPlayerIndex, clientRpcParamsList[activeCompetitorIndex]);
-            shotTimer = 21;
+            shotTimer = (player1powerupsenabled && player2powerupsenabled) ? 42 : 21;
         }
         catch (System.Exception e)
         {
@@ -306,6 +319,8 @@ public class ServerLogicScript : NetworkBehaviour
         activeCompetitorIndex = 0;
         startingPlayerIndex = 0;
         gameIsRunning = false;
+        player1powerupsenabled = false;
+        player2powerupsenabled = false;
     }
 
     public void Rematch()
