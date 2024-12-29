@@ -272,10 +272,15 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 minusCPUSFX.Play();
             }
         }
+
+        if (zoneMultiplier != enteredZoneMultiplier)
+        {
+            zoneMultiplier = enteredZoneMultiplier;
+            // show floating text
+            var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
+            floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f, true);
+        }
         zoneMultiplier = enteredZoneMultiplier;
-        // show floating text
-        var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
-        floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f, true);
     }
 
     // when a puck exits a scoring zone
