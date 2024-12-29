@@ -33,6 +33,7 @@ public class PlinkoDropButtonScript : MonoBehaviour
         previousDropsValue = -1;
         SetDropButtonText();
         playerXPonEnable = PlayerPrefs.GetInt("XP");
+        PuckManager.Instance.ClearAllPucks();
     }
 
     // Update is called once per frame
@@ -56,8 +57,11 @@ public class PlinkoDropButtonScript : MonoBehaviour
                 SetDropButtonText();
             }
 
-            // if any single puck exists (if this loop is entered at least once) then the back button should be disabled
-            backButton.interactable = false;
+            // if any single dropped puck exists (if this loop and if statement is entered at least once) then the back button should be disabled
+            if (puck.GetComponent<Rigidbody2D>().gravityScale > 0)
+            {
+                backButton.interactable = false;
+            }
         }
         // if cooldown is active, disable button
         dropButton.interactable = ((Time.time - cooldown) > 2 && drops > 0);
