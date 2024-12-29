@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 
 public class SoundManagerScript : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class SoundManagerScript : MonoBehaviour
     [SerializeField] private AudioClip menu_1_Play_It_Cool;
 
     private AudioClip[] clips;
+
     void Awake()
     {
         clips = new AudioClip[] { music_Shufflepuck, game_1_Quirkii, game_2_Mana_Trail, menu_1_Play_It_Cool };
@@ -21,15 +23,16 @@ public class SoundManagerScript : MonoBehaviour
         if (Instance == null)
             Instance = this;
         else
-            Destroy(Instance);
+            Destroy(gameObject);
     }
 
     private void Start()
     {
         Load();
+        StartCoroutine(FadeInMusic());
     }
 
-    private string[] clipNames = { "Ethan Larose - Shufflepuck", "HeatleyBros - Quirkii", "HeatleyBros - Mana Trail", "HeatleyBros - Play It Cool"};
+    private string[] clipNames = { "Ethan Larose - Shufflepuck", "HeatleyBros - Quirkii", "HeatleyBros - Mana Trail", "HeatleyBros - Play It Cool" };
     private int currentClipIndex = 0;
 
     // settings page buttons (move to UI manager?)
@@ -50,14 +53,13 @@ public class SoundManagerScript : MonoBehaviour
     [SerializeField] private AudioSource winSFX;
     private bool isInitialized = false;
 
-
     public void Load()
     {
         currentClipIndex = PlayerPrefs.GetInt("SelectedTrack", 0);
         PlayClip(currentClipIndex);
 
         musicVolumeFromPref = PlayerPrefs.GetFloat("MusicVolume", 0.5f);
-        musicComponent.volume = musicVolumeFromPref;
+        musicComponent.volume = 0f; // Start at 0 volume for fade-in
 
         SFXVolumeFromPref = PlayerPrefs.GetFloat("SFXVolume", 1.0f);
     }
@@ -132,5 +134,22 @@ public class SoundManagerScript : MonoBehaviour
     {
         winSFX.volume = SFXVolumeFromPref * 0.5f;
         winSFX.Play();
+    }
+
+    private IEnumerator FadeInMusic()
+    {
+        float targetVolume = musicVolumeFromPref;
+        float fadeDuration = 3f; // Duration of the fade-in in seconds
+        float startVolume = 0f;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < fadeDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            musicComponent.volume = Mathf.Lerp(startVolume, targetVolume, elapsedTime / fadeDuration);
+            yield return null;
+        }
+
+        musicComponent.volume = targetVolume; // Ensure it ends at the correct volume
     }
 }
