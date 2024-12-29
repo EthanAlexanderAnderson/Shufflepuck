@@ -233,52 +233,49 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         // all zones are past safe line, so pastSafeLine can be set to true permanently
         pastSafeLine = true;
         safe = isZoneSafe;
-        if (enteredZoneMultiplier > zoneMultiplier || enteredZoneMultiplier == 0)
+
+        // if puck moves into higher scoring zone and gains a point play SFX
+        if (enteredZoneMultiplier > zoneMultiplier)
         {
-            // if puck moves into higher scoring zone and gains a point play SFX
-            if (enteredZoneMultiplier > zoneMultiplier)
+            if (IsPlayersPuck())
             {
-                if (IsPlayersPuck())
-                {
-                    pointPlayerSFX.volume = SFXvolume;
-                    pointPlayerSFX.pitch = 0.9f + (0.05f * enteredZoneMultiplier);
-                    pointPlayerSFX.Play();
-                }
-                else
-                {
-                    pointCPUSFX.volume = SFXvolume;
-                    pointCPUSFX.pitch = 0.8f + (0.05f * enteredZoneMultiplier);
-                    pointCPUSFX.Play();
-                }
-                // if this puck object already has a floating text, destroy it
-                foreach (Transform child in transform)
-                {
-                    if (child.gameObject.tag == "floatingText")
-                    {
-                        Destroy(child.gameObject);
-                    }
-                }
-                zoneMultiplier = enteredZoneMultiplier;
-                // show floating text
-                var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
-                floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f, true);
+                pointPlayerSFX.volume = SFXvolume;
+                pointPlayerSFX.pitch = 0.9f + (0.05f * enteredZoneMultiplier);
+                pointPlayerSFX.Play();
             }
-            // if puck moves into the off zone, play minus sfx
-            else if (enteredZoneMultiplier < zoneMultiplier && !IsStopped())
+            else
             {
-                if (IsPlayersPuck())
+                pointCPUSFX.volume = SFXvolume;
+                pointCPUSFX.pitch = 0.8f + (0.05f * enteredZoneMultiplier);
+                pointCPUSFX.Play();
+            }
+            // if this puck object already has a floating text, destroy it
+            foreach (Transform child in transform)
+            {
+                if (child.gameObject.tag == "floatingText")
                 {
-                    minusPlayerSFX.volume = SFXvolume;
-                    minusPlayerSFX.Play();
+                    Destroy(child.gameObject);
                 }
-                else
-                {
-                    minusCPUSFX.volume = SFXvolume;
-                    minusCPUSFX.Play();
-                }
-                zoneMultiplier = enteredZoneMultiplier;
             }
         }
+        // if puck moves into the off zone, play minus sfx
+        else if (enteredZoneMultiplier < zoneMultiplier)
+        {
+            if (IsPlayersPuck())
+            {
+                minusPlayerSFX.volume = SFXvolume;
+                minusPlayerSFX.Play();
+            }
+            else
+            {
+                minusCPUSFX.volume = SFXvolume;
+                minusCPUSFX.Play();
+            }
+        }
+        zoneMultiplier = enteredZoneMultiplier;
+        // show floating text
+        var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
+        floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f, true);
     }
 
     // when a puck exits a scoring zone
