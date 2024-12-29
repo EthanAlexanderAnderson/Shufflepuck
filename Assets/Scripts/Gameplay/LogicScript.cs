@@ -490,12 +490,12 @@ public class LogicScript : MonoBehaviour
             best.EnablePathVisualization();
 
             // handle powerup shots
-            if (best.DoesPathRequirePhasePowerup())
+            if (best.DoesPathRequirePhasePowerup() && powerupsAreEnabled)
             {
                 powerupManager.PhasePowerup();
                 powerupHasBeenUsedThisTurn = true;
             }
-            else if (best.IsPathAContactShot())
+            else if (best.IsPathAContactShot() && powerupsAreEnabled)
             {
                 powerupManager.ForceFieldPowerup();
                 powerupHasBeenUsedThisTurn = true;

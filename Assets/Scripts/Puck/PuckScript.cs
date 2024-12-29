@@ -241,11 +241,13 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 if (IsPlayersPuck())
                 {
                     pointPlayerSFX.volume = SFXvolume;
+                    pointPlayerSFX.pitch = 0.9f + (0.05f * enteredZoneMultiplier);
                     pointPlayerSFX.Play();
                 }
                 else
                 {
                     pointCPUSFX.volume = SFXvolume;
+                    pointCPUSFX.pitch = 0.8f + (0.05f * enteredZoneMultiplier);
                     pointCPUSFX.Play();
                 }
                 // if this puck object already has a floating text, destroy it
