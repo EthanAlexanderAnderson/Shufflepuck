@@ -15209,7 +15209,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a698dfe9c6f0ed458626df658031776, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  growShrinkRatio: 0.003
+  growShrinkRatio: 0.009
   growShrinkMin: 0.5
   growShrinkMax: 1
   rotateRatio: 1
@@ -38942,7 +38942,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a698dfe9c6f0ed458626df658031776, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  growShrinkRatio: 0.075
+  growShrinkRatio: 0.225
   growShrinkMin: 12.5
   growShrinkMax: 25
   rotateRatio: 1
@@ -55098,7 +55098,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a698dfe9c6f0ed458626df658031776, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  growShrinkRatio: 0.003
+  growShrinkRatio: 0.009
   growShrinkMin: 0.5
   growShrinkMax: 1
   rotateRatio: 1
@@ -56554,7 +56554,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a698dfe9c6f0ed458626df658031776, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  growShrinkRatio: 0.006
+  growShrinkRatio: 0.009
   growShrinkMin: 0.5
   growShrinkMax: 1
   rotateRatio: 1
