@@ -590,7 +590,7 @@ public class UIManagerScript : MonoBehaviour
     }
 
     // helper for debug mode button
-    int debugMode = 0;
+    public int debugMode = 0;
     public void DebugMode()
     {
         debugMode++;
