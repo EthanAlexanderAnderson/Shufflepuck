@@ -183,6 +183,7 @@ public class ClientLogicScript : NetworkBehaviour
             UI.opponentPuckCountText.text = count.ToString();
         }
         DecrementWallCount();
+        PowerupManager.Instance.DisableForceFieldIfNecessary();
     }
 
     // Server tells the client to update online waiting screen to show that a competitor has clicked the ready button

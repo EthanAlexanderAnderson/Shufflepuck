@@ -215,6 +215,7 @@ public class PowerupManager : NetworkBehaviour
 
     public void DisableForceFieldIfNecessary()
     {
+        GetActiveCompetitor();
         if (forcefieldScript.IsPlayers() != activeCompetitor.isPlayer)
         {
             forcefieldScript.DisableForcefield();

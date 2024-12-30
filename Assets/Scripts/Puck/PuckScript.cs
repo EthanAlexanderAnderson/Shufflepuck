@@ -418,6 +418,12 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     public void DestroyPuck() // Destroys the puck with a particle and sound effect
     {
+        Destroy(gameObject, 0.1f);
+        logic.playDestroyPuckSFX(SFXvolume);
+    }
+
+    override public void OnDestroy()
+    {
         ParticleSystem collisionParticleEffect = Instantiate(collisionParticleEffectPrefab, transform.position, Quaternion.identity);
         ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
         emission.rateOverTime = 1000f;
@@ -428,7 +434,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         {
             main.startColor = new ParticleSystem.MinMaxGradient(Color.grey);
         }
-        else if (color.Length == 1 ) // handle one color
+        else if (color.Length == 1) // handle one color
         {
             main.startColor = color[0];
         }
@@ -438,8 +444,6 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
         collisionParticleEffect.Play();
         Destroy(collisionParticleEffect.gameObject, 10f);
-        Destroy(gameObject, 0.1f);
-        logic.playDestroyPuckSFX(SFXvolume);
     }
 
     [ServerRpc]
