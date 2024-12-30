@@ -338,4 +338,40 @@ public class ServerLogicScript : NetworkBehaviour
         }
         SelectRandomStartingPlayer();
     }
+
+    // Block Powerup
+    [ServerRpc(RequireOwnership = false)]
+    public void BlockServerRpc()
+    {
+        if (!IsServer) return;
+        try
+        {
+            Competitor competitor = competitorList[activeCompetitorIndex];
+            int puckSpriteID = competitor.puckSpriteID;
+
+            float xpos = (startingPlayerIndex == activeCompetitorIndex ? (Random.Range(2f, 4f)) : (Random.Range(-2f, -4f)));
+            GameObject puckObject = Instantiate(puck, new Vector3(xpos, Random.Range(2f, 4f), 0.0f), Quaternion.identity);
+            puckObject.GetComponent<NetworkObject>().Spawn();
+
+            PuckScript puckScript = puckObject.GetComponent<PuckScript>();
+
+            // tell the active competitor this new puck is theirs, tell non-active competitors it's not theirs
+            for (int i = 0; i < competitorList.Count; i++)
+            {
+                puckScript.InitPuckClientRpc(i == activeCompetitorIndex, puckSpriteID, clientRpcParamsList[i]);
+            }
+            puckScript.InitBlockPuckClientRpc();
+
+            Debug.Log(
+                $"Puck has been spawned. \n" +
+                $"Owned by Client Index #{activeCompetitorIndex} \n" +
+                $"Client ID : {clients[activeCompetitorIndex]} \n" +
+                $"Puck Skin ID: {competitor.puckSpriteID} \n");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError(e);
+            clientLogic.SetErrorMessageClientRpc(4);
+        }
+    }
 }

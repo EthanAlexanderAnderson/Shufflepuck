@@ -56,7 +56,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     private float SFXvolume;
 
     // particle colors
-    private Color[] color = {new Color(0.5f, 0.5f, 0.5f)};
+    private Color[] color = { new Color(0.5f, 0.5f, 0.5f) };
 
     // for powerups
     [SerializeField] private bool phase = false;
@@ -175,13 +175,14 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     private float spin;
     public void Shoot(float angleParameter, float powerParameter, float spinParameter = 50)
     {
-        if ( angleParameter < -5 || angleParameter > 105 || powerParameter < -5 || powerParameter > 105 || spinParameter < -5 || spinParameter > 105 )
+        if (angleParameter < -5 || angleParameter > 105 || powerParameter < -5 || powerParameter > 105 || spinParameter < -5 || spinParameter > 105)
         {
             Debug.LogError("Invalid input: One or more parameters are out of the valid range (-5 to 105).");
         }
         // give high power shots an extra oomf
         var volumeBoost = 0f;
-        if (powerParameter >= 95) { 
+        if (powerParameter >= 95)
+        {
             powerParameter += (powerParameter - 95) * powerModifier + 10;
             if (trail != null)
             {
@@ -228,11 +229,12 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public void SetZoneMultiplier(int ZM) { zoneMultiplier = ZM; }
 
     // when a puck enters a scoring zone, update its score and play a SFX
-    public void EnterScoreZone( bool isZoneSafe, int enteredZoneMultiplier)
+    public void EnterScoreZone(bool isZoneSafe, int enteredZoneMultiplier)
     {
         // all zones are past safe line, so pastSafeLine can be set to true permanently
         pastSafeLine = true;
         safe = isZoneSafe;
+        shot = true;
 
         // if puck moves into higher scoring zone and gains a point play SFX
         if (enteredZoneMultiplier > zoneMultiplier)
@@ -310,11 +312,11 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             "\n IsShot: " + IsShot() +
             "\n IsSafe: " + IsSafe() +
             "\n IsStopped: " + IsStopped()
-            ); 
+            );
     }
 
     [SerializeField] private ParticleSystem collisionParticleEffectPrefab;
- 
+
     // play bonk SFX when pucks collide
     void OnCollisionEnter2D(Collision2D col)
     {
@@ -346,7 +348,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             {
                 main.startColor = new ParticleSystem.MinMaxGradient(Color.grey);
             }
-            else if (color.Length == 1 ) // handle one color
+            else if (color.Length == 1) // handle one color
             {
                 main.startColor = color[0];
             }
@@ -457,5 +459,14 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public void SetPhase(bool isPhase)
     {
         phase = isPhase;
+    }
+
+    [ClientRpc]
+    public void InitBlockPuckClientRpc(ClientRpcParams clientRpcParams = default)
+    {
+        if (!IsClient) return;
+        SetPuckBaseValue(0);
+        SetPowerupText("valueless");
+        CreatePowerupFloatingText();
     }
 }

@@ -70,6 +70,7 @@ public class PowerupManager : NetworkBehaviour
 
     public void ShufflePowerups()
     {
+        GetActiveCompetitor();
         Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
         Sprite[] powerupSprites = { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage };
 
@@ -128,15 +129,14 @@ public class PowerupManager : NetworkBehaviour
     {
         if (!fromClientRpc && ClientLogicScript.Instance.isRunning)
         {
-            PowerupServerRpc(2);
-            return;
+            ServerLogicScript.Instance.BlockServerRpc();
+            return; // for online mode, this function always returns here, unlike other powerups, because it gets handed off to it's dedicated serverrpc function
         }
         fromClientRpc = false;
         GetActiveCompetitor();
 
-        int swap = activeCompetitor.isPlayer || (ClientLogicScript.Instance.isRunning && activeCompetitor.goingFirst) ? 1 : -1;
+        int swap = activeCompetitor.isPlayer ? 1 : -1;
         GameObject blockPuckObject = Instantiate(puckPrefab, new Vector3(Random.Range(2f * swap, 4f * swap), Random.Range(2f, 4f), -1.0f), Quaternion.identity);
-        if (ClientLogicScript.Instance.isRunning) { blockPuckObject.GetComponent<NetworkObject>().Spawn(); }
         PuckScript blockPuckScript = blockPuckObject.GetComponent<PuckScript>();
         blockPuckScript.InitPuck(activeCompetitor.isPlayer, activeCompetitor.puckSpriteID);
         blockPuckScript.SetPuckBaseValue(0);
@@ -171,7 +171,7 @@ public class PowerupManager : NetworkBehaviour
         {
             if (ClientLogicScript.Instance.isRunning)
             {
-                pucki.DestroyPuckServerRpc(); // for online
+                pucki.DestroyPuckServerRpc(); // for online. This only triggers once, because calling this requires ownership of the puck
             }
             else
             {
