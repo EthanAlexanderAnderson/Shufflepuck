@@ -424,6 +424,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     override public void OnDestroy()
     {
+        if (!logic.gameIsRunning && !ClientLogicScript.Instance.isRunning) { return; }
         ParticleSystem collisionParticleEffect = Instantiate(collisionParticleEffectPrefab, transform.position, Quaternion.identity);
         ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
         emission.rateOverTime = 1000f;

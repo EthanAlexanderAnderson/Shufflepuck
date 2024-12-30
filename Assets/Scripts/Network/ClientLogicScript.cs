@@ -184,6 +184,7 @@ public class ClientLogicScript : NetworkBehaviour
         }
         DecrementWallCount();
         PowerupManager.Instance.DisableForceFieldIfNecessary();
+        puckHalo.SetActive(false);
     }
 
     // Server tells the client to update online waiting screen to show that a competitor has clicked the ready button

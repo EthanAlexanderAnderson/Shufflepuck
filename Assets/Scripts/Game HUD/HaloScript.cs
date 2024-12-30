@@ -42,7 +42,14 @@ public class HaloScript : MonoBehaviour
     {
         if (debuggingInProgress) return;
 
-        sideModifier = logic.activeCompetitor.isPlayer ? (-3.6f) : (3.6f);
+        if (!ClientLogicScript.Instance.isRunning) // offline
+        {
+            sideModifier = LogicScript.Instance.activeCompetitor.isPlayer ? (-3.6f) : (3.6f);
+        }
+        else // online
+        {
+            sideModifier = ClientLogicScript.Instance.client.goingFirst ? (-3.6f) : (3.6f);
+        }
 
         // calculate the pucks estimated position
         if (logic.activeBar == "angle" || (ClientLogicScript.Instance.isRunning && ClientLogicScript.Instance.activeBar == "angle"))

@@ -22684,6 +22684,7 @@ MonoBehaviour:
   table: {fileID: 16345473}
   tableLight: {fileID: 21300000, guid: d83fa14700396b34ba9c9f093fd12cbd, type: 3}
   tableDark: {fileID: 21300000, guid: c6abc355049ccfe428afb80f1080acbc, type: 3}
+  debugMode: 0
 --- !u!4 &671090518
 Transform:
   m_ObjectHideFlags: 0
