@@ -7,21 +7,27 @@ public class LineDrawerTest : MonoBehaviour
 {
 #if (UNITY_EDITOR)
     //public GameObject myGameObject;
-    private PolygonCollider2D pColider;
+    private PolygonCollider2D pCollider;
     private BoxCollider2D bCollider;
+    private CircleCollider2D cCollider;
 
     protected void Start()
     {
-        pColider = GetComponent<PolygonCollider2D>();
+        pCollider = GetComponent<PolygonCollider2D>();
         bCollider = GetComponent<BoxCollider2D>();
+        cCollider = GetComponent<CircleCollider2D>();
 
-        if (pColider == null)
+        if (bCollider != null)
         {
             highlightAroundCollider(bCollider, Color.green, Color.green, 0.1f);
         }
-        else
+        else if (pCollider != null)
         {
-            highlightAroundCollider(pColider, Color.green, Color.green, 0.1f);
+            highlightAroundCollider(pCollider, Color.green, Color.green, 0.1f);
+        }
+        else if (cCollider != null)
+        {
+            //highlightAroundCollider(cCollider, Color.green, Color.green, 0.1f);
         }
 
     }
@@ -48,29 +54,29 @@ public class LineDrawerTest : MonoBehaviour
         if (cpType is PolygonCollider2D)
         {
             //3. Get the points from the PolygonCollider2D
-            Vector2[] pColiderPos = (cpType as PolygonCollider2D).points;
+            Vector2[] pColliderPos = (cpType as PolygonCollider2D).points;
 
             //4. Convert local to world points
-            for (int i = 0; i < pColiderPos.Length; i++)
+            for (int i = 0; i < pColliderPos.Length; i++)
             {
-                pColiderPos[i] = cpType.transform.TransformPoint(pColiderPos[i]);
+                pColliderPos[i] = cpType.transform.TransformPoint(pColliderPos[i]);
             }
 
             //5. Set the SetVertexCount of the LineRenderer to the Length of the points
-            lineRenderer.positionCount = pColiderPos.Length + 1;
-            for (int i = 0; i < pColiderPos.Length; i++)
+            lineRenderer.positionCount = pColliderPos.Length + 1;
+            for (int i = 0; i < pColliderPos.Length; i++)
             {
                 //6. Draw the  line
-                Vector3 finalLine = pColiderPos[i];
+                Vector3 finalLine = pColliderPos[i];
                 finalLine.z = zPos;
                 lineRenderer.SetPosition(i, finalLine);
 
                 //7. Check if this is the last loop. Now Close the Line drawn
-                if (i == (pColiderPos.Length - 1))
+                if (i == (pColliderPos.Length - 1))
                 {
-                    finalLine = pColiderPos[0];
+                    finalLine = pColliderPos[0];
                     finalLine.z = zPos;
-                    lineRenderer.SetPosition(pColiderPos.Length, finalLine);
+                    lineRenderer.SetPosition(pColliderPos.Length, finalLine);
                 }
             }
         }
@@ -84,23 +90,23 @@ public class LineDrawerTest : MonoBehaviour
             Vector2 bottomLeft = new Vector2(boxBounds.center.x - boxBounds.extents.x, boxBounds.center.y - boxBounds.extents.y);
             Vector2 bottomRight = new Vector2(boxBounds.center.x + boxBounds.extents.x, boxBounds.center.y - boxBounds.extents.y);
 
-            Vector2[] pColiderPos = { topLeft, topRight, bottomRight, bottomLeft };
+            Vector2[] pColliderPos = { topLeft, topRight, bottomRight, bottomLeft };
 
             //5. Set the SetVertexCount of the LineRenderer to the Length of the points
-            lineRenderer.positionCount = pColiderPos.Length + 1;
-            for (int i = 0; i < pColiderPos.Length; i++)
+            lineRenderer.positionCount = pColliderPos.Length + 1;
+            for (int i = 0; i < pColliderPos.Length; i++)
             {
                 //6. Draw the  line
-                Vector3 finalLine = pColiderPos[i];
+                Vector3 finalLine = pColliderPos[i];
                 finalLine.z = zPos;
                 lineRenderer.SetPosition(i, finalLine);
 
                 //7. Check if this is the last loop. Now Close the Line drawn
-                if (i == (pColiderPos.Length - 1))
+                if (i == (pColliderPos.Length - 1))
                 {
-                    finalLine = pColiderPos[0];
+                    finalLine = pColliderPos[0];
                     finalLine.z = zPos;
-                    lineRenderer.SetPosition(pColiderPos.Length, finalLine);
+                    lineRenderer.SetPosition(pColliderPos.Length, finalLine);
                 }
             }
         }

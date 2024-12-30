@@ -17,6 +17,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     // puck object components
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private Collider2D puckCollider;
     [SerializeField] private AudioSource bonkHeavySFX;
     [SerializeField] private AudioSource bonkLightSFX;
     [SerializeField] private AudioSource noiseSFX;
@@ -55,7 +56,10 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     private float SFXvolume;
 
     // particle colors
-    private Color[] color = {new Color(0.5f, 0.5f, 0.5f)};
+    private Color[] color = { new Color(0.5f, 0.5f, 0.5f) };
+
+    // for powerups
+    [SerializeField] private bool phase = false;
 
     void OnEnable()
     {
@@ -75,6 +79,11 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             rb.AddTorque(shotTorqueToAdd);
             shotForceToAdd = Vector2.zero;
             shotTorqueToAdd = 0.0f;
+            if (phase)
+            {
+                spriteRenderer.color = new Color(1f, 1f, 1f, 0.5f);
+                puckCollider.isTrigger = true;
+            }
         }
 
         // Calculate the magnitude of the velocity vector to determine the sliding noise volume
@@ -105,6 +114,25 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 rb.AddForce((up * angularVelocity * angularVelocityModifier * counterForce) * 0.03f);
             }
         }
+
+        // for phase powerup
+        if (phase && IsShot() && pastSafeLine && IsStopped()) // is slowed & shot & past safeline
+        {
+            // if this puck is within 2 units of the nearest puck, destroy it
+            var pucks = GameObject.FindGameObjectsWithTag("puck");
+            foreach (var puck in pucks)
+            {
+                if (puck != gameObject && Vector2.Distance(puck.transform.position, transform.position) < 2)
+                {
+                    DestroyPuck();
+                    return;
+                }
+            }
+            // othewrise, unphase it (make it visible again)
+            spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+            puckCollider.isTrigger = false;
+            phase = false;
+        }
     }
 
     // initiate a new puck
@@ -132,6 +160,13 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         // enable animation for atom
         animationLayer.SetActive(Math.Abs(puckSpriteID) == 40);
 
+        if (transform.position.y < 0f)
+        {
+            ClientLogicScript.Instance.client.activePuckScript = this;
+            ClientLogicScript.Instance.client.activePuckObject = gameObject;
+        }
+        ClientLogicScript.Instance.client.isPlayer = IsPlayersPuckParameter;
+
         Debug.Log($"Puck initialized. IsPlayersPuckParameter: {IsPlayersPuckParameter}. PuckSpriteID: {puckSpriteID}");
     }
 
@@ -140,16 +175,20 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     private float spin;
     public void Shoot(float angleParameter, float powerParameter, float spinParameter = 50)
     {
-        if ( angleParameter < -5 || angleParameter > 105 || powerParameter < -5 || powerParameter > 105 || spinParameter < -5 || spinParameter > 105 )
+        if (angleParameter < -5 || angleParameter > 105 || powerParameter < -5 || powerParameter > 105 || spinParameter < -5 || spinParameter > 105)
         {
             Debug.LogError("Invalid input: One or more parameters are out of the valid range (-5 to 105).");
         }
         // give high power shots an extra oomf
         var volumeBoost = 0f;
-        if (powerParameter >= 95) { 
+        if (powerParameter >= 95)
+        {
             powerParameter += (powerParameter - 95) * powerModifier + 10;
-            trail.startColor = new Color(1, 0.8f, 0);
-            trail.endColor = Color.yellow;
+            if (trail != null)
+            {
+                trail.startColor = new Color(1, 0.8f, 0);
+                trail.endColor = Color.yellow;
+            }
             volumeBoost += 0.2f;
         }
         // normalize power and then scale
@@ -180,7 +219,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     // ---------- GETTERS AND SETTERS ----------
     public bool IsSlowed() { return rb.velocity.x < 2 && rb.velocity.y < 2 && IsShot() && transform.position.y > -9; }
     public bool IsSlowedMore() { return rb.velocity.x < 0.4 && rb.velocity.y < 0.4 && IsShot() && transform.position.y > -9; }
-    public bool IsStopped() { return rb.velocity.x < 0.1 && rb.velocity.y < 0.1 && IsShot() && transform.position.y > -9; }
+    public bool IsStopped() { return rb.velocity.x < 0.05 && rb.velocity.y < 0.05 && IsShot() && transform.position.y > -9; }
     public bool IsShot() { return shot; }
     public bool IsSafe() { return safe; }
     public bool IsPastSafeLine() { return pastSafeLine; }
@@ -190,55 +229,60 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public void SetZoneMultiplier(int ZM) { zoneMultiplier = ZM; }
 
     // when a puck enters a scoring zone, update its score and play a SFX
-    public void EnterScoreZone( bool isZoneSafe, int enteredZoneMultiplier)
+    public void EnterScoreZone(bool isZoneSafe, int enteredZoneMultiplier)
     {
         // all zones are past safe line, so pastSafeLine can be set to true permanently
         pastSafeLine = true;
         safe = isZoneSafe;
-        if (enteredZoneMultiplier > zoneMultiplier || enteredZoneMultiplier == 0)
+        shot = true;
+
+        // if puck moves into higher scoring zone and gains a point play SFX
+        if (enteredZoneMultiplier > zoneMultiplier)
         {
-            // if puck moves into higher scoring zone and gains a point play SFX
-            if (enteredZoneMultiplier > zoneMultiplier && !IsStopped())
+            if (IsPlayersPuck())
             {
-                if (IsPlayersPuck())
-                {
-                    pointPlayerSFX.volume = SFXvolume;
-                    pointPlayerSFX.Play();
-                }
-                else
-                {
-                    pointCPUSFX.volume = SFXvolume;
-                    pointCPUSFX.Play();
-                }
-                // if this puck object already has a floating text, destroy it
-                foreach (Transform child in transform)
-                {
-                    if (child.gameObject.tag == "floatingText")
-                    {
-                        Destroy(child.gameObject);
-                    }
-                }
-                zoneMultiplier = enteredZoneMultiplier;
-                // show floating text
-                var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
-                floatingText.GetComponent<TMP_Text>().text = ComputeValue().ToString();
+                pointPlayerSFX.volume = SFXvolume;
+                pointPlayerSFX.pitch = 0.9f + (0.05f * enteredZoneMultiplier);
+                pointPlayerSFX.Play();
             }
-            // if puck moves into the off zone, play minus sfx
-            else if (enteredZoneMultiplier < zoneMultiplier && !IsStopped())
+            else
             {
-                if (IsPlayersPuck())
+                pointCPUSFX.volume = SFXvolume;
+                pointCPUSFX.pitch = 0.8f + (0.05f * enteredZoneMultiplier);
+                pointCPUSFX.Play();
+            }
+            // if this puck object already has a floating text, destroy it
+            foreach (Transform child in transform)
+            {
+                if (child.gameObject.tag == "floatingText")
                 {
-                    minusPlayerSFX.volume = SFXvolume;
-                    minusPlayerSFX.Play();
+                    Destroy(child.gameObject);
                 }
-                else
-                {
-                    minusCPUSFX.volume = SFXvolume;
-                    minusCPUSFX.Play();
-                }
-                zoneMultiplier = enteredZoneMultiplier;
             }
         }
+        // if puck moves into the off zone, play minus sfx
+        else if (enteredZoneMultiplier < zoneMultiplier)
+        {
+            if (IsPlayersPuck())
+            {
+                minusPlayerSFX.volume = SFXvolume;
+                minusPlayerSFX.Play();
+            }
+            else
+            {
+                minusCPUSFX.volume = SFXvolume;
+                minusCPUSFX.Play();
+            }
+        }
+
+        if (zoneMultiplier != enteredZoneMultiplier)
+        {
+            zoneMultiplier = enteredZoneMultiplier;
+            // show floating text
+            var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
+            floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f, true);
+        }
+        zoneMultiplier = enteredZoneMultiplier;
     }
 
     // when a puck exits a scoring zone
@@ -250,7 +294,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             safe = false;
         }
         // decrement score unless exiting a zero zone
-        if (zoneMultiplier > 0)
+        if (zoneMultiplier > 0 && exitedZoneMultiplier == zoneMultiplier)
         {
             zoneMultiplier = exitedZoneMultiplier - 1;
         }
@@ -268,11 +312,11 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             "\n IsShot: " + IsShot() +
             "\n IsSafe: " + IsSafe() +
             "\n IsStopped: " + IsStopped()
-            ); 
+            );
     }
 
     [SerializeField] private ParticleSystem collisionParticleEffectPrefab;
- 
+
     // play bonk SFX when pucks collide
     void OnCollisionEnter2D(Collision2D col)
     {
@@ -304,7 +348,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             {
                 main.startColor = new ParticleSystem.MinMaxGradient(Color.grey);
             }
-            else if (color.Length == 1 ) // handle one color
+            else if (color.Length == 1) // handle one color
             {
                 main.startColor = color[0];
             }
@@ -359,19 +403,70 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public void CreatePowerupFloatingText()
     {
         var floatingText = Instantiate(floatingTextPrefab, transform.position + new Vector3(0, -1.5f, 0), Quaternion.identity, transform);
-        floatingText.GetComponent<FloatingTextScript>().Initialize(powerupText, 0, 0, 0.1f, 1);
+        floatingText.GetComponent<FloatingTextScript>().Initialize(powerupText, 0, 0, 0.1f, 1, true);
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
         // show puck score when clicked
         var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
-        floatingText.GetComponent<TMP_Text>().text = ComputeValue().ToString();
+        floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f, true);
         // if powerupText has been set, show it
         if (powerupText != null)
         {
             CreatePowerupFloatingText();
         }
+    }
 
+    public void DestroyPuck() // Destroys the puck with a particle and sound effect
+    {
+        Destroy(gameObject, 0.1f);
+        logic.playDestroyPuckSFX(SFXvolume);
+    }
+
+    override public void OnDestroy()
+    {
+        if (!logic.gameIsRunning && !ClientLogicScript.Instance.isRunning) { return; }
+        ParticleSystem collisionParticleEffect = Instantiate(collisionParticleEffectPrefab, transform.position, Quaternion.identity);
+        ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
+        emission.rateOverTime = 1000f;
+        ParticleSystem.MainModule main = collisionParticleEffect.main;
+        main.startSpeed = 100f;
+        // set color of particle effect to puck color
+        if (color == null || color.Length <= 0) // handle null color
+        {
+            main.startColor = new ParticleSystem.MinMaxGradient(Color.grey);
+        }
+        else if (color.Length == 1) // handle one color
+        {
+            main.startColor = color[0];
+        }
+        else // handle two or more colors
+        {
+            main.startColor = new ParticleSystem.MinMaxGradient(CreateRandomGradient());
+        }
+        collisionParticleEffect.Play();
+        Destroy(collisionParticleEffect.gameObject, 10f);
+    }
+
+    [ServerRpc]
+    public void DestroyPuckServerRpc()
+    {
+        if (!IsServer) return;
+        DestroyPuck();
+    }
+
+    public void SetPhase(bool isPhase)
+    {
+        phase = isPhase;
+    }
+
+    [ClientRpc]
+    public void InitBlockPuckClientRpc(ClientRpcParams clientRpcParams = default)
+    {
+        if (!IsClient) return;
+        SetPuckBaseValue(0);
+        SetPowerupText("valueless");
+        CreatePowerupFloatingText();
     }
 }

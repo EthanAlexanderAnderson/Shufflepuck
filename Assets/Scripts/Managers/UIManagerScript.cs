@@ -169,7 +169,8 @@ public class UIManagerScript : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0) && tutorialMenu.activeInHierarchy && iPage != 6)
         {
-            if (Input.mousePosition.y < Screen.height / 2)
+            // make sure click is not on a puck
+            if (logic.ClickNotOnPuck())
             {
                 AdvanceTutorial();
             }
@@ -589,7 +590,7 @@ public class UIManagerScript : MonoBehaviour
     }
 
     // helper for debug mode button
-    int debugMode = 0;
+    public int debugMode = 0;
     public void DebugMode()
     {
         debugMode++;

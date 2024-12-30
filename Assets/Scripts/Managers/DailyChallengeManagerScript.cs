@@ -24,6 +24,8 @@ public class DailyChallengeManagerScript : MonoBehaviour
 
     [SerializeField] private Button claim1;
     [SerializeField] private Button claim2;
+    [SerializeField] private GameObject glow1;
+    [SerializeField] private GameObject glow2;
 
     private string[] easyChallengeText = { "Claimed", "Beat the easy CPU", "Beat the medium CPU", "Beat the easy CPU by 3 or more points", "Beat the medium CPU by 3 or more points", "Beat the easy CPU by 5 or more points" };
     private int[] easyChallengeReward = { 0, 40, 60, 60, 80, 80 };
@@ -67,6 +69,9 @@ public class DailyChallengeManagerScript : MonoBehaviour
         // if the challenge is completed, the value is negative
         claim1.interactable = DC1 < 0;
         claim2.interactable = DC2 < 0;
+        glow1.SetActive(claim1.interactable);
+        glow2.SetActive(claim2.interactable);
+
         // assert the challenge ID is within range, prevent index error
         if (DC1 >= easyChallengeText.Length || DC1 <= (easyChallengeText.Length * -1) || DC1 <= (easyChallengeReward.Length * -1) || DC1 <= (easyChallengeReward.Length * -1))
         {

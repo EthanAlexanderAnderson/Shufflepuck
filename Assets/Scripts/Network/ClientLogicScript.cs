@@ -18,17 +18,18 @@ public class ClientLogicScript : NetworkBehaviour
     private ServerLogicScript serverLogic;
     private PuckSkinManager puckSkinManager;
     private PuckManager puckManager;
+    private PowerupManager powerupManager;
 
-    private bool isTurn;
-    private bool isShooting;
-    public bool isStartingPlayer { get; private set; }
+    // client competitor variable
+    public Competitor client;
 
     public bool isRunning { get; private set; }
     private float shotTimer;
 
-    private int puckCount;
-
     private bool receivedGameResult = false;
+
+    private bool powerupsAreEnabled;
+    [SerializeField] private GameObject powerupsMenu;
 
     // bar and line
     private BarScript bar;
@@ -61,6 +62,7 @@ public class ClientLogicScript : NetworkBehaviour
         line = LineScript.Instance;
         puckSkinManager = PuckSkinManager.Instance;
         puckManager = PuckManager.Instance;
+        powerupManager = PowerupManager.Instance;
     }
 
     // Update is called once per frame
@@ -77,28 +79,30 @@ public class ClientLogicScript : NetworkBehaviour
         }
 
         // start turn, do this once then start shooting
-        if (isTurn && puckCount > 0 && puckManager.AllPucksAreSlowed())
+        if (client.isTurn && client.puckCount > 0 && puckManager.AllPucksAreSlowed())
         {
-            activeBar = bar.ChangeBar("angle", isStartingPlayer);
+            activeBar = bar.ChangeBar("angle", client.goingFirst);
             line.isActive = true;
             arrow.SetActive(true);
             UI.TurnText = "Your Turn";
             serverLogic.CreatePuckServerRpc();
-            isTurn = false;
-            isShooting = true;
-            shotTimer = 18;
+            client.isTurn = false;
+            client.isShooting = true;
+            shotTimer = powerupsAreEnabled ? 36 : 18;
+            powerupsMenu.SetActive(powerupsAreEnabled);
+            if (powerupsAreEnabled) { powerupManager.ShufflePowerups(); }
         }
 
-        if (isShooting && Input.GetMouseButtonDown(0))
+        if (client.isShooting && Input.GetMouseButtonDown(0) && powerupsMenu.activeInHierarchy == false)
         {
             // make sure click is on the bottom half of the screen
-            if (Input.mousePosition.y < Screen.height / 2)
+            if (logic.ClickNotOnPuck())
             {
                 switch (activeBar)
                 {
                     case "angle":
                         angle = line.GetValue();
-                        activeBar = bar.ChangeBar("power", isStartingPlayer);
+                        activeBar = bar.ChangeBar("power", client.goingFirst);
                         break;
                     case "power":
                         power = line.GetValue();
@@ -111,24 +115,24 @@ public class ClientLogicScript : NetworkBehaviour
                         UI.TurnText = "Opponent's Turn";
                         line.isActive = false;
                         arrow.SetActive(false);
-                        isShooting = false;
+                        client.isShooting = false;
                         break;
                 }
             }
         }
 
         // update shot clock text under 10 secs
-        if (isShooting && shotTimer <= 10.5 && shotTimer > 0)
+        if (client.isShooting && shotTimer <= 10.5 && shotTimer > 0)
         {
             UI.shotClockText.text = Mathf.RoundToInt(shotTimer).ToString();
         }
         // clear shot clock when not turn
-        else if (!isShooting && !isTurn)
+        else if (!client.isShooting && !client.isTurn)
         {
             UI.shotClockText.text = "";
         }
         // force shot after shot clock
-        else if (isShooting && shotTimer < 0)
+        else if (client.isShooting && shotTimer < 0)
         {
             angle = UnityEngine.Random.Range(20.0f, 80.0f);
             power = UnityEngine.Random.Range(30.0f, 60.0f);
@@ -138,17 +142,18 @@ public class ClientLogicScript : NetworkBehaviour
             UI.TurnText = "Opponent's Turn";
             line.isActive = false;
             arrow.SetActive(false);
-            isShooting = false;
+            client.isShooting = false;
+            powerupsMenu.SetActive(false);
         }
 
-        if ((isTurn || isShooting) && isRunning && puckCount <= 0)
+        if ((client.isTurn || client.isShooting) && isRunning && client.puckCount <= 0)
         {
             activeBar = bar.ChangeBar("none");
             line.isActive = false;
             arrow.SetActive(false);
             UI.TurnText = "";
-            isTurn = false;
-            isShooting = false;
+            client.isTurn = false;
+            client.isShooting = false;
         }
         shotTimer -= Time.deltaTime;
     }
@@ -170,7 +175,7 @@ public class ClientLogicScript : NetworkBehaviour
 
         if (isPlayer)
         {
-            puckCount = count;
+            client.puckCount = count;
             UI.playerPuckCountText.text = count.ToString();
         }
         else
@@ -178,6 +183,8 @@ public class ClientLogicScript : NetworkBehaviour
             UI.opponentPuckCountText.text = count.ToString();
         }
         DecrementWallCount();
+        PowerupManager.Instance.DisableForceFieldIfNecessary();
+        puckHalo.SetActive(false);
     }
 
     // Server tells the client to update online waiting screen to show that a competitor has clicked the ready button
@@ -216,18 +223,22 @@ public class ClientLogicScript : NetworkBehaviour
     // Server tells the client to switch to game scene and start the game.
     // Inputs the two puck skins used by the competitors.
     [ClientRpc]
-    public void RestartGameOnlineClientRpc(int puckSpriteID_0, int puckSpriteID_1)
+    public void RestartGameOnlineClientRpc(int puckSpriteID_0, int puckSpriteID_1, bool powerupsEnabled = false)
     {
         if (!IsClient) return;
 
         UI.SetReButtons(false);
 
-        puckCount = 5;
+
         isRunning = true;
         wallCount = 3;
         wall.SetActive(true);
         UI.UpdateWallText(wallCount);
         receivedGameResult = false;
+        powerupsAreEnabled = powerupsEnabled;
+        client = new();
+        client.puckCount = 5;
+        logic.activeCompetitor = client;
 
         Debug.Log("Client: Restarting game");
         Debug.Log($"player : {logic.player.puckSpriteID}     0 : {puckSpriteID_0}   1 : {puckSpriteID_1}");
@@ -237,11 +248,13 @@ public class ClientLogicScript : NetworkBehaviour
         {
             var swapAlt = puckSpriteID_0 == puckSpriteID_1 ? -1 : 1;
             UI.SetOpponentPuckIcon(puckSkinManager.ColorIDtoPuckSprite(puckSpriteID_1 * swapAlt), Math.Abs(puckSpriteID_1) == 40);
+            client.puckSpriteID = puckSpriteID_0;
         }
         else
         {
             var swapAlt = puckSpriteID_0 == puckSpriteID_1 ? -1 : 1;
             UI.SetOpponentPuckIcon(puckSkinManager.ColorIDtoPuckSprite(puckSpriteID_0 * swapAlt), Math.Abs(puckSpriteID_0) == 40);
+            client.puckSpriteID = puckSpriteID_1;
         }
 
         puckHalo.SetActive(false);
@@ -258,8 +271,8 @@ public class ClientLogicScript : NetworkBehaviour
         if (!IsClient) return;
 
         Debug.Log("Client: Starting turn");
-        isTurn = true;
-        isStartingPlayer = isStartingPlayerParam;
+        client.isTurn = true;
+        client.goingFirst = isStartingPlayerParam;
     }
 
     // Server tells the client to set the error message.
@@ -285,12 +298,20 @@ public class ClientLogicScript : NetworkBehaviour
         UI.TurnText = "";
         activeBar = bar.ChangeBar("none");
         line.isActive = false;
-        isTurn = false;
-        isShooting = false;
+        if (client != null)
+        {
+            client.isTurn = false;
+            client.isShooting = false;
+        }
     }
 
     public void ShowRematchButton()
     {
         UI.onlineRematchButton.SetActive(true);
+    }
+
+    public bool IsStartingPlayer()
+    {
+        return client.goingFirst;
     }
 }

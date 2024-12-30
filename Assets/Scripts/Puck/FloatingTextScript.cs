@@ -10,6 +10,7 @@ public class FloatingTextScript : MonoBehaviour
     [SerializeField] private float speedUp; // 0.05
     [SerializeField] private float speedShrink; // 0.005f;
     [SerializeField] private float speedFade; // 0.005
+    [SerializeField] private bool shouldFollowParent;
 
     // Start is called before the first frame update
     void Start()
@@ -41,8 +42,11 @@ public class FloatingTextScript : MonoBehaviour
 
     private void Update()
     {
-        transform.position = new Vector3(transform.parent.position.x, transform.position.y, transform.position.z);
-        transform.rotation = Quaternion.identity;
+        if (shouldFollowParent)
+        {
+            transform.position = new Vector3(transform.parent.position.x, transform.position.y, transform.position.z);
+            transform.rotation = Quaternion.identity;
+        }
     }
 
     public void Initialize(string text)
@@ -58,12 +62,13 @@ public class FloatingTextScript : MonoBehaviour
         transform.localScale = new Vector3(scale, scale, scale);
     }
 
-    public void Initialize(string text, float speedUpRate, float speedShrinkRate, float speedFadeRate, float scale = 1)
+    public void Initialize(string text, float speedUpRate, float speedShrinkRate, float speedFadeRate, float scale = 1, bool textShouldFollowParent = false)
     {
         TMPtext.text = text;
         speedUp *= speedUpRate;
         speedShrink *= speedShrinkRate;
         speedFade *= speedFadeRate;
         transform.localScale = new Vector3(scale, scale, scale);
+        shouldFollowParent = textShouldFollowParent;
     }
 }

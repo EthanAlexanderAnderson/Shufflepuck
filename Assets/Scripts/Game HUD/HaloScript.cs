@@ -42,10 +42,17 @@ public class HaloScript : MonoBehaviour
     {
         if (debuggingInProgress) return;
 
-        sideModifier = logic.activeCompetitor.isPlayer ? (-3.6f) : (3.6f);
+        if (!ClientLogicScript.Instance.isRunning) // offline
+        {
+            sideModifier = LogicScript.Instance.activeCompetitor.isPlayer ? (-3.6f) : (3.6f);
+        }
+        else // online
+        {
+            sideModifier = ClientLogicScript.Instance.client.goingFirst ? (-3.6f) : (3.6f);
+        }
 
         // calculate the pucks estimated position
-        if (logic.activeBar == "angle")
+        if (logic.activeBar == "angle" || (ClientLogicScript.Instance.isRunning && ClientLogicScript.Instance.activeBar == "angle"))
         {
             this.transform.position = new Vector3(0.0f, -10.0f, 1.0f);
             angle = (float)((-line.GetValue() * 0.6) + 120);
@@ -53,7 +60,7 @@ public class HaloScript : MonoBehaviour
             float ycomponent = Mathf.Sin(angle * Mathf.PI / 180) * angleModifierY;
             this.transform.position = new Vector3(xcomponent + sideModifier, ycomponent - minusY, this.transform.position.z);
         }
-        else if (logic.activeBar == "power")
+        else if (logic.activeBar == "power" || (ClientLogicScript.Instance.isRunning && ClientLogicScript.Instance.activeBar == "power"))
         {
             power = (line.GetValue() - (line.GetValue() - 50) * 0.5f) * powerModifier;
             if (line.GetValue() >= 95)
