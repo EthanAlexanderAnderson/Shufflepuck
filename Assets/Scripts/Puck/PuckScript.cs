@@ -35,6 +35,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     private bool pastSafeLine;
     private bool playersPuck;
     private float velocity;
+    public NetworkVariable<int> velocityNetworkedRounded = new NetworkVariable<int>();
 
     // this one actually does stuff
     [SerializeField] private float powerModifier;
@@ -88,6 +89,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
         // Calculate the magnitude of the velocity vector to determine the sliding noise volume
         velocity = Mathf.Sqrt(rb.velocity.x * rb.velocity.x + rb.velocity.y * rb.velocity.y);
+        if (IsServer) { velocityNetworkedRounded.Value = (int)velocity; }
         noiseSFX.volume = logic.gameIsRunning ? (velocity / 15.0f) * SFXvolume : 0f; // only play noise if game is running (not plinko)
 
         if (IsSafe())

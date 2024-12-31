@@ -79,7 +79,7 @@ public class ClientLogicScript : NetworkBehaviour
         }
 
         // start turn, do this once then start shooting
-        if (client.isTurn && client.puckCount > 0 && puckManager.AllPucksAreSlowed())
+        if (client.isTurn && client.puckCount > 0 && puckManager.AllPucksAreSlowedClient())
         {
             activeBar = bar.ChangeBar("angle", client.goingFirst);
             line.isActive = true;
