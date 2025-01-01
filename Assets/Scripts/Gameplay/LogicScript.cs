@@ -324,7 +324,14 @@ public class LogicScript : MonoBehaviour
                 // otherwise, use plus one
                 else
                 {
-                    powerupManager.PlusOnePowerup();
+                    if (opponent.puckCount > 2)
+                    {
+                        powerupManager.GrowthPowerup();
+                    }
+                    else
+                    {
+                        powerupManager.PlusOnePowerup();
+                    }
                     powerupHasBeenUsedThisTurn = true;
                 }
             }

@@ -493,7 +493,14 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
         else if (LogicScript.Instance.gameIsRunning) // growth vs CPU
         {
-            LogicScript.OnPlayerShot += IncrementBonusValue;
+            if (playersPuck)
+            {
+                LogicScript.OnPlayerShot += IncrementBonusValue;
+            }
+            else
+            {
+                LogicScript.OnOpponentShot += IncrementBonusValue;
+            }
         }
     }
 
