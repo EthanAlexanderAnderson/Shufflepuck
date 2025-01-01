@@ -57,6 +57,11 @@ public class LogicScript : MonoBehaviour
         }
     }
 
+    public delegate void PlayerShot();
+    public static event PlayerShot OnPlayerShot;
+    public delegate void OpponentShot();
+    public static event PlayerShot OnOpponentShot;
+
     // temp variables
     private float tempTime = 0;
     public float CPUShotAngle = 0;
@@ -371,6 +376,14 @@ public class LogicScript : MonoBehaviour
         UI.PostShotUpdate(player.puckCount, opponent.puckCount);
         UI.UpdateShotDebugText(angle, power, spin);
         nonActiveCompetitor.isTurn = true;
+        if (activeCompetitor.isPlayer)
+        {
+            OnPlayerShot?.Invoke();
+        }
+        else
+        {
+            OnOpponentShot?.Invoke();
+        }
         SwapCompetitors();
     }
 

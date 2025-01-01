@@ -56101,6 +56101,8 @@ MonoBehaviour:
   boltImage: {fileID: 21300000, guid: d81136647aa57f844aa890782705126f, type: 3}
   forceFieldImage: {fileID: 21300000, guid: 1c7818fa93676a545ae68c085140ac35, type: 3}
   phaseImage: {fileID: 21300000, guid: f30acaa61d3105c4fad1bf8be9e47cf0, type: 3}
+  cullImage: {fileID: 21300000, guid: 06c5ee6af271e6543ae8057a95e02478, type: 3}
+  growthImage: {fileID: 21300000, guid: 6fcb225fe209a5f40b0a8b2434c007c9, type: 3}
   forcefieldScript: {fileID: 553278802}
 --- !u!4 &1593171485
 Transform:

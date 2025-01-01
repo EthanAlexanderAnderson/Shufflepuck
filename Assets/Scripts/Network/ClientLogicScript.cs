@@ -45,6 +45,12 @@ public class ClientLogicScript : NetworkBehaviour
     private int wallCount = 3;
     [SerializeField] private GameObject wall; // set in editor
 
+    // game state / events
+    public delegate void PlayerShot();
+    public static event PlayerShot OnPlayerShot;
+    public delegate void OpponentShot();
+    public static event OpponentShot OnOpponentShot;
+
     private void Awake()
     {
         if (Instance == null)
@@ -184,6 +190,14 @@ public class ClientLogicScript : NetworkBehaviour
         }
         DecrementWallCount();
         PowerupManager.Instance.DisableForceFieldIfNecessary();
+        if (isPlayer)
+        {
+            OnPlayerShot?.Invoke();
+        }
+        else
+        {
+            OnOpponentShot?.Invoke();
+        }
         puckHalo.SetActive(false);
     }
 

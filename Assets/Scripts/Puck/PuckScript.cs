@@ -449,6 +449,11 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
         collisionParticleEffect.Play();
         Destroy(collisionParticleEffect.gameObject, 10f);
+        // un sub from events
+        LogicScript.OnPlayerShot -= IncrementBonusValue;
+        LogicScript.OnOpponentShot -= IncrementBonusValue;
+        ClientLogicScript.OnPlayerShot -= IncrementBonusValue;
+        ClientLogicScript.OnOpponentShot -= IncrementBonusValue;
     }
 
     [ServerRpc]
@@ -470,5 +475,33 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         SetPuckBaseValue(0);
         SetPowerupText("valueless");
         CreatePowerupFloatingText();
+    }
+
+    public void EnableGrowth()
+    {
+        puckBonusValue--; // start one under, because it gets shot directly after this
+        if (ClientLogicScript.Instance.isRunning) // growth online
+        {
+            if (playersPuck)
+            {
+                ClientLogicScript.OnPlayerShot += IncrementBonusValue;
+            }
+            else
+            {
+                ClientLogicScript.OnOpponentShot += IncrementBonusValue;
+            }
+        }
+        else if (LogicScript.Instance.gameIsRunning) // growth vs CPU
+        {
+            LogicScript.OnPlayerShot += IncrementBonusValue;
+        }
+    }
+
+    private void IncrementBonusValue()
+    {
+        puckBonusValue++;
+        if (ComputeValue() == 0) { return; }
+        var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
+        floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f, true);
     }
 }

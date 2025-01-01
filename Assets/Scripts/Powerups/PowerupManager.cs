@@ -25,6 +25,9 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private Sprite boltImage;
     [SerializeField] private Sprite forceFieldImage;
     [SerializeField] private Sprite phaseImage;
+    [SerializeField] private Sprite cullImage;
+    [SerializeField] private Sprite growthImage;
+
 
     private Competitor activeCompetitor;
     Action[] methodArray;
@@ -47,7 +50,9 @@ public class PowerupManager : NetworkBehaviour
             BlockPowerup,
             BoltPowerup,
             ForceFieldPowerup,
-            PhasePowerup
+            PhasePowerup,
+            CullPowerup,
+            GrowthPowerup
         };
     }
 
@@ -72,7 +77,7 @@ public class PowerupManager : NetworkBehaviour
     {
         GetActiveCompetitor();
         Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
-        Sprite[] powerupSprites = { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage };
+        Sprite[] powerupSprites = { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage, cullImage, growthImage };
 
         // generate 3 unique random powerups
         int[] randomPowerups = { 0, 1, 2 };
@@ -211,6 +216,51 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.SetPowerupText("phase");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         activeCompetitor.activePuckScript.SetPhase(true);
+    }
+
+    public void CullPowerup()
+    {
+        if (!fromClientRpc && ClientLogicScript.Instance.isRunning)
+        {
+            PowerupServerRpc(6);
+            return;
+        }
+        fromClientRpc = false;
+        GetActiveCompetitor();
+
+        var allPucks = GameObject.FindGameObjectsWithTag("puck");
+        foreach (var puck in allPucks)
+        {
+            var pucki = puck.GetComponent<PuckScript>();
+            if (pucki.ComputeValue() <= 0 && pucki.IsShot())
+            {
+                if (ClientLogicScript.Instance.isRunning)
+                {
+                    pucki.DestroyPuckServerRpc(); // for online. This only triggers once, because calling this requires ownership of the puck
+                }
+                else
+                {
+                    pucki.DestroyPuck();
+                }
+            }
+        }
+        activeCompetitor.activePuckScript.SetPowerupText("cull");
+        activeCompetitor.activePuckScript.CreatePowerupFloatingText();
+    }
+
+    public void GrowthPowerup()
+    {
+        if (!fromClientRpc && ClientLogicScript.Instance.isRunning)
+        {
+            PowerupServerRpc(7);
+            return;
+        }
+        fromClientRpc = false;
+        GetActiveCompetitor();
+
+        activeCompetitor.activePuckScript.SetPowerupText("growth");
+        activeCompetitor.activePuckScript.CreatePowerupFloatingText();
+        activeCompetitor.activePuckScript.EnableGrowth();
     }
 
     public void DisableForceFieldIfNecessary()
