@@ -29,6 +29,8 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private Sprite growthImage;
     [SerializeField] private Sprite lockImage;
     [SerializeField] private Sprite explosionImage;
+    [SerializeField] private Sprite fogImage;
+
 
     private Competitor activeCompetitor;
     Action[] methodArray;
@@ -55,13 +57,9 @@ public class PowerupManager : NetworkBehaviour
             CullPowerup,
             GrowthPowerup,
             LockPowerup,
-            ExplosionPowerup
+            ExplosionPowerup,
+            FogPowerup
         };
-    }
-
-    private void Update()
-    {
-        activeCompetitor = LogicScript.Instance.activeCompetitor;
     }
 
     private void GetActiveCompetitor()
@@ -80,7 +78,7 @@ public class PowerupManager : NetworkBehaviour
     {
         GetActiveCompetitor();
         Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
-        Sprite[] powerupSprites = { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage, cullImage, growthImage, lockImage, explosionImage };
+        Sprite[] powerupSprites = { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage, cullImage, growthImage, lockImage, explosionImage, fogImage };
 
         // generate 3 unique random powerups
         int[] randomPowerups = { 0, 1, 2 };
@@ -127,6 +125,7 @@ public class PowerupManager : NetworkBehaviour
             return;
         }
         fromClientRpc = false;
+        GetActiveCompetitor();
 
         puckHalo.SetActive(true);
         activeCompetitor.activePuckScript.SetPowerupText("foresight");
@@ -294,6 +293,22 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.SetPowerupText("explosion");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         activeCompetitor.activePuckScript.EnableExplosion();
+    }
+
+    [SerializeField] private GameObject fog;
+    public void FogPowerup()
+    {
+        if (!fromClientRpc && ClientLogicScript.Instance.isRunning)
+        {
+            PowerupServerRpc(10);
+            return;
+        }
+        fromClientRpc = false;
+        GetActiveCompetitor();
+
+        activeCompetitor.activePuckScript.SetPowerupText("fog");
+        activeCompetitor.activePuckScript.CreatePowerupFloatingText();
+        FogScript.Instance.StartListeners(activeCompetitor.isPlayer);
     }
 
     public void DisableForceFieldIfNecessary()

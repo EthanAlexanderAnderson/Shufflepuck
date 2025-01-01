@@ -219,6 +219,7 @@ public class ClientLogicScript : NetworkBehaviour
         Debug.Log("Game Over");
         isRunning = false;
         UI.TurnText = "";
+        FogScript.Instance.DisableFog();
     }
 
     // Server updates us with match result, for now we fetch score local
@@ -232,6 +233,7 @@ public class ClientLogicScript : NetworkBehaviour
         UI.ChangeUI(UI.gameResultScreen);
         arrow.SetActive(false);
         receivedGameResult = true;
+        FogScript.Instance.DisableFog();
     }
 
     // Server tells the client to switch to game scene and start the game.
