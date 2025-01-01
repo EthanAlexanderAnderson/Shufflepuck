@@ -28,8 +28,7 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private Sprite cullImage;
     [SerializeField] private Sprite growthImage;
     [SerializeField] private Sprite lockImage;
-
-
+    [SerializeField] private Sprite explosionImage;
 
     private Competitor activeCompetitor;
     Action[] methodArray;
@@ -55,7 +54,8 @@ public class PowerupManager : NetworkBehaviour
             PhasePowerup,
             CullPowerup,
             GrowthPowerup,
-            LockPowerup
+            LockPowerup,
+            ExplosionPowerup
         };
     }
 
@@ -80,7 +80,7 @@ public class PowerupManager : NetworkBehaviour
     {
         GetActiveCompetitor();
         Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
-        Sprite[] powerupSprites = { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage, cullImage, growthImage, lockImage };
+        Sprite[] powerupSprites = { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage, cullImage, growthImage, lockImage, explosionImage };
 
         // generate 3 unique random powerups
         int[] randomPowerups = { 0, 1, 2 };
@@ -279,6 +279,21 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.SetPowerupText("lock");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         activeCompetitor.activePuckScript.EnableLock();
+    }
+
+    public void ExplosionPowerup()
+    {
+        if (!fromClientRpc && ClientLogicScript.Instance.isRunning)
+        {
+            PowerupServerRpc(9);
+            return;
+        }
+        fromClientRpc = false;
+        GetActiveCompetitor();
+
+        activeCompetitor.activePuckScript.SetPowerupText("explosion");
+        activeCompetitor.activePuckScript.CreatePowerupFloatingText();
+        activeCompetitor.activePuckScript.EnableExplosion();
     }
 
     public void DisableForceFieldIfNecessary()

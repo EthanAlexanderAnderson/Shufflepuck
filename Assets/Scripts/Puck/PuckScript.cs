@@ -62,6 +62,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     // for powerups
     [SerializeField] private bool phase = false;
     [SerializeField] private bool lockPowerup = false;
+    [SerializeField] private bool explosionPowerup = false;
 
     void OnEnable()
     {
@@ -374,6 +375,15 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             Destroy(collisionParticleEffect.gameObject, 5f);
         }
         angularVelocityModifier = 0;
+
+        // explosion powerup
+        if (explosionPowerup && col.gameObject.CompareTag("puck"))
+        {
+            // Destroy the collided object
+            Destroy(col.gameObject);
+            // destroy self
+            DestroyPuck();
+        }
     }
 
     // base value is multplied by score zone value
@@ -562,5 +572,10 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             rb.bodyType = RigidbodyType2D.Dynamic;
             spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
         }
+    }
+
+    public void EnableExplosion()
+    {
+        explosionPowerup = true;
     }
 }
