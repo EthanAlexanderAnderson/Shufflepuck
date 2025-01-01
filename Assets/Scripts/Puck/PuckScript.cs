@@ -61,6 +61,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     // for powerups
     [SerializeField] private bool phase = false;
+    [SerializeField] private bool lockPowerup = false;
 
     void OnEnable()
     {
@@ -117,23 +118,33 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             }
         }
 
-        // for phase powerup
-        if (phase && IsShot() && pastSafeLine && IsStopped()) // is slowed & shot & past safeline
+        // for phase & lock powerup
+        if (IsShot() && pastSafeLine && IsStopped())
         {
-            // if this puck is within 2 units of the nearest puck, destroy it
-            var pucks = GameObject.FindGameObjectsWithTag("puck");
-            foreach (var puck in pucks)
+            if (phase)
             {
-                if (puck != gameObject && Vector2.Distance(puck.transform.position, transform.position) < 2)
+                // if this puck is within 2 units of the nearest puck, destroy it
+                var pucks = GameObject.FindGameObjectsWithTag("puck");
+                foreach (var puck in pucks)
                 {
-                    DestroyPuck();
-                    return;
+                    if (puck != gameObject && Vector2.Distance(puck.transform.position, transform.position) < 2)
+                    {
+                        DestroyPuck();
+                        return;
+                    }
                 }
+                // othewrise, unphase it (make it visible again)
+                spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+                puckCollider.isTrigger = false;
+                phase = false;
             }
-            // othewrise, unphase it (make it visible again)
-            spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
-            puckCollider.isTrigger = false;
-            phase = false;
+
+            if (lockPowerup)
+            {
+                rb.bodyType = RigidbodyType2D.Kinematic;
+                spriteRenderer.color = new Color(0.5f, 0.5f, 0.5f, 1f);
+                lockPowerup = false;
+            }
         }
     }
 
@@ -454,6 +465,10 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         LogicScript.OnOpponentShot -= IncrementBonusValue;
         ClientLogicScript.OnPlayerShot -= IncrementBonusValue;
         ClientLogicScript.OnOpponentShot -= IncrementBonusValue;
+        LogicScript.OnPlayerShot -= DisableLock;
+        LogicScript.OnOpponentShot -= DisableLock;
+        ClientLogicScript.OnPlayerShot -= DisableLock;
+        ClientLogicScript.OnOpponentShot -= DisableLock;
     }
 
     [ServerRpc]
@@ -510,5 +525,42 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         if (ComputeValue() == 0) { return; }
         var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
         floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f, true);
+    }
+
+    public void EnableLock()
+    {
+        lockPowerup = true;
+
+        if (ClientLogicScript.Instance.isRunning) // lock online
+        {
+            if (playersPuck)
+            {
+                ClientLogicScript.OnPlayerShot += DisableLock;
+            }
+            else
+            {
+                ClientLogicScript.OnOpponentShot += DisableLock;
+            }
+        }
+        else if (LogicScript.Instance.gameIsRunning) // lock vs CPU
+        {
+            if (playersPuck)
+            {
+                LogicScript.OnPlayerShot += DisableLock;
+            }
+            else
+            {
+                LogicScript.OnOpponentShot += DisableLock;
+            }
+        }
+    }
+
+    private void DisableLock()
+    {
+        if (transform.position.y > -9)
+        {
+            rb.bodyType = RigidbodyType2D.Dynamic;
+            spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+        }
     }
 }
