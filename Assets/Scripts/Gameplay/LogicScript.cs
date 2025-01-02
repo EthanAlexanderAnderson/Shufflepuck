@@ -428,6 +428,7 @@ public class LogicScript : MonoBehaviour
         }
         else // for hard
         {
+            if (powerupsAreEnabled) { powerupManager.LoadDeck(); }
             player.isTurn = true;
             opponent.isTurn = false;
             activeCompetitor = player;
@@ -479,6 +480,7 @@ public class LogicScript : MonoBehaviour
         line.isActive = false;
         bar.ChangeBar("none");
         arrow.SetActive(false);
+        FogScript.Instance.DisableFog();
     }
 
     // this is the CPU AI for hard mode
@@ -540,9 +542,11 @@ public class LogicScript : MonoBehaviour
         Application.Quit();
     }
 
+    [SerializeField] GameObject deckScreen;
     public void SetPowerups(bool value)
     {
         powerupsAreEnabled = value;
+        UI.ChangeUI(deckScreen); // TODO: make this not dumb
     }
 
     [SerializeField] private AudioSource puckDestroySFX;

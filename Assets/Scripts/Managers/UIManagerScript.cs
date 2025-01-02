@@ -589,6 +589,14 @@ public class UIManagerScript : MonoBehaviour
                 sr.color = darkMode ? Color.white : Color.black;
             }
         }
+        // swap color to white for all children image objects with the blackText tag
+        foreach (Image img in activeUI.GetComponentsInChildren<Image>())
+        {
+            if (img.tag == "blackText")
+            {
+                img.color = darkMode ? Color.white : Color.black;
+            }
+        }
     }
 
     // helper for debug mode button

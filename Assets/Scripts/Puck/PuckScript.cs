@@ -563,6 +563,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     private void IncrementBonusValue()
     {
+        if (this == null) { return; }
         puckBonusValue++;
         if (ComputeValue() == 0) { return; }
         var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
@@ -599,6 +600,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     private void DisableLock()
     {
+        if (this == null) { return; }
         if (transform.position.y > -9)
         {
             rb.bodyType = RigidbodyType2D.Dynamic;

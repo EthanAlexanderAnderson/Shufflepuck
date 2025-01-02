@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 342459d2bf890e24d969429f103b9db3
+guid: 2cc441a8cb3282e4692ea6b625f1a78c
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5865670524570963042
-    second: block_0
+      213: 1816984551686634014
+    second: Deck Button Mini_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: block_0
+      name: Deck Button Mini_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1680
-        height: 480
+        width: 240
+        height: 260
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -140,8 +140,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 26c0882b34c076150800000000000000
-      internalID: 5865670524570963042
+      spriteID: e1a77ada2d9373910800000000000000
+      internalID: 1816984551686634014
       vertices: []
       indices: 
       edges: []
@@ -157,7 +157,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      block_0: 5865670524570963042
+      Deck Button Mini_0: 1816984551686634014
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

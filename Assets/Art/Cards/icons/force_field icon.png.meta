@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 342459d2bf890e24d969429f103b9db3
+guid: 600bef945ec029d4fa75a53073cb1c3c
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5865670524570963042
-    second: block_0
+      213: 1325534212423442481
+    second: force_field icon_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: block_0
+      name: force_field icon_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1680
-        height: 480
+        width: 182
+        height: 182
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -140,8 +140,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 26c0882b34c076150800000000000000
-      internalID: 5865670524570963042
+      spriteID: 130602dd75e356210800000000000000
+      internalID: 1325534212423442481
       vertices: []
       indices: 
       edges: []
@@ -157,7 +157,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      block_0: 5865670524570963042
+      force_field icon_0: 1325534212423442481
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

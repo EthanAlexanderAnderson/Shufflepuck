@@ -244,7 +244,7 @@ public class ClientLogicScript : NetworkBehaviour
         if (!IsClient) return;
 
         UI.SetReButtons(false);
-
+        if (powerupsAreEnabled) { powerupManager.LoadDeck(); }
 
         isRunning = true;
         wallCount = 3;
