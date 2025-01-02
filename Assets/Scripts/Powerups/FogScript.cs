@@ -9,7 +9,8 @@ public class FogScript : MonoBehaviour
     private float moveSpeed = 0.01f;  // Speed of movement
     private float fadeSpeed = 0.01f;  // Speed of fade in/out
     private bool movingRight = true;  // Direction flag
-    private SpriteRenderer sr;
+    [SerializeField] private SpriteRenderer sr1;
+    [SerializeField] private SpriteRenderer sr2;
 
     private void Awake()
     {
@@ -19,21 +20,18 @@ public class FogScript : MonoBehaviour
             Destroy(Instance);
     }
 
-    private void Start()
-    {
-        sr = GetComponent<SpriteRenderer>();
-    }
-
     void FixedUpdate()
     {
         // change opacity
-        if (fogEnabled && sr.color.a < 1)
+        if (fogEnabled && sr1.color.a < 1)
         {
-            sr.color = new Color(1, 1, 1, sr.color.a + fadeSpeed);
+            sr1.color = new Color(1, 1, 1, sr1.color.a + fadeSpeed);
+            sr2.color = new Color(1, 1, 1, sr2.color.a + fadeSpeed);
         }
-        else if (!fogEnabled && sr.color.a > 0)
+        else if (!fogEnabled && sr1.color.a > 0)
         {
-            sr.color = new Color(1, 1, 1, sr.color.a - fadeSpeed);
+            sr1.color = new Color(1, 1, 1, sr1.color.a - fadeSpeed);
+            sr2.color = new Color(1, 1, 1, sr2.color.a - fadeSpeed);
         }
 
         if (!fogEnabled) { return; }

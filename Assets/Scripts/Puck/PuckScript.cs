@@ -566,6 +566,19 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         if (this == null) { return; }
         puckBonusValue++;
         if (ComputeValue() == 0) { return; }
+        LogicScript.Instance.UpdateScores();
+        if (IsPlayersPuck())
+        {
+            pointPlayerSFX.volume = SFXvolume;
+            pointPlayerSFX.pitch = 0.9f + (0.05f * ComputeValue());
+            pointPlayerSFX.Play();
+        }
+        else
+        {
+            pointCPUSFX.volume = SFXvolume;
+            pointCPUSFX.pitch = 0.8f + (0.05f * ComputeValue());
+            pointCPUSFX.Play();
+        }
         var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
         floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f, true);
     }
