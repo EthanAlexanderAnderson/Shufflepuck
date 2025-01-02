@@ -68,6 +68,11 @@ public class FogScript : MonoBehaviour
         StopListeners();
     }
 
+    public bool FogEnabled()
+    {
+        return fogEnabled;
+    }
+
     public void StartListeners(bool playersPuck)
     {
         StopListeners();

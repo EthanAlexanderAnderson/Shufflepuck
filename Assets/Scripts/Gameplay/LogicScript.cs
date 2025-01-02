@@ -308,7 +308,7 @@ public class LogicScript : MonoBehaviour
                 foreach (var puck in allPucks)
                 {
                     var puckScript = puck.GetComponent<PuckScript>();
-                    if (puckScript.IsPlayersPuck() && puckScript.ComputeValue() > 0)
+                    if (puckScript.IsPlayersPuck() && puckScript.ComputeValue() > 0 && !puckScript.IsHydra())
                     {
                         playerPucks++;
                     }
@@ -484,6 +484,9 @@ public class LogicScript : MonoBehaviour
     // this is the CPU AI for hard mode
     private (float, float, float) FindOpenPath()
     {
+        // if Fog is active, shoot random
+        if (FogScript.Instance.FogEnabled()) { return (Random.Range(35.0f, 65.0f), Random.Range(40.0f, 70.0f), Random.Range(45.0f, 55.0f)); }
+
         CPUPathScript best = null;
         int highestValue = 0;
         // check all paths to see which are unblocked

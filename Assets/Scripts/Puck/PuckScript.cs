@@ -145,6 +145,8 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             {
                 rb.bodyType = RigidbodyType2D.Kinematic;
                 spriteRenderer.color = new Color(0.5f, 0.5f, 0.5f, 1f);
+                rb.angularVelocity = 0;
+                rb.velocity = Vector2.zero;
                 lockPowerup = false;
             }
         }
@@ -242,6 +244,9 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public int ComputeValue() { return (puckBaseValue * zoneMultiplier) + (zoneMultiplier > 0 ? puckBonusValue : 0); }
     public int GetZoneMultiplier() { return zoneMultiplier; }
     public void SetZoneMultiplier(int ZM) { zoneMultiplier = ZM; }
+    public bool IsLocked() { return lockPowerup; }
+    public bool IsExplosion() { return explosionPowerup; }
+    public bool IsHydra() { return hydraPowerup; }
 
     // when a puck enters a scoring zone, update its score and play a SFX
     public void EnterScoreZone(bool isZoneSafe, int enteredZoneMultiplier)
