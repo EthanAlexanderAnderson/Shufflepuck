@@ -63,6 +63,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     [SerializeField] private bool phase = false;
     [SerializeField] private bool lockPowerup = false;
     [SerializeField] private bool explosionPowerup = false;
+    [SerializeField] private bool hydraPowerup = false;
 
     void OnEnable()
     {
@@ -380,7 +381,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         if (explosionPowerup && col.gameObject.CompareTag("puck"))
         {
             // Destroy the collided object
-            Destroy(col.gameObject);
+            col.gameObject.GetComponent<PuckScript>().DestroyPuck();
             // destroy self
             DestroyPuck();
         }
@@ -441,10 +442,22 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
     }
 
-    public void DestroyPuck() // Destroys the puck with a particle and sound effect
+    public void DestroyPuck() // Destroys the puck with a particle and sound effect, used by powerups that say destroy
     {
         Destroy(gameObject, 0.1f);
         logic.playDestroyPuckSFX(SFXvolume);
+        // hydra powerup
+        if (hydraPowerup)
+        {
+            if (ClientLogicScript.Instance.isRunning)
+            {
+                ServerLogicScript.Instance.HydraServerRpc(playersPuck, transform.position.x, transform.position.y);
+            }
+            else
+            {
+                PowerupManager.Instance.HydraHelper(playersPuck, transform.position.x, transform.position.y);
+            }
+        }
     }
 
     override public void OnDestroy()
@@ -470,6 +483,20 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
         collisionParticleEffect.Play();
         Destroy(collisionParticleEffect.gameObject, 10f);
+
+        // Check if the puck has a TrailRenderer
+        TrailRenderer trail = GetComponent<TrailRenderer>();
+        if (trail != null)
+        {
+            Destroy(trail); // Destroy the TrailRenderer
+        }
+
+        // update score
+        puckBaseValue = 0;
+        puckBonusValue = 0;
+        zoneMultiplier = 0;
+        LogicScript.Instance.UpdateScores();
+
         // un sub from events
         LogicScript.OnPlayerShot -= IncrementBonusValue;
         LogicScript.OnOpponentShot -= IncrementBonusValue;
@@ -577,5 +604,10 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public void EnableExplosion()
     {
         explosionPowerup = true;
+    }
+
+    public void EnableHydra()
+    {
+        hydraPowerup = true;
     }
 }

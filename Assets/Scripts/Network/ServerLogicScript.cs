@@ -374,4 +374,70 @@ public class ServerLogicScript : NetworkBehaviour
             clientLogic.SetErrorMessageClientRpc(4);
         }
     }
+
+    // Hydra Powerup
+    [ServerRpc(RequireOwnership = true)] // this is true so it only fires once
+    public void HydraServerRpc(bool playersPuck, float x, float y, ServerRpcParams rpcParams = default)
+    {
+        if (!IsServer) return;
+        // Get the ClientId of the client that sent this ServerRPC
+        ulong clientId = rpcParams.Receive.SenderClientId;
+        int competitorIndex = clients.IndexOf(clientId);
+        Vector3 pos = Vector3.zero;
+
+        try
+        {
+            if (!playersPuck) { competitorIndex = (competitorIndex == 0 ? 1 : 0); }
+            Competitor competitor = competitorList[competitorIndex];
+            //Competitor competitor = playersPuck ? competitorList[competitorIndex] : competitorList[(competitorIndex == 0 ? 1 : 0)];
+            //competitorIndex = competitorList.IndexOf(competitor);
+            int puckSpriteID = competitor.puckSpriteID;
+
+            // do twice (spawn 2 pucks)
+            for (int i = 0; i < 2; i++)
+            {
+                float randRange = 2.0f;
+                // generate coordinates for potenial spawn, then see if it's too close to another puck
+                bool tooClose = true;
+                while (tooClose)
+                {
+                    pos = new Vector3(x + Random.Range(-randRange, randRange), y + Random.Range(-randRange, randRange), 0);
+
+                    tooClose = false;
+                    var pucks = GameObject.FindGameObjectsWithTag("puck");
+                    foreach (var puck in pucks)
+                    {
+                        if (Vector2.Distance(puck.transform.position, pos) < 2)
+                        {
+                            tooClose = true;
+                            break;
+                        }
+                    }
+                    // expand possible range until we find a valid postion
+                    randRange += 0.1f;
+                }
+                GameObject puckObject = Instantiate(puck, pos, Quaternion.identity);
+                puckObject.GetComponent<NetworkObject>().Spawn();
+
+                PuckScript puckScript = puckObject.GetComponent<PuckScript>();
+
+                // tell the active competitor this new puck is theirs, tell non-active competitors it's not theirs
+                for (int j = 0; j < competitorList.Count; j++)
+                {
+                    puckScript.InitPuckClientRpc(j == competitorIndex, puckSpriteID, clientRpcParamsList[j]);
+                }
+
+                Debug.Log(
+                    $"Puck has been spawned. \n" +
+                    $"Owned by Client Index #{competitorIndex} \n" +
+                    $"Client ID : {clients[competitorIndex]} \n" +
+                    $"Puck Skin ID: {competitor.puckSpriteID} \n");
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError(e);
+            clientLogic.SetErrorMessageClientRpc(4);
+        }
+    }
 }

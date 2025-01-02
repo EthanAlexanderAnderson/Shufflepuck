@@ -56206,6 +56206,7 @@ MonoBehaviour:
   lockImage: {fileID: 21300000, guid: f3cf5af306d4aee4e8c5f2f1970bc620, type: 3}
   explosionImage: {fileID: 21300000, guid: 4777651c00814454e830141cd8d477a5, type: 3}
   fogImage: {fileID: 21300000, guid: 93e9f4b084d55194d97e0e2defcfed80, type: 3}
+  hydraImage: {fileID: 21300000, guid: 07231e025e6fcf149ad24c843e75fa0d, type: 3}
   forcefieldScript: {fileID: 553278802}
   fog: {fileID: 0}
 --- !u!4 &1593171485

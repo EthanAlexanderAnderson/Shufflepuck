@@ -30,6 +30,7 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private Sprite lockImage;
     [SerializeField] private Sprite explosionImage;
     [SerializeField] private Sprite fogImage;
+    [SerializeField] private Sprite hydraImage;
 
 
     private Competitor activeCompetitor;
@@ -58,7 +59,8 @@ public class PowerupManager : NetworkBehaviour
             GrowthPowerup,
             LockPowerup,
             ExplosionPowerup,
-            FogPowerup
+            FogPowerup,
+            HydraPowerup
         };
     }
 
@@ -78,7 +80,7 @@ public class PowerupManager : NetworkBehaviour
     {
         GetActiveCompetitor();
         Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
-        Sprite[] powerupSprites = { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage, cullImage, growthImage, lockImage, explosionImage, fogImage };
+        Sprite[] powerupSprites = { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage, cullImage, growthImage, lockImage, explosionImage, fogImage, hydraImage };
 
         // generate 3 unique random powerups
         int[] randomPowerups = { 0, 1, 2 };
@@ -311,6 +313,21 @@ public class PowerupManager : NetworkBehaviour
         FogScript.Instance.StartListeners(activeCompetitor.isPlayer);
     }
 
+    public void HydraPowerup()
+    {
+        if (!fromClientRpc && ClientLogicScript.Instance.isRunning)
+        {
+            PowerupServerRpc(11);
+            return;
+        }
+        fromClientRpc = false;
+        GetActiveCompetitor();
+
+        activeCompetitor.activePuckScript.SetPowerupText("hydra");
+        activeCompetitor.activePuckScript.CreatePowerupFloatingText();
+        activeCompetitor.activePuckScript.EnableHydra();
+    }
+
     public void DisableForceFieldIfNecessary()
     {
         GetActiveCompetitor();
@@ -335,5 +352,40 @@ public class PowerupManager : NetworkBehaviour
         if (!IsClient) return;
         fromClientRpc = true;
         methodArray[powerupActionIndex].Invoke();
+    }
+
+    public void HydraHelper(bool isPlayers, float x, float y)
+    {
+        Competitor hydraCompetitor = isPlayers ? LogicScript.Instance.player : LogicScript.Instance.player;
+        Vector3 pos = Vector3.zero;
+
+        // do twice (spawn 2 pucks)
+        for (int i = 0; i < 2; i++)
+        {
+            float randRange = 2.0f;
+            // generate coordinates for potenial spawn, then see if it's too close to another puck
+            bool tooClose = true;
+            while (tooClose)
+            {
+                pos = new Vector3(x + Random.Range(-randRange, randRange), y + Random.Range(-randRange, randRange), 0);
+
+                tooClose = false;
+                var pucks = GameObject.FindGameObjectsWithTag("puck");
+                foreach (var puck in pucks)
+                {
+                    if (Vector2.Distance(puck.transform.position, pos) < 2)
+                    {
+                        tooClose = true;
+                        break;
+                    }
+                }
+                // expand possible range until we find a valid postion
+                randRange += 0.1f;
+            }
+
+            GameObject puckObject = Instantiate(puckPrefab, pos, Quaternion.identity);
+            PuckScript puckScript = puckObject.GetComponent<PuckScript>();
+            puckScript.InitPuck(hydraCompetitor.isPlayer, hydraCompetitor.puckSpriteID);
+        }
     }
 }
