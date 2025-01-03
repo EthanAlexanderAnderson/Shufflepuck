@@ -218,12 +218,17 @@ MonoBehaviour:
   minusCPUSFX: {fileID: -916678449169613619}
   animationLayer: {fileID: 3448663806602933473}
   trail: {fileID: 6188019625278550676}
+  velocityNetworkedRounded:
+    m_InternalValue: 0
   powerModifier: 12
   angularVelocity: 0
   angularVelocityModifier: 0.06
   counterForce: 0.3
   floatingTextPrefab: {fileID: 4579905589776270658, guid: a4af9b0b007a49c4ca9fa4d76af0f273, type: 3}
   phase: 0
+  lockPowerup: 0
+  explosionPowerup: 0
+  hydraPowerup: 0
   collisionParticleEffectPrefab: {fileID: 4929346313033784861, guid: 9f76c534760375c468d38282f074644f, type: 3}
 --- !u!96 &6188019625278550676
 TrailRenderer:
@@ -6046,7 +6051,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 10, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!212 &3561834274626098060
 SpriteRenderer:

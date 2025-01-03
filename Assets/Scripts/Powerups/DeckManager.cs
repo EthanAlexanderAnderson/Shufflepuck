@@ -9,7 +9,7 @@ public class DeckManager : MonoBehaviour
     // self
     public static DeckManager Instance;
 
-    [SerializeField] private TMP_Text deckCount;
+    [SerializeField] private TMP_Text deckCount; // total number of cards in deck
     private int[] deck;
 
     [SerializeField] private GameObject cardPreviewImage;
@@ -25,14 +25,14 @@ public class DeckManager : MonoBehaviour
     private void Start()
     {
         deck = new int[PowerupManager.Instance.GetMethodArrayLength()];
-        // load deck from prefs here
+        // default deck is one of each card
         for (int i = 0; i < PowerupManager.Instance.GetMethodArrayLength(); i++)
         {
             deck[i] = 1;
         }
     }
 
-    public void SetCount(int index, int count)
+    public void SetCardCount(int index, int count)
     {
         deck[index] = count;
         UpdateDeckCount();
@@ -63,6 +63,7 @@ public class DeckManager : MonoBehaviour
         var sum = deck.Sum();
         if (sum < 10)
         {
+            // if our deck is invalid, return the default deck
             for (int i = 0; i < deck.Length; i++)
             {
                 deck[i] = 1;
