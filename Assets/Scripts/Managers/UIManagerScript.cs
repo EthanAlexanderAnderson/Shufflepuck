@@ -70,6 +70,13 @@ public class UIManagerScript : MonoBehaviour
     [SerializeField] private Text playerScoreText;
     [SerializeField] private Text opponentScoreText;
 
+    private int playerWins; // TODO: this should not be stored here
+    private int opponentWins; // TODO: this should not be stored here
+    [SerializeField] private GameObject playerWinsObject;
+    [SerializeField] private GameObject opponentWinsObject;
+    [SerializeField] private Text playerWinsText;
+    [SerializeField] private Text opponentWinsText;
+
     public Text shotClockText;
 
     [SerializeField] private Text AngleDebugText;
@@ -241,18 +248,26 @@ public class UIManagerScript : MonoBehaviour
 
         if (isOnline)
         {
+            playerWinsObject.SetActive(true);
+            opponentWinsObject.SetActive(true);
             if (opponentScore < playerScore)
             {
                 gameResultText.text = "You Win!";
                 gameResultHighscoreMessageText.text = "You won by " + System.Math.Abs(scoreDifference) + " points.";
                 IncrementPlayerPref("onlineWin");
                 gameResultHighscoreMessageText.text += dailyChallenge.EvaluateChallenge(2, scoreDifference, 1);
+                playerWins++;
+                playerWinsText.text = playerWins.ToString();
+                opponentWinsText.text = opponentWins.ToString();
             }
             else if (opponentScore > playerScore)
             {
                 gameResultText.text = "You Lose";
                 gameResultHighscoreMessageText.text = "They won by " + System.Math.Abs(scoreDifference) + " points.";
                 IncrementPlayerPref("onlineLoss");
+                opponentWins++;
+                playerWinsText.text = playerWins.ToString();
+                opponentWinsText.text = opponentWins.ToString();
             }
             else
             {
@@ -294,11 +309,13 @@ public class UIManagerScript : MonoBehaviour
         {
             gameResultText.text = "You Win!";
             gameResultHighscoreMessageText.text = "You won by " + scoreDifference + " points.";
-            if (logic.powerupsAreEnabled && difficulty >= 2) { return; }
-            if (scoreDifference > PlayerPrefs.GetInt(highscoresPlayerPrefsKeys[difficulty]))
+            if (!logic.powerupsAreEnabled || difficulty < 2)
             {
-                gameResultHighscoreMessageText.text += "\nNew Highscore!";
-                OverwriteHighscore(scoreDifference, difficulty);
+                if (scoreDifference > PlayerPrefs.GetInt(highscoresPlayerPrefsKeys[difficulty]))
+                {
+                    gameResultHighscoreMessageText.text += "\nNew Highscore!";
+                    OverwriteHighscore(scoreDifference, difficulty);
+                }
             }
             IncrementPlayerPref(winPlayerPrefsKeys[difficulty]);
             gameResultHighscoreMessageText.text += dailyChallenge.EvaluateChallenge(difficulty, scoreDifference, 0);
@@ -466,6 +483,8 @@ public class UIManagerScript : MonoBehaviour
             customizeScreen.SetActive(true);
             UpdateLocks();
             customizeScreen.SetActive(false);
+            playerWins = 0;
+            opponentWins = 0;
         }
         else if (newUI == profileScreen)
         {
@@ -495,6 +514,8 @@ public class UIManagerScript : MonoBehaviour
         opponentScoreText.text = 0.ToString();
         playerPuckCountText.text = 5.ToString();
         opponentPuckCountText.text = 5.ToString();
+        playerWinsObject.SetActive(playerWins > 0 || opponentWins > 0);
+        opponentWinsObject.SetActive(playerWins > 0 || opponentWins > 0);
     }
 
     public void ResetWaitingScreen(string waitingTextInput)
@@ -585,6 +606,14 @@ public class UIManagerScript : MonoBehaviour
             if (sr.tag == "blackText")
             {
                 sr.color = darkMode ? Color.white : Color.black;
+            }
+        }
+        // swap color to white for all children image objects with the blackText tag
+        foreach (Image img in activeUI.GetComponentsInChildren<Image>())
+        {
+            if (img.tag == "blackText")
+            {
+                img.color = darkMode ? Color.white : Color.black;
             }
         }
     }

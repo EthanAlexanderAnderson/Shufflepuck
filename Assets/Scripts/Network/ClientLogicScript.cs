@@ -45,6 +45,12 @@ public class ClientLogicScript : NetworkBehaviour
     private int wallCount = 3;
     [SerializeField] private GameObject wall; // set in editor
 
+    // game state / events
+    public delegate void PlayerShot();
+    public static event PlayerShot OnPlayerShot;
+    public delegate void OpponentShot();
+    public static event OpponentShot OnOpponentShot;
+
     private void Awake()
     {
         if (Instance == null)
@@ -79,7 +85,7 @@ public class ClientLogicScript : NetworkBehaviour
         }
 
         // start turn, do this once then start shooting
-        if (client.isTurn && client.puckCount > 0 && puckManager.AllPucksAreSlowed())
+        if (client.isTurn && client.puckCount > 0 && puckManager.AllPucksAreSlowedClient())
         {
             activeBar = bar.ChangeBar("angle", client.goingFirst);
             line.isActive = true;
@@ -184,6 +190,14 @@ public class ClientLogicScript : NetworkBehaviour
         }
         DecrementWallCount();
         PowerupManager.Instance.DisableForceFieldIfNecessary();
+        if (isPlayer)
+        {
+            OnPlayerShot?.Invoke();
+        }
+        else
+        {
+            OnOpponentShot?.Invoke();
+        }
         puckHalo.SetActive(false);
     }
 
@@ -205,6 +219,7 @@ public class ClientLogicScript : NetworkBehaviour
         Debug.Log("Game Over");
         isRunning = false;
         UI.TurnText = "";
+        FogScript.Instance.DisableFog();
     }
 
     // Server updates us with match result, for now we fetch score local
@@ -218,6 +233,7 @@ public class ClientLogicScript : NetworkBehaviour
         UI.ChangeUI(UI.gameResultScreen);
         arrow.SetActive(false);
         receivedGameResult = true;
+        FogScript.Instance.DisableFog();
     }
 
     // Server tells the client to switch to game scene and start the game.
@@ -228,7 +244,7 @@ public class ClientLogicScript : NetworkBehaviour
         if (!IsClient) return;
 
         UI.SetReButtons(false);
-
+        if (powerupsAreEnabled) { powerupManager.LoadDeck(); }
 
         isRunning = true;
         wallCount = 3;
@@ -238,6 +254,7 @@ public class ClientLogicScript : NetworkBehaviour
         powerupsAreEnabled = powerupsEnabled;
         client = new();
         client.puckCount = 5;
+        client.clientID = NetworkManager.Singleton.LocalClientId;
         logic.activeCompetitor = client;
 
         Debug.Log("Client: Restarting game");

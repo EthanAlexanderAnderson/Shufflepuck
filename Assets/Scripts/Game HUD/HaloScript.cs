@@ -17,6 +17,8 @@ public class HaloScript : MonoBehaviour
     [SerializeField] private float powerModifier; // 0.1396
     [SerializeField] private float power;
     [SerializeField] private float angle;
+    [SerializeField] private float fart = 0.13f;
+    [SerializeField] private float poop = 0.0009f;
 
     private float sideModifier;
 
@@ -73,6 +75,16 @@ public class HaloScript : MonoBehaviour
             float ycomponent = Mathf.Sin(angle * Mathf.PI / 180) * angleModifierY * (powerModifier * power);
             this.transform.position = new Vector3(xcomponent + sideModifier, ycomponent - minusY, this.transform.position.z);
         }
+        else if (logic.activeBar == "spin" || (ClientLogicScript.Instance.isRunning && ClientLogicScript.Instance.activeBar == "spin"))
+        {
+            var spin = line.GetValue();
+            var spinAngle = (float)((((-spin * 0.6) + 120) * (fart + power * 0.02)) - (90 * (fart + power * 0.02)));
+            var spinPower = (float)(System.Math.Abs((spin - 50)) * poop);
+
+            float xcomponent = Mathf.Cos((angle + spinAngle) * Mathf.PI / 180) * angleModifierX * (powerModifier * power - spinPower);
+            float ycomponent = Mathf.Sin((angle + spinAngle) * Mathf.PI / 180) * angleModifierY * (powerModifier * power - spinPower);
+            this.transform.position = new Vector3(xcomponent + sideModifier, ycomponent - minusY, this.transform.position.z);
+        }
     }
 
     // for debug menu
@@ -95,8 +107,12 @@ public class HaloScript : MonoBehaviour
         {
             haloPower += (power - 95) * tempBoostPowerMod + tempBoostPowerModBase;
         }
-        float powerXcomponent = Mathf.Cos(haloAngel * Mathf.PI / 180) * angleModifierX * (powerModifier * haloPower);
-        float powerYcomponent = Mathf.Sin(haloAngel * Mathf.PI / 180) * angleModifierY * (powerModifier * haloPower);
+
+        var spinAngle = (float)((((-spin * 0.6) + 120) * (fart + haloPower * 0.02)) - (90 * (fart + haloPower * 0.02)));
+        var spinPower = (float)(System.Math.Abs((spin - 50)) * poop);
+
+        float powerXcomponent = Mathf.Cos((haloAngel + spinAngle) * Mathf.PI / 180) * angleModifierX * (powerModifier * haloPower - spinPower);
+        float powerYcomponent = Mathf.Sin((haloAngel + spinAngle) * Mathf.PI / 180) * angleModifierY * (powerModifier * haloPower - spinPower);
         this.transform.position = new Vector3(powerXcomponent + sideModifier, powerYcomponent - minusY, this.transform.position.z);
     }
 

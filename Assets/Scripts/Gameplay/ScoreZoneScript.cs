@@ -22,6 +22,7 @@ public class ScoreZoneScript : MonoBehaviour
     // when a puck enters, trigger it's function
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (boundary) { return; }
         if (collision.gameObject.layer == 3)
         {
             puck = collision.gameObject.transform.parent.gameObject.GetComponent<PuckScript>();

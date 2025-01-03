@@ -1,4 +1,5 @@
 using System;
+using Unity.Netcode;
 using UnityEngine;
 
 public class PuckManager : MonoBehaviour
@@ -42,6 +43,13 @@ public class PuckManager : MonoBehaviour
             }
         }
         return (playerSum, opponentSum);
+    }
+
+    // TODO: this is such an awful way to make this work but whatever (THIS MAY NOT BE NEEDED ACTUALLY)
+    public (int, int, ulong) UpdateScoresOnlineHelper()
+    {
+        var (hosterScore, joinerScore) = UpdateScores();
+        return (hosterScore, joinerScore, NetworkManager.Singleton.LocalClientId);
     }
 
     // helper for AllPucksAreSlowed, AllPucksAreSlowedMore, AllPucksAreStopped
@@ -96,4 +104,25 @@ public class PuckManager : MonoBehaviour
             Destroy(puck);
         }
     }
+
+    // this special function is needed for the ClientLogicScript, because it cannot call functions on pucks it doesn't own
+    public bool AllPucksAreSlowedClient()
+    {
+        var allPucks = GameObject.FindGameObjectsWithTag("puck");
+        foreach (var puck in allPucks)
+        {
+            var puckScript = puck.GetComponent<PuckScript>();
+            if (puckScript == null) continue;
+            if (puckScript.velocityNetworkedRounded == null) continue;
+
+            var velocity = puckScript.velocityNetworkedRounded.Value;
+
+            if (velocity >= 1 || puck.transform.position.y < -9)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }

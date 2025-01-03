@@ -57,6 +57,11 @@ public class LogicScript : MonoBehaviour
         }
     }
 
+    public delegate void PlayerShot();
+    public static event PlayerShot OnPlayerShot;
+    public delegate void OpponentShot();
+    public static event PlayerShot OnOpponentShot;
+
     // temp variables
     private float tempTime = 0;
     public float CPUShotAngle = 0;
@@ -175,6 +180,7 @@ public class LogicScript : MonoBehaviour
             UI.UpdateGameResult(player.score, opponent.score, difficulty, isLocal);
             isLocal = false;
             arrow.SetActive(false);
+            FogScript.Instance.DisableFog();
         }
     }
 
@@ -302,7 +308,7 @@ public class LogicScript : MonoBehaviour
                 foreach (var puck in allPucks)
                 {
                     var puckScript = puck.GetComponent<PuckScript>();
-                    if (puckScript.IsPlayersPuck() && puckScript.ComputeValue() > 0)
+                    if (puckScript.IsPlayersPuck() && puckScript.ComputeValue() > 0 && !puckScript.IsHydra())
                     {
                         playerPucks++;
                     }
@@ -319,7 +325,14 @@ public class LogicScript : MonoBehaviour
                 // otherwise, use plus one
                 else
                 {
-                    powerupManager.PlusOnePowerup();
+                    if (opponent.puckCount > 2)
+                    {
+                        powerupManager.GrowthPowerup();
+                    }
+                    else
+                    {
+                        powerupManager.PlusOnePowerup();
+                    }
                     powerupHasBeenUsedThisTurn = true;
                 }
             }
@@ -371,6 +384,14 @@ public class LogicScript : MonoBehaviour
         UI.PostShotUpdate(player.puckCount, opponent.puckCount);
         UI.UpdateShotDebugText(angle, power, spin);
         nonActiveCompetitor.isTurn = true;
+        if (activeCompetitor.isPlayer)
+        {
+            OnPlayerShot?.Invoke();
+        }
+        else
+        {
+            OnOpponentShot?.Invoke();
+        }
         SwapCompetitors();
     }
 
@@ -407,6 +428,7 @@ public class LogicScript : MonoBehaviour
         }
         else // for hard
         {
+            if (powerupsAreEnabled) { powerupManager.LoadDeck(); }
             player.isTurn = true;
             opponent.isTurn = false;
             activeCompetitor = player;
@@ -458,11 +480,15 @@ public class LogicScript : MonoBehaviour
         line.isActive = false;
         bar.ChangeBar("none");
         arrow.SetActive(false);
+        FogScript.Instance.DisableFog();
     }
 
     // this is the CPU AI for hard mode
     private (float, float, float) FindOpenPath()
     {
+        // if Fog is active, shoot random
+        if (FogScript.Instance.FogEnabled()) { return (Random.Range(35.0f, 65.0f), Random.Range(40.0f, 70.0f), Random.Range(45.0f, 55.0f)); }
+
         CPUPathScript best = null;
         int highestValue = 0;
         // check all paths to see which are unblocked
@@ -516,9 +542,11 @@ public class LogicScript : MonoBehaviour
         Application.Quit();
     }
 
+    [SerializeField] GameObject deckScreen;
     public void SetPowerups(bool value)
     {
         powerupsAreEnabled = value;
+        UI.ChangeUI(deckScreen); // TODO: make this not dumb
     }
 
     [SerializeField] private AudioSource puckDestroySFX;

@@ -45,7 +45,7 @@ public class CPUPathScript : MonoBehaviour
         {
             if (numberOfPucksCurrentlyInPath <=1) return 0;
 
-            if (pucksCurrentlyInPath.TrueForAll(IsPlayersPuck))
+            if (pucksCurrentlyInPath.TrueForAll(IsPlayersPuck) && pucksCurrentlyInPath.TrueForAll(IsNotLockedOrExposion))
             {
                 return value;
             }
@@ -62,6 +62,16 @@ public class CPUPathScript : MonoBehaviour
         if (p.GetComponent<PuckScript>() == null) return false;
 
         return p.GetComponent<PuckScript>().IsPlayersPuck();
+    }
+
+    // helper only for CalculateValue() contact shots
+    private bool IsNotLockedOrExposion(GameObject p)
+    {
+        if (p == null) return false;
+
+        if (p.GetComponent<PuckScript>() == null) return false;
+
+        return !(p.GetComponent<PuckScript>().IsLocked() || p.GetComponent<PuckScript>().IsExplosion());
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

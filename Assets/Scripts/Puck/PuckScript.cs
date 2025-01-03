@@ -35,6 +35,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     private bool pastSafeLine;
     private bool playersPuck;
     private float velocity;
+    public NetworkVariable<int> velocityNetworkedRounded = new NetworkVariable<int>();
 
     // this one actually does stuff
     [SerializeField] private float powerModifier;
@@ -60,6 +61,9 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     // for powerups
     [SerializeField] private bool phase = false;
+    [SerializeField] private bool lockPowerup = false;
+    [SerializeField] private bool explosionPowerup = false;
+    [SerializeField] private bool hydraPowerup = false;
 
     void OnEnable()
     {
@@ -88,6 +92,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
         // Calculate the magnitude of the velocity vector to determine the sliding noise volume
         velocity = Mathf.Sqrt(rb.velocity.x * rb.velocity.x + rb.velocity.y * rb.velocity.y);
+        if (IsServer) { velocityNetworkedRounded.Value = (int)velocity; }
         noiseSFX.volume = logic.gameIsRunning ? (velocity / 15.0f) * SFXvolume : 0f; // only play noise if game is running (not plinko)
 
         if (IsSafe())
@@ -115,23 +120,35 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             }
         }
 
-        // for phase powerup
-        if (phase && IsShot() && pastSafeLine && IsStopped()) // is slowed & shot & past safeline
+        // for phase & lock powerup
+        if (IsShot() && pastSafeLine && IsStopped())
         {
-            // if this puck is within 2 units of the nearest puck, destroy it
-            var pucks = GameObject.FindGameObjectsWithTag("puck");
-            foreach (var puck in pucks)
+            if (phase)
             {
-                if (puck != gameObject && Vector2.Distance(puck.transform.position, transform.position) < 2)
+                // if this puck is within 2 units of the nearest puck, destroy it
+                var pucks = GameObject.FindGameObjectsWithTag("puck");
+                foreach (var puck in pucks)
                 {
-                    DestroyPuck();
-                    return;
+                    if (puck != gameObject && Vector2.Distance(puck.transform.position, transform.position) < 2)
+                    {
+                        DestroyPuck();
+                        return;
+                    }
                 }
+                // othewrise, unphase it (make it visible again)
+                spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+                puckCollider.isTrigger = false;
+                phase = false;
             }
-            // othewrise, unphase it (make it visible again)
-            spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
-            puckCollider.isTrigger = false;
-            phase = false;
+
+            if (lockPowerup)
+            {
+                rb.bodyType = RigidbodyType2D.Kinematic;
+                spriteRenderer.color = new Color(0.5f, 0.5f, 0.5f, 1f);
+                rb.angularVelocity = 0;
+                rb.velocity = Vector2.zero;
+                lockPowerup = false;
+            }
         }
     }
 
@@ -227,6 +244,9 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public int ComputeValue() { return (puckBaseValue * zoneMultiplier) + (zoneMultiplier > 0 ? puckBonusValue : 0); }
     public int GetZoneMultiplier() { return zoneMultiplier; }
     public void SetZoneMultiplier(int ZM) { zoneMultiplier = ZM; }
+    public bool IsLocked() { return lockPowerup; }
+    public bool IsExplosion() { return explosionPowerup; }
+    public bool IsHydra() { return hydraPowerup; }
 
     // when a puck enters a scoring zone, update its score and play a SFX
     public void EnterScoreZone(bool isZoneSafe, int enteredZoneMultiplier)
@@ -361,6 +381,15 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             Destroy(collisionParticleEffect.gameObject, 5f);
         }
         angularVelocityModifier = 0;
+
+        // explosion powerup
+        if (explosionPowerup && col.gameObject.CompareTag("puck"))
+        {
+            // Destroy the collided object
+            col.gameObject.GetComponent<PuckScript>().DestroyPuck();
+            // destroy self
+            DestroyPuck();
+        }
     }
 
     // base value is multplied by score zone value
@@ -418,10 +447,22 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
     }
 
-    public void DestroyPuck() // Destroys the puck with a particle and sound effect
+    public void DestroyPuck() // Destroys the puck with a particle and sound effect, used by powerups that say destroy
     {
         Destroy(gameObject, 0.1f);
         logic.playDestroyPuckSFX(SFXvolume);
+        // hydra powerup
+        if (hydraPowerup)
+        {
+            if (ClientLogicScript.Instance.isRunning)
+            {
+                ServerLogicScript.Instance.HydraServerRpc(playersPuck, transform.position.x, transform.position.y);
+            }
+            else
+            {
+                PowerupManager.Instance.HydraHelper(playersPuck, transform.position.x, transform.position.y);
+            }
+        }
     }
 
     override public void OnDestroy()
@@ -447,6 +488,29 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
         collisionParticleEffect.Play();
         Destroy(collisionParticleEffect.gameObject, 10f);
+
+        // Check if the puck has a TrailRenderer
+        TrailRenderer trail = GetComponent<TrailRenderer>();
+        if (trail != null)
+        {
+            Destroy(trail); // Destroy the TrailRenderer
+        }
+
+        // update score
+        puckBaseValue = 0;
+        puckBonusValue = 0;
+        zoneMultiplier = 0;
+        LogicScript.Instance.UpdateScores();
+
+        // un sub from events
+        LogicScript.OnPlayerShot -= IncrementBonusValue;
+        LogicScript.OnOpponentShot -= IncrementBonusValue;
+        ClientLogicScript.OnPlayerShot -= IncrementBonusValue;
+        ClientLogicScript.OnOpponentShot -= IncrementBonusValue;
+        LogicScript.OnPlayerShot -= DisableLock;
+        LogicScript.OnOpponentShot -= DisableLock;
+        ClientLogicScript.OnPlayerShot -= DisableLock;
+        ClientLogicScript.OnOpponentShot -= DisableLock;
     }
 
     [ServerRpc]
@@ -468,5 +532,102 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         SetPuckBaseValue(0);
         SetPowerupText("valueless");
         CreatePowerupFloatingText();
+    }
+
+    public void EnableGrowth()
+    {
+        puckBonusValue--; // start one under, because it gets shot directly after this
+        if (ClientLogicScript.Instance.isRunning) // growth online
+        {
+            if (playersPuck)
+            {
+                ClientLogicScript.OnPlayerShot += IncrementBonusValue;
+            }
+            else
+            {
+                ClientLogicScript.OnOpponentShot += IncrementBonusValue;
+            }
+        }
+        else if (LogicScript.Instance.gameIsRunning) // growth vs CPU
+        {
+            if (playersPuck)
+            {
+                LogicScript.OnPlayerShot += IncrementBonusValue;
+            }
+            else
+            {
+                LogicScript.OnOpponentShot += IncrementBonusValue;
+            }
+        }
+    }
+
+    private void IncrementBonusValue()
+    {
+        if (this == null) { return; }
+        puckBonusValue++;
+        if (ComputeValue() == 0) { return; }
+        LogicScript.Instance.UpdateScores();
+        if (IsPlayersPuck())
+        {
+            pointPlayerSFX.volume = SFXvolume;
+            pointPlayerSFX.pitch = 0.9f + (0.05f * ComputeValue());
+            pointPlayerSFX.Play();
+        }
+        else
+        {
+            pointCPUSFX.volume = SFXvolume;
+            pointCPUSFX.pitch = 0.8f + (0.05f * ComputeValue());
+            pointCPUSFX.Play();
+        }
+        var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
+        floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f, true);
+    }
+
+    public void EnableLock()
+    {
+        lockPowerup = true;
+
+        if (ClientLogicScript.Instance.isRunning) // lock online
+        {
+            if (playersPuck)
+            {
+                ClientLogicScript.OnPlayerShot += DisableLock;
+            }
+            else
+            {
+                ClientLogicScript.OnOpponentShot += DisableLock;
+            }
+        }
+        else if (LogicScript.Instance.gameIsRunning) // lock vs CPU
+        {
+            if (playersPuck)
+            {
+                LogicScript.OnPlayerShot += DisableLock;
+            }
+            else
+            {
+                LogicScript.OnOpponentShot += DisableLock;
+            }
+        }
+    }
+
+    private void DisableLock()
+    {
+        if (this == null) { return; }
+        if (transform.position.y > -9)
+        {
+            rb.bodyType = RigidbodyType2D.Dynamic;
+            spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+        }
+    }
+
+    public void EnableExplosion()
+    {
+        explosionPowerup = true;
+    }
+
+    public void EnableHydra()
+    {
+        hydraPowerup = true;
     }
 }

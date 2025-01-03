@@ -14,6 +14,7 @@ public class Competitor
     public Sprite puckSprite;
     public int puckSpriteID;
     public int score;
+    public int wins;
     public int puckCount = 5;
     public bool isTurn;
     public bool isShooting;
