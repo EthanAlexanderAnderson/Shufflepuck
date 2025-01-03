@@ -1,4 +1,5 @@
 using System;
+using Unity.Netcode;
 using UnityEngine;
 
 public class PuckManager : MonoBehaviour
@@ -42,6 +43,13 @@ public class PuckManager : MonoBehaviour
             }
         }
         return (playerSum, opponentSum);
+    }
+
+    // TODO: this is such an awful way to make this work but whatever (THIS MAY NOT BE NEEDED ACTUALLY)
+    public (int, int, ulong) UpdateScoresOnlineHelper()
+    {
+        var (hosterScore, joinerScore) = UpdateScores();
+        return (hosterScore, joinerScore, NetworkManager.Singleton.LocalClientId);
     }
 
     // helper for AllPucksAreSlowed, AllPucksAreSlowedMore, AllPucksAreStopped

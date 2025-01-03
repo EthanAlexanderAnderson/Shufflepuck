@@ -254,6 +254,7 @@ public class ClientLogicScript : NetworkBehaviour
         powerupsAreEnabled = powerupsEnabled;
         client = new();
         client.puckCount = 5;
+        client.clientID = NetworkManager.Singleton.LocalClientId;
         logic.activeCompetitor = client;
 
         Debug.Log("Client: Restarting game");

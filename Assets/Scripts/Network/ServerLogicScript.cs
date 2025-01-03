@@ -23,10 +23,6 @@ public class ServerLogicScript : NetworkBehaviour
     private List<Competitor> competitorList = new(); // use this for puck ownership, same indexes as clients
     private List<ClientRpcParams> clientRpcParamsList = new(); // use this for targeted rpc, same indexes as clients
 
-    // TODO: move these into competitorList
-    private List<int> competitorPuckCountList = new();
-    private List<int> competitorScoreList = new();
-
     private int activeCompetitorIndex;
     private int startingPlayerIndex;
 
@@ -37,6 +33,8 @@ public class ServerLogicScript : NetworkBehaviour
 
     private bool player1powerupsenabled = false;
     private bool player2powerupsenabled = false;
+
+    private bool sentGameResult = false;
 
     private void Awake()
     {
@@ -65,7 +63,7 @@ public class ServerLogicScript : NetworkBehaviour
         }
 
         // If both players have 0 pucks (aka game is over)
-        if (competitorPuckCountList.Count > 1 && competitorPuckCountList.All(n => n <= 0))
+        if (competitorList.Count > 1 && competitorList.All(n => n.puckCount <= 0) && !sentGameResult)
         {
             var allPucks = GameObject.FindGameObjectsWithTag("puck");
             foreach (var puck in allPucks)
@@ -79,6 +77,41 @@ public class ServerLogicScript : NetworkBehaviour
             clientLogic.GameResultClientRpc();
             // host only, show rematch button
             clientLogic.ShowRematchButton();
+            // take note of winner (functionally this does nothing rn lol)
+            try
+            {
+                var (hosterScore, joinerScore, clientID) = PuckManager.Instance.UpdateScoresOnlineHelper();
+                //Debug.Log("[SERVER] Scores: " + hosterScore + " : " + joinerScore);
+                //Debug.Log("[SERVER] " + clientID);
+                for (int i = 0; i < competitorList.Count; i++)
+                {
+                    //Debug.Log("[SERVER]" + " " + i + " " + competitorList[i].clientID);
+                    if (i > 1) { Debug.LogError("TOO MANY PLAYERS"); break; }
+                    if (clients[i] == clientID)
+                    {
+                        competitorList[i].score = hosterScore;
+                    }
+                    else
+                    {
+                        competitorList[i].score = joinerScore;
+                    }
+                }
+                if (competitorList[0].score > competitorList[1].score)
+                {
+                    competitorList[0].wins++;
+                }
+                else if (competitorList[0].score < competitorList[1].score)
+                {
+                    competitorList[1].wins++;
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError(e);
+                clientLogic.SetErrorMessageClientRpc(6);
+            }
+            // this is here so this block doesn't get called repeatedly
+            sentGameResult = true;
         }
     }
 
@@ -101,6 +134,8 @@ public class ServerLogicScript : NetworkBehaviour
 
             Competitor newCompetitor = new(puckID);
             newCompetitor.clientID = clientId;
+            newCompetitor.puckCount = 5;
+            newCompetitor.score = 0;
 
             competitorList.Add(newCompetitor);
 
@@ -111,9 +146,6 @@ public class ServerLogicScript : NetworkBehaviour
                     TargetClientIds = new ulong[] { clientId }
                 }
             });
-
-            competitorPuckCountList.Add(5);
-            competitorScoreList.Add(0);
 
             if (powerupsEnabled && player1powerupsenabled) { player2powerupsenabled = true; }
             if (powerupsEnabled) { player1powerupsenabled = true; }
@@ -197,7 +229,7 @@ public class ServerLogicScript : NetworkBehaviour
         try
         {
             // if both players have 0 pucks, end game
-            if (competitorPuckCountList.All(n => n <= 0))
+            if (competitorList.All(n => n.puckCount <= 0))
             {
                 clientLogic.GameOverConfirmationClientRpc();
                 return;
@@ -238,6 +270,8 @@ public class ServerLogicScript : NetworkBehaviour
             Debug.LogError(e);
             clientLogic.SetErrorMessageClientRpc(4);
         }
+        var (hosterScore, joinerScore) = PuckManager.Instance.UpdateScores();
+        //Debug.Log("[SERVER] Scores: " + hosterScore + " : " + joinerScore);
     }
 
     // Client tells the sever to shoot, given the shot parameters
@@ -251,11 +285,11 @@ public class ServerLogicScript : NetworkBehaviour
             competitorList[activeCompetitorIndex].activePuckScript.Shoot(angleParameter, powerParameter, spinParameter);
 
             // Update puck count
-            competitorPuckCountList[activeCompetitorIndex]--;
+            competitorList[activeCompetitorIndex].puckCount--;
             // tell active their puck count decreased
-            clientLogic.UpdatePuckCountClientRpc(true, competitorPuckCountList[activeCompetitorIndex], clientRpcParamsList[activeCompetitorIndex]);
+            clientLogic.UpdatePuckCountClientRpc(true, competitorList[activeCompetitorIndex].puckCount, clientRpcParamsList[activeCompetitorIndex]);
             // tell non-active their opponent's count decreased, and swap competitors
-            clientLogic.UpdatePuckCountClientRpc(false, competitorPuckCountList[activeCompetitorIndex], clientRpcParamsList[SwapCompetitors()]);
+            clientLogic.UpdatePuckCountClientRpc(false, competitorList[activeCompetitorIndex].puckCount, clientRpcParamsList[SwapCompetitors()]);
 
             CleanupDeadPucks();
 
@@ -314,8 +348,6 @@ public class ServerLogicScript : NetworkBehaviour
         clients.Clear();
         competitorList.Clear();
         clientRpcParamsList.Clear();
-        competitorPuckCountList.Clear();
-        competitorScoreList.Clear();
         activeCompetitorIndex = 0;
         startingPlayerIndex = 0;
         gameIsRunning = false;
@@ -325,6 +357,7 @@ public class ServerLogicScript : NetworkBehaviour
 
     public void Rematch()
     {
+        sentGameResult = false;
         // destroy all network objects with the tag puck
         foreach (var obj in GameObject.FindGameObjectsWithTag("puck"))
         {
@@ -333,8 +366,8 @@ public class ServerLogicScript : NetworkBehaviour
         // reset puck count and score
         for (int i = 0; i < competitorList.Count; i++)
         {
-            competitorPuckCountList[i] = 5;
-            competitorScoreList[i] = 0;
+            competitorList[i].puckCount = 5;
+            competitorList[i].score = 0;
         }
         SelectRandomStartingPlayer();
     }
