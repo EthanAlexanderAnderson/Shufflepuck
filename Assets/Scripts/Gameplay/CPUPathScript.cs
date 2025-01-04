@@ -79,6 +79,15 @@ public class CPUPathScript : MonoBehaviour
         if (collision.gameObject.layer != 3) // ignore center puck collider
         {
             if (!pucksInPath.Contains(collision.gameObject)) { pucksInPath.Add(collision.gameObject); }
+#if (UNITY_EDITOR)
+            if (!isContactShot) { return; }
+            List<GameObject> pucksCurrentlyInPath = GetPucksInPath();
+            int numberOfPucksCurrentlyInPath = pucksCurrentlyInPath.Count;
+            if (numberOfPucksCurrentlyInPath > 1)
+            {
+                EnablePathVisualization(1);
+            }
+#endif
         }
     }
 
@@ -87,14 +96,37 @@ public class CPUPathScript : MonoBehaviour
         if (collision.gameObject.layer != 3) // ignore center puck collider
         { 
             pucksInPath.Remove(collision.gameObject);
+#if (UNITY_EDITOR)
+            if (!isContactShot) { return; }
+            List<GameObject> pucksCurrentlyInPath = GetPucksInPath();
+            int numberOfPucksCurrentlyInPath = pucksCurrentlyInPath.Count;
+            if (numberOfPucksCurrentlyInPath <= 1)
+            {
+                DisablePathVisualization();
+            }
+#endif
         }
     }
 
     // These two are only used to help me create CPU paths
-    public void EnablePathVisualization()
+    public void EnablePathVisualization(int mode = 0)
     {
 #if (UNITY_EDITOR)
         GetComponent<LineRenderer>().enabled = true;
+        if (mode == 0)
+        {
+            GetComponent<LineRenderer>().startColor = Color.green;
+            GetComponent<LineRenderer>().endColor = Color.green;
+            GetComponent<LineRenderer>().startWidth = 0.08f;
+            GetComponent<LineRenderer>().endWidth = 0.08f;
+        }
+        else if (mode == 1)
+        {
+            GetComponent<LineRenderer>().startColor = Color.white;
+            GetComponent<LineRenderer>().endColor = Color.white;
+            GetComponent<LineRenderer>().startWidth = 0.03f;
+            GetComponent<LineRenderer>().endWidth = 0.03f;
+        }
 #endif
     }
     public void DisablePathVisualization()
