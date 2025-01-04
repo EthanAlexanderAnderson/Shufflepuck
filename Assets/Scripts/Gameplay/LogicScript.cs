@@ -546,7 +546,10 @@ public class LogicScript : MonoBehaviour
     public void SetPowerups(bool value)
     {
         powerupsAreEnabled = value;
-        UI.ChangeUI(deckScreen); // TODO: make this not dumb
+        if (value)
+        {
+            UI.ChangeUI(deckScreen); // TODO: make this not dumb
+        }
     }
 
     [SerializeField] private AudioSource puckDestroySFX;
