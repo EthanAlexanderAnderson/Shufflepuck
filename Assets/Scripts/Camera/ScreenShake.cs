@@ -27,7 +27,7 @@ public class ScreenShake : MonoBehaviour
         screenShakeToggle.GetComponent<Toggle>().isOn = shakeEnabled;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (!shakeEnabled) { return; }
         float x = Random.Range(-1f, 1f) * shakeMagnitude;
