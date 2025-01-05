@@ -291,7 +291,7 @@ public class LogicScript : MonoBehaviour
             (CPUShotAngle, CPUShotPower, CPUShotSpin) = FindOpenPath();
         }
 
-        // use powerup (this must be after CPU find path, to not double-use powerups after a phase shot path has been selected)
+        // use powerup (this must be after CPU find path, to not double-use powerups after a phase, contact, or explosion shot path has been selected)
         if (difficulty >= 2 && !isLocal && powerupsAreEnabled && !powerupHasBeenUsedThisTurn)
         {
             if (opponent.puckCount > 3) // first two shots use block
@@ -299,7 +299,7 @@ public class LogicScript : MonoBehaviour
                 powerupManager.BlockPowerup();
                 powerupHasBeenUsedThisTurn = true;
             }
-            else // last three, use plus one or bolt
+            else // last three, use plus one, growth, or bolt
             {
                 // if the ratio of player pucks to opponent pucks is greater than 2, use bolt
                 var allPucks = GameObject.FindGameObjectsWithTag("puck");
@@ -322,7 +322,7 @@ public class LogicScript : MonoBehaviour
                     powerupManager.BoltPowerup();
                     powerupHasBeenUsedThisTurn = true;
                 }
-                // otherwise, use plus one
+                // otherwise, use plus one or growth
                 else
                 {
                     if (opponent.puckCount > 2)
@@ -504,6 +504,11 @@ public class LogicScript : MonoBehaviour
                 {
                     continue;
                 }
+                // handle phase powerup shots
+                if (!powerupsAreEnabled && pathi.DoesPathRequireExplosionPowerup())
+                {
+                    continue;
+                }
 
                 best = pathi;
                 highestValue = pathiShotValue;
@@ -516,12 +521,17 @@ public class LogicScript : MonoBehaviour
             best.EnablePathVisualization();
 
             // handle powerup shots
-            if (best.DoesPathRequirePhasePowerup() && powerupsAreEnabled)
+            if (best.DoesPathRequirePhasePowerup() && powerupsAreEnabled && !powerupHasBeenUsedThisTurn)
             {
                 powerupManager.PhasePowerup();
                 powerupHasBeenUsedThisTurn = true;
             }
-            else if (best.IsPathAContactShot() && powerupsAreEnabled)
+            else if (best.DoesPathRequireExplosionPowerup() && powerupsAreEnabled && !powerupHasBeenUsedThisTurn)
+            {
+                powerupManager.ExplosionPowerup();
+                powerupHasBeenUsedThisTurn = true;
+            }
+            else if (best.IsPathAContactShot() && powerupsAreEnabled && !powerupHasBeenUsedThisTurn)
             {
                 powerupManager.ForceFieldPowerup();
                 powerupHasBeenUsedThisTurn = true;

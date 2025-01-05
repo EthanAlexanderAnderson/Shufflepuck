@@ -16,10 +16,13 @@ public class CPUPathScript : MonoBehaviour
     [SerializeField] private int value;
     [SerializeField] private bool isContactShot;
     [SerializeField] private bool requiresPhasePowerup;
+    private bool requiresExplosionPowerup;
 
     public (float, float, float) GetPath() { return (angle, power, spin); }
 
     public bool DoesPathRequirePhasePowerup() { return requiresPhasePowerup; }
+
+    public bool DoesPathRequireExplosionPowerup() { return requiresExplosionPowerup; }
 
     public bool IsPathAContactShot() { return isContactShot; }
 
@@ -27,6 +30,7 @@ public class CPUPathScript : MonoBehaviour
     {
         List<GameObject> pucksCurrentlyInPath = GetPucksInPath();
         int numberOfPucksCurrentlyInPath = pucksCurrentlyInPath.Count;
+        requiresExplosionPowerup = false;
 
         // if not contact shot, only shoot if path is clear
         if (!isContactShot)
@@ -34,6 +38,11 @@ public class CPUPathScript : MonoBehaviour
             if (numberOfPucksCurrentlyInPath == 0)
             {
                 return value;
+            }
+            else if (numberOfPucksCurrentlyInPath == 1 && pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsPlayersPuck() && !requiresPhasePowerup && !isContactShot) // explosion shot
+            {
+                requiresExplosionPowerup = true;
+                return pucksCurrentlyInPath[0].GetComponent<PuckScript>().ComputeValue();
             }
             else
             {
@@ -45,7 +54,7 @@ public class CPUPathScript : MonoBehaviour
         {
             if (numberOfPucksCurrentlyInPath <=1) return 0;
 
-            if (pucksCurrentlyInPath.TrueForAll(IsPlayersPuck) && pucksCurrentlyInPath.TrueForAll(IsNotLockedOrExposion))
+            if (pucksCurrentlyInPath.TrueForAll(IsPlayersPuck) && pucksCurrentlyInPath.TrueForAll(IsNotLockedOrExposion) && pucksCurrentlyInPath.TrueForAll(HasPostiveValue) && !WallIsActive())
             {
                 return value;
             }
@@ -72,6 +81,23 @@ public class CPUPathScript : MonoBehaviour
         if (p.GetComponent<PuckScript>() == null) return false;
 
         return !(p.GetComponent<PuckScript>().IsLocked() || p.GetComponent<PuckScript>().IsExplosion());
+    }
+
+    // helper only for CalculateValue() contact shots
+    private bool HasPostiveValue(GameObject p)
+    {
+        if (p == null) return false;
+
+        if (p.GetComponent<PuckScript>() == null) return false;
+
+        return p.GetComponent<PuckScript>().ComputeValue() > 0;
+    }
+
+    // helper only for CalculateValue() contact shots
+    private bool WallIsActive()
+    {
+        // TODO: make this work
+        return false;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
