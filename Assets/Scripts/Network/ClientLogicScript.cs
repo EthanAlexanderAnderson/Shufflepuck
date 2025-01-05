@@ -85,7 +85,7 @@ public class ClientLogicScript : NetworkBehaviour
         }
 
         // start turn, do this once then start shooting
-        if (client.isTurn && client.puckCount > 0 && puckManager.AllPucksAreSlowedClient())
+        if (client.isTurn && puckManager.AllPucksAreSlowedClient())
         {
             activeBar = bar.ChangeBar("angle", client.goingFirst);
             line.isActive = true;
@@ -94,7 +94,7 @@ public class ClientLogicScript : NetworkBehaviour
             serverLogic.CreatePuckServerRpc();
             client.isTurn = false;
             client.isShooting = true;
-            shotTimer = powerupsAreEnabled ? 36 : 18;
+            shotTimer = powerupsAreEnabled ? 30 : 18;
             powerupsMenu.SetActive(powerupsAreEnabled);
             if (powerupsAreEnabled) { powerupManager.ShufflePowerups(); }
         }
@@ -151,7 +151,7 @@ public class ClientLogicScript : NetworkBehaviour
             client.isShooting = false;
             powerupsMenu.SetActive(false);
         }
-
+        // if we have no pucks left, don't show any bar
         if ((client.isTurn || client.isShooting) && isRunning && client.puckCount <= 0)
         {
             activeBar = bar.ChangeBar("none");

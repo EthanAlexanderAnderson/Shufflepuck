@@ -117,12 +117,11 @@ public class PuckManager : MonoBehaviour
 
             var velocity = puckScript.velocityNetworkedRounded.Value;
 
-            if (velocity >= 1 || puck.transform.position.y < -9)
+            if (velocity >= 1.0f || puck.transform.position.y < -9)
             {
                 return false;
             }
         }
         return true;
     }
-
 }

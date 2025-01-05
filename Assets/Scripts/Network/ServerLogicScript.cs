@@ -136,6 +136,7 @@ public class ServerLogicScript : NetworkBehaviour
             newCompetitor.clientID = clientId;
             newCompetitor.puckCount = 5;
             newCompetitor.score = 0;
+            sentGameResult = false;
 
             competitorList.Add(newCompetitor);
 

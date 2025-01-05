@@ -35,7 +35,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     private bool pastSafeLine;
     private bool playersPuck;
     private float velocity;
-    public NetworkVariable<int> velocityNetworkedRounded = new NetworkVariable<int>();
+    public NetworkVariable<float> velocityNetworkedRounded = new NetworkVariable<float>();
 
     // this one actually does stuff
     [SerializeField] private float powerModifier;
@@ -83,17 +83,19 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             rb.AddTorque(shotTorqueToAdd);
             shotForceToAdd = Vector2.zero;
             shotTorqueToAdd = 0.0f;
-            if (phase)
-            {
-                spriteRenderer.color = new Color(1f, 1f, 1f, 0.5f);
-                puckCollider.isTrigger = true;
-            }
         }
 
         // Calculate the magnitude of the velocity vector to determine the sliding noise volume
         velocity = Mathf.Sqrt(rb.velocity.x * rb.velocity.x + rb.velocity.y * rb.velocity.y);
-        if (IsServer) { velocityNetworkedRounded.Value = (int)velocity; }
+        if (IsServer) { velocityNetworkedRounded.Value = velocity; }
         noiseSFX.volume = logic.gameIsRunning ? (velocity / 15.0f) * SFXvolume : 0f; // only play noise if game is running (not plinko)
+
+        // phase powerup
+        if (phase && (velocity > 1 || velocityNetworkedRounded.Value > 1.0f || !IsShot()))
+        {
+            spriteRenderer.color = new Color(1f, 1f, 1f, 0.5f);
+            puckCollider.isTrigger = true;
+        }
 
         if (IsSafe())
         {
@@ -121,7 +123,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
 
         // for phase & lock powerup
-        if (IsShot() && pastSafeLine && IsStopped())
+        if (IsShot() && pastSafeLine && IsStopped() && (!ClientLogicScript.Instance.isRunning || velocityNetworkedRounded.Value < 0.05f))
         {
             if (phase)
             {
@@ -131,6 +133,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 {
                     if (puck != gameObject && Vector2.Distance(puck.transform.position, transform.position) < 2)
                     {
+                        if (ClientLogicScript.Instance.isRunning && !IsServer) { break; }
                         DestroyPuck();
                         return;
                     }
@@ -160,6 +163,13 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         playersPuck = IsPlayersPuckParameter;
         // enable animation for atom
         animationLayer.SetActive(Math.Abs(puckSpriteID) == 40);
+
+        if (transform.position.y > 0) // for block, hydra, any spawned puck above safe line
+        {
+            shot = true;
+            safe = true;
+        }
+
         return this;
     }
 
@@ -183,6 +193,12 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             ClientLogicScript.Instance.client.activePuckObject = gameObject;
         }
         ClientLogicScript.Instance.client.isPlayer = IsPlayersPuckParameter;
+
+        if (transform.position.y > 0)
+        {
+            shot = true;
+            safe = true;
+        }
 
         Debug.Log($"Puck initialized. IsPlayersPuckParameter: {IsPlayersPuckParameter}. PuckSpriteID: {puckSpriteID}");
     }
@@ -449,7 +465,11 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     public void DestroyPuck() // Destroys the puck with a particle and sound effect, used by powerups that say destroy
     {
-        Destroy(gameObject, 0.1f);
+        // update score
+        puckBaseValue = 0;
+        puckBonusValue = 0;
+        zoneMultiplier = 0;
+        LogicScript.Instance.UpdateScores();
         logic.playDestroyPuckSFX(SFXvolume);
         // hydra powerup
         if (hydraPowerup)
@@ -463,11 +483,13 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 PowerupManager.Instance.HydraHelper(playersPuck, transform.position.x, transform.position.y);
             }
         }
+        Destroy(gameObject);
     }
 
     override public void OnDestroy()
     {
         if (!logic.gameIsRunning && !ClientLogicScript.Instance.isRunning) { return; }
+        logic.playDestroyPuckSFX(SFXvolume); // TODO: investigate if this causes the SFX twice in any scenerio
         ParticleSystem collisionParticleEffect = Instantiate(collisionParticleEffectPrefab, transform.position, Quaternion.identity);
         ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
         emission.rateOverTime = 1000f;
@@ -532,6 +554,8 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         SetPuckBaseValue(0);
         SetPowerupText("valueless");
         CreatePowerupFloatingText();
+        shot = true;
+        safe = true;
     }
 
     public void EnableGrowth()
