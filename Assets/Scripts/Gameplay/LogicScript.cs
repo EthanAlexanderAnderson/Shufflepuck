@@ -259,6 +259,7 @@ public class LogicScript : MonoBehaviour
         }
         line.isActive = true;
         arrow.SetActive(true);
+        puckHalo.SetActive(difficulty == 0);
         UI.TurnText = isLocal ? "Player 2's Turn" : "CPU's Turn";
         if (opponent.puckCount == 1 && isLocal)
         {
@@ -455,6 +456,7 @@ public class LogicScript : MonoBehaviour
         bar.ChangeBar("none");
         UI.ChangeUI(UI.gameHud);
         powerupManager.DisableForceFieldIfNecessary();
+        FogScript.Instance.DisableFog();
         Debug.Log("Starting match with difficulty: " + difficulty);
     }
 
@@ -481,6 +483,13 @@ public class LogicScript : MonoBehaviour
         bar.ChangeBar("none");
         arrow.SetActive(false);
         FogScript.Instance.DisableFog();
+#if (UNITY_EDITOR)
+        foreach (var path in CPUPaths)
+        {
+            var pathi = path.GetComponent<CPUPathScript>();
+            pathi.DisablePathVisualization();
+        }
+#endif
     }
 
     // this is the CPU AI for hard mode
