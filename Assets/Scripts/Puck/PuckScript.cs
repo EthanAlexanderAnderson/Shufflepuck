@@ -395,6 +395,12 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
             collisionParticleEffect.Play();
             Destroy(collisionParticleEffect.gameObject, 5f);
+
+            // Screen shake
+            if (col.gameObject.CompareTag("puck"))
+            {
+                ScreenShake.Instance.Shake(velocity / 20);
+            }
         }
         angularVelocityModifier = 0;
 
@@ -483,6 +489,9 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 PowerupManager.Instance.HydraHelper(playersPuck, transform.position.x, transform.position.y);
             }
         }
+        // Screen shake
+        ScreenShake.Instance.Shake(0.25f);
+        // actually destroy the gameobject
         Destroy(gameObject);
     }
 
