@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Camera))]
 public class ScreenShake : MonoBehaviour
@@ -8,6 +9,8 @@ public class ScreenShake : MonoBehaviour
 
     private Vector3 _originalPosition;
     private float shakeMagnitude;
+    private bool shakeEnabled;
+    [SerializeField] private GameObject screenShakeToggle;
 
     private void Awake()
     {
@@ -20,10 +23,13 @@ public class ScreenShake : MonoBehaviour
     private void Start()
     {
         _originalPosition = transform.position;
+        shakeEnabled = PlayerPrefs.GetInt("ScreenShakeEnabled", 1) == 1;
+        screenShakeToggle.GetComponent<Toggle>().isOn = shakeEnabled;
     }
 
     private void Update()
     {
+        if (!shakeEnabled) { return; }
         float x = Random.Range(-1f, 1f) * shakeMagnitude;
         float y = Random.Range(-1f, 1f) * shakeMagnitude;
 
@@ -40,5 +46,11 @@ public class ScreenShake : MonoBehaviour
     public void Shake(float magnitude)
     {
         shakeMagnitude = magnitude;
+    }
+
+    public void ToggleShake(bool enabled)
+    {
+        shakeEnabled = enabled;
+        PlayerPrefs.SetInt("ScreenShakeEnabled", enabled ? 1 : 0);
     }
 }
