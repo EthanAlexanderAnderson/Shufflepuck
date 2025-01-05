@@ -15,7 +15,6 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private GameObject puckHalo;
     [SerializeField] private GameObject powerupsMenu;
 
-    // power up stuff, eventually should be put into it's own script
     [SerializeField] private Button powerupButton1;
     [SerializeField] private Button powerupButton2;
     [SerializeField] private Button powerupButton3;
@@ -85,6 +84,12 @@ public class PowerupManager : NetworkBehaviour
         deck = DeckManager.Instance.GetDeck();
     }
 
+    // used by CPU during gameplay to check what the player has left in their deck
+    public List<int> GetDeck()
+    {
+        return deck;
+    }
+
     public void ShufflePowerups()
     {
         if (deck == null) { LoadDeck(); }
@@ -147,6 +152,7 @@ public class PowerupManager : NetworkBehaviour
         GetActiveCompetitor();
 
         puckHalo.SetActive(true);
+        LineScript.Instance.HalfSpeed();
         activeCompetitor.activePuckScript.SetPowerupText("foresight");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
