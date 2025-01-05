@@ -49,7 +49,7 @@ public class DeckManager : MonoBehaviour
     public void UpdateDeckCount()
     {
         var sum = deck.Sum();
-        deckCount.text = sum.ToString() + "/10";
+        deckCount.text = sum.ToString();
         if (sum < 10)
         {
             deckCount.color = new Color(0.9490197f, 0.4235294f, 0.3098039f); // red

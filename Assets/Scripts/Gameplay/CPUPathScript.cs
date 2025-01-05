@@ -39,7 +39,7 @@ public class CPUPathScript : MonoBehaviour
             {
                 return value;
             }
-            else if (numberOfPucksCurrentlyInPath == 1 && pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsPlayersPuck() && !requiresPhasePowerup && !isContactShot) // explosion shot
+            else if (numberOfPucksCurrentlyInPath == 1 && pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsPlayersPuck() && !pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsHydra() && !requiresPhasePowerup && !isContactShot) // explosion shot
             {
                 requiresExplosionPowerup = true;
                 return pucksCurrentlyInPath[0].GetComponent<PuckScript>().ComputeValue();
