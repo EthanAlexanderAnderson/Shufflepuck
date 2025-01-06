@@ -41,6 +41,8 @@ public class BarScript : MonoBehaviour
         switch (type)
         {
             case "angle":
+                transform.localPosition = new Vector3(transform.position.x, -5, transform.position.z);
+                LeanTween.moveLocalY(gameObject, 0, 1f).setEase(LeanTweenType.easeOutElastic);
                 spriteRenderer.enabled = true;
                 spriteRenderer.sprite = (isPlayer ? angleBarLeft : angleBarRight);
                 barText.text = "angle";
