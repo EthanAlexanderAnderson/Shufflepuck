@@ -11,6 +11,8 @@ public class HaloScript : MonoBehaviour
     private LineScript line;
     private LogicScript logic;
 
+    [SerializeField] private GameObject fogHaloMask;
+
     [SerializeField] private float angleModifierX; // 20
     [SerializeField] private float angleModifierY; // 20
     [SerializeField] private float minusY; // 10
@@ -89,6 +91,12 @@ public class HaloScript : MonoBehaviour
             float ycomponent = Mathf.Sin((angle + spinAngle) * Mathf.PI / 180) * angleModifierY * (powerModifier * power - spinPower);
             this.transform.position = new Vector3(xcomponent + sideModifier, ycomponent - minusY, this.transform.position.z);
         }
+        else
+        {
+            EnableFogMask(false);
+        }
+        fogHaloMask.transform.position = this.transform.position;
+
     }
 
     // for debug menu
@@ -122,4 +130,9 @@ public class HaloScript : MonoBehaviour
 
     public float tempBoostPowerMod; // 0.85
     public float tempBoostPowerModBase; // 0.7
+
+    public void EnableFogMask(bool enabled)
+    {
+        fogHaloMask.SetActive(enabled);
+    }
 }

@@ -152,6 +152,7 @@ public class PowerupManager : NetworkBehaviour
         GetActiveCompetitor();
 
         puckHalo.SetActive(true);
+        puckHalo.GetComponent<HaloScript>().EnableFogMask(true);
         LineScript.Instance.HalfSpeed();
         activeCompetitor.activePuckScript.SetPowerupText("foresight");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
