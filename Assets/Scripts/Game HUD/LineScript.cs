@@ -89,7 +89,7 @@ public class LineScript : MonoBehaviour
         LogicScript.OnOpponentShot += FullSpeed;
     }
 
-    private void FullSpeed()
+    public void FullSpeed()
     {
         moveSpeed = 10;
     }

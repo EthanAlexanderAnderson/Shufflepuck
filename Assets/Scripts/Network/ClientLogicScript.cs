@@ -279,6 +279,7 @@ public class ClientLogicScript : NetworkBehaviour
         UI.onlineRematchButton.SetActive(false);
         UI.ChangeUI(UI.gameHud);
         UI.TurnText = "Opponent's Turn";
+        line.GetComponent<LineScript>().FullSpeed();
     }
 
     // Server tells the client they can begin their turn

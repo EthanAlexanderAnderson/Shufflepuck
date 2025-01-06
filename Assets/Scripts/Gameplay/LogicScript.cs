@@ -453,6 +453,7 @@ public class LogicScript : MonoBehaviour
         gameIsRunning = true;
         puckHalo.SetActive(difficulty == 0);
         line.isActive = false;
+        line.GetComponent<LineScript>().FullSpeed();
         bar.ChangeBar("none");
         UI.ChangeUI(UI.gameHud);
         powerupManager.DisableForceFieldIfNecessary();
