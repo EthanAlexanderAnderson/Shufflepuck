@@ -79,7 +79,7 @@ public class ClientLogicScript : NetworkBehaviour
         // update wall status
         if (wallCount == 0)
         {
-            wall.SetActive(false);
+            WallScript.Instance.WallEnabled(false);
             UI.UpdateWallText(wallCount);
             wallCount--;
         }
@@ -248,7 +248,7 @@ public class ClientLogicScript : NetworkBehaviour
 
         isRunning = true;
         wallCount = 3;
-        wall.SetActive(true);
+        WallScript.Instance.WallEnabled(true);
         UI.UpdateWallText(wallCount);
         receivedGameResult = false;
         powerupsAreEnabled = powerupsEnabled;

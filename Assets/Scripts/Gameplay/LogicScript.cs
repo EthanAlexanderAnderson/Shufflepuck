@@ -136,7 +136,7 @@ public class LogicScript : MonoBehaviour
             // update wall status
             if (wallCount == 0 && puckManager.AllPucksAreSlowedMore())
             {
-                wall.SetActive(false);
+                WallScript.Instance.WallEnabled(false);
                 UI.UpdateWallText(wallCount);
                 wallCount--;
             }
@@ -440,12 +440,12 @@ public class LogicScript : MonoBehaviour
 
         if (difficulty == 0) {
             wallCount = 0;
-            wall.SetActive(false);
+            WallScript.Instance.WallEnabled(false);
         }
         else
         {
             wallCount = 3;
-            wall.SetActive(true);
+            WallScript.Instance.WallEnabled(true);
         }
         UI.UpdateWallText(wallCount);
 
