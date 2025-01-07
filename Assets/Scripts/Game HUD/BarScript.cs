@@ -41,39 +41,63 @@ public class BarScript : MonoBehaviour
         switch (type)
         {
             case "angle":
-                transform.localPosition = new Vector3(transform.position.x, -5, transform.position.z);
-                LeanTween.moveLocalY(gameObject, 0, 1f).setEase(LeanTweenType.easeOutElastic);
+                // animation
+                transform.localScale = new Vector3(0.95f, 1f, 1f);
+                transform.localPosition = new Vector3(transform.localPosition.x, -5, transform.localPosition.z);
+                LeanTween.cancel(gameObject);
+                LeanTween.moveLocalY(gameObject, 0, 1f).setEase(LeanTweenType.easeOutElastic).setDelay(0.1f);
+                // set sprite
                 spriteRenderer.enabled = true;
                 spriteRenderer.sprite = (isPlayer ? angleBarLeft : angleBarRight);
+                // set text
                 barText.text = "angle";
                 barTextCanvas.SetActive(true);
                 break;
             case "power":
+                // animation
+                transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
+                LeanTween.cancel(gameObject);
+                LeanTween.scale(gameObject, new Vector3(0.95f, 1f, 1f), 1f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
+                // set sprite
                 spriteRenderer.enabled = true;
                 var lineValue = line.GetValue();
                 var notPlayerAngleModifier = (isPlayer ? 0 : 27);
                 spriteRenderer.sprite = (lineValue > (50 - notPlayerAngleModifier) && lineValue < (77 - notPlayerAngleModifier) ? powerBarMid : powerBarOut);
+                // set text
                 barText.text = "power";
                 barTextCanvas.SetActive(true);
                 break;
             case "spin":
+                // animation
+                transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
+                LeanTween.cancel(gameObject);
+                LeanTween.scale(gameObject, new Vector3(0.95f, 1f, 1f), 1f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
+                // set sprite
                 spriteRenderer.enabled = true;
                 spriteRenderer.sprite = spinBar;
+                // set text
                 barText.text = "spin";
                 barTextCanvas.SetActive(true);
                 break;
             case "none":
-                spriteRenderer.enabled = false;
-                barText.text = "";
-                barTextCanvas.SetActive(false);
+                // animation
+                transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
+                LeanTween.cancel(gameObject);
+                LeanTween.scale(gameObject, new Vector3(0.95f, 1f, 1f), 1f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
+                LeanTween.moveLocalY(gameObject, -5, 1f).setEase(LeanTweenType.easeInElastic).setDelay(0.01f).setOnComplete(DisableBarImageAndText);
                 break;
             default:
-                spriteRenderer.enabled = false;
-                barText.text = "";
-                barTextCanvas.SetActive(false);
+                DisableBarImageAndText();
                 break;
         }
         return type;
+    }
+
+    private void DisableBarImageAndText()
+    {
+        spriteRenderer.enabled = false;
+        barText.text = "";
+        barTextCanvas.SetActive(false);
     }
 
     public void ToggleDim(bool dim)
