@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using Random = UnityEngine.Random;
 using Unity.Netcode;
 using System.Collections.Generic;
+using TMPro;
 
 public class PowerupManager : NetworkBehaviour
 {
@@ -19,6 +20,12 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private Button powerupButton2;
     [SerializeField] private Button powerupButton3;
 
+    [SerializeField] private GameObject popupEffectIconObject;
+    [SerializeField] private Image popupEffectIcon;
+    [SerializeField] private GameObject popupEffectTextObject;
+    [SerializeField] private TMP_Text popupEffectText;
+
+    // images
     [SerializeField] private Sprite plusOneImage;
     [SerializeField] private Sprite foresightImage;
     [SerializeField] private Sprite blockImage;
@@ -31,6 +38,19 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private Sprite explosionImage;
     [SerializeField] private Sprite fogImage;
     [SerializeField] private Sprite hydraImage;
+
+    [SerializeField] private Sprite plusOneIcon;
+    [SerializeField] private Sprite foresightIcon;
+    [SerializeField] private Sprite blockIcon;
+    [SerializeField] private Sprite boltIcon;
+    [SerializeField] private Sprite forceFieldIcon;
+    [SerializeField] private Sprite phaseIcon;
+    [SerializeField] private Sprite cullIcon;
+    [SerializeField] private Sprite growthIcon;
+    [SerializeField] private Sprite lockIcon;
+    [SerializeField] private Sprite explosionIcon;
+    [SerializeField] private Sprite fogIcon;
+    [SerializeField] private Sprite hydraIcon;
 
     private List<int> deck;
 
@@ -137,6 +157,7 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.SetPowerupText("plus one");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
+        PowerupPopupEffectAnimation(index);
     }
 
     public void ForesightPowerup() // enable the shot predicted location halo
@@ -157,6 +178,7 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.SetPowerupText("foresight");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
+        PowerupPopupEffectAnimation(index);
     }
 
     public void BlockPowerup() // create a valueless blocking puck
@@ -181,6 +203,7 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.SetPowerupText("block");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
+        PowerupPopupEffectAnimation(index);
     }
 
     private PuckScript pucki;
@@ -220,6 +243,7 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.SetPowerupText("bolt");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
+        PowerupPopupEffectAnimation(index);
     }
 
     [SerializeField] private ForcefieldScript forcefieldScript;
@@ -239,6 +263,7 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         forcefieldScript.EnableForcefield(activeCompetitor.isPlayer);
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
+        PowerupPopupEffectAnimation(index);
     }
 
     public void PhasePowerup()
@@ -257,6 +282,7 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         activeCompetitor.activePuckScript.SetPhase(true);
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
+        PowerupPopupEffectAnimation(index);
     }
 
     public void CullPowerup()
@@ -290,6 +316,7 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.SetPowerupText("cull");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
+        PowerupPopupEffectAnimation(index);
     }
 
     public void GrowthPowerup()
@@ -308,6 +335,7 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         activeCompetitor.activePuckScript.EnableGrowth();
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
+        PowerupPopupEffectAnimation(index);
     }
 
     public void LockPowerup()
@@ -326,6 +354,7 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         activeCompetitor.activePuckScript.EnableLock();
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
+        PowerupPopupEffectAnimation(index);
     }
 
     public void ExplosionPowerup()
@@ -344,6 +373,7 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         activeCompetitor.activePuckScript.EnableExplosion();
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
+        PowerupPopupEffectAnimation(index);
     }
 
     public void FogPowerup()
@@ -362,6 +392,7 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         FogScript.Instance.StartListeners(activeCompetitor.isPlayer);
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
+        PowerupPopupEffectAnimation(index);
     }
 
     public void HydraPowerup()
@@ -380,6 +411,7 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         activeCompetitor.activePuckScript.EnableHydra();
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
+        PowerupPopupEffectAnimation(index);
     }
 
     public void DisableForceFieldIfNecessary()
@@ -441,5 +473,26 @@ public class PowerupManager : NetworkBehaviour
             PuckScript puckScript = puckObject.GetComponent<PuckScript>();
             puckScript.InitPuck(hydraCompetitor.isPlayer, hydraCompetitor.puckSpriteID);
         }
+    }
+
+    public void PowerupPopupEffectAnimation(int index)
+    {
+        Sprite[] powerupIcon = { plusOneIcon, foresightIcon, blockIcon, boltIcon, forceFieldIcon, phaseIcon, cullIcon, growthIcon, lockIcon, explosionIcon, fogIcon, hydraIcon };
+        String[] powerupText = { "plus one", "foresight", "block", "bolt", "force field", "phase", "cull", "growth", "lock", "explosion", "fog", "hydra" };
+
+        popupEffectIcon.sprite = powerupIcon[index];
+        popupEffectText.text = powerupText[index];
+
+        LeanTween.cancel(popupEffectIconObject);
+        LeanTween.cancel(popupEffectTextObject);
+
+        popupEffectIconObject.transform.localScale = new Vector3(0f, 0f, 0f);
+        popupEffectTextObject.transform.localScale = new Vector3(0f, 0f, 0f);
+
+        LeanTween.scale(popupEffectIconObject, new Vector3(1f, 1f, 1f), 1f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
+        LeanTween.scale(popupEffectTextObject, new Vector3(1f, 1f, 1f), 1f).setEase(LeanTweenType.easeOutElastic).setDelay(0.2f);
+
+        LeanTween.scale(popupEffectIconObject, new Vector3(0f, 0f, 0f), 1f).setEase(LeanTweenType.easeInElastic).setDelay(2.01f);
+        LeanTween.scale(popupEffectTextObject, new Vector3(0f, 0f, 0f), 1f).setEase(LeanTweenType.easeInElastic).setDelay(2.2f);
     }
 }
