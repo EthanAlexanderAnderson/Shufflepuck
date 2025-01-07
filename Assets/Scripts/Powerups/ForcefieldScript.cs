@@ -4,6 +4,7 @@ public class ForcefieldScript : MonoBehaviour
 {
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private Collider2D boxCollider;
+    [SerializeField] private ParticleSystem particles;
     [SerializeField] private bool forcefieldIsEnabled;
     [SerializeField] private bool playersPuck;
 
@@ -33,6 +34,8 @@ public class ForcefieldScript : MonoBehaviour
         forcefieldIsEnabled = true;
         playersPuck = isPlayersPuck;
         spriteRenderer.enabled = true;
+        var emission = particles.emission;
+        emission.enabled = true;
         boxCollider.enabled = true;
         spriteRenderer.color = isPlayersPuck ? new Color(0, 0.7490196f, 0.9529412f, 0.5f) : new Color(0.9490197f, 0.4235294f, 0.3098039f, 0.5f);
     }
@@ -41,6 +44,8 @@ public class ForcefieldScript : MonoBehaviour
     {
         forcefieldIsEnabled = false;
         spriteRenderer.enabled = false;
+        var emission = particles.emission;
+        emission.enabled = false;
         boxCollider.enabled = false;
     }
 

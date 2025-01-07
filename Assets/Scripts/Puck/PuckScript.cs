@@ -96,19 +96,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         emission.rateOverTime = (velocity);
         ParticleSystem.MainModule main = PS.main;
 
-        // set color of particle effect to puck color
-        if (color == null || color.Length <= 0) // handle null color
-        {
-            main.startColor = new ParticleSystem.MinMaxGradient(Color.grey);
-        }
-        else if (color.Length == 1) // handle one color
-        {
-            main.startColor = color[0];
-        }
-        else // handle two or more colors
-        {
-            main.startColor = new ParticleSystem.MinMaxGradient(CreateRandomGradient());
-        }
+        main.startColor = SetParticleColor();
 
         // phase powerup
         if (phase && (velocity > 1 || velocityNetworkedRounded.Value > 1.0f || !IsShot()))
@@ -262,7 +250,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         shotSFX.volume *= SFXvolume;
         shotSFX.Play();
         // screen shake
-        ScreenShake.Instance.Shake(powerParameter/500);
+        ScreenShake.Instance.Shake(powerParameter / 500);
     }
 
     [ServerRpc]
@@ -404,19 +392,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             ParticleSystem.MainModule main = collisionParticleEffect.main;
             main.startSpeed = (velocity) * 4f;
 
-            // set color of particle effect to puck color
-            if (color == null || color.Length <= 0) // handle null color
-            {
-                main.startColor = new ParticleSystem.MinMaxGradient(Color.grey);
-            }
-            else if (color.Length == 1) // handle one color
-            {
-                main.startColor = color[0];
-            }
-            else // handle two or more colors
-            {
-                main.startColor = new ParticleSystem.MinMaxGradient(CreateRandomGradient());
-            }
+            main.startColor = SetParticleColor();
 
             collisionParticleEffect.Play();
             Destroy(collisionParticleEffect.gameObject, 5f);
@@ -449,25 +425,6 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public void SetPuckBonusValue(int value)
     {
         puckBonusValue = value;
-    }
-
-    Gradient CreateRandomGradient()
-    {
-        Gradient gradient = new Gradient();
-        GradientColorKey[] colorKeys = new GradientColorKey[color.Length];
-        GradientAlphaKey[] alphaKeys = new GradientAlphaKey[1]; // One alpha key for consistent transparency
-
-        for (int i = 0; i < color.Length; i++)
-        {
-            // Each color is mapped to a specific point in the gradient
-            float time = i / (float)(color.Length - 1);
-            colorKeys[i] = new GradientColorKey(color[i], time);
-        }
-
-        alphaKeys[0] = new GradientAlphaKey(1f, 0f); // Set constant alpha
-
-        gradient.SetKeys(colorKeys, alphaKeys);
-        return gradient;
     }
 
     public void SetPowerupText(string text)
@@ -529,19 +486,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         emission.rateOverTime = 1000f;
         ParticleSystem.MainModule main = collisionParticleEffect.main;
         main.startSpeed = 100f;
-        // set color of particle effect to puck color
-        if (color == null || color.Length <= 0) // handle null color
-        {
-            main.startColor = new ParticleSystem.MinMaxGradient(Color.grey);
-        }
-        else if (color.Length == 1) // handle one color
-        {
-            main.startColor = color[0];
-        }
-        else // handle two or more colors
-        {
-            main.startColor = new ParticleSystem.MinMaxGradient(CreateRandomGradient());
-        }
+        main.startColor = SetParticleColor();
         collisionParticleEffect.Play();
         Destroy(collisionParticleEffect.gameObject, 10f);
 
@@ -687,5 +632,40 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public void EnableHydra()
     {
         hydraPowerup = true;
+    }
+
+    public ParticleSystem.MinMaxGradient SetParticleColor()
+    {
+        // set color of particle effect to puck color
+        if (color == null || color.Length <= 0) // handle null color
+        {
+            return new ParticleSystem.MinMaxGradient(Color.grey);
+        }
+        else if (color.Length == 1) // handle one color
+        {
+            return color[0];
+        }
+        else // handle two or more colors
+        {
+            return new ParticleSystem.MinMaxGradient(CreateRandomGradient());
+        }
+    }
+    Gradient CreateRandomGradient()
+    {
+        Gradient gradient = new Gradient();
+        GradientColorKey[] colorKeys = new GradientColorKey[color.Length];
+        GradientAlphaKey[] alphaKeys = new GradientAlphaKey[1]; // One alpha key for consistent transparency
+
+        for (int i = 0; i < color.Length; i++)
+        {
+            // Each color is mapped to a specific point in the gradient
+            float time = i / (float)(color.Length - 1);
+            colorKeys[i] = new GradientColorKey(color[i], time);
+        }
+
+        alphaKeys[0] = new GradientAlphaKey(1f, 0f); // Set constant alpha
+
+        gradient.SetKeys(colorKeys, alphaKeys);
+        return gradient;
     }
 }
