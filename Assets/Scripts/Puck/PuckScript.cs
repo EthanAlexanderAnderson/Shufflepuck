@@ -90,6 +90,26 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         if (IsServer) { velocityNetworkedRounded.Value = velocity; }
         noiseSFX.volume = logic.gameIsRunning ? (velocity / 15.0f) * SFXvolume : 0f; // only play noise if game is running (not plinko)
 
+        // update particle emisson based on velocity
+        var PS = GetComponent<ParticleSystem>();
+        ParticleSystem.EmissionModule emission = PS.emission;
+        emission.rateOverTime = (velocity);
+        ParticleSystem.MainModule main = PS.main;
+
+        // set color of particle effect to puck color
+        if (color == null || color.Length <= 0) // handle null color
+        {
+            main.startColor = new ParticleSystem.MinMaxGradient(Color.grey);
+        }
+        else if (color.Length == 1) // handle one color
+        {
+            main.startColor = color[0];
+        }
+        else // handle two or more colors
+        {
+            main.startColor = new ParticleSystem.MinMaxGradient(CreateRandomGradient());
+        }
+
         // phase powerup
         if (phase && (velocity > 1 || velocityNetworkedRounded.Value > 1.0f || !IsShot()))
         {
@@ -241,6 +261,8 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         shotSFX.volume += volumeBoost;
         shotSFX.volume *= SFXvolume;
         shotSFX.Play();
+        // screen shake
+        ScreenShake.Instance.Shake(powerParameter/500);
     }
 
     [ServerRpc]
