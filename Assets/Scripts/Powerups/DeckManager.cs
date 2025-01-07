@@ -20,10 +20,7 @@ public class DeckManager : MonoBehaviour
             Instance = this;
         else
             Destroy(Instance);
-    }
 
-    private void Start()
-    {
         deck = new int[PowerupManager.Instance.GetMethodArrayLength()];
         // default deck is one of each card
         for (int i = 0; i < PowerupManager.Instance.GetMethodArrayLength(); i++)

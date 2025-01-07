@@ -3,6 +3,7 @@
  */
 
 using UnityEngine;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class LogicScript : MonoBehaviour
@@ -41,6 +42,7 @@ public class LogicScript : MonoBehaviour
     public bool powerupsAreEnabled = false;
     [SerializeField] private GameObject powerupsMenu; // set in editor
     private bool powerupHasBeenUsedThisTurn = false;
+    [SerializeField] private GameObject powerupsToggle;
 
     // game state
     public bool gameIsRunning { get; private set; }
@@ -114,8 +116,13 @@ public class LogicScript : MonoBehaviour
         nonActiveCompetitor = player;
         // check if tutorial should be active
         tutorialActive = PlayerPrefs.GetInt("tutorialCompleted") == 0 && PlayerPrefs.GetInt("easyWin") == 0 && PlayerPrefs.GetInt("easyHighscore") == 0;
+        // load if powerups should be active
+        powerupsAreEnabled = PlayerPrefs.GetInt("PowerupsEnabled", 0) == 1;
+        powerupsToggle.GetComponent<Toggle>().isOn = powerupsAreEnabled;
         // initialize CPU paths
         CPUPaths = GameObject.FindGameObjectsWithTag("cpu_path");
+        // make sure we're on title screen
+        UI.ChangeUI(UI.titleScreen);
     }
 
     // Update is called once per frame
@@ -567,6 +574,7 @@ public class LogicScript : MonoBehaviour
     public void SetPowerups(bool value)
     {
         powerupsAreEnabled = value;
+        PlayerPrefs.SetInt("PowerupsEnabled", value ? 1 : 0);
         if (value)
         {
             UI.ChangeUI(deckScreen); // TODO: make this not dumb

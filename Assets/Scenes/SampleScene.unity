@@ -38748,6 +38748,7 @@ MonoBehaviour:
   wall: {fileID: 474300706}
   powerupsAreEnabled: 0
   powerupsMenu: {fileID: 1793697537}
+  powerupsToggle: {fileID: 2129569473}
   CPUShotAngle: 0
   CPUShotPower: 0
   CPUShotSpin: 50
