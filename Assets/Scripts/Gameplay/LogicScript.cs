@@ -484,6 +484,7 @@ public class LogicScript : MonoBehaviour
         bar.ChangeBar("none");
         arrow.SetActive(false);
         FogScript.Instance.DisableFog();
+        WallScript.Instance.WallEnabled(false);
 #if (UNITY_EDITOR)
         foreach (var path in CPUPaths)
         {

@@ -309,14 +309,6 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 pointCPUSFX.pitch = 0.8f + (0.05f * enteredZoneMultiplier);
                 pointCPUSFX.Play();
             }
-            // if this puck object already has a floating text, destroy it
-            foreach (Transform child in transform)
-            {
-                if (child.gameObject.tag == "floatingText")
-                {
-                    Destroy(child.gameObject);
-                }
-            }
         }
         // if puck moves into the off zone, play minus sfx
         else if (enteredZoneMultiplier < zoneMultiplier)
@@ -324,21 +316,32 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             if (IsPlayersPuck())
             {
                 minusPlayerSFX.volume = SFXvolume;
+                minusPlayerSFX.pitch = 0.9f + (0.05f * enteredZoneMultiplier);
                 minusPlayerSFX.Play();
             }
             else
             {
                 minusCPUSFX.volume = SFXvolume;
+                minusPlayerSFX.pitch = 0.8f + (0.05f * enteredZoneMultiplier);
                 minusCPUSFX.Play();
             }
         }
 
         if (zoneMultiplier != enteredZoneMultiplier)
         {
+            // if this puck object already has a floating text, destroy it
+            foreach (Transform child in transform)
+            {
+                if (child.gameObject.CompareTag("floatingText"))
+                {
+                    Destroy(child.gameObject);
+                }
+            }
+
             zoneMultiplier = enteredZoneMultiplier;
             // show floating text
             var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
-            floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f, true);
+            floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f + (ComputeValue() / 10), true);
         }
         zoneMultiplier = enteredZoneMultiplier;
     }
@@ -483,7 +486,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     {
         // show puck score when clicked
         var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
-        floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f, true);
+        floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f + (ComputeValue() / 10), true);
         // if powerupText has been set, show it
         if (powerupText != null)
         {
@@ -635,7 +638,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             pointCPUSFX.Play();
         }
         var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
-        floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f, true);
+        floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f + (ComputeValue() / 10), true);
     }
 
     public void EnableLock()
