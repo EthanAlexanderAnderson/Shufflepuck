@@ -388,9 +388,9 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             ParticleSystem collisionParticleEffect = Instantiate(collisionParticleEffectPrefab, col.GetContact(0).point, Quaternion.identity);
             collisionParticleEffect.transform.position = col.GetContact(0).point;
             ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
-            emission.rateOverTime = (velocity) * 50f;
+            emission.rateOverTime = (velocity) * 75f;
             ParticleSystem.MainModule main = collisionParticleEffect.main;
-            main.startSpeed = (velocity) * 4f;
+            main.startSpeed = (velocity) * 5f;
 
             main.startColor = SetParticleColor();
 
