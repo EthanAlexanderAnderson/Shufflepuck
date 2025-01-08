@@ -424,6 +424,7 @@ public class LogicScript : MonoBehaviour
         }
         player.ResetProperties();
         opponent.ResetProperties();
+        UI.PostShotUpdate(player.puckCount, opponent.puckCount);
 
         if (difficulty < 2) // for easy & medium
         {

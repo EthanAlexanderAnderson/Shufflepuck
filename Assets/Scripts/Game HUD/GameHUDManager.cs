@@ -9,30 +9,38 @@ public class GameHUDManager : MonoBehaviour
     private GameObject[] playerHUDElements;
     private GameObject[] playerHUDTexts;
     private GameObject[] playerHUDIcons;
+    private GameObject[] playerHUDBackgrounds;
     [SerializeField] private GameObject playerScore;
     [SerializeField] private GameObject playerScoreText;
     [SerializeField] private GameObject playerScoreIcon;
+    [SerializeField] private GameObject playerScoreBackground;
     [SerializeField] private GameObject playerPuckCount;
     [SerializeField] private GameObject playerPuckCountText;
     [SerializeField] private GameObject playerPuckCountIcon;
+    [SerializeField] private GameObject playerPuckCountBackground;
     [SerializeField] private GameObject playerWins;
     [SerializeField] private GameObject playerWinsText;
     [SerializeField] private GameObject playerWinsIcon;
+    [SerializeField] private GameObject playerWinsBackground;
     private float playerStartXLocalPos = -1340;
     private float playerEndXLocalPos = -840;
 
     private GameObject[] opponentHUDElements;
     private GameObject[] opponentHUDTexts;
     private GameObject[] opponentHUDIcons;
+    private GameObject[] opponentHUDBackgrounds;
     [SerializeField] private GameObject opponentScore;
     [SerializeField] private GameObject opponentScoreText;
     [SerializeField] private GameObject opponentScoreIcon;
+    [SerializeField] private GameObject opponentScoreBackground;
     [SerializeField] private GameObject opponentPuckCount;
     [SerializeField] private GameObject opponentPuckCountText;
     [SerializeField] private GameObject opponentPuckCountIcon;
+    [SerializeField] private GameObject opponentPuckCountBackground;
     [SerializeField] private GameObject opponentWins;
     [SerializeField] private GameObject opponentWinsText;
     [SerializeField] private GameObject opponentWinsIcon;
+    [SerializeField] private GameObject opponentWinsBackground;
     private float opponentStartXLocalPos = 1340;
     private float opponentEndXLocalPos = 840;
 
@@ -54,10 +62,12 @@ public class GameHUDManager : MonoBehaviour
         playerHUDElements = new GameObject[] { playerScore, playerPuckCount, playerWins };
         playerHUDTexts = new GameObject[] { playerScoreText, playerPuckCountText, playerWinsText };
         playerHUDIcons = new GameObject[] { playerScoreIcon, playerPuckCountIcon, playerWinsIcon };
+        playerHUDBackgrounds = new GameObject[] { playerScoreBackground, playerPuckCountBackground, playerWinsBackground };
 
         opponentHUDElements = new GameObject[] { opponentScore, opponentPuckCount, opponentWins };
         opponentHUDTexts = new GameObject[] { opponentScoreText, opponentPuckCountText, opponentWinsText };
         opponentHUDIcons = new GameObject[] { opponentScoreIcon, opponentPuckCountIcon, opponentWinsIcon };
+        opponentHUDBackgrounds = new GameObject[] { opponentScoreBackground, opponentPuckCountBackground, opponentWinsBackground };
         Reset();
     }
 
@@ -143,6 +153,11 @@ public class GameHUDManager : MonoBehaviour
         backButton.transform.localScale = new Vector3(0f, 0f, 0f);
         restartButton.transform.localScale = new Vector3(0f, 0f, 0f);
         turnText.transform.localScale = new Vector3(0f, 0f, 0f);
+
+        playerScoreText.transform.localRotation = new Quaternion(0f, 0f, 0f, 0f);
+        opponentScoreText.transform.localRotation = new Quaternion(0f, 0f, 0f, 0f);
+        playerPuckCountText.transform.localRotation = new Quaternion(0f, 0f, 0f, 0f);
+        opponentPuckCountText.transform.localRotation = new Quaternion(0f, 0f, 0f, 0f);
     }
 
     public void ChangeScoreText(bool isPlayers, string score, bool playAnimation)
@@ -152,13 +167,18 @@ public class GameHUDManager : MonoBehaviour
 
         var iconObject = isPlayers ? playerScoreIcon : opponentScoreIcon;
 
+        var backgroundObject = isPlayers ? playerScoreBackground : opponentScoreBackground;
+
         if (playAnimation)
         {
             // reset position
             LeanTween.cancel(textObject);
+            LeanTween.cancel(iconObject);
+            LeanTween.cancel(backgroundObject);
             textObject.transform.localRotation = new Quaternion(0f, 0f, Random.Range(-20f, 20f), 0f);
-            textObject.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
-            iconObject.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
+            textObject.transform.localScale = new Vector3(2f, 2f, 2f);
+            iconObject.transform.localScale = new Vector3(2f, 2f, 2f);
+            LeanTween.color(backgroundObject.GetComponent<Image>().rectTransform, Color.white, 0.01f);
         }
 
         // set text
@@ -167,9 +187,44 @@ public class GameHUDManager : MonoBehaviour
         if (playAnimation)
         {
             // animation
+            LeanTween.color(backgroundObject.GetComponent<Image>().rectTransform, Color.black, 0.1f).setDelay(0.01f);
             LeanTween.rotateZ(textObject, 0, 0.7f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
             LeanTween.scale(textObject, new Vector3(1f, 1f, 1f), 0.7f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
-            LeanTween.scale(iconObject, new Vector3(1f, 1f, 1f), 0.5f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
+            LeanTween.scale(iconObject, new Vector3(1f, 1f, 1f), 0.6f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
+        }
+    }
+
+    public void ChangePuckCountText(bool isPlayers, string puckCount, bool playAnimation)
+    {
+        var textObject = isPlayers ? playerPuckCountText : opponentPuckCountText;
+        var text = textObject.GetComponent<Text>();
+
+        var iconObject = isPlayers ? playerPuckCountIcon : opponentPuckCountIcon;
+
+        var backgroundObject = isPlayers ? playerPuckCountBackground : opponentPuckCountBackground;
+
+        if (playAnimation)
+        {
+            // reset position
+            LeanTween.cancel(textObject);
+            LeanTween.cancel(iconObject);
+            LeanTween.cancel(backgroundObject);
+            textObject.transform.localRotation = new Quaternion(0f, 0f, Random.Range(-20f, 20f), 0f);
+            textObject.transform.localScale = new Vector3(2f, 2f, 2f);
+            iconObject.transform.localScale = new Vector3(2f, 2f, 2f);
+            LeanTween.color(backgroundObject.GetComponent<Image>().rectTransform, Color.white, 0.01f);
+        }
+
+        // set text
+        text.text = puckCount;
+
+        if (playAnimation)
+        {
+            // animation
+            LeanTween.color(backgroundObject.GetComponent<Image>().rectTransform, Color.black, 0.1f).setDelay(0.01f);
+            LeanTween.rotateZ(textObject, 0, 0.7f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
+            LeanTween.scale(textObject, new Vector3(1f, 1f, 1f), 0.7f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
+            LeanTween.scale(iconObject, new Vector3(1f, 1f, 1f), 0.6f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
         }
     }
 }

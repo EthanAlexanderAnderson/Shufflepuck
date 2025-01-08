@@ -25681,7 +25681,7 @@ GameObject:
   - component: {fileID: 502496218}
   - component: {fileID: 502496217}
   m_Layer: 5
-  m_Name: Black Rectangle (3)
+  m_Name: opponentPuckCountBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43346,7 +43346,7 @@ GameObject:
   - component: {fileID: 902237561}
   - component: {fileID: 902237560}
   m_Layer: 5
-  m_Name: Black Rectangle (2)
+  m_Name: playerWinsBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43472,21 +43472,27 @@ MonoBehaviour:
   playerScore: {fileID: 2137079885}
   playerScoreText: {fileID: 1329857204}
   playerScoreIcon: {fileID: 469271505}
+  playerScoreBackground: {fileID: 1798068381}
   playerPuckCount: {fileID: 446678406}
   playerPuckCountText: {fileID: 309557849}
   playerPuckCountIcon: {fileID: 1133283555}
+  playerPuckCountBackground: {fileID: 1096052435}
   playerWins: {fileID: 2140082027}
   playerWinsText: {fileID: 1311017036}
   playerWinsIcon: {fileID: 1866417289}
+  playerWinsBackground: {fileID: 902237558}
   opponentScore: {fileID: 1769138519}
   opponentScoreText: {fileID: 738030195}
   opponentScoreIcon: {fileID: 1612456767}
+  opponentScoreBackground: {fileID: 1603681223}
   opponentPuckCount: {fileID: 612670864}
   opponentPuckCountText: {fileID: 838801537}
   opponentPuckCountIcon: {fileID: 1349874435}
+  opponentPuckCountBackground: {fileID: 502496215}
   opponentWins: {fileID: 336547830}
   opponentWinsText: {fileID: 1885846412}
   opponentWinsIcon: {fileID: 88528194}
+  opponentWinsBackground: {fileID: 1638423207}
   backButton: {fileID: 219292097}
   restartButton: {fileID: 548542104}
   turnText: {fileID: 340869349}
@@ -51902,7 +51908,7 @@ GameObject:
   - component: {fileID: 1096052438}
   - component: {fileID: 1096052437}
   m_Layer: 5
-  m_Name: Black Rectangle (2)
+  m_Name: playerPuckCountBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -78570,7 +78576,7 @@ GameObject:
   - component: {fileID: 1603681226}
   - component: {fileID: 1603681225}
   m_Layer: 5
-  m_Name: Black Rectangle (1)
+  m_Name: opponentScoreBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -80518,7 +80524,7 @@ GameObject:
   - component: {fileID: 1638423210}
   - component: {fileID: 1638423209}
   m_Layer: 5
-  m_Name: Black Rectangle (4)
+  m_Name: opponentWinsBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -87460,7 +87466,7 @@ GameObject:
   - component: {fileID: 1798068384}
   - component: {fileID: 1798068383}
   m_Layer: 5
-  m_Name: Black Rectangle
+  m_Name: playerScoreBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

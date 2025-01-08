@@ -199,13 +199,21 @@ public class UIManagerScript : MonoBehaviour
             logic.tutorialActive = false;
             PlayerPrefs.SetInt("tutorialCompleted", 1);
         }
-
     }
 
+    int prevPlayerPuckCount = 5;
+    int prevOpponentPuckCount = 5;
     public void PostShotUpdate(int playerPuckCount, int opponentPuckCount)
     {
-        playerPuckCountText.text = playerPuckCount.ToString();
-        opponentPuckCountText.text = opponentPuckCount.ToString();
+        if (!playerPuckCountText || !opponentPuckCountText) { return; }
+
+        var newPlayerPuckCount = Mathf.Max(0, playerPuckCount);
+        GameHUDManager.Instance.ChangePuckCountText(true, newPlayerPuckCount.ToString(), newPlayerPuckCount != prevPlayerPuckCount);
+        prevPlayerPuckCount = playerPuckCount;
+
+        var newOpponentPuckCount = Mathf.Max(0, opponentPuckCount);
+        GameHUDManager.Instance.ChangePuckCountText(false, newOpponentPuckCount.ToString(), newOpponentPuckCount != prevOpponentPuckCount);
+        prevOpponentPuckCount = opponentPuckCount;
     }
 
     int prevPlayerScore;
