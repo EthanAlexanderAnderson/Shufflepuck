@@ -137,7 +137,8 @@ public class PowerupManager : NetworkBehaviour
             powerupButtons[i].onClick.RemoveAllListeners();
             powerupButtons[i].onClick.AddListener(() => methodArray[randomCard]());
             // add disable powerupmenu object function as listener
-            powerupButtons[i].onClick.AddListener(() => powerupsMenu.SetActive(false));
+            int index = i; // this has to be here for some technical closure reason idk
+            powerupButtons[i].onClick.AddListener(() => PowerupsHUDUIManager.Instance.UsePowerup(index));
         }
     }
 
@@ -489,10 +490,10 @@ public class PowerupManager : NetworkBehaviour
         popupEffectIconObject.transform.localScale = new Vector3(0f, 0f, 0f);
         popupEffectTextObject.transform.localScale = new Vector3(0f, 0f, 0f);
 
-        LeanTween.scale(popupEffectIconObject, new Vector3(1f, 1f, 1f), 1f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
-        LeanTween.scale(popupEffectTextObject, new Vector3(1f, 1f, 1f), 1f).setEase(LeanTweenType.easeOutElastic).setDelay(0.2f);
+        LeanTween.scale(popupEffectIconObject, new Vector3(1f, 1f, 1f), 1f).setEase(LeanTweenType.easeOutElastic).setDelay(1.01f);
+        LeanTween.scale(popupEffectTextObject, new Vector3(1f, 1f, 1f), 1f).setEase(LeanTweenType.easeOutElastic).setDelay(1.2f);
 
-        LeanTween.scale(popupEffectIconObject, new Vector3(0f, 0f, 0f), 1f).setEase(LeanTweenType.easeInElastic).setDelay(2.01f);
-        LeanTween.scale(popupEffectTextObject, new Vector3(0f, 0f, 0f), 1f).setEase(LeanTweenType.easeInElastic).setDelay(2.2f);
+        LeanTween.scale(popupEffectIconObject, new Vector3(0f, 0f, 0f), 1f).setEase(LeanTweenType.easeInElastic).setDelay(3.01f);
+        LeanTween.scale(popupEffectTextObject, new Vector3(0f, 0f, 0f), 1f).setEase(LeanTweenType.easeInElastic).setDelay(3.2f);
     }
 }

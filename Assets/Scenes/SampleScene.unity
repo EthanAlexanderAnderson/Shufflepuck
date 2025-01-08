@@ -8639,7 +8639,7 @@ RectTransform:
   m_GameObject: {fileID: 233410802}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.9, y: 0.9, z: 0.9}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1793697538}
@@ -8647,7 +8647,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 150}
-  m_SizeDelta: {x: 1680, y: 480}
+  m_SizeDelta: {x: 1512, y: 432}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &233410804
 MonoBehaviour:
@@ -26239,7 +26239,7 @@ RectTransform:
   m_GameObject: {fileID: 508192272}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.9, y: 0.9, z: 0.9}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1793697538}
@@ -26247,7 +26247,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 650}
-  m_SizeDelta: {x: 1680, y: 480}
+  m_SizeDelta: {x: 1512, y: 432}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &508192274
 MonoBehaviour:
@@ -31337,7 +31337,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 6
+  m_SortingOrder: 7
   m_TargetDisplay: 0
 --- !u!1 &639747014
 GameObject:
@@ -40021,7 +40021,7 @@ RectTransform:
   m_GameObject: {fileID: 832538568}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.9, y: 0.9, z: 0.9}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1793697538}
@@ -40029,7 +40029,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 170}
-  m_SizeDelta: {x: 1680, y: 260}
+  m_SizeDelta: {x: 1512, y: 234}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &832538570
 MonoBehaviour:
@@ -50967,7 +50967,7 @@ RectTransform:
   m_GameObject: {fileID: 1062224063}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.9, y: 0.9, z: 0.9}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1793697538}
@@ -50975,7 +50975,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -350}
-  m_SizeDelta: {x: 1680, y: 480}
+  m_SizeDelta: {x: 1512, y: 432}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1062224065
 MonoBehaviour:
@@ -87362,6 +87362,7 @@ GameObject:
   - component: {fileID: 1793697538}
   - component: {fileID: 1793697540}
   - component: {fileID: 1793697539}
+  - component: {fileID: 1793697541}
   m_Layer: 5
   m_Name: Power-Ups
   m_TagString: Untagged
@@ -87405,7 +87406,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.78039217}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.8}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -87430,6 +87431,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1793697537}
   m_CullTransparentMesh: 1
+--- !u!114 &1793697541
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1793697537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8eb4931a4821c1549ad6688f8683a299, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  powerupsMenu: {fileID: 1793697537}
+  powerupButtonObject1: {fileID: 508192272}
+  powerupButtonObject2: {fileID: 233410802}
+  powerupButtonObject3: {fileID: 1062224063}
+  skipButtonObject: {fileID: 832538568}
 --- !u!1 &1798068381
 GameObject:
   m_ObjectHideFlags: 0
