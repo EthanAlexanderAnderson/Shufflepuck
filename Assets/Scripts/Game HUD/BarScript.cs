@@ -84,7 +84,7 @@ public class BarScript : MonoBehaviour
                 transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
                 LeanTween.cancel(gameObject);
                 LeanTween.scale(gameObject, new Vector3(0.95f, 1f, 1f), 1f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
-                LeanTween.moveLocalY(gameObject, -5, 1f).setEase(LeanTweenType.easeInElastic).setDelay(0.01f).setOnComplete(DisableBarImageAndText);
+                LeanTween.moveLocalY(gameObject, -5, 1f).setEase(LeanTweenType.easeInElastic).setDelay(0.51f).setOnComplete(DisableBarImageAndText);
                 break;
             default:
                 DisableBarImageAndText();

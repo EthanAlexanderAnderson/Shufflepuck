@@ -210,10 +210,10 @@ public class LogicScript : MonoBehaviour
         bar.ToggleDim(false);
         line.isActive = true;
         arrow.SetActive(true);
-        UI.TurnText = isLocal ? "Player 1's Turn" : "Your Turn";
+        GameHUDManager.Instance.ChangeTurnText(isLocal ? "Player 1's Turn" : "Your Turn");
         if (player.puckCount == 1)
         {
-            UI.TurnText = "LAST PUCK";
+            GameHUDManager.Instance.ChangeTurnText("LAST PUCK");
         }
         puckManager.CreatePuck(player);
         player.isTurn = false;
@@ -267,10 +267,10 @@ public class LogicScript : MonoBehaviour
         line.isActive = true;
         arrow.SetActive(true);
         puckHalo.SetActive(difficulty == 0);
-        UI.TurnText = isLocal ? "Player 2's Turn" : "CPU's Turn";
+        GameHUDManager.Instance.ChangeTurnText(isLocal ? "Player 2's Turn" : "CPU's Turn");
         if (opponent.puckCount == 1 && isLocal)
         {
-            UI.TurnText = "LAST PUCK";
+            GameHUDManager.Instance.ChangeTurnText("LAST PUCK");
         }
         puckManager.CreatePuck(opponent);
         opponent.isTurn = false;
@@ -388,6 +388,7 @@ public class LogicScript : MonoBehaviour
         activeBar = bar.ChangeBar("none");
         line.isActive = false;
         arrow.SetActive(false);
+        GameHUDManager.Instance.ChangeTurnText(string.Empty);
         activeCompetitor.ShootActivePuck(angle, power, spin);
         UI.PostShotUpdate(player.puckCount, opponent.puckCount);
         UI.UpdateShotDebugText(angle, power, spin);

@@ -1,5 +1,7 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class GameHUDManager : MonoBehaviour
 {
@@ -226,5 +228,39 @@ public class GameHUDManager : MonoBehaviour
             LeanTween.scale(textObject, new Vector3(1f, 1f, 1f), 0.7f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
             LeanTween.scale(iconObject, new Vector3(1f, 1f, 1f), 0.6f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
         }
+    }
+
+    public void ChangeTurnText(string turnTextString, bool playAnimation = true)
+    {
+        if (playAnimation)
+        {
+            // reset position
+            LeanTween.cancel(turnText);
+            if (turnTextString == "" || turnTextString == string.Empty)
+            {
+                // shrink out, then set text to blank
+                LeanTween.scale(turnText, new Vector3(0f, 0f, 0f), 1f).setEase(LeanTweenType.easeInQuint).setDelay(0.01f);
+                return;
+            }
+            else
+            {
+                // text should already be 0 scale, but just in case
+                turnText.transform.localScale = new Vector3(0f, 0f, 0f);
+            }
+        }
+
+        if (playAnimation && !(turnTextString == "" || turnTextString == string.Empty))
+        {
+            // set text, then scale in
+            turnText.GetComponent<Text>().text = turnTextString;
+            LeanTween.cancel(this.turnText);
+            LeanTween.scale(this.turnText, new Vector3(1f, 1f, 1f), 1f).setEase(LeanTweenType.easeOutQuint).setDelay(0.5f);
+        }
+    }
+
+    private Action ChangeTurnTextHelper(string turnTextString)
+    {
+        turnText.GetComponent<Text>().text = turnTextString;
+        return null;
     }
 }

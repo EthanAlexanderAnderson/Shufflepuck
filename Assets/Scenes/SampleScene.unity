@@ -25986,7 +25986,7 @@ MonoBehaviour:
   heavySpin: {fileID: 21300000, guid: aa10c2fd0467b5a48afa646348ccdf15, type: 3}
   anchorPoint: {fileID: 1719474260}
   angleParameter: 0.6
-  powerParameter: 2.5
+  powerParameter: 10
 --- !u!331 &505056776
 SpriteMask:
   m_ObjectHideFlags: 0
