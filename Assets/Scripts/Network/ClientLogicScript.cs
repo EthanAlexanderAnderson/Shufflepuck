@@ -90,7 +90,7 @@ public class ClientLogicScript : NetworkBehaviour
             activeBar = bar.ChangeBar("angle", client.goingFirst);
             line.isActive = true;
             arrow.SetActive(true);
-            UI.TurnText = "Your Turn";
+            GameHUDManager.Instance.ChangeTurnText("Your Turn");
             serverLogic.CreatePuckServerRpc();
             client.isTurn = false;
             client.isShooting = true;
@@ -118,7 +118,7 @@ public class ClientLogicScript : NetworkBehaviour
                         spin = line.GetValue();
                         serverLogic.ShootServerRpc(angle, power, spin);
                         activeBar = bar.ChangeBar("none");
-                        UI.TurnText = "Opponent's Turn";
+                        GameHUDManager.Instance.ChangeTurnText("Opponent's Turn");
                         line.isActive = false;
                         arrow.SetActive(false);
                         client.isShooting = false;
@@ -145,7 +145,7 @@ public class ClientLogicScript : NetworkBehaviour
             power = UnityEngine.Random.Range(45.0f, 55.0f);
             serverLogic.ShootServerRpc(angle, power, spin);
             activeBar = bar.ChangeBar("none");
-            UI.TurnText = "Opponent's Turn";
+            GameHUDManager.Instance.ChangeTurnText("Opponent's Turn");
             line.isActive = false;
             arrow.SetActive(false);
             client.isShooting = false;
@@ -157,7 +157,7 @@ public class ClientLogicScript : NetworkBehaviour
             activeBar = bar.ChangeBar("none");
             line.isActive = false;
             arrow.SetActive(false);
-            UI.TurnText = "";
+            GameHUDManager.Instance.ChangeTurnText(String.Empty);
             client.isTurn = false;
             client.isShooting = false;
         }
@@ -182,11 +182,11 @@ public class ClientLogicScript : NetworkBehaviour
         if (isPlayer)
         {
             client.puckCount = count;
-            UI.playerPuckCountText.text = count.ToString();
+            GameHUDManager.Instance.ChangePuckCountText(isPlayer, count.ToString(), true);
         }
         else
         {
-            UI.opponentPuckCountText.text = count.ToString();
+            GameHUDManager.Instance.ChangePuckCountText(isPlayer, count.ToString(), true);
         }
         DecrementWallCount();
         PowerupManager.Instance.DisableForceFieldIfNecessary();
@@ -218,7 +218,7 @@ public class ClientLogicScript : NetworkBehaviour
 
         Debug.Log("Game Over");
         isRunning = false;
-        UI.TurnText = "";
+        GameHUDManager.Instance.ChangeTurnText(String.Empty);
         FogScript.Instance.DisableFog();
     }
 
@@ -278,7 +278,7 @@ public class ClientLogicScript : NetworkBehaviour
         bar.ToggleDim(false);
         UI.onlineRematchButton.SetActive(false);
         UI.ChangeUI(UI.gameHud);
-        UI.TurnText = "Opponent's Turn";
+        GameHUDManager.Instance.ChangeTurnText("Opponent's Turn");
         line.GetComponent<LineScript>().FullSpeed();
     }
 
@@ -313,7 +313,7 @@ public class ClientLogicScript : NetworkBehaviour
     public void StopGame()
     {
         isRunning = false;
-        UI.TurnText = "";
+        GameHUDManager.Instance.ChangeTurnText(String.Empty);
         activeBar = bar.ChangeBar("none");
         line.isActive = false;
         if (client != null)
