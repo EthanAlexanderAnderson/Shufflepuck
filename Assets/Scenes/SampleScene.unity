@@ -25909,7 +25909,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 18, z: 0}
-  m_LocalScale: {x: 8, y: 8, z: 8}
+  m_LocalScale: {x: 4, y: 4, z: 4}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1612694014}
@@ -25986,7 +25986,7 @@ MonoBehaviour:
   heavySpin: {fileID: 21300000, guid: aa10c2fd0467b5a48afa646348ccdf15, type: 3}
   anchorPoint: {fileID: 1719474260}
   angleParameter: 0.6
-  powerParameter: 5
+  powerParameter: 2.5
 --- !u!331 &505056776
 SpriteMask:
   m_ObjectHideFlags: 0
@@ -79063,7 +79063,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 505056773}
