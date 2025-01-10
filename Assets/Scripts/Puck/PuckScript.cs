@@ -35,7 +35,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     private bool pastSafeLine;
     private bool playersPuck;
     private float velocity;
-    public NetworkVariable<int> velocityNetworkedRounded = new NetworkVariable<int>();
+    public NetworkVariable<float> velocityNetworkedRounded = new NetworkVariable<float>();
 
     // this one actually does stuff
     [SerializeField] private float powerModifier;
@@ -83,17 +83,27 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             rb.AddTorque(shotTorqueToAdd);
             shotForceToAdd = Vector2.zero;
             shotTorqueToAdd = 0.0f;
-            if (phase)
-            {
-                spriteRenderer.color = new Color(1f, 1f, 1f, 0.5f);
-                puckCollider.isTrigger = true;
-            }
         }
 
         // Calculate the magnitude of the velocity vector to determine the sliding noise volume
         velocity = Mathf.Sqrt(rb.velocity.x * rb.velocity.x + rb.velocity.y * rb.velocity.y);
-        if (IsServer) { velocityNetworkedRounded.Value = (int)velocity; }
+        if (IsServer) { velocityNetworkedRounded.Value = velocity; }
         noiseSFX.volume = logic.gameIsRunning ? (velocity / 15.0f) * SFXvolume : 0f; // only play noise if game is running (not plinko)
+
+        // update particle emisson based on velocity
+        var PS = GetComponent<ParticleSystem>();
+        ParticleSystem.EmissionModule emission = PS.emission;
+        emission.rateOverTime = (velocity);
+        ParticleSystem.MainModule main = PS.main;
+
+        main.startColor = SetParticleColor();
+
+        // phase powerup
+        if (phase && (velocity > 1 || velocityNetworkedRounded.Value > 1.0f || !IsShot()))
+        {
+            spriteRenderer.color = new Color(1f, 1f, 1f, 0.5f);
+            puckCollider.isTrigger = true;
+        }
 
         if (IsSafe())
         {
@@ -121,7 +131,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
 
         // for phase & lock powerup
-        if (IsShot() && pastSafeLine && IsStopped())
+        if (IsShot() && pastSafeLine && IsStopped() && (!ClientLogicScript.Instance.isRunning || velocityNetworkedRounded.Value < 0.05f))
         {
             if (phase)
             {
@@ -131,6 +141,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 {
                     if (puck != gameObject && Vector2.Distance(puck.transform.position, transform.position) < 2)
                     {
+                        if (ClientLogicScript.Instance.isRunning && !IsServer) { break; }
                         DestroyPuck();
                         return;
                     }
@@ -160,6 +171,13 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         playersPuck = IsPlayersPuckParameter;
         // enable animation for atom
         animationLayer.SetActive(Math.Abs(puckSpriteID) == 40);
+
+        if (transform.position.y > 0) // for block, hydra, any spawned puck above safe line
+        {
+            shot = true;
+            safe = true;
+        }
+
         return this;
     }
 
@@ -183,6 +201,12 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             ClientLogicScript.Instance.client.activePuckObject = gameObject;
         }
         ClientLogicScript.Instance.client.isPlayer = IsPlayersPuckParameter;
+
+        if (transform.position.y > 0)
+        {
+            shot = true;
+            safe = true;
+        }
 
         Debug.Log($"Puck initialized. IsPlayersPuckParameter: {IsPlayersPuckParameter}. PuckSpriteID: {puckSpriteID}");
     }
@@ -225,6 +249,8 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         shotSFX.volume += volumeBoost;
         shotSFX.volume *= SFXvolume;
         shotSFX.Play();
+        // screen shake
+        ScreenShake.Instance.Shake(powerParameter / 500);
     }
 
     [ServerRpc]
@@ -271,14 +297,6 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 pointCPUSFX.pitch = 0.8f + (0.05f * enteredZoneMultiplier);
                 pointCPUSFX.Play();
             }
-            // if this puck object already has a floating text, destroy it
-            foreach (Transform child in transform)
-            {
-                if (child.gameObject.tag == "floatingText")
-                {
-                    Destroy(child.gameObject);
-                }
-            }
         }
         // if puck moves into the off zone, play minus sfx
         else if (enteredZoneMultiplier < zoneMultiplier)
@@ -286,21 +304,32 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             if (IsPlayersPuck())
             {
                 minusPlayerSFX.volume = SFXvolume;
+                minusPlayerSFX.pitch = 0.9f + (0.05f * enteredZoneMultiplier);
                 minusPlayerSFX.Play();
             }
             else
             {
                 minusCPUSFX.volume = SFXvolume;
+                minusPlayerSFX.pitch = 0.8f + (0.05f * enteredZoneMultiplier);
                 minusCPUSFX.Play();
             }
         }
 
         if (zoneMultiplier != enteredZoneMultiplier)
         {
+            // if this puck object already has a floating text, destroy it
+            foreach (Transform child in transform)
+            {
+                if (child.gameObject.CompareTag("floatingText"))
+                {
+                    Destroy(child.gameObject);
+                }
+            }
+
             zoneMultiplier = enteredZoneMultiplier;
             // show floating text
             var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
-            floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f, true);
+            floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f + (ComputeValue() / 10), true);
         }
         zoneMultiplier = enteredZoneMultiplier;
     }
@@ -359,26 +388,20 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             ParticleSystem collisionParticleEffect = Instantiate(collisionParticleEffectPrefab, col.GetContact(0).point, Quaternion.identity);
             collisionParticleEffect.transform.position = col.GetContact(0).point;
             ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
-            emission.rateOverTime = (velocity) * 50f;
+            emission.rateOverTime = (velocity) * 75f;
             ParticleSystem.MainModule main = collisionParticleEffect.main;
-            main.startSpeed = (velocity) * 4f;
+            main.startSpeed = (velocity) * 5f;
 
-            // set color of particle effect to puck color
-            if (color == null || color.Length <= 0) // handle null color
-            {
-                main.startColor = new ParticleSystem.MinMaxGradient(Color.grey);
-            }
-            else if (color.Length == 1) // handle one color
-            {
-                main.startColor = color[0];
-            }
-            else // handle two or more colors
-            {
-                main.startColor = new ParticleSystem.MinMaxGradient(CreateRandomGradient());
-            }
+            main.startColor = SetParticleColor();
 
             collisionParticleEffect.Play();
             Destroy(collisionParticleEffect.gameObject, 5f);
+
+            // Screen shake
+            if (col.gameObject.CompareTag("puck"))
+            {
+                ScreenShake.Instance.Shake(velocity / 20);
+            }
         }
         angularVelocityModifier = 0;
 
@@ -404,25 +427,6 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         puckBonusValue = value;
     }
 
-    Gradient CreateRandomGradient()
-    {
-        Gradient gradient = new Gradient();
-        GradientColorKey[] colorKeys = new GradientColorKey[color.Length];
-        GradientAlphaKey[] alphaKeys = new GradientAlphaKey[1]; // One alpha key for consistent transparency
-
-        for (int i = 0; i < color.Length; i++)
-        {
-            // Each color is mapped to a specific point in the gradient
-            float time = i / (float)(color.Length - 1);
-            colorKeys[i] = new GradientColorKey(color[i], time);
-        }
-
-        alphaKeys[0] = new GradientAlphaKey(1f, 0f); // Set constant alpha
-
-        gradient.SetKeys(colorKeys, alphaKeys);
-        return gradient;
-    }
-
     public void SetPowerupText(string text)
     {
         powerupText = text;
@@ -439,7 +443,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     {
         // show puck score when clicked
         var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
-        floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f, true);
+        floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f + (ComputeValue() / 10), true);
         // if powerupText has been set, show it
         if (powerupText != null)
         {
@@ -449,7 +453,11 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     public void DestroyPuck() // Destroys the puck with a particle and sound effect, used by powerups that say destroy
     {
-        Destroy(gameObject, 0.1f);
+        // update score
+        puckBaseValue = 0;
+        puckBonusValue = 0;
+        zoneMultiplier = 0;
+        LogicScript.Instance.UpdateScores();
         logic.playDestroyPuckSFX(SFXvolume);
         // hydra powerup
         if (hydraPowerup)
@@ -463,29 +471,22 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 PowerupManager.Instance.HydraHelper(playersPuck, transform.position.x, transform.position.y);
             }
         }
+        // Screen shake
+        ScreenShake.Instance.Shake(0.25f);
+        // actually destroy the gameobject
+        Destroy(gameObject);
     }
 
     override public void OnDestroy()
     {
         if (!logic.gameIsRunning && !ClientLogicScript.Instance.isRunning) { return; }
+        logic.playDestroyPuckSFX(SFXvolume); // TODO: investigate if this causes the SFX twice in any scenerio
         ParticleSystem collisionParticleEffect = Instantiate(collisionParticleEffectPrefab, transform.position, Quaternion.identity);
         ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
         emission.rateOverTime = 1000f;
         ParticleSystem.MainModule main = collisionParticleEffect.main;
         main.startSpeed = 100f;
-        // set color of particle effect to puck color
-        if (color == null || color.Length <= 0) // handle null color
-        {
-            main.startColor = new ParticleSystem.MinMaxGradient(Color.grey);
-        }
-        else if (color.Length == 1) // handle one color
-        {
-            main.startColor = color[0];
-        }
-        else // handle two or more colors
-        {
-            main.startColor = new ParticleSystem.MinMaxGradient(CreateRandomGradient());
-        }
+        main.startColor = SetParticleColor();
         collisionParticleEffect.Play();
         Destroy(collisionParticleEffect.gameObject, 10f);
 
@@ -532,6 +533,8 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         SetPuckBaseValue(0);
         SetPowerupText("valueless");
         CreatePowerupFloatingText();
+        shot = true;
+        safe = true;
     }
 
     public void EnableGrowth()
@@ -580,7 +583,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             pointCPUSFX.Play();
         }
         var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
-        floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f, true);
+        floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f + (ComputeValue() / 10), true);
     }
 
     public void EnableLock()
@@ -629,5 +632,40 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public void EnableHydra()
     {
         hydraPowerup = true;
+    }
+
+    public ParticleSystem.MinMaxGradient SetParticleColor()
+    {
+        // set color of particle effect to puck color
+        if (color == null || color.Length <= 0) // handle null color
+        {
+            return new ParticleSystem.MinMaxGradient(Color.grey);
+        }
+        else if (color.Length == 1) // handle one color
+        {
+            return color[0];
+        }
+        else // handle two or more colors
+        {
+            return new ParticleSystem.MinMaxGradient(CreateRandomGradient());
+        }
+    }
+    Gradient CreateRandomGradient()
+    {
+        Gradient gradient = new Gradient();
+        GradientColorKey[] colorKeys = new GradientColorKey[color.Length];
+        GradientAlphaKey[] alphaKeys = new GradientAlphaKey[1]; // One alpha key for consistent transparency
+
+        for (int i = 0; i < color.Length; i++)
+        {
+            // Each color is mapped to a specific point in the gradient
+            float time = i / (float)(color.Length - 1);
+            colorKeys[i] = new GradientColorKey(color[i], time);
+        }
+
+        alphaKeys[0] = new GradientAlphaKey(1f, 0f); // Set constant alpha
+
+        gradient.SetKeys(colorKeys, alphaKeys);
+        return gradient;
     }
 }

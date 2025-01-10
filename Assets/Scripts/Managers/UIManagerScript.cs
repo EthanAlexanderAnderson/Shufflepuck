@@ -113,6 +113,8 @@ public class UIManagerScript : MonoBehaviour
         get => turnText.text;
         set
         {
+            LeanTween.alpha(turnText.gameObject, 0f, 0.001f);
+            LeanTween.alpha(turnText.gameObject, 1f, 1f).setDelay(1f);
             turnText.text = value;
         }
     }
@@ -197,20 +199,36 @@ public class UIManagerScript : MonoBehaviour
             logic.tutorialActive = false;
             PlayerPrefs.SetInt("tutorialCompleted", 1);
         }
-
     }
 
+    int prevPlayerPuckCount = 5;
+    int prevOpponentPuckCount = 5;
     public void PostShotUpdate(int playerPuckCount, int opponentPuckCount)
     {
-        playerPuckCountText.text = playerPuckCount.ToString();
-        opponentPuckCountText.text = opponentPuckCount.ToString();
+        if (!playerPuckCountText || !opponentPuckCountText) { return; }
+
+        var newPlayerPuckCount = Mathf.Max(0, playerPuckCount);
+        GameHUDManager.Instance.ChangePuckCountText(true, newPlayerPuckCount.ToString(), newPlayerPuckCount != prevPlayerPuckCount);
+        prevPlayerPuckCount = playerPuckCount;
+
+        var newOpponentPuckCount = Mathf.Max(0, opponentPuckCount);
+        GameHUDManager.Instance.ChangePuckCountText(false, newOpponentPuckCount.ToString(), newOpponentPuckCount != prevOpponentPuckCount);
+        prevOpponentPuckCount = opponentPuckCount;
     }
+
+    int prevPlayerScore;
+    int prevOpponentScore;
     public void UpdateScores(int playerScore, int opponentScore)
     {
         if (!playerScoreText || !opponentScoreText) { return; }
-        // if score is negative, display 0
-        playerScoreText.text = Mathf.Max(0, playerScore).ToString();
-        opponentScoreText.text = Mathf.Max(0, opponentScore).ToString();
+
+        var newPlayerScore = Mathf.Max(0, playerScore);
+        GameHUDManager.Instance.ChangeScoreText(true, newPlayerScore.ToString(), newPlayerScore != prevPlayerScore);
+        prevPlayerScore = newPlayerScore;
+
+        var newOpponentScore = Mathf.Max(0, opponentScore);
+        GameHUDManager.Instance.ChangeScoreText(false, newOpponentScore.ToString(), newOpponentScore != prevOpponentScore);
+        prevOpponentScore = newOpponentScore;
     }
 
     public void UpdateWallText(int wallCount)

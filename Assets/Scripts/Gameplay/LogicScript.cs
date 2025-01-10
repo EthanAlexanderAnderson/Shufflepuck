@@ -3,6 +3,7 @@
  */
 
 using UnityEngine;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class LogicScript : MonoBehaviour
@@ -41,6 +42,7 @@ public class LogicScript : MonoBehaviour
     public bool powerupsAreEnabled = false;
     [SerializeField] private GameObject powerupsMenu; // set in editor
     private bool powerupHasBeenUsedThisTurn = false;
+    [SerializeField] private GameObject powerupsToggle;
 
     // game state
     public bool gameIsRunning { get; private set; }
@@ -114,8 +116,13 @@ public class LogicScript : MonoBehaviour
         nonActiveCompetitor = player;
         // check if tutorial should be active
         tutorialActive = PlayerPrefs.GetInt("tutorialCompleted") == 0 && PlayerPrefs.GetInt("easyWin") == 0 && PlayerPrefs.GetInt("easyHighscore") == 0;
+        // load if powerups should be active
+        powerupsAreEnabled = PlayerPrefs.GetInt("PowerupsEnabled", 0) == 1;
+        powerupsToggle.GetComponent<Toggle>().isOn = powerupsAreEnabled;
         // initialize CPU paths
         CPUPaths = GameObject.FindGameObjectsWithTag("cpu_path");
+        // make sure we're on title screen
+        UI.ChangeUI(UI.titleScreen);
     }
 
     // Update is called once per frame
@@ -136,7 +143,7 @@ public class LogicScript : MonoBehaviour
             // update wall status
             if (wallCount == 0 && puckManager.AllPucksAreSlowedMore())
             {
-                wall.SetActive(false);
+                WallScript.Instance.WallEnabled(false);
                 UI.UpdateWallText(wallCount);
                 wallCount--;
             }
@@ -203,10 +210,10 @@ public class LogicScript : MonoBehaviour
         bar.ToggleDim(false);
         line.isActive = true;
         arrow.SetActive(true);
-        UI.TurnText = isLocal ? "Player 1's Turn" : "Your Turn";
+        GameHUDManager.Instance.ChangeTurnText(isLocal ? "Player 1's Turn" : "Your Turn");
         if (player.puckCount == 1)
         {
-            UI.TurnText = "LAST PUCK";
+            GameHUDManager.Instance.ChangeTurnText("LAST PUCK");
         }
         puckManager.CreatePuck(player);
         player.isTurn = false;
@@ -259,10 +266,11 @@ public class LogicScript : MonoBehaviour
         }
         line.isActive = true;
         arrow.SetActive(true);
-        UI.TurnText = isLocal ? "Player 2's Turn" : "CPU's Turn";
+        puckHalo.SetActive(difficulty == 0);
+        GameHUDManager.Instance.ChangeTurnText(isLocal ? "Player 2's Turn" : "CPU's Turn");
         if (opponent.puckCount == 1 && isLocal)
         {
-            UI.TurnText = "LAST PUCK";
+            GameHUDManager.Instance.ChangeTurnText("LAST PUCK");
         }
         puckManager.CreatePuck(opponent);
         opponent.isTurn = false;
@@ -291,7 +299,7 @@ public class LogicScript : MonoBehaviour
             (CPUShotAngle, CPUShotPower, CPUShotSpin) = FindOpenPath();
         }
 
-        // use powerup (this must be after CPU find path, to not double-use powerups after a phase shot path has been selected)
+        // use powerup (this must be after CPU find path, to not double-use powerups after a phase, contact, or explosion shot path has been selected)
         if (difficulty >= 2 && !isLocal && powerupsAreEnabled && !powerupHasBeenUsedThisTurn)
         {
             if (opponent.puckCount > 3) // first two shots use block
@@ -299,7 +307,7 @@ public class LogicScript : MonoBehaviour
                 powerupManager.BlockPowerup();
                 powerupHasBeenUsedThisTurn = true;
             }
-            else // last three, use plus one or bolt
+            else // last three, use plus one, growth, or bolt
             {
                 // if the ratio of player pucks to opponent pucks is greater than 2, use bolt
                 var allPucks = GameObject.FindGameObjectsWithTag("puck");
@@ -322,7 +330,7 @@ public class LogicScript : MonoBehaviour
                     powerupManager.BoltPowerup();
                     powerupHasBeenUsedThisTurn = true;
                 }
-                // otherwise, use plus one
+                // otherwise, use plus one or growth
                 else
                 {
                     if (opponent.puckCount > 2)
@@ -380,6 +388,7 @@ public class LogicScript : MonoBehaviour
         activeBar = bar.ChangeBar("none");
         line.isActive = false;
         arrow.SetActive(false);
+        GameHUDManager.Instance.ChangeTurnText(string.Empty);
         activeCompetitor.ShootActivePuck(angle, power, spin);
         UI.PostShotUpdate(player.puckCount, opponent.puckCount);
         UI.UpdateShotDebugText(angle, power, spin);
@@ -416,6 +425,7 @@ public class LogicScript : MonoBehaviour
         }
         player.ResetProperties();
         opponent.ResetProperties();
+        UI.PostShotUpdate(player.puckCount, opponent.puckCount);
 
         if (difficulty < 2) // for easy & medium
         {
@@ -439,12 +449,12 @@ public class LogicScript : MonoBehaviour
 
         if (difficulty == 0) {
             wallCount = 0;
-            wall.SetActive(false);
+            WallScript.Instance.WallEnabled(false);
         }
         else
         {
             wallCount = 3;
-            wall.SetActive(true);
+            WallScript.Instance.WallEnabled(true);
         }
         UI.UpdateWallText(wallCount);
 
@@ -452,9 +462,11 @@ public class LogicScript : MonoBehaviour
         gameIsRunning = true;
         puckHalo.SetActive(difficulty == 0);
         line.isActive = false;
+        line.GetComponent<LineScript>().FullSpeed();
         bar.ChangeBar("none");
         UI.ChangeUI(UI.gameHud);
         powerupManager.DisableForceFieldIfNecessary();
+        FogScript.Instance.DisableFog();
         Debug.Log("Starting match with difficulty: " + difficulty);
     }
 
@@ -481,6 +493,14 @@ public class LogicScript : MonoBehaviour
         bar.ChangeBar("none");
         arrow.SetActive(false);
         FogScript.Instance.DisableFog();
+        WallScript.Instance.WallEnabled(false);
+#if (UNITY_EDITOR)
+        foreach (var path in CPUPaths)
+        {
+            var pathi = path.GetComponent<CPUPathScript>();
+            pathi.DisablePathVisualization();
+        }
+#endif
     }
 
     // this is the CPU AI for hard mode
@@ -504,6 +524,11 @@ public class LogicScript : MonoBehaviour
                 {
                     continue;
                 }
+                // handle phase powerup shots
+                if (!powerupsAreEnabled && pathi.DoesPathRequireExplosionPowerup())
+                {
+                    continue;
+                }
 
                 best = pathi;
                 highestValue = pathiShotValue;
@@ -516,12 +541,17 @@ public class LogicScript : MonoBehaviour
             best.EnablePathVisualization();
 
             // handle powerup shots
-            if (best.DoesPathRequirePhasePowerup() && powerupsAreEnabled)
+            if (best.DoesPathRequirePhasePowerup() && powerupsAreEnabled && !powerupHasBeenUsedThisTurn)
             {
                 powerupManager.PhasePowerup();
                 powerupHasBeenUsedThisTurn = true;
             }
-            else if (best.IsPathAContactShot() && powerupsAreEnabled)
+            else if (best.DoesPathRequireExplosionPowerup() && powerupsAreEnabled && !powerupHasBeenUsedThisTurn)
+            {
+                powerupManager.ExplosionPowerup();
+                powerupHasBeenUsedThisTurn = true;
+            }
+            else if (best.IsPathAContactShot() && powerupsAreEnabled && !powerupHasBeenUsedThisTurn)
             {
                 powerupManager.ForceFieldPowerup();
                 powerupHasBeenUsedThisTurn = true;
@@ -546,7 +576,11 @@ public class LogicScript : MonoBehaviour
     public void SetPowerups(bool value)
     {
         powerupsAreEnabled = value;
-        UI.ChangeUI(deckScreen); // TODO: make this not dumb
+        PlayerPrefs.SetInt("PowerupsEnabled", value ? 1 : 0);
+        if (value)
+        {
+            UI.ChangeUI(deckScreen); // TODO: make this not dumb
+        }
     }
 
     [SerializeField] private AudioSource puckDestroySFX;

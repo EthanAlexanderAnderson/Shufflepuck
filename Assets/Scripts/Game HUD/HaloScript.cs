@@ -11,6 +11,8 @@ public class HaloScript : MonoBehaviour
     private LineScript line;
     private LogicScript logic;
 
+    [SerializeField] private GameObject fogHaloMask;
+
     [SerializeField] private float angleModifierX; // 20
     [SerializeField] private float angleModifierY; // 20
     [SerializeField] private float minusY; // 10
@@ -53,6 +55,8 @@ public class HaloScript : MonoBehaviour
             sideModifier = ClientLogicScript.Instance.client.goingFirst ? (-3.6f) : (3.6f);
         }
 
+        var sr = GetComponent<SpriteRenderer>();
+
         // calculate the pucks estimated position
         if (logic.activeBar == "angle" || (ClientLogicScript.Instance.isRunning && ClientLogicScript.Instance.activeBar == "angle"))
         {
@@ -61,14 +65,16 @@ public class HaloScript : MonoBehaviour
             float xcomponent = Mathf.Cos(angle * Mathf.PI / 180) * angleModifierX;
             float ycomponent = Mathf.Sin(angle * Mathf.PI / 180) * angleModifierY;
             this.transform.position = new Vector3(xcomponent + sideModifier, ycomponent - minusY, this.transform.position.z);
+            if (sr != null) { sr.color = new Color(1.0f, 1.0f, 1.0f, 1.0f); } // remove yellow tint
         }
         else if (logic.activeBar == "power" || (ClientLogicScript.Instance.isRunning && ClientLogicScript.Instance.activeBar == "power"))
         {
             power = (line.GetValue() - (line.GetValue() - 50) * 0.5f) * powerModifier;
-            if (line.GetValue() >= 95)
+            if (line.GetValue() >= 90)
             {
                 // TODO: get feedback and uncomment this
                 //power += (line.GetValue() - 95) * tempBoostPowerMod + tempBoostPowerModBase;
+                if (sr != null) { sr.color = new Color(1.0f, 1.0f, 1.0f - 0.15f * (line.GetValue() - 90), 1.0f); } // tint halo yellow for extra high power shot
             }
 
             float xcomponent = Mathf.Cos(angle * Mathf.PI / 180) * angleModifierX * (powerModifier * power);
@@ -85,6 +91,12 @@ public class HaloScript : MonoBehaviour
             float ycomponent = Mathf.Sin((angle + spinAngle) * Mathf.PI / 180) * angleModifierY * (powerModifier * power - spinPower);
             this.transform.position = new Vector3(xcomponent + sideModifier, ycomponent - minusY, this.transform.position.z);
         }
+        else
+        {
+            EnableFogMask(false);
+        }
+        fogHaloMask.transform.position = this.transform.position;
+
     }
 
     // for debug menu
@@ -118,4 +130,9 @@ public class HaloScript : MonoBehaviour
 
     public float tempBoostPowerMod; // 0.85
     public float tempBoostPowerModBase; // 0.7
+
+    public void EnableFogMask(bool enabled)
+    {
+        fogHaloMask.SetActive(enabled);
+    }
 }

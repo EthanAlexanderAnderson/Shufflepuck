@@ -16,10 +16,13 @@ public class CPUPathScript : MonoBehaviour
     [SerializeField] private int value;
     [SerializeField] private bool isContactShot;
     [SerializeField] private bool requiresPhasePowerup;
+    private bool requiresExplosionPowerup;
 
     public (float, float, float) GetPath() { return (angle, power, spin); }
 
     public bool DoesPathRequirePhasePowerup() { return requiresPhasePowerup; }
+
+    public bool DoesPathRequireExplosionPowerup() { return requiresExplosionPowerup; }
 
     public bool IsPathAContactShot() { return isContactShot; }
 
@@ -27,6 +30,7 @@ public class CPUPathScript : MonoBehaviour
     {
         List<GameObject> pucksCurrentlyInPath = GetPucksInPath();
         int numberOfPucksCurrentlyInPath = pucksCurrentlyInPath.Count;
+        requiresExplosionPowerup = false;
 
         // if not contact shot, only shoot if path is clear
         if (!isContactShot)
@@ -34,6 +38,11 @@ public class CPUPathScript : MonoBehaviour
             if (numberOfPucksCurrentlyInPath == 0)
             {
                 return value;
+            }
+            else if (numberOfPucksCurrentlyInPath == 1 && pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsPlayersPuck() && !pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsHydra() && !requiresPhasePowerup && !isContactShot) // explosion shot
+            {
+                requiresExplosionPowerup = true;
+                return pucksCurrentlyInPath[0].GetComponent<PuckScript>().ComputeValue();
             }
             else
             {
@@ -45,7 +54,7 @@ public class CPUPathScript : MonoBehaviour
         {
             if (numberOfPucksCurrentlyInPath <=1) return 0;
 
-            if (pucksCurrentlyInPath.TrueForAll(IsPlayersPuck) && pucksCurrentlyInPath.TrueForAll(IsNotLockedOrExposion))
+            if (pucksCurrentlyInPath.TrueForAll(IsPlayersPuck) && pucksCurrentlyInPath.TrueForAll(IsNotLockedOrExposion) && pucksCurrentlyInPath.TrueForAll(HasPostiveValue) && !WallIsActive())
             {
                 return value;
             }
@@ -74,11 +83,37 @@ public class CPUPathScript : MonoBehaviour
         return !(p.GetComponent<PuckScript>().IsLocked() || p.GetComponent<PuckScript>().IsExplosion());
     }
 
+    // helper only for CalculateValue() contact shots
+    private bool HasPostiveValue(GameObject p)
+    {
+        if (p == null) return false;
+
+        if (p.GetComponent<PuckScript>() == null) return false;
+
+        return p.GetComponent<PuckScript>().ComputeValue() > 0;
+    }
+
+    // helper only for CalculateValue() contact shots
+    private bool WallIsActive()
+    {
+        // TODO: make this work
+        return false;
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.layer != 3) // ignore center puck collider
         {
             if (!pucksInPath.Contains(collision.gameObject)) { pucksInPath.Add(collision.gameObject); }
+#if (UNITY_EDITOR)
+            if (!isContactShot) { return; }
+            List<GameObject> pucksCurrentlyInPath = GetPucksInPath();
+            int numberOfPucksCurrentlyInPath = pucksCurrentlyInPath.Count;
+            if (numberOfPucksCurrentlyInPath > 1)
+            {
+                EnablePathVisualization(1);
+            }
+#endif
         }
     }
 
@@ -87,14 +122,37 @@ public class CPUPathScript : MonoBehaviour
         if (collision.gameObject.layer != 3) // ignore center puck collider
         { 
             pucksInPath.Remove(collision.gameObject);
+#if (UNITY_EDITOR)
+            if (!isContactShot) { return; }
+            List<GameObject> pucksCurrentlyInPath = GetPucksInPath();
+            int numberOfPucksCurrentlyInPath = pucksCurrentlyInPath.Count;
+            if (numberOfPucksCurrentlyInPath <= 1)
+            {
+                DisablePathVisualization();
+            }
+#endif
         }
     }
 
     // These two are only used to help me create CPU paths
-    public void EnablePathVisualization()
+    public void EnablePathVisualization(int mode = 0)
     {
 #if (UNITY_EDITOR)
         GetComponent<LineRenderer>().enabled = true;
+        if (mode == 0)
+        {
+            GetComponent<LineRenderer>().startColor = Color.green;
+            GetComponent<LineRenderer>().endColor = Color.green;
+            GetComponent<LineRenderer>().startWidth = 0.08f;
+            GetComponent<LineRenderer>().endWidth = 0.08f;
+        }
+        else if (mode == 1)
+        {
+            GetComponent<LineRenderer>().startColor = Color.white;
+            GetComponent<LineRenderer>().endColor = Color.white;
+            GetComponent<LineRenderer>().startWidth = 0.03f;
+            GetComponent<LineRenderer>().endWidth = 0.03f;
+        }
 #endif
     }
     public void DisablePathVisualization()

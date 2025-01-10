@@ -10,7 +10,7 @@ public class LineScript : MonoBehaviour
     [SerializeField] private SpriteRenderer spriteRenderer;
 
     bool movingLeft;
-    const float moveSpeed = 10;
+    float moveSpeed = 10;
 
     [SerializeField] private float value;
     public bool isActive;
@@ -78,5 +78,19 @@ public class LineScript : MonoBehaviour
         {
             return value;
         }
+    }
+
+    public void HalfSpeed()
+    {
+        moveSpeed = 5;
+        ClientLogicScript.OnPlayerShot += FullSpeed;
+        ClientLogicScript.OnOpponentShot += FullSpeed;
+        LogicScript.OnPlayerShot += FullSpeed;
+        LogicScript.OnOpponentShot += FullSpeed;
+    }
+
+    public void FullSpeed()
+    {
+        moveSpeed = 10;
     }
 }
