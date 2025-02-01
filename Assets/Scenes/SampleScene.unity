@@ -3046,10 +3046,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30119a0734817b04a8239ae71211b0e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  angle: 84
-  power: 90
+  angle: 82
+  power: 88
   spin: 0
-  value: 3
+  value: 2
   isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!60 &73639749
@@ -26667,7 +26667,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 23.41374
+  orthographic size: 19.2
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -28137,7 +28137,7 @@ MonoBehaviour:
   angle: 0
   power: 94.9
   spin: 70
-  value: 3
+  value: 2
   isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!60 &541556641
