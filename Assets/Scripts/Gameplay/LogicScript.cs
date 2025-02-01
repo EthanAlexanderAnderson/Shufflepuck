@@ -199,6 +199,17 @@ public class LogicScript : MonoBehaviour
             UI.AdvanceTutorial();
         }
 
+        // if we start our turn with no pucks remaining, skip our turn
+        if (player.puckCount == 0 && opponent.puckCount > 0)
+        {
+            player.isTurn = false;
+            opponent.isTurn = true;
+            return;
+        }
+
+        activeCompetitor = player;
+        nonActiveCompetitor = opponent;
+
         if (difficulty >= 2 && !isLocal)
         {
             powerupsMenu.SetActive(powerupsAreEnabled);
@@ -258,6 +269,17 @@ public class LogicScript : MonoBehaviour
 
     private void StartingOpponentsTurnHelper()
     {
+        // if opponents starts their turn with no pucks remaining, skip their turn
+        if (opponent.puckCount <= 0 && player.puckCount > 0)
+        {
+            opponent.isTurn = false;
+            player.isTurn = true;
+            return;
+        }
+
+        activeCompetitor = opponent;
+        nonActiveCompetitor = player;
+
         powerupHasBeenUsedThisTurn = false;
         activeBar = bar.ChangeBar("angle", activeCompetitor.isPlayer);
         if (!isLocal)
@@ -392,23 +414,18 @@ public class LogicScript : MonoBehaviour
         activeCompetitor.ShootActivePuck(angle, power, spin);
         UI.PostShotUpdate(player.puckCount, opponent.puckCount);
         UI.UpdateShotDebugText(angle, power, spin);
-        nonActiveCompetitor.isTurn = true;
         if (activeCompetitor.isPlayer)
         {
             OnPlayerShot?.Invoke();
+            player.isTurn = false;
+            opponent.isTurn = true;
         }
         else
         {
             OnOpponentShot?.Invoke();
+            player.isTurn = true;
+            opponent.isTurn = false;
         }
-        SwapCompetitors();
-    }
-
-    private void SwapCompetitors()
-    {
-        var temp = activeCompetitor;
-        activeCompetitor = nonActiveCompetitor;
-        nonActiveCompetitor = temp;
     }
 
     public void RestartGame(int diff)
