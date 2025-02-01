@@ -149,7 +149,7 @@ public class LogicScript : MonoBehaviour
             }
 
             // start Players turn, do this then start shooting
-            if (player.isTurn && !player.isShooting && ((player.goingFirst && opponent.puckCount == 5) || opponent.activePuckScript.IsSlowed()))
+            if (player.isTurn && !player.isShooting && ((player.goingFirst && opponent.puckCount == 5) || puckManager.AllPucksAreSlowed()))
             {
                 StartingPlayersTurnHelper();
             }
@@ -165,7 +165,7 @@ public class LogicScript : MonoBehaviour
             }
 
             // start CPU's turn, do this then start shooting
-            if (opponent.isTurn && (player.activePuckScript == null || (player.activePuckScript.IsSlowed() && (puckManager.AllPucksAreSlowed() && difficulty < 2 || puckManager.AllPucksAreSlowedMore()))))
+            if (opponent.isTurn && (player.activePuckScript == null || puckManager.AllPucksAreSlowed() && difficulty < 2 || puckManager.AllPucksAreSlowedMore()))
             {
                 StartingOpponentsTurnHelper();
             }
