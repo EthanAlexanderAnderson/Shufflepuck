@@ -147,6 +147,7 @@ public class SoundManagerScript : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
             musicComponent.volume = Mathf.Lerp(startVolume, targetVolume, elapsedTime / fadeDuration);
+            if ( musicComponent.volume > 0.1) { musicComponent.mute = false; } // this is weird but it prevents the 0.1 seconds of full volume music on startup
             yield return null;
         }
 

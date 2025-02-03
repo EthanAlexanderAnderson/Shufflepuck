@@ -89,6 +89,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         velocity = Mathf.Sqrt(rb.velocity.x * rb.velocity.x + rb.velocity.y * rb.velocity.y);
         if (IsServer) { velocityNetworkedRounded.Value = velocity; }
         noiseSFX.volume = logic.gameIsRunning ? (velocity / 15.0f) * SFXvolume : 0f; // only play noise if game is running (not plinko)
+        noiseSFX.mute = noiseSFX.volume < 0.1;  // this is weird but it prevents the 0.1 seconds of noise on spawn
 
         // update particle emisson based on velocity
         var PS = GetComponent<ParticleSystem>();

@@ -185,7 +185,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3563702670
+  GlobalObjectIdHash: 3569049060
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -606,10 +606,10 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: 95d3dcc2c1f702148bb04eb95cb4f9ca, type: 3}
   m_Resource: {fileID: 8300000, guid: 95d3dcc2c1f702148bb04eb95cb4f9ca, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.7
+  m_Volume: 0
   m_Pitch: 1
   Loop: 1
-  Mute: 0
+  Mute: 1
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
