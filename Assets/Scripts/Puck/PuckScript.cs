@@ -137,16 +137,23 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             if (phase)
             {
                 // if this puck is within 2 units of the nearest puck, destroy it
+                var phaseHasOverlap = false;
                 var pucks = GameObject.FindGameObjectsWithTag("puck");
                 foreach (var puck in pucks)
                 {
                     if (puck != gameObject && Vector2.Distance(puck.transform.position, transform.position) < 2)
                     {
                         if (ClientLogicScript.Instance.isRunning && !IsServer) { break; }
-                        DestroyPuck();
-                        return;
+                        phaseHasOverlap = true;
+                        if (explosionPowerup) { puck.GetComponent<PuckScript>().DestroyPuck(); } // phase & explosion combo
                     }
                 }
+                if (phaseHasOverlap)
+                {
+                    DestroyPuck();
+                    return;
+                }
+
                 // othewrise, unphase it (make it visible again)
                 spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
                 puckCollider.isTrigger = false;
