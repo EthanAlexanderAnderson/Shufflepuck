@@ -135,4 +135,9 @@ public class HaloScript : MonoBehaviour
     {
         fogHaloMask.SetActive(enabled);
     }
+
+    public bool HaloEnabled()
+    {
+        return fogHaloMask.activeInHierarchy;
+    }
 }

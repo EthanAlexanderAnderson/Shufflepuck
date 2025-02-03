@@ -318,73 +318,9 @@ public class LogicScript : MonoBehaviour
         // hard uses paths, and random if no path is found
         else
         {
+            if (difficulty >= 2 && !isLocal && powerupsAreEnabled && powerupsUsedThisTurn < 3) { CPUPreShotPowerups(); }
             (CPUShotAngle, CPUShotPower, CPUShotSpin) = FindOpenPath();
-        }
-
-        // use powerup (this must be after CPU find path, to not double-use powerups after a phase, contact, or explosion shot path has been selected)
-        if (difficulty >= 2 && !isLocal && powerupsAreEnabled && powerupsUsedThisTurn < 3)
-        {
-            // first two shots use block
-            if (opponent.puckCount > 3)
-            {
-                powerupManager.BlockPowerup();
-                powerupsUsedThisTurn++;
-            }
-            else if (opponent.puckCount > 1)
-            {
-                // if the ratio of player pucks to opponent pucks is greater than 2, use bolt
-                var allPucks = GameObject.FindGameObjectsWithTag("puck");
-                float playerPucks = 0;
-                float opponentPucks = 0.001f; // so we don't divide by zero
-                foreach (var puck in allPucks)
-                {
-                    var puckScript = puck.GetComponent<PuckScript>();
-                    if (puckScript.IsPlayersPuck() && puckScript.ComputeValue() > 0 && !puckScript.IsHydra())
-                    {
-                        playerPucks++;
-                    }
-                    else if (!puckScript.IsPlayersPuck() && puckScript.ComputeValue() > 0)
-                    {
-                        opponentPucks++;
-                    }
-                }
-                if (playerPucks / opponentPucks > 2)
-                {
-                    powerupManager.BoltPowerup();
-                    powerupsUsedThisTurn++;
-                }
-            }
-            if (powerupsUsedThisTurn >= 3) { return; }
-            // plus one, growth, hydra
-            if (opponent.puckCount > 3)
-            {
-                powerupManager.GrowthPowerup();
-            }
-            else if (opponent.puckCount < 3)
-            {
-                powerupManager.PlusOnePowerup();
-            }
-            else
-            {
-                powerupManager.HydraPowerup();
-            }
-            powerupsUsedThisTurn++;
-            if (powerupsUsedThisTurn >= 3) { return; }
-            // lock, fog, cull
-            if (opponent.puckCount == 4)
-            {
-                powerupManager.LockPowerup();
-            }
-            else if (opponent.puckCount == 2)
-            {
-                powerupManager.FogPowerup();
-            }
-            else if (opponent.puckCount == 1 && powerupsUsedThisTurn < 2)
-            {
-                powerupManager.CullPowerup();
-            }
-            powerupsUsedThisTurn++;
-            if (powerupsUsedThisTurn >= 3) { return; }
+            if (difficulty >= 2 && !isLocal && powerupsAreEnabled && powerupsUsedThisTurn < 3) { CPUPostShotPowerups(); }
         }
     }
 
@@ -542,8 +478,8 @@ public class LogicScript : MonoBehaviour
     // this is the CPU AI for hard mode
     private (float, float, float) FindOpenPath()
     {
-        // if Fog is active, shoot random
-        if (FogScript.Instance.FogEnabled()) { return (Random.Range(35.0f, 65.0f), Random.Range(40.0f, 70.0f), Random.Range(45.0f, 55.0f)); }
+        // if Fog is active and foresight isn't, shoot random
+        if (FogScript.Instance.FogEnabled() && !HaloScript.Instance.HaloEnabled()) { return (Random.Range(35.0f, 65.0f), Random.Range(40.0f, 70.0f), Random.Range(45.0f, 55.0f)); }
 
         CPUPathScript best = null;
         int highestValue = 0;
@@ -553,7 +489,8 @@ public class LogicScript : MonoBehaviour
             var pathi = path.GetComponent<CPUPathScript>();
             pathi.DisablePathVisualization();
             var pathiShotValue = pathi.CalculateValue();
-            if (pathiShotValue > highestValue)
+            float randomValue = Random.Range(0f, 1f);
+            if (pathiShotValue > highestValue || (pathiShotValue == highestValue && randomValue < 0.25))
             {
                 // handle phase powerup shots
                 if (!powerupsAreEnabled && pathi.DoesPathRequirePhasePowerup())
@@ -601,6 +538,85 @@ public class LogicScript : MonoBehaviour
             Debug.Log("No path :(");
             return (Random.Range(35.0f, 65.0f), Random.Range(40.0f, 70.0f), Random.Range(45.0f, 55.0f));
         }
+    }
+
+    private void CPUPreShotPowerups()
+    {
+        float randomValue = Random.Range(0f, 1f);
+        // first two shots use block
+        if (opponent.puckCount > 3 && randomValue < 0.75)
+        {
+            powerupManager.BlockPowerup();
+            powerupsUsedThisTurn++;
+        }
+        // shot three and four check if bolt is needed, if it isn't use foresight
+        else if (opponent.puckCount > 1 && randomValue < 0.75)
+        {
+            // if the ratio of player pucks to opponent pucks is greater than 2, use bolt
+            var allPucks = GameObject.FindGameObjectsWithTag("puck");
+            float playerPucks = 0;
+            float opponentPucks = 0.001f; // so we don't divide by zero
+            foreach (var puck in allPucks)
+            {
+                var puckScript = puck.GetComponent<PuckScript>();
+                if (puckScript.IsPlayersPuck() && puckScript.ComputeValue() > 0 && !puckScript.IsHydra())
+                {
+                    playerPucks++;
+                }
+                else if (!puckScript.IsPlayersPuck() && puckScript.ComputeValue() > 0)
+                {
+                    opponentPucks++;
+                }
+            }
+            if (playerPucks / opponentPucks > 2)
+            {
+                powerupManager.BoltPowerup();
+                powerupsUsedThisTurn++;
+            }
+            else if (FogScript.Instance.FogEnabled())
+            {
+                powerupManager.ForesightPowerup();
+                powerupsUsedThisTurn++;
+            }
+        }
+        // last shot, cull
+        else if (opponent.puckCount == 1 && randomValue < 0.75)
+        {
+            powerupManager.CullPowerup();
+        }
+    }
+
+    private void CPUPostShotPowerups()
+    {
+        // plus one, growth, hydra
+        float randomValue = Random.Range(0f, 1f);
+        if (opponent.puckCount > 3 && randomValue < 0.75)
+        {
+            powerupManager.GrowthPowerup();
+        }
+        else if (opponent.puckCount < 3 && randomValue < 0.75)
+        {
+            powerupManager.PlusOnePowerup();
+        }
+        else if (opponent.puckCount == 3 && randomValue < 0.75)
+        {
+            powerupManager.HydraPowerup();
+        }
+        powerupsUsedThisTurn++;
+        if (powerupsUsedThisTurn >= 3) { return; }
+
+        // lock, fog
+        randomValue = Random.Range(0f, 1f);
+        if (opponent.puckCount > 3 && randomValue < 0.75)
+        {
+            powerupManager.LockPowerup();
+        }
+        else if ((opponent.puckCount == 3 || opponent.puckCount == 2) && randomValue < 0.50)
+        {
+            powerupManager.FogPowerup();
+        }
+        powerupsUsedThisTurn++;
+        if (powerupsUsedThisTurn >= 3) { return; }
     }
 
     public void QuitGame()

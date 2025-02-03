@@ -169,7 +169,7 @@ MonoBehaviour:
   angle: 32.3
   power: 50
   spin: 50
-  value: 7
+  value: 6
   isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!61 &756733
@@ -2559,7 +2559,7 @@ MonoBehaviour:
   angle: 41
   power: 100
   spin: 50
-  value: 8
+  value: 7
   isContactShot: 1
   requiresPhasePowerup: 0
 --- !u!61 &65559126
@@ -4653,7 +4653,7 @@ MonoBehaviour:
   angle: 28
   power: 100
   spin: 50
-  value: 8
+  value: 7
   isContactShot: 1
   requiresPhasePowerup: 0
 --- !u!61 &112330477
@@ -6751,7 +6751,7 @@ MonoBehaviour:
   angle: 29
   power: 100
   spin: 50
-  value: 8
+  value: 7
   isContactShot: 1
   requiresPhasePowerup: 0
 --- !u!60 &175755569
@@ -7147,7 +7147,7 @@ MonoBehaviour:
   angle: 31
   power: 100
   spin: 50
-  value: 8
+  value: 7
   isContactShot: 1
   requiresPhasePowerup: 0
 --- !u!61 &179528125
@@ -10527,7 +10527,7 @@ MonoBehaviour:
   angle: 30
   power: 71
   spin: 50
-  value: 11
+  value: 9
   isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!61 &266553088
@@ -11688,7 +11688,7 @@ MonoBehaviour:
   angle: 57
   power: 74
   spin: 0
-  value: 9
+  value: 8
   isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!60 &299694977
@@ -36500,7 +36500,7 @@ MonoBehaviour:
   angle: 22
   power: 77
   spin: 80
-  value: 9
+  value: 8
   isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!60 &750069014
@@ -39714,7 +39714,7 @@ MonoBehaviour:
   angle: 35.5
   power: 102
   spin: 50
-  value: 99
+  value: 10
   isContactShot: 1
   requiresPhasePowerup: 0
 --- !u!61 &826075816
@@ -40320,7 +40320,7 @@ MonoBehaviour:
   angle: 15
   power: 82
   spin: 100
-  value: 9
+  value: 8
   isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!60 &835633550
@@ -43149,7 +43149,7 @@ MonoBehaviour:
   angle: 42
   power: 100
   spin: 50
-  value: 8
+  value: 7
   isContactShot: 1
   requiresPhasePowerup: 0
 --- !u!61 &898887451
@@ -62297,7 +62297,7 @@ MonoBehaviour:
   angle: 35.5
   power: 71
   spin: 50
-  value: 12
+  value: 9
   isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!61 &1237600845
@@ -63195,7 +63195,7 @@ MonoBehaviour:
   angle: 49
   power: 72
   spin: 20
-  value: 9
+  value: 8
   isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!60 &1247150378
@@ -65167,7 +65167,7 @@ MonoBehaviour:
   angle: 35.5
   power: 100
   spin: 50
-  value: 8
+  value: 7
   isContactShot: 1
   requiresPhasePowerup: 0
 --- !u!61 &1280224750
@@ -69162,7 +69162,7 @@ MonoBehaviour:
   angle: 39
   power: 100
   spin: 50
-  value: 8
+  value: 7
   isContactShot: 1
   requiresPhasePowerup: 0
 --- !u!61 &1351228538
@@ -74012,7 +74012,7 @@ MonoBehaviour:
   angle: 44
   power: 100
   spin: 50
-  value: 8
+  value: 7
   isContactShot: 1
   requiresPhasePowerup: 0
 --- !u!60 &1488933047
@@ -82115,7 +82115,7 @@ MonoBehaviour:
   angle: 30
   power: 100
   spin: 50
-  value: 8
+  value: 7
   isContactShot: 1
   requiresPhasePowerup: 0
 --- !u!61 &1675047166
@@ -91133,7 +91133,7 @@ MonoBehaviour:
   angle: 40
   power: 71
   spin: 50
-  value: 11
+  value: 9
   isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!61 &1876184033
