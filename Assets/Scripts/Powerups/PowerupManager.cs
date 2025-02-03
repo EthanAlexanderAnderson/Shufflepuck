@@ -113,6 +113,7 @@ public class PowerupManager : NetworkBehaviour
     public void ShufflePowerups()
     {
         if (deck == null) { LoadDeck(); }
+        var deckCount = deck.Count;
         GetActiveCompetitor();
         Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
         Sprite[] powerupSprites = { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage, cullImage, growthImage, lockImage, explosionImage, fogImage, hydraImage };
@@ -122,6 +123,8 @@ public class PowerupManager : NetworkBehaviour
         int[] previouslyGeneratedIndexes = { -1, -1, -1 };
         for (int i = 0; i < 3; i++)
         {
+            if (deckCount <= 0) { continue; }
+            deckCount--;
             int randomCard;
             int randomIndex = Random.Range(0, deck.Count);
             // while empty in deck, reroll
@@ -133,6 +136,7 @@ public class PowerupManager : NetworkBehaviour
 
             randomCard = deck[randomIndex];
             randomPowerups[i] = randomCard;
+            powerupButtons[i].gameObject.SetActive(true);
             powerupButtons[i].image.sprite = powerupSprites[randomCard];
             powerupButtons[i].onClick.RemoveAllListeners();
             powerupButtons[i].onClick.AddListener(() => methodArray[randomCard]());
@@ -154,11 +158,11 @@ public class PowerupManager : NetworkBehaviour
         fromClientRpc = false;
         GetActiveCompetitor();
 
-        activeCompetitor.activePuckScript.SetPuckBonusValue(1);
+        activeCompetitor.activePuckScript.IncrementPuckBonusValue(1);
         activeCompetitor.activePuckScript.SetPowerupText("plus one");
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
-        PowerupPopupEffectAnimation(index);
+        AddPowerupPopupEffectAnimationToQueue(index);
     }
 
     public void ForesightPowerup() // enable the shot predicted location halo
@@ -176,10 +180,10 @@ public class PowerupManager : NetworkBehaviour
         puckHalo.SetActive(true);
         puckHalo.GetComponent<HaloScript>().EnableFogMask(true);
         LineScript.Instance.HalfSpeed();
-        activeCompetitor.activePuckScript.SetPowerupText("foresight");
-        activeCompetitor.activePuckScript.CreatePowerupFloatingText();
+        //activeCompetitor.activePuckScript.SetPowerupText("foresight");
+        //activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
-        PowerupPopupEffectAnimation(index);
+        AddPowerupPopupEffectAnimationToQueue(index);
     }
 
     public void BlockPowerup() // create a valueless blocking puck
@@ -201,10 +205,10 @@ public class PowerupManager : NetworkBehaviour
         blockPuckScript.SetPuckBaseValue(0);
         blockPuckScript.SetPowerupText("valueless");
         blockPuckScript.CreatePowerupFloatingText();
-        activeCompetitor.activePuckScript.SetPowerupText("block");
-        activeCompetitor.activePuckScript.CreatePowerupFloatingText();
+        //activeCompetitor.activePuckScript.SetPowerupText("block");
+        //activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
-        PowerupPopupEffectAnimation(index);
+        AddPowerupPopupEffectAnimationToQueue(index);
     }
 
     private PuckScript pucki;
@@ -241,10 +245,10 @@ public class PowerupManager : NetworkBehaviour
                 pucki.DestroyPuck();
             }
         }
-        activeCompetitor.activePuckScript.SetPowerupText("bolt");
-        activeCompetitor.activePuckScript.CreatePowerupFloatingText();
+        //activeCompetitor.activePuckScript.SetPowerupText("bolt");
+        //activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
-        PowerupPopupEffectAnimation(index);
+        AddPowerupPopupEffectAnimationToQueue(index);
     }
 
     [SerializeField] private ForcefieldScript forcefieldScript;
@@ -260,11 +264,11 @@ public class PowerupManager : NetworkBehaviour
         fromClientRpc = false;
         GetActiveCompetitor();
 
-        activeCompetitor.activePuckScript.SetPowerupText("force field");
-        activeCompetitor.activePuckScript.CreatePowerupFloatingText();
+        //activeCompetitor.activePuckScript.SetPowerupText("force field");
+        //activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         forcefieldScript.EnableForcefield(activeCompetitor.isPlayer);
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
-        PowerupPopupEffectAnimation(index);
+        AddPowerupPopupEffectAnimationToQueue(index);
     }
 
     public void PhasePowerup()
@@ -283,7 +287,7 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         activeCompetitor.activePuckScript.SetPhase(true);
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
-        PowerupPopupEffectAnimation(index);
+        AddPowerupPopupEffectAnimationToQueue(index);
     }
 
     public void CullPowerup()
@@ -314,10 +318,10 @@ public class PowerupManager : NetworkBehaviour
                 }
             }
         }
-        activeCompetitor.activePuckScript.SetPowerupText("cull");
-        activeCompetitor.activePuckScript.CreatePowerupFloatingText();
+        //activeCompetitor.activePuckScript.SetPowerupText("cull");
+        //activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
-        PowerupPopupEffectAnimation(index);
+        AddPowerupPopupEffectAnimationToQueue(index);
     }
 
     public void GrowthPowerup()
@@ -336,7 +340,7 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         activeCompetitor.activePuckScript.EnableGrowth();
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
-        PowerupPopupEffectAnimation(index);
+        AddPowerupPopupEffectAnimationToQueue(index);
     }
 
     public void LockPowerup()
@@ -355,7 +359,7 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         activeCompetitor.activePuckScript.EnableLock();
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
-        PowerupPopupEffectAnimation(index);
+        AddPowerupPopupEffectAnimationToQueue(index);
     }
 
     public void ExplosionPowerup()
@@ -374,7 +378,7 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         activeCompetitor.activePuckScript.EnableExplosion();
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
-        PowerupPopupEffectAnimation(index);
+        AddPowerupPopupEffectAnimationToQueue(index);
     }
 
     public void FogPowerup()
@@ -389,11 +393,11 @@ public class PowerupManager : NetworkBehaviour
         fromClientRpc = false;
         GetActiveCompetitor();
 
-        activeCompetitor.activePuckScript.SetPowerupText("fog");
-        activeCompetitor.activePuckScript.CreatePowerupFloatingText();
+        //activeCompetitor.activePuckScript.SetPowerupText("fog");
+        //activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         FogScript.Instance.StartListeners(activeCompetitor.isPlayer);
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
-        PowerupPopupEffectAnimation(index);
+        AddPowerupPopupEffectAnimationToQueue(index);
     }
 
     public void HydraPowerup()
@@ -412,7 +416,7 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.CreatePowerupFloatingText();
         activeCompetitor.activePuckScript.EnableHydra();
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
-        PowerupPopupEffectAnimation(index);
+        AddPowerupPopupEffectAnimationToQueue(index);
     }
 
     public void DisableForceFieldIfNecessary()
@@ -476,7 +480,34 @@ public class PowerupManager : NetworkBehaviour
         }
     }
 
-    public void PowerupPopupEffectAnimation(int index)
+    Queue<int> PowerupPopupEffectAnimationQueue = new Queue<int>();
+
+    public void AddPowerupPopupEffectAnimationToQueue(int index)
+    {
+        PowerupPopupEffectAnimationQueue.Enqueue(index);
+        if (PowerupPopupEffectAnimationQueue.Count == 1)
+        {
+            PlayNextPowerupPopupEffectAnimationInQueue();
+        }
+    }
+
+    public void PlayNextPowerupPopupEffectAnimationInQueue()
+    {
+        if (PowerupPopupEffectAnimationQueue.Count <= 0) { return; }
+        PlayPowerupPopupEffectAnimation(PowerupPopupEffectAnimationQueue.Peek());
+    }
+
+    public void FinishCurrentPowerupPopupEffectAnimationInQueue()
+    {
+        if (PowerupPopupEffectAnimationQueue.Count <= 0) { return; }
+        PowerupPopupEffectAnimationQueue.Dequeue();
+        if (PowerupPopupEffectAnimationQueue.Count >= 1)
+        {
+            PlayNextPowerupPopupEffectAnimationInQueue();
+        }
+    }
+
+    public void PlayPowerupPopupEffectAnimation(int index)
     {
         Sprite[] powerupIcon = { plusOneIcon, foresightIcon, blockIcon, boltIcon, forceFieldIcon, phaseIcon, cullIcon, growthIcon, lockIcon, explosionIcon, fogIcon, hydraIcon };
         String[] powerupText = { "plus one", "foresight", "block", "bolt", "force field", "phase", "cull", "growth", "lock", "explosion", "fog", "hydra" };
@@ -490,10 +521,10 @@ public class PowerupManager : NetworkBehaviour
         popupEffectIconObject.transform.localScale = new Vector3(0f, 0f, 0f);
         popupEffectTextObject.transform.localScale = new Vector3(0f, 0f, 0f);
 
-        LeanTween.scale(popupEffectIconObject, new Vector3(1f, 1f, 1f), 1f).setEase(LeanTweenType.easeOutElastic).setDelay(1.01f);
-        LeanTween.scale(popupEffectTextObject, new Vector3(1f, 1f, 1f), 1f).setEase(LeanTweenType.easeOutElastic).setDelay(1.2f);
+        LeanTween.scale(popupEffectIconObject, new Vector3(1f, 1f, 1f), 0.5f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
+        LeanTween.scale(popupEffectTextObject, new Vector3(1f, 1f, 1f), 0.5f).setEase(LeanTweenType.easeOutElastic).setDelay(0.2f);
 
-        LeanTween.scale(popupEffectIconObject, new Vector3(0f, 0f, 0f), 1f).setEase(LeanTweenType.easeInElastic).setDelay(3.01f);
-        LeanTween.scale(popupEffectTextObject, new Vector3(0f, 0f, 0f), 1f).setEase(LeanTweenType.easeInElastic).setDelay(3.2f);
+        LeanTween.scale(popupEffectIconObject, new Vector3(0f, 0f, 0f), 0.5f).setEase(LeanTweenType.easeInElastic).setDelay(1.51f);
+        LeanTween.scale(popupEffectTextObject, new Vector3(0f, 0f, 0f), 0.5f).setEase(LeanTweenType.easeInElastic).setDelay(1.7f).setOnComplete(FinishCurrentPowerupPopupEffectAnimationInQueue);
     }
 }

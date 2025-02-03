@@ -426,10 +426,14 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     {
         puckBonusValue = value;
     }
+    public void IncrementPuckBonusValue(int value)
+    {
+        puckBonusValue += value;
+    }
 
     public void SetPowerupText(string text)
     {
-        powerupText = text;
+        powerupText += text + "\n";
     }
 
     // text to show what powerup was used under the puck. Only fades, no up/shrink.
@@ -465,10 +469,12 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             if (ClientLogicScript.Instance.isRunning)
             {
                 ServerLogicScript.Instance.HydraServerRpc(playersPuck, transform.position.x, transform.position.y);
+                hydraPowerup = false;
             }
             else
             {
                 PowerupManager.Instance.HydraHelper(playersPuck, transform.position.x, transform.position.y);
+                hydraPowerup = false;
             }
         }
         // Screen shake

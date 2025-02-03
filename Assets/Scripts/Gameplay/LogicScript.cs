@@ -41,7 +41,7 @@ public class LogicScript : MonoBehaviour
     // powerups
     public bool powerupsAreEnabled = false;
     [SerializeField] private GameObject powerupsMenu; // set in editor
-    private bool powerupHasBeenUsedThisTurn = false;
+    private int powerupsUsedThisTurn = 0;
     [SerializeField] private GameObject powerupsToggle;
 
     // game state
@@ -212,9 +212,9 @@ public class LogicScript : MonoBehaviour
 
         if (difficulty >= 2 && !isLocal)
         {
-            powerupsMenu.SetActive(powerupsAreEnabled);
             if (powerupsAreEnabled) { powerupManager.ShufflePowerups(); }
-            powerupHasBeenUsedThisTurn = false;
+            powerupsMenu.SetActive(powerupsAreEnabled);
+            powerupsUsedThisTurn = 0;
         }
         puckHalo.SetActive(difficulty == 0);
         activeBar = bar.ChangeBar("angle", activeCompetitor.isPlayer);
@@ -280,7 +280,7 @@ public class LogicScript : MonoBehaviour
         activeCompetitor = opponent;
         nonActiveCompetitor = player;
 
-        powerupHasBeenUsedThisTurn = false;
+        powerupsUsedThisTurn = 0;
         activeBar = bar.ChangeBar("angle", activeCompetitor.isPlayer);
         if (!isLocal)
         {
@@ -322,14 +322,15 @@ public class LogicScript : MonoBehaviour
         }
 
         // use powerup (this must be after CPU find path, to not double-use powerups after a phase, contact, or explosion shot path has been selected)
-        if (difficulty >= 2 && !isLocal && powerupsAreEnabled && !powerupHasBeenUsedThisTurn)
+        if (difficulty >= 2 && !isLocal && powerupsAreEnabled && powerupsUsedThisTurn < 3)
         {
-            if (opponent.puckCount > 3) // first two shots use block
+            // first two shots use block
+            if (opponent.puckCount > 3)
             {
                 powerupManager.BlockPowerup();
-                powerupHasBeenUsedThisTurn = true;
+                powerupsUsedThisTurn++;
             }
-            else // last three, use plus one, growth, or bolt
+            else if (opponent.puckCount > 1)
             {
                 // if the ratio of player pucks to opponent pucks is greater than 2, use bolt
                 var allPucks = GameObject.FindGameObjectsWithTag("puck");
@@ -350,22 +351,40 @@ public class LogicScript : MonoBehaviour
                 if (playerPucks / opponentPucks > 2)
                 {
                     powerupManager.BoltPowerup();
-                    powerupHasBeenUsedThisTurn = true;
-                }
-                // otherwise, use plus one or growth
-                else
-                {
-                    if (opponent.puckCount > 2)
-                    {
-                        powerupManager.GrowthPowerup();
-                    }
-                    else
-                    {
-                        powerupManager.PlusOnePowerup();
-                    }
-                    powerupHasBeenUsedThisTurn = true;
+                    powerupsUsedThisTurn++;
                 }
             }
+            if (powerupsUsedThisTurn >= 3) { return; }
+            // plus one, growth, hydra
+            if (opponent.puckCount > 3)
+            {
+                powerupManager.GrowthPowerup();
+            }
+            else if (opponent.puckCount < 3)
+            {
+                powerupManager.PlusOnePowerup();
+            }
+            else
+            {
+                powerupManager.HydraPowerup();
+            }
+            powerupsUsedThisTurn++;
+            if (powerupsUsedThisTurn >= 3) { return; }
+            // lock, fog, cull
+            if (opponent.puckCount == 4)
+            {
+                powerupManager.LockPowerup();
+            }
+            else if (opponent.puckCount == 2)
+            {
+                powerupManager.FogPowerup();
+            }
+            else if (opponent.puckCount == 1 && powerupsUsedThisTurn < 2)
+            {
+                powerupManager.CullPowerup();
+            }
+            powerupsUsedThisTurn++;
+            if (powerupsUsedThisTurn >= 3) { return; }
         }
     }
 
@@ -558,20 +577,20 @@ public class LogicScript : MonoBehaviour
             best.EnablePathVisualization();
 
             // handle powerup shots
-            if (best.DoesPathRequirePhasePowerup() && powerupsAreEnabled && !powerupHasBeenUsedThisTurn)
+            if (best.DoesPathRequirePhasePowerup() && powerupsAreEnabled && powerupsUsedThisTurn < 3)
             {
                 powerupManager.PhasePowerup();
-                powerupHasBeenUsedThisTurn = true;
+                powerupsUsedThisTurn++;
             }
-            else if (best.DoesPathRequireExplosionPowerup() && powerupsAreEnabled && !powerupHasBeenUsedThisTurn)
+            else if (best.DoesPathRequireExplosionPowerup() && powerupsAreEnabled && powerupsUsedThisTurn < 3)
             {
                 powerupManager.ExplosionPowerup();
-                powerupHasBeenUsedThisTurn = true;
+                powerupsUsedThisTurn++;
             }
-            else if (best.IsPathAContactShot() && powerupsAreEnabled && !powerupHasBeenUsedThisTurn)
+            else if (best.IsPathAContactShot() && powerupsAreEnabled && powerupsUsedThisTurn < 3)
             {
                 powerupManager.ForceFieldPowerup();
-                powerupHasBeenUsedThisTurn = true;
+                powerupsUsedThisTurn++;
             }
 
             return best.GetPath();

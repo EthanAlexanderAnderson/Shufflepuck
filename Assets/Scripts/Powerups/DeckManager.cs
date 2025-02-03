@@ -47,29 +47,10 @@ public class DeckManager : MonoBehaviour
     {
         var sum = deck.Sum();
         deckCount.text = sum.ToString();
-        if (sum < 10)
-        {
-            deckCount.color = new Color(0.9490197f, 0.4235294f, 0.3098039f); // red
-        }
-        else
-        {
-            deckCount.color = new Color(0.4862745f, 0.7725491f, 0.4627451f); // green
-        }
     }
 
     public List<int> GetDeck()
     {
-        // make sure our decklist is valid
-        var sum = deck.Sum();
-        if (sum < 10)
-        {
-            // if our deck is invalid, return the default deck
-            for (int i = 0; i < deck.Length; i++)
-            {
-                deck[i] = 1;
-            }
-        }
-
         // convert from a decklist to a playdeck
         List<int> playDeck = new List<int>();
         for (int i = 0; i < deck.Length; i++)

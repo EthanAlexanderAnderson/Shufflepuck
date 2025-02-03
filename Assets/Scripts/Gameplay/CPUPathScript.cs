@@ -138,6 +138,7 @@ public class CPUPathScript : MonoBehaviour
     public void EnablePathVisualization(int mode = 0)
     {
 #if (UNITY_EDITOR)
+        if (UIManagerScript.Instance.debugMode <= 0) { return;  }
         GetComponent<LineRenderer>().enabled = true;
         if (mode == 0)
         {
