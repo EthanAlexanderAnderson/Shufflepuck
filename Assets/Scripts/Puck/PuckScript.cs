@@ -658,6 +658,16 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     }
     Gradient CreateRandomGradient()
     {
+        while ( color.Length <= 4 ) // Double the colors until there are at least 4, to make the gradient switch colors more often
+        {
+            Color[] newColor = new Color[color.Length * 2];
+            for (int i = 0; i < color.Length; i++)
+            {
+                newColor[i] = color[i];
+                newColor[i + color.Length] = color[i];
+            }
+            color = newColor;
+        }
         Gradient gradient = new Gradient();
         GradientColorKey[] colorKeys = new GradientColorKey[color.Length];
         GradientAlphaKey[] alphaKeys = new GradientAlphaKey[1]; // One alpha key for consistent transparency
