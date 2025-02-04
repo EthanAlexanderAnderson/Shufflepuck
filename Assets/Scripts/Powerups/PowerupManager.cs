@@ -38,6 +38,12 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private Sprite explosionImage;
     [SerializeField] private Sprite fogImage;
     [SerializeField] private Sprite hydraImage;
+    [SerializeField] private Sprite factoryImage;
+    [SerializeField] private Sprite shieldImage;
+    [SerializeField] private Sprite shuffleImage;
+    [SerializeField] private Sprite insanityImage;
+    [SerializeField] private Sprite millImage;
+    [SerializeField] private Sprite resurrectImage;
 
     [SerializeField] private Sprite plusOneIcon;
     [SerializeField] private Sprite foresightIcon;
@@ -51,6 +57,12 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private Sprite explosionIcon;
     [SerializeField] private Sprite fogIcon;
     [SerializeField] private Sprite hydraIcon;
+    [SerializeField] private Sprite factoryIcon;
+    [SerializeField] private Sprite shieldIcon;
+    [SerializeField] private Sprite shuffleIcon;
+    [SerializeField] private Sprite insanityIcon;
+    [SerializeField] private Sprite millIcon;
+    [SerializeField] private Sprite resurrectIcon;
 
     private List<int> deck;
 
@@ -78,7 +90,10 @@ public class PowerupManager : NetworkBehaviour
             LockPowerup,
             ExplosionPowerup,
             FogPowerup,
-            HydraPowerup
+            HydraPowerup,
+            FactoryPowerup,
+            ShieldPowerup,
+            ShufflePowerup
         };
     }
 
@@ -110,13 +125,13 @@ public class PowerupManager : NetworkBehaviour
         return deck;
     }
 
-    public void ShufflePowerups()
+    public void ShuffleDeck()
     {
         if (deck == null) { LoadDeck(); }
         var deckCount = deck.Count;
         GetActiveCompetitor();
         Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
-        Sprite[] powerupSprites = { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage, cullImage, growthImage, lockImage, explosionImage, fogImage, hydraImage };
+        Sprite[] powerupSprites = { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage, cullImage, growthImage, lockImage, explosionImage, fogImage, hydraImage, factoryImage, shieldImage, shuffleImage, insanityImage, millImage, resurrectImage };
 
         // generate 3 unique random powerups
         int[] randomPowerups = { 0, 1, 2 };
@@ -419,6 +434,117 @@ public class PowerupManager : NetworkBehaviour
         AddPowerupPopupEffectAnimationToQueue(index);
     }
 
+    public void FactoryPowerup()
+    {
+        var index = Array.IndexOf(methodArray, FactoryPowerup);
+        if (!fromClientRpc && ClientLogicScript.Instance.isRunning)
+        {
+            PowerupServerRpc(index);
+            deck.Remove(index);
+            return;
+        }
+        fromClientRpc = false;
+        GetActiveCompetitor();
+
+        activeCompetitor.activePuckScript.SetPowerupText("factory");
+        activeCompetitor.activePuckScript.CreatePowerupFloatingText();
+        activeCompetitor.activePuckScript.EnableFactory();
+        if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
+        AddPowerupPopupEffectAnimationToQueue(index);
+    }
+    public void ShieldPowerup()
+    {
+        var index = Array.IndexOf(methodArray, ShieldPowerup);
+        if (!fromClientRpc && ClientLogicScript.Instance.isRunning)
+        {
+            PowerupServerRpc(index);
+            deck.Remove(index);
+            return;
+        }
+        fromClientRpc = false;
+        GetActiveCompetitor();
+
+        activeCompetitor.activePuckScript.SetPowerupText("shield");
+        activeCompetitor.activePuckScript.CreatePowerupFloatingText();
+        activeCompetitor.activePuckScript.EnableShield();
+        if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
+        AddPowerupPopupEffectAnimationToQueue(index);
+    }
+    public void ShufflePowerup()
+    {
+        Debug.Log("ShufflePowerup called");
+        var index = Array.IndexOf(methodArray, ShufflePowerup);
+        if (!fromClientRpc && ClientLogicScript.Instance.isRunning)
+        {
+            PowerupServerRpc(index);
+            deck.Remove(index);
+            return;
+        }
+        if (!IsServer && ClientLogicScript.Instance.isRunning)
+        {
+            return;
+        }
+        fromClientRpc = false;
+        GetActiveCompetitor();
+
+        // sort by valid / non-valid
+        var allPucks = GameObject.FindGameObjectsWithTag("puck");
+        int numOfValidPucks = 0;
+        for (int i = 0; i < allPucks.Length; i++)
+        {
+            if (allPucks[i].transform.position.y > 0 && allPucks[i].transform.position.y < 20 && allPucks[i].transform.position.x > -12 && allPucks[i].transform.position.x < 12)
+            {
+                numOfValidPucks++;
+            }
+        }
+        GameObject[] validPucks = new GameObject[numOfValidPucks];
+        int j = 0;
+        for (int i = 0; i < allPucks.Length; i++)
+        {
+            if (allPucks[i].transform.position.y > 0 && allPucks[i].transform.position.y < 20 && allPucks[i].transform.position.x > -12 && allPucks[i].transform.position.x < 12)
+            {
+                validPucks[j] = allPucks[i];
+                j++;
+            }
+        }
+
+        // get old positions of all pucks
+        Vector3[] oldPuckPositions = new Vector3[numOfValidPucks];
+        Vector3[] newPuckPositions = new Vector3[numOfValidPucks];
+        Debug.Log("Shuffling " + numOfValidPucks + " pucks.");
+        for (int i = 0; i < numOfValidPucks; i++)
+        {
+            oldPuckPositions[i] = validPucks[i].transform.position;
+            validPucks[i].transform.position = new Vector3(0, 20f * (i+1), validPucks[i].transform.position.z); // move it far away temporarily
+        }
+        // randomize their position (every puck must switch, that's why we don't do a built-in randomize)
+        for (int i = 0; i < oldPuckPositions.Length; i++)
+        {
+            int iterations = 0;
+            var newIndex = Random.Range(0, newPuckPositions.Length);
+            // while the new position has already been chosen (not null & not zero) OR the new position is the same as the old one, reroll
+            while (((newPuckPositions[newIndex] != null && newPuckPositions[newIndex] != Vector3.zero) || newIndex == i) && iterations < 1000)
+            {
+                newIndex = Random.Range(0, newPuckPositions.Length);
+                iterations++;
+            }
+            if (iterations >= 1000) // fail case
+            {
+                newIndex = i;
+                Debug.Log("Shuffle " + i + " failed.");
+            }
+            newPuckPositions[newIndex] = oldPuckPositions[i];
+        }
+        // move the pucks
+        for (int i = 0; i < numOfValidPucks; i++)
+        {
+            validPucks[i].transform.position = newPuckPositions[i]; // move the puck
+        }
+        Debug.Log("ShufflePowerup finished");
+        if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { deck.Remove(index); }
+        AddPowerupPopupEffectAnimationToQueue(index);
+    }
+
     public void DisableForceFieldIfNecessary()
     {
         GetActiveCompetitor();
@@ -445,13 +571,13 @@ public class PowerupManager : NetworkBehaviour
         methodArray[powerupActionIndex].Invoke();
     }
 
-    public void HydraHelper(bool isPlayers, float x, float y)
+    public void PuckSpawnHelper(bool isPlayers, float x, float y, int spwanCount)
     {
         Competitor hydraCompetitor = isPlayers ? LogicScript.Instance.player : LogicScript.Instance.player;
         Vector3 pos = Vector3.zero;
 
-        // do twice (spawn 2 pucks)
-        for (int i = 0; i < 2; i++)
+        // do X times (X is count)
+        for (int i = 0; i < spwanCount; i++)
         {
             float randRange = 2.0f;
             // generate coordinates for potenial spawn, then see if it's too close to another puck
@@ -509,8 +635,8 @@ public class PowerupManager : NetworkBehaviour
 
     public void PlayPowerupPopupEffectAnimation(int index)
     {
-        Sprite[] powerupIcon = { plusOneIcon, foresightIcon, blockIcon, boltIcon, forceFieldIcon, phaseIcon, cullIcon, growthIcon, lockIcon, explosionIcon, fogIcon, hydraIcon };
-        String[] powerupText = { "plus one", "foresight", "block", "bolt", "force field", "phase", "cull", "growth", "lock", "explosion", "fog", "hydra" };
+        Sprite[] powerupIcon = { plusOneIcon, foresightIcon, blockIcon, boltIcon, forceFieldIcon, phaseIcon, cullIcon, growthIcon, lockIcon, explosionIcon, fogIcon, hydraIcon, factoryIcon, shieldIcon, shuffleIcon, insanityIcon, millIcon, resurrectIcon };
+        String[] powerupText = { "plus one", "foresight", "block", "bolt", "force field", "phase", "cull", "growth", "lock", "explosion", "fog", "hydra", "factory", "shield", "shuffle", "insanity", "mill", "resurrect" };
 
         popupEffectIcon.sprite = powerupIcon[index];
         popupEffectText.text = powerupText[index];

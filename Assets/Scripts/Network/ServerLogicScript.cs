@@ -411,7 +411,7 @@ public class ServerLogicScript : NetworkBehaviour
 
     // Hydra Powerup
     [ServerRpc(RequireOwnership = true)] // this is true so it only fires once
-    public void HydraServerRpc(bool playersPuck, float x, float y, ServerRpcParams rpcParams = default)
+    public void PuckSpawnHelperServerRpc(bool playersPuck, float x, float y, int spwanCount, ServerRpcParams rpcParams = default)
     {
         if (!IsServer) return;
         // Get the ClientId of the client that sent this ServerRPC
@@ -427,8 +427,8 @@ public class ServerLogicScript : NetworkBehaviour
             //competitorIndex = competitorList.IndexOf(competitor);
             int puckSpriteID = competitor.puckSpriteID;
 
-            // do twice (spawn 2 pucks)
-            for (int i = 0; i < 2; i++)
+            // do X times (X is spwanCount)
+            for (int i = 0; i < spwanCount; i++)
             {
                 float randRange = 2.0f;
                 // generate coordinates for potenial spawn, then see if it's too close to another puck

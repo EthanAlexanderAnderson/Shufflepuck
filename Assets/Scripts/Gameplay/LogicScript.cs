@@ -212,7 +212,7 @@ public class LogicScript : MonoBehaviour
 
         if (difficulty >= 2 && !isLocal)
         {
-            if (powerupsAreEnabled) { powerupManager.ShufflePowerups(); }
+            if (powerupsAreEnabled) { powerupManager.ShuffleDeck(); }
             powerupsMenu.SetActive(powerupsAreEnabled);
             powerupsUsedThisTurn = 0;
         }

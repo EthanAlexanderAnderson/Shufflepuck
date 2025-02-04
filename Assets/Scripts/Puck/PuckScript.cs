@@ -7,6 +7,7 @@ using UnityEngine.EventSystems;
 using Unity.Netcode;
 using TMPro;
 using System;
+using System.Collections.Generic;
 
 public class PuckScript : NetworkBehaviour, IPointerClickHandler
 {
@@ -26,6 +27,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     [SerializeField] private AudioSource pointCPUSFX;
     [SerializeField] private AudioSource minusPlayerSFX;
     [SerializeField] private AudioSource minusCPUSFX;
+    [SerializeField] private AudioSource breakSFX;
     [SerializeField] private GameObject animationLayer;
     [SerializeField] private TrailRenderer trail;
 
@@ -51,7 +53,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     // floating text
     [SerializeField] private GameObject floatingTextPrefab;
-    private string powerupText;
+    List<string> powerupText = new List<string>();
 
     // sound effect volume
     private float SFXvolume;
@@ -61,9 +63,10 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     // for powerups
     [SerializeField] private bool phase = false;
-    [SerializeField] private bool lockPowerup = false;
-    [SerializeField] private bool explosionPowerup = false;
-    [SerializeField] private bool hydraPowerup = false;
+    [SerializeField] private bool lockPowerup = false; // TODO: make lock stack
+    [SerializeField] private int explosionPowerup = 0;
+    [SerializeField] private int hydraPowerup = 0;
+    [SerializeField] private int shieldPowerup = 0;
 
     void OnEnable()
     {
@@ -89,7 +92,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         velocity = Mathf.Sqrt(rb.velocity.x * rb.velocity.x + rb.velocity.y * rb.velocity.y);
         if (IsServer) { velocityNetworkedRounded.Value = velocity; }
         noiseSFX.volume = logic.gameIsRunning ? (velocity / 15.0f) * SFXvolume : 0f; // only play noise if game is running (not plinko)
-        noiseSFX.mute = noiseSFX.volume < 0.1;  // this is weird but it prevents the 0.1 seconds of noise on spawn
+        noiseSFX.mute = noiseSFX.volume < 0.01;  // this is weird but it prevents the 0.1 seconds of noise on spawn
 
         // update particle emisson based on velocity
         var PS = GetComponent<ParticleSystem>();
@@ -145,7 +148,12 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                     {
                         if (ClientLogicScript.Instance.isRunning && !IsServer) { break; }
                         phaseHasOverlap = true;
-                        if (explosionPowerup) { puck.GetComponent<PuckScript>().DestroyPuck(); } // phase & explosion combo
+                        if (explosionPowerup > 0) // phase & explosion combo
+                        {
+                            puck.GetComponent<PuckScript>().DestroyPuck();
+                            explosionPowerup--;
+                            RemovePowerupText("explosion");
+                        }
                     }
                 }
                 if (phaseHasOverlap)
@@ -186,6 +194,11 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             safe = true;
         }
 
+        // animation
+        gameObject.transform.localScale = new Vector3(0f, 0f, 0f);
+        LeanTween.cancel(gameObject);
+        LeanTween.scale(gameObject, new Vector3(0.2f, 0.2f, 0.2f), 0.5f).setEase(LeanTweenType.easeOutQuint).setDelay(0.01f);
+
         return this;
     }
 
@@ -215,6 +228,11 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             shot = true;
             safe = true;
         }
+
+        // animation
+        gameObject.transform.localScale = new Vector3(0f, 0f, 0f);
+        LeanTween.cancel(gameObject);
+        LeanTween.scale(gameObject, new Vector3(0.2f, 0.2f, 0.2f), 0.5f).setEase(LeanTweenType.easeOutQuint).setDelay(0.01f);
 
         Debug.Log($"Puck initialized. IsPlayersPuckParameter: {IsPlayersPuckParameter}. PuckSpriteID: {puckSpriteID}");
     }
@@ -279,8 +297,8 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public int GetZoneMultiplier() { return zoneMultiplier; }
     public void SetZoneMultiplier(int ZM) { zoneMultiplier = ZM; }
     public bool IsLocked() { return lockPowerup; }
-    public bool IsExplosion() { return explosionPowerup; }
-    public bool IsHydra() { return hydraPowerup; }
+    public bool IsExplosion() { return explosionPowerup > 0; }
+    public bool IsHydra() { return hydraPowerup > 0; }
 
     // when a puck enters a scoring zone, update its score and play a SFX
     public void EnterScoreZone(bool isZoneSafe, int enteredZoneMultiplier)
@@ -414,10 +432,12 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         angularVelocityModifier = 0;
 
         // explosion powerup
-        if (explosionPowerup && col.gameObject.CompareTag("puck"))
+        if (explosionPowerup > 0 && col.gameObject.CompareTag("puck"))
         {
             // Destroy the collided object
             col.gameObject.GetComponent<PuckScript>().DestroyPuck();
+            explosionPowerup--;
+            RemovePowerupText("explosion");
             // destroy self
             DestroyPuck();
         }
@@ -441,14 +461,19 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     public void SetPowerupText(string text)
     {
-        powerupText += text + "\n";
+        powerupText.Add(text);
+    }
+
+    public void RemovePowerupText(string text)
+    {
+        powerupText.Remove(text);
     }
 
     // text to show what powerup was used under the puck. Only fades, no up/shrink.
     public void CreatePowerupFloatingText()
     {
         var floatingText = Instantiate(floatingTextPrefab, transform.position + new Vector3(0, -1.5f, 0), Quaternion.identity, transform);
-        floatingText.GetComponent<FloatingTextScript>().Initialize(powerupText, 0, 0, 0.1f, 1, true);
+        floatingText.GetComponent<FloatingTextScript>().Initialize(string.Join("\n", powerupText), 0, 0, 0.1f, 1, true);
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -457,7 +482,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
         floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f + (ComputeValue() / 10), true);
         // if powerupText has been set, show it
-        if (powerupText != null)
+        if (powerupText.Count > 0)
         {
             CreatePowerupFloatingText();
         }
@@ -465,6 +490,26 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     public void DestroyPuck() // Destroys the puck with a particle and sound effect, used by powerups that say destroy
     {
+        if (shieldPowerup > 0)
+        {
+            shieldPowerup--;
+            RemovePowerupText("shield");
+            // Grey particles
+            ParticleSystem collisionParticleEffect = Instantiate(collisionParticleEffectPrefab, transform.position, Quaternion.identity);
+            ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
+            emission.rateOverTime = 500f;
+            ParticleSystem.MainModule main = collisionParticleEffect.main;
+            main.startSpeed = 50f;
+            main.startColor = new Color(0.5f, 0.5f, 0.5f, 1f);
+            collisionParticleEffect.Play();
+            Destroy(collisionParticleEffect.gameObject, 10f);
+            // Screen shake
+            ScreenShake.Instance.Shake(0.25f);
+            // play break sfx
+            breakSFX.volume *= SFXvolume;
+            breakSFX.Play();
+            return;
+        };
         // update score
         puckBaseValue = 0;
         puckBonusValue = 0;
@@ -472,17 +517,19 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         LogicScript.Instance.UpdateScores();
         logic.playDestroyPuckSFX(SFXvolume);
         // hydra powerup
-        if (hydraPowerup)
+        if (hydraPowerup > 0)
         {
             if (ClientLogicScript.Instance.isRunning)
             {
-                ServerLogicScript.Instance.HydraServerRpc(playersPuck, transform.position.x, transform.position.y);
-                hydraPowerup = false;
+                ServerLogicScript.Instance.PuckSpawnHelperServerRpc(playersPuck, transform.position.x, transform.position.y, 2);
+                hydraPowerup--;
+                RemovePowerupText("hydra");
             }
             else
             {
-                PowerupManager.Instance.HydraHelper(playersPuck, transform.position.x, transform.position.y);
-                hydraPowerup = false;
+                PowerupManager.Instance.PuckSpawnHelper(playersPuck, transform.position.x, transform.position.y, 2);
+                hydraPowerup--;
+                RemovePowerupText("hydra");
             }
         }
         // Screen shake
@@ -526,6 +573,10 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         LogicScript.OnOpponentShot -= DisableLock;
         ClientLogicScript.OnPlayerShot -= DisableLock;
         ClientLogicScript.OnOpponentShot -= DisableLock;
+        LogicScript.OnPlayerShot -= FactoryHelper;
+        LogicScript.OnOpponentShot -= FactoryHelper;
+        ClientLogicScript.OnPlayerShot -= FactoryHelper;
+        ClientLogicScript.OnOpponentShot -= FactoryHelper;
     }
 
     [ServerRpc]
@@ -640,12 +691,58 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     public void EnableExplosion()
     {
-        explosionPowerup = true;
+        explosionPowerup++;
     }
 
     public void EnableHydra()
     {
-        hydraPowerup = true;
+        hydraPowerup++;
+    }
+
+    public void EnableFactory()
+    {
+        puckBaseValue = 0; // set to valueless
+        puckBonusValue = 0; // set to valueless
+        if (ClientLogicScript.Instance.isRunning) // factory online
+        {
+            if (playersPuck)
+            {
+                ClientLogicScript.OnPlayerShot += FactoryHelper;
+            }
+            else
+            {
+                ClientLogicScript.OnOpponentShot += FactoryHelper;
+            }
+        }
+        else if (LogicScript.Instance.gameIsRunning) // factory vs CPU
+        {
+            if (playersPuck)
+            {
+                LogicScript.OnPlayerShot += FactoryHelper;
+            }
+            else
+            {
+                LogicScript.OnOpponentShot += FactoryHelper;
+            }
+        }
+    }
+
+    private void FactoryHelper()
+    {
+        if (this == null || transform == null || transform.position.y < 0) { return; }
+        if (ClientLogicScript.Instance.isRunning)
+        {
+            ServerLogicScript.Instance.PuckSpawnHelperServerRpc(playersPuck, transform.position.x, transform.position.y, 1);
+        }
+        else
+        {
+            PowerupManager.Instance.PuckSpawnHelper(playersPuck, transform.position.x, transform.position.y, 1);
+        }
+    }
+
+    public void EnableShield()
+    {
+        shieldPowerup++;
     }
 
     public ParticleSystem.MinMaxGradient SetParticleColor()
