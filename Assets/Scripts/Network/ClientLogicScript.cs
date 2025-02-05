@@ -95,8 +95,8 @@ public class ClientLogicScript : NetworkBehaviour
             client.isTurn = false;
             client.isShooting = true;
             shotTimer = powerupsAreEnabled ? 30 : 18;
-            powerupsMenu.SetActive(powerupsAreEnabled);
             if (powerupsAreEnabled) { powerupManager.ShuffleDeck(); }
+            powerupsMenu.SetActive(powerupsAreEnabled);
         }
 
         if (client.isShooting && Input.GetMouseButtonDown(0) && powerupsMenu.activeInHierarchy == false)

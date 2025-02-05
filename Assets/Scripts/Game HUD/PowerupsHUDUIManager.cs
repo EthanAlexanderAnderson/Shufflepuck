@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -49,7 +50,7 @@ public class PowerupsHUDUIManager : MonoBehaviour
         }
     }
 
-    public void UsePowerup(int index)
+    public void UsePowerup(int index, int powerupID)
     {
         for (int i = 0; i < powerupButtonObjects.Length; i++)
         {
@@ -60,6 +61,15 @@ public class PowerupsHUDUIManager : MonoBehaviour
                 LeanTween.cancel(powerupButtonObjects[i]);
                 LeanTween.scale(powerupButtonObjects[i], new Vector3(1f, 1f, 1f), 0.5f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
                 LeanTween.scale(powerupButtonObjects[i], new Vector3(0f, 0f, 0f), 0.5f).setEase(LeanTweenType.easeOutElastic).setDelay(0.81f).setOnComplete(() => powerupButtonObjects[index].SetActive(false));
+                cardsInHand--;
+            }
+            // if paid 2 discard cost, discard the other 2 cards
+            if (Array.Exists(PowerupManager.Instance.cost2Discard, x => x == powerupID) && i != index)
+            {
+                LeanTween.cancel(powerupButtonObjects[i]);
+                powerupButtonObjects[i].GetComponent<Button>().onClick.RemoveAllListeners();
+                var tempindex = i;
+                LeanTween.moveLocalX(powerupButtonObjects[i], -startXLocalPos, 0.5f).setEase(LeanTweenType.easeInBack).setDelay((0.1f * i) + 0.01f).setOnComplete(() => powerupButtonObjects[tempindex].SetActive(false));
                 cardsInHand--;
             }
         }

@@ -294,6 +294,12 @@ public class ServerLogicScript : NetworkBehaviour
 
             CleanupDeadPucks();
 
+            // if a player would start their turn with 0 pucks, instead start the turn of the other player (who has pucks remaining)
+            if (competitorList[activeCompetitorIndex].puckCount <= 0 && competitorList[activeCompetitorIndex ^ 1].puckCount > 0)
+            {
+                SwapCompetitors();
+            }
+
             clientLogic.StartTurnClientRpc(activeCompetitorIndex == startingPlayerIndex, clientRpcParamsList[activeCompetitorIndex]);
             shotTimer = (player1powerupsenabled && player2powerupsenabled) ? 42 : 21;
         }
@@ -421,7 +427,7 @@ public class ServerLogicScript : NetworkBehaviour
 
         try
         {
-            if (!playersPuck) { competitorIndex = (competitorIndex == 0 ? 1 : 0); }
+            if (!playersPuck) { competitorIndex ^= 1; }
             Competitor competitor = competitorList[competitorIndex];
             //Competitor competitor = playersPuck ? competitorList[competitorIndex] : competitorList[(competitorIndex == 0 ? 1 : 0)];
             //competitorIndex = competitorList.IndexOf(competitor);
@@ -473,5 +479,17 @@ public class ServerLogicScript : NetworkBehaviour
             Debug.LogError(e);
             clientLogic.SetErrorMessageClientRpc(4);
         }
+    }
+
+    [ServerRpc(RequireOwnership = true)]
+    public void AdjustPuckCountServerRpc(bool playersPuck, int value, ServerRpcParams rpcParams = default)
+    {
+        ulong clientId = rpcParams.Receive.SenderClientId;
+        int competitorIndex = clients.IndexOf(clientId);
+        if (!playersPuck) { competitorIndex ^= 1; }
+
+        competitorList[competitorIndex].puckCount += value;
+        clientLogic.UpdatePuckCountClientRpc(true, competitorList[competitorIndex].puckCount, clientRpcParamsList[competitorIndex]);
+        clientLogic.UpdatePuckCountClientRpc(false, competitorList[competitorIndex].puckCount, clientRpcParamsList[competitorIndex ^ 1]);
     }
 }

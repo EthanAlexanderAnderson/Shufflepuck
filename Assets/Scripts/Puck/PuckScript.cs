@@ -67,6 +67,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     [SerializeField] private int explosionPowerup = 0;
     [SerializeField] private int hydraPowerup = 0;
     [SerializeField] private int shieldPowerup = 0;
+    [SerializeField] private int resurrectPowerup = 0;
 
     void OnEnable()
     {
@@ -309,7 +310,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         shot = true;
 
         // if puck moves into higher scoring zone and gains a point play SFX
-        if (enteredZoneMultiplier > zoneMultiplier)
+        if (enteredZoneMultiplier > zoneMultiplier && ComputeValue() > 0)
         {
             if (IsPlayersPuck())
             {
@@ -517,7 +518,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         LogicScript.Instance.UpdateScores();
         logic.playDestroyPuckSFX(SFXvolume);
         // hydra powerup
-        if (hydraPowerup > 0)
+        while (hydraPowerup > 0)
         {
             if (ClientLogicScript.Instance.isRunning)
             {
@@ -532,6 +533,23 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 RemovePowerupText("hydra");
             }
         }
+        // resurrect powerup
+        while (resurrectPowerup > 0)
+        {
+            if (ClientLogicScript.Instance.isRunning)
+            {
+                ServerLogicScript.Instance.AdjustPuckCountServerRpc(playersPuck, 1); // requires ownership
+                resurrectPowerup--;
+                RemovePowerupText("resurrect");
+            }
+            else
+            {
+                LogicScript.Instance.IncrementPuckCount(playersPuck);
+                resurrectPowerup--;
+                RemovePowerupText("resurrect");
+            }
+        }
+
         // Screen shake
         ScreenShake.Instance.Shake(0.25f);
         // actually destroy the gameobject
@@ -604,7 +622,6 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     public void EnableGrowth()
     {
-        puckBonusValue--; // start one under, because it gets shot directly after this
         if (ClientLogicScript.Instance.isRunning) // growth online
         {
             if (playersPuck)
@@ -631,7 +648,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     private void IncrementBonusValue()
     {
-        if (this == null) { return; }
+        if (this == null || transform == null || transform.position.y < 0) { return; }
         puckBonusValue++;
         if (ComputeValue() == 0) { return; }
         LogicScript.Instance.UpdateScores();
@@ -743,6 +760,11 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public void EnableShield()
     {
         shieldPowerup++;
+    }
+
+    public void EnableResurrect()
+    {
+        resurrectPowerup++;
     }
 
     public ParticleSystem.MinMaxGradient SetParticleColor()

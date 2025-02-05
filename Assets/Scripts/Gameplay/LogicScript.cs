@@ -430,6 +430,7 @@ public class LogicScript : MonoBehaviour
         }
         UI.UpdateWallText(wallCount);
 
+        mill = 0;
         UI.SetReButtons(true);
         gameIsRunning = true;
         puckHalo.SetActive(difficulty == 0);
@@ -460,6 +461,7 @@ public class LogicScript : MonoBehaviour
         gameIsRunning = false;
         player.puckCount = 0;
         opponent.puckCount = 0;
+        mill = 0;
         UI.ChangeUI(UI.titleScreen);
         line.isActive = false;
         bar.ChangeBar("none");
@@ -544,13 +546,13 @@ public class LogicScript : MonoBehaviour
     {
         float randomValue = Random.Range(0f, 1f);
         // first two shots use block
-        if (opponent.puckCount > 3 && randomValue < 0.75)
+        if (opponent.puckCount > 3 && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
         {
             powerupManager.BlockPowerup();
             powerupsUsedThisTurn++;
         }
         // shot three and four check if bolt is needed, if it isn't use foresight
-        else if (opponent.puckCount > 1 && randomValue < 0.75)
+        else if (opponent.puckCount > 1 && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
         {
             // if the ratio of player pucks to opponent pucks is greater than 2, use bolt
             var allPucks = GameObject.FindGameObjectsWithTag("puck");
@@ -580,7 +582,7 @@ public class LogicScript : MonoBehaviour
             }
         }
         // last shot, cull
-        else if (opponent.puckCount == 1 && randomValue < 0.75)
+        else if (opponent.puckCount == 1 && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
         {
             powerupManager.CullPowerup();
         }
@@ -590,15 +592,15 @@ public class LogicScript : MonoBehaviour
     {
         // plus one, growth, hydra
         float randomValue = Random.Range(0f, 1f);
-        if (opponent.puckCount > 3 && randomValue < 0.75)
+        if (opponent.puckCount > 3 && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
         {
             powerupManager.GrowthPowerup();
         }
-        else if (opponent.puckCount < 3 && randomValue < 0.75)
+        else if (opponent.puckCount < 3 && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
         {
             powerupManager.PlusOnePowerup();
         }
-        else if (opponent.puckCount == 3 && randomValue < 0.75)
+        else if (opponent.puckCount == 3 && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
         {
             powerupManager.HydraPowerup();
         }
@@ -607,16 +609,71 @@ public class LogicScript : MonoBehaviour
 
         // lock, fog
         randomValue = Random.Range(0f, 1f);
-        if (opponent.puckCount > 3 && randomValue < 0.75)
+        if (opponent.puckCount > 3 && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
         {
             powerupManager.LockPowerup();
         }
-        else if ((opponent.puckCount == 3 || opponent.puckCount == 2) && randomValue < 0.50)
+        else if ((opponent.puckCount == 3 || opponent.puckCount == 2) && randomValue < (0.50 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
         {
             powerupManager.FogPowerup();
         }
         powerupsUsedThisTurn++;
         if (powerupsUsedThisTurn >= 3) { return; }
+
+        // shield
+        randomValue = Random.Range(0f, 1f);
+        if ((opponent.puckCount == 3 || opponent.puckCount == 2) && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
+        {
+            powerupManager.ShieldPowerup();
+        }
+        powerupsUsedThisTurn++;
+        if (powerupsUsedThisTurn >= 3) { return; }
+
+        // factory
+        randomValue = Random.Range(0f, 1f);
+        if ((opponent.puckCount == 5 || opponent.puckCount == 4) && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
+        {
+            powerupManager.FactoryPowerup();
+        }
+        powerupsUsedThisTurn++;
+        if (powerupsUsedThisTurn >= 3) { return; }
+
+        // mill
+        randomValue = Random.Range(0f, 1f);
+        if (powerupsUsedThisTurn == 0 && (opponent.puckCount == 4 || opponent.puckCount == 3) && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
+        {
+            powerupManager.MillPowerup();
+        }
+        powerupsUsedThisTurn++;
+        if (powerupsUsedThisTurn >= 3) { return; }
+
+        // resurrect
+        randomValue = Random.Range(0f, 1f);
+        if (powerupsUsedThisTurn == 0 && (opponent.puckCount == 5 || opponent.puckCount == 2) && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
+        {
+            powerupManager.MillPowerup();
+        }
+        powerupsUsedThisTurn++;
+        if (powerupsUsedThisTurn >= 3) { return; }
+    }
+
+    public void IncrementPuckCount(bool playersPuck)
+    {
+        if (playersPuck)
+        {
+            player.puckCount++;
+        }
+        else
+        {
+            opponent.puckCount++;
+        }
+        UI.PostShotUpdate(player.puckCount, opponent.puckCount);
+    }
+
+    private int mill = 0;
+    public void MillPowerupHelper()
+    {
+        mill++;
     }
 
     public void QuitGame()
@@ -638,6 +695,7 @@ public class LogicScript : MonoBehaviour
     [SerializeField] private AudioSource puckDestroySFX;
     public void playDestroyPuckSFX(float SFXvolume)
     {
+        if (puckDestroySFX == null) { return; }
         puckDestroySFX.volume = SFXvolume;
         puckDestroySFX.Play();
     }
