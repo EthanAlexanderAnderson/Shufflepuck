@@ -14,6 +14,7 @@ public class Competitor
     public Sprite puckSprite;
     public int puckSpriteID;
     public int score;
+    public int scoreBonus;
     public int wins;
     public int puckCount = 5;
     public bool isTurn;
@@ -42,7 +43,13 @@ public class Competitor
     public void ResetProperties()
     {
         score = 0;
+        scoreBonus = 0;
         puckCount = 5;
         isShooting = false;
+    }
+
+    public int GetScore()
+    {
+        return score + scoreBonus;
     }
 }

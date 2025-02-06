@@ -310,7 +310,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         shot = true;
 
         // if puck moves into higher scoring zone and gains a point play SFX
-        if (enteredZoneMultiplier > zoneMultiplier && ComputeValue() > 0)
+        if (enteredZoneMultiplier > zoneMultiplier && (puckBaseValue + puckBonusValue) > 0)
         {
             if (IsPlayersPuck())
             {
@@ -455,9 +455,15 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     {
         puckBonusValue = value;
     }
+
     public void IncrementPuckBonusValue(int value)
     {
         puckBonusValue += value;
+    }
+
+    public void DoublePuckBaseValue()
+    {
+        puckBaseValue *= 2;
     }
 
     public void SetPowerupText(string text)
@@ -719,7 +725,6 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public void EnableFactory()
     {
         puckBaseValue = 0; // set to valueless
-        puckBonusValue = 0; // set to valueless
         if (ClientLogicScript.Instance.isRunning) // factory online
         {
             if (playersPuck)

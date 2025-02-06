@@ -184,7 +184,7 @@ public class LogicScript : MonoBehaviour
             gameIsRunning = false;
             UpdateScores();
             UI.ChangeUI(UI.gameResultScreen);
-            UI.UpdateGameResult(player.score, opponent.score, difficulty, isLocal);
+            UI.UpdateGameResult(player.GetScore(), opponent.GetScore(), difficulty, isLocal);
             isLocal = false;
             arrow.SetActive(false);
             FogScript.Instance.DisableFog();
@@ -398,6 +398,7 @@ public class LogicScript : MonoBehaviour
         player.ResetProperties();
         opponent.ResetProperties();
         UI.PostShotUpdate(player.puckCount, opponent.puckCount);
+        powerupManager.ClearPowerupPopupEffectAnimationQueue();
 
         if (difficulty < 2) // for easy & medium
         {
@@ -452,7 +453,8 @@ public class LogicScript : MonoBehaviour
     public void UpdateScores()
     {
         (player.score, opponent.score) = puckManager.UpdateScores();
-        UI.UpdateScores(player.score, opponent.score);
+        UI.UpdateScores(player.GetScore(), opponent.GetScore());
+        UI.UpdateScoreBonuses(player.scoreBonus, opponent.scoreBonus);
     }
 
     // back button in game
@@ -674,6 +676,21 @@ public class LogicScript : MonoBehaviour
     public void MillPowerupHelper()
     {
         mill++;
+    }
+
+
+    public void ModifyScoreBonus(bool isplayer, int value)
+    {
+        if (isplayer)
+        {
+            player.scoreBonus += value;
+        }
+        else
+        {
+            opponent.scoreBonus += value;
+        }
+        UI.UpdateScores(player.GetScore(), opponent.GetScore());
+        UI.UpdateScoreBonuses(player.scoreBonus, opponent.scoreBonus);
     }
 
     public void QuitGame()

@@ -12,7 +12,7 @@ public class PowerupsHUDUIManager : MonoBehaviour
     [SerializeField] private GameObject powerupButtonObject1;
     [SerializeField] private GameObject powerupButtonObject2;
     [SerializeField] private GameObject powerupButtonObject3;
-    [SerializeField] private GameObject skipButtonObject;
+    [SerializeField] private GameObject continueButtonObject;
     private GameObject[] powerupButtonObjects;
 
     private float startXLocalPos = -1920;
@@ -28,7 +28,7 @@ public class PowerupsHUDUIManager : MonoBehaviour
             Destroy(Instance);
 
         if (-(Screen.width * 1.2f) < startXLocalPos) { startXLocalPos = -(Screen.width * 1.2f); }
-        powerupButtonObjects = new GameObject[] { powerupButtonObject1, powerupButtonObject2, powerupButtonObject3, skipButtonObject };
+        powerupButtonObjects = new GameObject[] { powerupButtonObject1, powerupButtonObject2, powerupButtonObject3, continueButtonObject };
     }
 
     void OnEnable()
@@ -59,12 +59,12 @@ public class PowerupsHUDUIManager : MonoBehaviour
                 powerupButtonObjects[i].GetComponent<Button>().onClick.RemoveAllListeners();
                 powerupButtonObjects[i].transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
                 LeanTween.cancel(powerupButtonObjects[i]);
-                LeanTween.scale(powerupButtonObjects[i], new Vector3(1f, 1f, 1f), 0.5f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
+                LeanTween.scale(powerupButtonObjects[i], new Vector3(1f, 1f, 1f), 0.5f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f).setOnComplete(DisableMenuIfHandEmpty);
                 LeanTween.scale(powerupButtonObjects[i], new Vector3(0f, 0f, 0f), 0.5f).setEase(LeanTweenType.easeOutElastic).setDelay(0.81f).setOnComplete(() => powerupButtonObjects[index].SetActive(false));
                 cardsInHand--;
             }
             // if paid 2 discard cost, discard the other 2 cards
-            if (Array.Exists(PowerupManager.Instance.cost2Discard, x => x == powerupID) && i != index)
+            if (Array.Exists(PowerupManager.Instance.cost2Discard, x => x == powerupID) && i != index && i != 3)
             {
                 LeanTween.cancel(powerupButtonObjects[i]);
                 powerupButtonObjects[i].GetComponent<Button>().onClick.RemoveAllListeners();
@@ -73,13 +73,20 @@ public class PowerupsHUDUIManager : MonoBehaviour
                 cardsInHand--;
             }
         }
+    }
+
+    // this is so stupid lol
+    private bool disablingMenuAlreadyInProgress = false;
+    private void FinishedDisablingMenu() { disablingMenuAlreadyInProgress = false;  }
+    private void DisableMenuIfHandEmpty()
+    {
         // disable menu if we have no more cards in hand
-        if (cardsInHand <= 0)
+        if (cardsInHand <= 0 && !disablingMenuAlreadyInProgress)
         {
+            disablingMenuAlreadyInProgress = true;
             AlphaHelper(false);
             // tween out continue button
-            LeanTween.cancel(powerupButtonObjects[3]);
-            LeanTween.moveLocalX(powerupButtonObjects[3], -startXLocalPos, 0.5f).setEase(LeanTweenType.easeInBack).setDelay(0.01f);
+            LeanTween.moveLocalX(powerupButtonObjects[3], -startXLocalPos, 0.5f).setEase(LeanTweenType.easeInBack).setDelay(0.01f).setOnComplete(FinishedDisablingMenu);
         }
     }
 
@@ -100,6 +107,7 @@ public class PowerupsHUDUIManager : MonoBehaviour
     public void Reset()
     {
         cardsInHand = -1; // minus one because we include continue button
+        powerupButtonObjects[3].SetActive(true); // make continue button active always
         for (int i = 0; i < powerupButtonObjects.Length; i++)
         {
             powerupButtonObjects[i].transform.localPosition = new Vector3(startXLocalPos, powerupButtonObjects[i].transform.localPosition.y, powerupButtonObjects[i].transform.localPosition.z);
@@ -116,7 +124,7 @@ public class PowerupsHUDUIManager : MonoBehaviour
         float targetAlpha = fadeIn ? 0.8f : 0f;
 
         // Use LeanTween to tween the alpha value
-        LeanTween.value(gameObject, currentColor.a, targetAlpha, 1.2f)
+        LeanTween.value(gameObject, currentColor.a, targetAlpha, 1.0f)
             .setEase(fadeIn ? LeanTweenType.easeOutQuint : LeanTweenType.easeInExpo)
             .setOnUpdate((float alpha) =>
             {
