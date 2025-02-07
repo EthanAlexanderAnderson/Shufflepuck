@@ -571,7 +571,6 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     override public void OnDestroy()
     {
         if (!logic.gameIsRunning && !ClientLogicScript.Instance.isRunning) { return; }
-        logic.playDestroyPuckSFX(SFXvolume); // TODO: investigate if this causes the SFX twice in any scenerio
         ParticleSystem collisionParticleEffect = Instantiate(collisionParticleEffectPrefab, transform.position, Quaternion.identity);
         ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
         emission.rateOverTime = 1000f;

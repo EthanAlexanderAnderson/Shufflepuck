@@ -492,8 +492,10 @@ public class LogicScript : MonoBehaviour
         line.isActive = false;
         bar.ChangeBar("none");
         arrow.SetActive(false);
+        powerupsMenu.SetActive(false);
         FogScript.Instance.DisableFog();
         WallScript.Instance.WallEnabled(false);
+        laser.GetComponent<LaserScript>().DisableLaser();
 #if (UNITY_EDITOR)
         foreach (var path in CPUPaths)
         {

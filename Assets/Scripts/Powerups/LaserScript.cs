@@ -16,6 +16,9 @@ public class LaserScript : MonoBehaviour
     private float sideModifier;
     private string activeBar;
 
+    // state
+    private bool laserEnabled = false;
+
     // base parameters
     [SerializeField] private float xBase = 0f;
     [SerializeField] private float yBase = 25f;
@@ -39,6 +42,8 @@ public class LaserScript : MonoBehaviour
     //Assign a GameObject in the Inspector to rotate around
     void Update()
     {
+        if (!laserEnabled) { return; } // optimization
+
         if (logic != null && logic.gameIsRunning)
         {
             sideModifier = logic.activeCompetitor.isPlayer ? (-3.6f) : (3.6f);
@@ -62,6 +67,7 @@ public class LaserScript : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (!laserEnabled) { return; } // optimization
         if (collision.gameObject.layer != 3) // ignore center puck collider
         {
             if (!pucksInPath.Contains(collision.gameObject)) { pucksInPath.Add(collision.gameObject); }
@@ -70,6 +76,7 @@ public class LaserScript : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
+        if (!laserEnabled) { return; } // optimization
         if (collision.gameObject.layer != 3) // ignore center puck collider
         {
             pucksInPath.Remove(collision.gameObject);
@@ -78,17 +85,18 @@ public class LaserScript : MonoBehaviour
 
     public void EnableLaser()
     {
+        laserEnabled = true;
         spriteRenderer.enabled = true;
     }
 
     public void DisableLaser()
     {
+        laserEnabled = false;
         spriteRenderer.enabled = false;
     }
 
     public void FireLaser()
     {
-        spriteRenderer.enabled = false;
         // destroy all pucks in path
         List<GameObject> pucksToDestroy = new List<GameObject>(pucksInPath);
         foreach (GameObject puck in pucksToDestroy)
@@ -98,5 +106,8 @@ public class LaserScript : MonoBehaviour
                 puck.GetComponent<PuckScript>().DestroyPuck();
             }
         }
+        // turn off the laser
+        laserEnabled = false;
+        spriteRenderer.enabled = false;
     }
 }
