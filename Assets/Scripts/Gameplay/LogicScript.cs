@@ -337,7 +337,7 @@ public class LogicScript : MonoBehaviour
         else
         {
             if (difficulty >= 2 && !isLocal && powerupsAreEnabled && powerupsUsedThisTurn < 3) { CPUPreShotPowerups(); }
-            (CPUShotAngle, CPUShotPower, CPUShotSpin) = FindOpenPath();
+            FindOpenPath();
             if (difficulty >= 2 && !isLocal && powerupsAreEnabled && powerupsUsedThisTurn < 3) { CPUPostShotPowerups(); }
         }
     }
@@ -506,11 +506,12 @@ public class LogicScript : MonoBehaviour
     }
 
     // this is the CPU AI for hard mode
-    private (float, float, float) FindOpenPath()
+    public void FindOpenPath()
     {
         // if Fog is active and foresight isn't, shoot random
-        if (FogScript.Instance.FogEnabled() && !HaloScript.Instance.HaloEnabled()) { return (Random.Range(35.0f, 65.0f), Random.Range(40.0f, 70.0f), Random.Range(45.0f, 55.0f)); }
+        if (FogScript.Instance.FogEnabled() && !HaloScript.Instance.HaloEnabled()) { (CPUShotAngle, CPUShotPower, CPUShotSpin) = (Random.Range(35.0f, 65.0f), Random.Range(40.0f, 70.0f), Random.Range(45.0f, 55.0f)); }
 
+        Debug.Log("start path find");
         CPUPathScript best = null;
         int highestValue = 0;
         // check all paths to see which are unblocked
@@ -560,13 +561,13 @@ public class LogicScript : MonoBehaviour
                 powerupsUsedThisTurn++;
             }
 
-            return best.GetPath();
+            (CPUShotAngle, CPUShotPower, CPUShotSpin) = best.GetPath();
         }
         // otherwise, Shoot random
         else
         {
             Debug.Log("No path :(");
-            return (Random.Range(35.0f, 65.0f), Random.Range(40.0f, 70.0f), Random.Range(45.0f, 55.0f));
+            (CPUShotAngle, CPUShotPower, CPUShotSpin) = (Random.Range(35.0f, 65.0f), Random.Range(40.0f, 70.0f), Random.Range(45.0f, 55.0f));
         }
     }
 

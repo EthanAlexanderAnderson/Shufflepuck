@@ -103,12 +103,19 @@ public class CPUPathScript : MonoBehaviour
     {
         if (collision.gameObject.layer != 3) // ignore center puck collider
         {
-            if (!pucksInPath.Contains(collision.gameObject)) { pucksInPath.Add(collision.gameObject); }
+            if (!pucksInPath.Contains(collision.gameObject))
+            {
+                pucksInPath.Add(collision.gameObject);
+                // update CPU pathfinding
+                if (LogicScript.Instance.gameIsRunning && LogicScript.Instance.opponent.isShooting)
+                {
+                    LogicScript.Instance.FindOpenPath();
+                }
+            }
 #if (UNITY_EDITOR)
-            if (!isContactShot) { return; }
             List<GameObject> pucksCurrentlyInPath = GetPucksInPath();
             int numberOfPucksCurrentlyInPath = pucksCurrentlyInPath.Count;
-            if (numberOfPucksCurrentlyInPath > 1)
+            if (numberOfPucksCurrentlyInPath >= 1)
             {
                 EnablePathVisualization(1);
             }
@@ -121,11 +128,15 @@ public class CPUPathScript : MonoBehaviour
         if (collision.gameObject.layer != 3) // ignore center puck collider
         { 
             pucksInPath.Remove(collision.gameObject);
+            // update CPU pathfinding
+            if (LogicScript.Instance.gameIsRunning && LogicScript.Instance.opponent.isShooting)
+            {
+                LogicScript.Instance.FindOpenPath();
+            }
 #if (UNITY_EDITOR)
-            if (!isContactShot) { return; }
             List<GameObject> pucksCurrentlyInPath = GetPucksInPath();
             int numberOfPucksCurrentlyInPath = pucksCurrentlyInPath.Count;
-            if (numberOfPucksCurrentlyInPath <= 1)
+            if (numberOfPucksCurrentlyInPath < 1)
             {
                 DisablePathVisualization();
             }
