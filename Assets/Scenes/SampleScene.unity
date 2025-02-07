@@ -33937,7 +33937,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 1}
-  m_LocalScale: {x: 1.96, y: 1.96, z: 1.96}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 16345475}
@@ -41185,8 +41185,8 @@ Transform:
   m_GameObject: {fileID: 750931542}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 12, z: 0}
-  m_LocalScale: {x: 12.8, y: 24, z: 7.2}
+  m_LocalPosition: {x: 0, y: 13, z: 0}
+  m_LocalScale: {x: 13.8, y: 26, z: 7.2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1168541193}
@@ -82460,7 +82460,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: 363c9c7287b8d264985a9c74cf4341d0, type: 3}
   m_Resource: {fileID: 8300000, guid: 363c9c7287b8d264985a9c74cf4341d0, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.5
+  m_Volume: 1
   m_Pitch: 1
   Loop: 0
   Mute: 1
@@ -82557,7 +82557,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: b1872e5a6a972bf4388aa8bcd7c22468, type: 3}
   m_Resource: {fileID: 8300000, guid: b1872e5a6a972bf4388aa8bcd7c22468, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.5
+  m_Volume: 0.7
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -82654,7 +82654,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: e66e6c2f6d55712469e2b8c0d807eb56, type: 3}
   m_Resource: {fileID: 8300000, guid: e66e6c2f6d55712469e2b8c0d807eb56, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.5
+  m_Volume: 1
   m_Pitch: 1
   Loop: 0
   Mute: 1
@@ -82751,7 +82751,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: c257c6d0f103b984e8f8f17ff3b97f86, type: 3}
   m_Resource: {fileID: 8300000, guid: c257c6d0f103b984e8f8f17ff3b97f86, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.5
+  m_Volume: 1
   m_Pitch: 1
   Loop: 0
   Mute: 1
@@ -82848,7 +82848,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: e985d976b16f89b4fa06f5b7e2414f1f, type: 3}
   m_Resource: {fileID: 8300000, guid: e985d976b16f89b4fa06f5b7e2414f1f, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.5
+  m_Volume: 1
   m_Pitch: 1
   Loop: 0
   Mute: 1

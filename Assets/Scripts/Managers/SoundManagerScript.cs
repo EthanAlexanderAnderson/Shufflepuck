@@ -65,7 +65,7 @@ public class SoundManagerScript : MonoBehaviour
         currentClipIndex = PlayerPrefs.GetInt("SelectedTrack", 0);
         PlayClip(currentClipIndex);
 
-        musicVolumeFromPref = PlayerPrefs.GetFloat("MusicVolume", 0.5f);
+        musicVolumeFromPref = PlayerPrefs.GetFloat("MusicVolume", 0.2f);
         musicComponent.volume = 0f; // Start at 0 volume for fade-in
 
         SFXVolumeFromPref = PlayerPrefs.GetFloat("SFXVolume", 1.0f);
@@ -138,7 +138,7 @@ public class SoundManagerScript : MonoBehaviour
         {
             clicks[i].mute = false;
             clicks[i].pitch = 1f;
-            clicks[i].volume = SFXVolumeFromPref * 0.5f;
+            clicks[i].volume = SFXVolumeFromPref;
             clicks[i].Play();
         }
         catch (System.Exception e){ Debug.LogError(e); }
@@ -151,7 +151,7 @@ public class SoundManagerScript : MonoBehaviour
         {
             clicks[i].mute = false;
             clicks[i].pitch = pitch;
-            clicks[i].volume = SFXVolumeFromPref * 0.5f;
+            clicks[i].volume = SFXVolumeFromPref;
             clicks[i].Play();
         }
         catch (System.Exception e) { Debug.LogError(e); }

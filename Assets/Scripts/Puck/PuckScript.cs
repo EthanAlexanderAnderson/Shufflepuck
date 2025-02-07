@@ -93,7 +93,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         // Calculate the magnitude of the velocity vector to determine the sliding noise volume
         velocity = Mathf.Sqrt(rb.velocity.x * rb.velocity.x + rb.velocity.y * rb.velocity.y);
         if (IsServer) { velocityNetworkedRounded.Value = velocity; }
-        noiseSFX.volume = logic.gameIsRunning ? (velocity / 15.0f) * SFXvolume : 0f; // only play noise if game is running (not plinko)
+        noiseSFX.volume = logic.gameIsRunning ? (velocity / 10.0f) * SFXvolume : 0f; // only play noise if game is running (not plinko)
         noiseSFX.mute = noiseSFX.volume < 0.01;  // this is weird but it prevents the 0.1 seconds of noise on spawn
 
         // update particle emisson based on velocity
@@ -275,8 +275,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         shotTorqueToAdd = spin;
         shot = true;
         // SFX
-        shotSFX.volume += volumeBoost;
-        shotSFX.volume *= SFXvolume;
+        shotSFX.volume = SFXvolume + volumeBoost;
         shotSFX.Play();
         // screen shake
         ScreenShake.Instance.Shake(powerParameter / 500);
@@ -307,12 +306,14 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public bool IsFactory() { return factoryPowerup; }
 
     // when a puck enters a scoring zone, update its score and play a SFX
-    public void EnterScoreZone(bool isZoneSafe, int enteredZoneMultiplier)
+    public void EnterScoreZone(bool isZoneSafe, int enteredZoneMultiplier, bool isBoundry)
     {
         // all zones are past safe line, so pastSafeLine can be set to true permanently
         pastSafeLine = true;
         safe = isZoneSafe;
         shot = true;
+
+        if (isBoundry) { return; } // don't update score or play SFX for the safe line boundry. This is important for hydra / factory powerups.
 
         // if puck moves into higher scoring zone and gains a point play SFX
         if (enteredZoneMultiplier > zoneMultiplier && (puckBaseValue + puckBonusValue) > 0)
@@ -441,11 +442,14 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         if (explosionPowerup > 0 && col.gameObject.CompareTag("puck"))
         {
             // Destroy the collided object
-            col.gameObject.GetComponent<PuckScript>().DestroyPuck();
-            explosionPowerup--;
-            RemovePowerupText("explosion");
-            // destroy self
-            DestroyPuck();
+            if (Vector2.Distance(col.gameObject.transform.position, transform.position) < 2.1f) // make sure it's nearby (trying to fix a weird bug)
+            {
+                col.gameObject.GetComponent<PuckScript>().DestroyPuck();
+                explosionPowerup--;
+                RemovePowerupText("explosion");
+                // destroy self
+                DestroyPuck();
+            }
         }
     }
 

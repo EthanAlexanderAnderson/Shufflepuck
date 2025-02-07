@@ -32,9 +32,8 @@ public class ScoreZoneScript : MonoBehaviour
         if (collision.gameObject.layer == 3)
         {
             FlashZoneBorder();
-            if (boundary) { return; }
             puck = collision.gameObject.transform.parent.gameObject.GetComponent<PuckScript>();
-            puck.EnterScoreZone(true, zoneMultiplier);
+            puck.EnterScoreZone(true, zoneMultiplier, boundary);
             logic.UpdateScores();
         }
     }
@@ -55,6 +54,8 @@ public class ScoreZoneScript : MonoBehaviour
     // These two are only used to help me create CPU paths
     private void FlashZoneBorder()
     {
+        if (lineRenderer == null) { return; }
+
         lineRenderer.enabled = true;
         lineRenderer.startColor = Color.white;
         lineRenderer.endColor = Color.white;
