@@ -34,7 +34,7 @@ public class ScoreZoneScript : MonoBehaviour
     // when a puck exits, trigger it's function
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (!isContained) { return; }
+        if (!isContained && !boundary) { return; }
 
         if (collision.gameObject.layer == 3)
         {

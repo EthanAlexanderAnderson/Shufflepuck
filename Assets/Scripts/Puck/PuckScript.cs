@@ -62,12 +62,13 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     private Color[] color = { new Color(0.5f, 0.5f, 0.5f) };
 
     // for powerups
-    [SerializeField] private bool phase = false;
+    [SerializeField] private bool phasePowerup = false;
     [SerializeField] private bool lockPowerup = false; // TODO: make lock stack
     [SerializeField] private int explosionPowerup = 0;
     [SerializeField] private int hydraPowerup = 0;
     [SerializeField] private int shieldPowerup = 0;
     [SerializeField] private int resurrectPowerup = 0;
+    [SerializeField] private bool factoryPowerup = false;
 
     void OnEnable()
     {
@@ -104,7 +105,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         main.startColor = SetParticleColor();
 
         // phase powerup
-        if (phase && (velocity > 1 || velocityNetworkedRounded.Value > 1.0f || !IsShot()))
+        if (phasePowerup && (velocity > 1 || velocityNetworkedRounded.Value > 1.0f || !IsShot()))
         {
             spriteRenderer.color = new Color(1f, 1f, 1f, 0.5f);
             puckCollider.isTrigger = true;
@@ -138,7 +139,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         // for phase & lock powerup
         if (IsShot() && pastSafeLine && IsStopped() && (!ClientLogicScript.Instance.isRunning || velocityNetworkedRounded.Value < 0.05f))
         {
-            if (phase)
+            if (phasePowerup)
             {
                 // if this puck is within 2 units of the nearest puck, destroy it
                 var phaseHasOverlap = false;
@@ -152,13 +153,13 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                         if (explosionPowerup > 0) // phase & explosion combo
                         {
                             puck.GetComponent<PuckScript>().DestroyPuck();
-                            explosionPowerup--;
-                            RemovePowerupText("explosion");
                         }
                     }
                 }
                 if (phaseHasOverlap)
                 {
+                    explosionPowerup--;
+                    RemovePowerupText("explosion");
                     DestroyPuck();
                     return;
                 }
@@ -166,7 +167,8 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 // othewrise, unphase it (make it visible again)
                 spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
                 puckCollider.isTrigger = false;
-                phase = false;
+                phasePowerup = false;
+                RemovePowerupText("phase");
             }
 
             if (lockPowerup)
@@ -300,6 +302,9 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public bool IsLocked() { return lockPowerup; }
     public bool IsExplosion() { return explosionPowerup > 0; }
     public bool IsHydra() { return hydraPowerup > 0; }
+    public bool IsPhase() { return phasePowerup; }
+    public bool IsResurrect() { return resurrectPowerup > 0; }
+    public bool IsFactory() { return factoryPowerup; }
 
     // when a puck enters a scoring zone, update its score and play a SFX
     public void EnterScoreZone(bool isZoneSafe, int enteredZoneMultiplier)
@@ -466,9 +471,10 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         puckBaseValue *= 2;
     }
 
-    public void SetPowerupText(string text)
+    public void SetPowerupText(string text, bool showFloatingText = true)
     {
         powerupText.Add(text);
+        if (showFloatingText) { CreatePowerupFloatingText(); }
     }
 
     public void RemovePowerupText(string text)
@@ -589,10 +595,10 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         LogicScript.Instance.UpdateScores();
 
         // un sub from events
-        LogicScript.OnPlayerShot -= IncrementBonusValue;
-        LogicScript.OnOpponentShot -= IncrementBonusValue;
-        ClientLogicScript.OnPlayerShot -= IncrementBonusValue;
-        ClientLogicScript.OnOpponentShot -= IncrementBonusValue;
+        LogicScript.OnPlayerShot -= IncrementGrowthValue;
+        LogicScript.OnOpponentShot -= IncrementGrowthValue;
+        ClientLogicScript.OnPlayerShot -= IncrementGrowthValue;
+        ClientLogicScript.OnOpponentShot -= IncrementGrowthValue;
         LogicScript.OnPlayerShot -= DisableLock;
         LogicScript.OnOpponentShot -= DisableLock;
         ClientLogicScript.OnPlayerShot -= DisableLock;
@@ -601,6 +607,10 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         LogicScript.OnOpponentShot -= FactoryHelper;
         ClientLogicScript.OnPlayerShot -= FactoryHelper;
         ClientLogicScript.OnOpponentShot -= FactoryHelper;
+        LogicScript.OnPlayerShot -= IncrementExponentValue;
+        LogicScript.OnOpponentShot -= IncrementExponentValue;
+        ClientLogicScript.OnPlayerShot -= IncrementExponentValue;
+        ClientLogicScript.OnOpponentShot -= IncrementExponentValue;
     }
 
     [ServerRpc]
@@ -612,16 +622,20 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     public void SetPhase(bool isPhase)
     {
-        phase = isPhase;
+        phasePowerup = isPhase;
     }
 
     [ClientRpc]
     public void InitBlockPuckClientRpc(ClientRpcParams clientRpcParams = default)
     {
         if (!IsClient) return;
+        InitBlockPuck();
+    }
+
+    public void InitBlockPuck()
+    {
         SetPuckBaseValue(0);
         SetPowerupText("valueless");
-        CreatePowerupFloatingText();
         shot = true;
         safe = true;
     }
@@ -632,27 +646,27 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         {
             if (playersPuck)
             {
-                ClientLogicScript.OnPlayerShot += IncrementBonusValue;
+                ClientLogicScript.OnPlayerShot += IncrementGrowthValue;
             }
             else
             {
-                ClientLogicScript.OnOpponentShot += IncrementBonusValue;
+                ClientLogicScript.OnOpponentShot += IncrementGrowthValue;
             }
         }
         else if (LogicScript.Instance.gameIsRunning) // growth vs CPU
         {
             if (playersPuck)
             {
-                LogicScript.OnPlayerShot += IncrementBonusValue;
+                LogicScript.OnPlayerShot += IncrementGrowthValue;
             }
             else
             {
-                LogicScript.OnOpponentShot += IncrementBonusValue;
+                LogicScript.OnOpponentShot += IncrementGrowthValue;
             }
         }
     }
 
-    private void IncrementBonusValue()
+    private void IncrementGrowthValue()
     {
         if (this == null || transform == null || transform.position.y < 0) { return; }
         puckBonusValue++;
@@ -724,6 +738,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     public void EnableFactory()
     {
+        factoryPowerup = true;
         puckBaseValue = 0; // set to valueless
         if (ClientLogicScript.Instance.isRunning) // factory online
         {
@@ -770,6 +785,54 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public void EnableResurrect()
     {
         resurrectPowerup++;
+    }
+
+    public void EnableExponent()
+    {
+        if (ClientLogicScript.Instance.isRunning) // exponent online
+        {
+            if (playersPuck)
+            {
+                ClientLogicScript.OnPlayerShot += IncrementExponentValue;
+            }
+            else
+            {
+                ClientLogicScript.OnOpponentShot += IncrementExponentValue;
+            }
+        }
+        else if (LogicScript.Instance.gameIsRunning) // exponent vs CPU
+        {
+            if (playersPuck)
+            {
+                LogicScript.OnPlayerShot += IncrementExponentValue;
+            }
+            else
+            {
+                LogicScript.OnOpponentShot += IncrementExponentValue;
+            }
+        }
+    }
+
+    private void IncrementExponentValue()
+    {
+        if (this == null || transform == null || transform.position.y < 0) { return; }
+        DoublePuckBaseValue();
+        if (ComputeValue() == 0) { return; }
+        LogicScript.Instance.UpdateScores();
+        if (IsPlayersPuck())
+        {
+            pointPlayerSFX.volume = SFXvolume;
+            pointPlayerSFX.pitch = 0.9f + (0.05f * ComputeValue());
+            pointPlayerSFX.Play();
+        }
+        else
+        {
+            pointCPUSFX.volume = SFXvolume;
+            pointCPUSFX.pitch = 0.8f + (0.05f * ComputeValue());
+            pointCPUSFX.Play();
+        }
+        var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
+        floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f + (ComputeValue() / 10), true);
     }
 
     public ParticleSystem.MinMaxGradient SetParticleColor()

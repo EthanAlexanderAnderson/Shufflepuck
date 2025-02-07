@@ -39,7 +39,7 @@ public class CPUPathScript : MonoBehaviour
             {
                 return value;
             }
-            else if (numberOfPucksCurrentlyInPath == 1 && pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsPlayersPuck() && !pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsHydra() && !requiresPhasePowerup && !isContactShot) // explosion shot
+            else if (numberOfPucksCurrentlyInPath == 1 && pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsPlayersPuck() && !pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsHydra() && !pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsResurrect() && !requiresPhasePowerup && !isContactShot) // explosion shot
             {
                 requiresExplosionPowerup = true;
                 return pucksCurrentlyInPath[0].GetComponent<PuckScript>().ComputeValue();
@@ -54,7 +54,7 @@ public class CPUPathScript : MonoBehaviour
         {
             if (numberOfPucksCurrentlyInPath <=1) return 0;
 
-            if (pucksCurrentlyInPath.TrueForAll(IsPlayersPuck) && pucksCurrentlyInPath.TrueForAll(IsNotLockedOrExposion) && pucksCurrentlyInPath.TrueForAll(HasPostiveValue) && !WallIsActive())
+            if (pucksCurrentlyInPath.TrueForAll(IsPlayersPuck) && pucksCurrentlyInPath.TrueForAll(IsNotLockedOrExposionOrPhase) && pucksCurrentlyInPath.TrueForAll(HasPostiveValue) && !WallIsActive())
             {
                 return value;
             }
@@ -74,13 +74,13 @@ public class CPUPathScript : MonoBehaviour
     }
 
     // helper only for CalculateValue() contact shots
-    private bool IsNotLockedOrExposion(GameObject p)
+    private bool IsNotLockedOrExposionOrPhase(GameObject p)
     {
         if (p == null) return false;
 
         if (p.GetComponent<PuckScript>() == null) return false;
 
-        return !(p.GetComponent<PuckScript>().IsLocked() || p.GetComponent<PuckScript>().IsExplosion());
+        return !(p.GetComponent<PuckScript>().IsLocked() || p.GetComponent<PuckScript>().IsExplosion() || p.GetComponent<PuckScript>().IsPhase());
     }
 
     // helper only for CalculateValue() contact shots
@@ -90,14 +90,13 @@ public class CPUPathScript : MonoBehaviour
 
         if (p.GetComponent<PuckScript>() == null) return false;
 
-        return p.GetComponent<PuckScript>().ComputeValue() > 0;
+        return (p.GetComponent<PuckScript>().ComputeValue() > 0 || p.GetComponent<PuckScript>().IsFactory());
     }
 
     // helper only for CalculateValue() contact shots
     private bool WallIsActive()
     {
-        // TODO: make this work
-        return false;
+        return LogicScript.Instance.WallIsActive();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

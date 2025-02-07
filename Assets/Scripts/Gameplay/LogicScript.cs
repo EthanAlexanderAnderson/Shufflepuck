@@ -34,6 +34,7 @@ public class LogicScript : MonoBehaviour
     // wall
     private int wallCount = 3;
     [SerializeField] private GameObject wall; // set in editor
+    public bool WallIsActive() { return wallCount > 0; }
 
     // Hard CPU shot paths
     GameObject[] CPUPaths;
@@ -75,6 +76,13 @@ public class LogicScript : MonoBehaviour
     public Competitor nonActiveCompetitor;
     public bool playedAGame = false;
     public bool tutorialActive;
+
+    // powerups TODO: move to powerups manager probably
+    public int triplePowerup = 0;
+    public GameObject laser;
+    private bool laserPowerup = false;
+    public void EnableLaserPowerup() { laserPowerup = true; laser.GetComponent<LaserScript>().EnableLaser(); }
+
 
     private void Awake()
     {
@@ -146,6 +154,14 @@ public class LogicScript : MonoBehaviour
                 WallScript.Instance.WallEnabled(false);
                 UI.UpdateWallText(wallCount);
                 wallCount--;
+            }
+
+            // do triple powerup
+            if (triplePowerup > 0 && activeCompetitor.activePuckScript != null && activeCompetitor.activePuckScript.IsSafe())
+            {
+                puckManager.CreatePuck(activeCompetitor);
+                activeCompetitor.ShootActivePuck(triplePower + Random.Range(-10.0f, 10.0f), tripleAngle + Random.Range(-10.0f, 10.0f), 50, false);
+                triplePowerup--;
             }
 
             // start Players turn, do this then start shooting
@@ -358,6 +374,7 @@ public class LogicScript : MonoBehaviour
         }
     }
 
+    private float triplePower, tripleAngle, tripleSpin;
     private void Shoot(float angle, float power, float spin = 50.0f)
     {
         powerupManager.DisableForceFieldIfNecessary();
@@ -367,6 +384,8 @@ public class LogicScript : MonoBehaviour
         arrow.SetActive(false);
         GameHUDManager.Instance.ChangeTurnText(string.Empty);
         activeCompetitor.ShootActivePuck(angle, power, spin);
+        (triplePower, tripleAngle, tripleSpin) = (angle, power, spin);
+        if (laserPowerup) { laserPowerup = false; laser.GetComponent<LaserScript>().FireLaser(); }
         UI.PostShotUpdate(player.puckCount, opponent.puckCount);
         UI.UpdateShotDebugText(angle, power, spin);
         if (activeCompetitor.isPlayer)
@@ -398,7 +417,10 @@ public class LogicScript : MonoBehaviour
         player.ResetProperties();
         opponent.ResetProperties();
         UI.PostShotUpdate(player.puckCount, opponent.puckCount);
+        UpdateScores();
         powerupManager.ClearPowerupPopupEffectAnimationQueue();
+        triplePowerup = 0;
+        laser.GetComponent<LaserScript>().DisableLaser();
 
         if (difficulty < 2) // for easy & medium
         {
@@ -615,7 +637,7 @@ public class LogicScript : MonoBehaviour
         {
             powerupManager.LockPowerup();
         }
-        else if ((opponent.puckCount == 3 || opponent.puckCount == 2) && randomValue < (0.50 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
+        else if ((opponent.puckCount == 3 || opponent.puckCount == 2) && player.puckCount > 0 && randomValue < (0.50 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
         {
             powerupManager.FogPowerup();
         }
@@ -642,7 +664,7 @@ public class LogicScript : MonoBehaviour
 
         // mill
         randomValue = Random.Range(0f, 1f);
-        if (powerupsUsedThisTurn == 0 && (opponent.puckCount == 4 || opponent.puckCount == 3) && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
+        if (powerupsUsedThisTurn == 0 && (opponent.puckCount == 4 || opponent.puckCount == 3) && player.puckCount > 0 && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
         {
             powerupManager.MillPowerup();
         }
@@ -659,15 +681,15 @@ public class LogicScript : MonoBehaviour
         if (powerupsUsedThisTurn >= 3) { return; }
     }
 
-    public void IncrementPuckCount(bool playersPuck)
+    public void IncrementPuckCount(bool playersPuck, int value = 1)
     {
         if (playersPuck)
         {
-            player.puckCount++;
+            player.puckCount += value;
         }
         else
         {
-            opponent.puckCount++;
+            opponent.puckCount += value;
         }
         UI.PostShotUpdate(player.puckCount, opponent.puckCount);
     }
