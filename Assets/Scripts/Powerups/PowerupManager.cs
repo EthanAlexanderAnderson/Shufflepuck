@@ -192,6 +192,7 @@ public class PowerupManager : NetworkBehaviour
             powerupButtons[i].onClick.AddListener(() => PowerupsHUDUIManager.Instance.UsePowerup(index, randomCard));
             powerupButtons[i].onClick.AddListener(() => methodArray[randomCard]());
             powerupButtons[i].onClick.AddListener(() => hand[index] = -1);
+            powerupButtons[i].onClick.AddListener(() => SoundManagerScript.Instance.PlayClickSFX(2));
         }
     }
 

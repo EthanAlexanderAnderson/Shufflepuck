@@ -254,15 +254,16 @@ public class LogicScript : MonoBehaviour
 
     private void PlayerShootingHelper()
     {
-        soundManager.PlayClickSFX();
         // change state on tap depending on current state
         switch (activeBar)
         {
             case "angle":
+                soundManager.PlayClickSFXAlterPitch(1, 1f);
                 angle = line.GetValue();
                 activeBar = bar.ChangeBar("power", activeCompetitor.isPlayer);
                 break;
             case "power":
+                soundManager.PlayClickSFXAlterPitch(1, 1.05f);
                 power = line.GetValue();
                 // if non-hard diff, end turn
                 if (difficulty < 2)
@@ -277,6 +278,7 @@ public class LogicScript : MonoBehaviour
                 break;
             // if hard, select spin
             case "spin":
+                soundManager.PlayClickSFXAlterPitch(1, 1.1f);
                 spin = line.GetValue();
                 Shoot(angle, power, spin);
                 break;

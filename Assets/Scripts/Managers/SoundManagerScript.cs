@@ -14,23 +14,7 @@ public class SoundManagerScript : MonoBehaviour
 
     [SerializeField] private AudioClip menu_1_Play_It_Cool;
 
-    private AudioClip[] clips;
-
-    void Awake()
-    {
-        clips = new AudioClip[] { music_Shufflepuck, game_1_Quirkii, game_2_Mana_Trail, menu_1_Play_It_Cool };
-
-        if (Instance == null)
-            Instance = this;
-        else
-            Destroy(gameObject);
-    }
-
-    private void Start()
-    {
-        Load();
-        StartCoroutine(FadeInMusic());
-    }
+    private AudioClip[] tracks;
 
     private string[] clipNames = { "Ethan Larose - Shufflepuck", "HeatleyBros - Quirkii", "HeatleyBros - Mana Trail", "HeatleyBros - Play It Cool" };
     private int currentClipIndex = 0;
@@ -48,10 +32,33 @@ public class SoundManagerScript : MonoBehaviour
     private float SFXVolumeFromPref;
 
     // click sfx
-    [SerializeField] private AudioSource clickSFX;
+    private AudioSource[] clicks;
+    [SerializeField] private AudioSource clickSFX1;
+    [SerializeField] private AudioSource clickSFX2;
+    [SerializeField] private AudioSource clickSFX3;
+    [SerializeField] private AudioSource clickSFX4;
+
+
     // win sfx
     [SerializeField] private AudioSource winSFX;
     private bool isInitialized = false;
+
+    void Awake()
+    {
+        tracks = new AudioClip[] { music_Shufflepuck, game_1_Quirkii, game_2_Mana_Trail, menu_1_Play_It_Cool };
+        clicks = new AudioSource[] { clickSFX1, clickSFX2, clickSFX3, clickSFX4 };
+
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
+    }
+
+    private void Start()
+    {
+        Load();
+        StartCoroutine(FadeInMusic());
+    }
 
     public void Load()
     {
@@ -105,12 +112,12 @@ public class SoundManagerScript : MonoBehaviour
     public void PlayNextClip()
     {
         currentClipIndex++;
-        if (currentClipIndex >= clips.Length)
+        if (currentClipIndex >= tracks.Length)
         {
             currentClipIndex = 0;
         }
 
-        musicComponent.clip = clips[currentClipIndex];
+        musicComponent.clip = tracks[currentClipIndex];
         musicComponent.Play();
 
         selectedTrackText.text = clipNames[currentClipIndex];
@@ -120,14 +127,34 @@ public class SoundManagerScript : MonoBehaviour
 
     private void PlayClip(int index)
     {
-        musicComponent.clip = clips[index];
+        musicComponent.clip = tracks[index];
         musicComponent.Play();
     }
 
-    public void PlayClickSFX()
+    public void PlayClickSFX(int i = 0)
     {
-        clickSFX.volume = SFXVolumeFromPref * 0.5f;
-        clickSFX.Play();
+        // very important this doesn't throw an error and stop the rest of whatever the button is trying to do
+        try
+        {
+            clicks[i].mute = false;
+            clicks[i].pitch = 1f;
+            clicks[i].volume = SFXVolumeFromPref * 0.5f;
+            clicks[i].Play();
+        }
+        catch (System.Exception e){ Debug.LogError(e); }
+    }
+
+    public void PlayClickSFXAlterPitch(int i = 0, float pitch = 1f)
+    {
+        // very important this doesn't throw an error and stop the rest of whatever the button is trying to do
+        try
+        {
+            clicks[i].mute = false;
+            clicks[i].pitch = pitch;
+            clicks[i].volume = SFXVolumeFromPref * 0.5f;
+            clicks[i].Play();
+        }
+        catch (System.Exception e) { Debug.LogError(e); }
     }
 
     public void PlayWinSFX()
@@ -147,7 +174,7 @@ public class SoundManagerScript : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
             musicComponent.volume = Mathf.Lerp(startVolume, targetVolume, elapsedTime / fadeDuration);
-            if ( musicComponent.volume > 0.1) { musicComponent.mute = false; } // this is weird but it prevents the 0.1 seconds of full volume music on startup
+            if ( musicComponent.volume > 0.01) { musicComponent.mute = false; } // this is weird but it prevents the 0.1 seconds of full volume music on startup
             yield return null;
         }
 
