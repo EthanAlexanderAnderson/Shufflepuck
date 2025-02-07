@@ -7219,7 +7219,7 @@ MonoBehaviour:
   count: 0
   maxCount: 3
   cardImage: {fileID: 21300000, guid: 59dfba5d6af0f54489ab8528e9a05476, type: 3}
-  cardName: laser
+  cardName: Laser
 --- !u!222 &149438170
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7647,7 +7647,7 @@ MonoBehaviour:
   count: 0
   maxCount: 3
   cardImage: {fileID: 21300000, guid: a3579f2368e10d04aa5d02ab493be11b, type: 3}
-  cardName: triple
+  cardName: Triple
 --- !u!222 &172038117
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -9939,7 +9939,7 @@ MonoBehaviour:
   count: 0
   maxCount: 3
   cardImage: {fileID: 21300000, guid: abc61b5c2bbbae44aa81ae40e142b843, type: 3}
-  cardName: factory
+  cardName: Factory
 --- !u!222 &229553269
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -17938,7 +17938,7 @@ MonoBehaviour:
   count: 0
   maxCount: 3
   cardImage: {fileID: 21300000, guid: a516b365e1275aa4da75fce9e9091ed8, type: 3}
-  cardName: chaos
+  cardName: Chaos
 --- !u!222 &400564893
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -77355,7 +77355,7 @@ MonoBehaviour:
   count: 0
   maxCount: 3
   cardImage: {fileID: 21300000, guid: de5f96edd98bba34188a3f2ad80f88d3, type: 3}
-  cardName: shuffle
+  cardName: Shuffle
 --- !u!222 &1332500521
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -80167,7 +80167,7 @@ MonoBehaviour:
   count: 0
   maxCount: 3
   cardImage: {fileID: 21300000, guid: 2daf1893b3aedc847bd8c11cf4086db2, type: 3}
-  cardName: mill
+  cardName: Mill
 --- !u!222 &1377455967
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -80816,7 +80816,7 @@ MonoBehaviour:
   count: 0
   maxCount: 3
   cardImage: {fileID: 21300000, guid: 1bed752b1a3175a4989e1d14c7cc98b8, type: 3}
-  cardName: times two
+  cardName: TimesTwo
 --- !u!222 &1384599328
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -84372,7 +84372,7 @@ MonoBehaviour:
   count: 0
   maxCount: 3
   cardImage: {fileID: 21300000, guid: 7b5e13857a8251b42b4e1e1843cd4167, type: 3}
-  cardName: research
+  cardName: Research
 --- !u!222 &1447499549
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -89925,6 +89925,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   deckCount: {fileID: 1162092566}
   cardPreviewImage: {fileID: 1763827461}
+  deckMenu: {fileID: 125596096}
 --- !u!1 &1596321423
 GameObject:
   m_ObjectHideFlags: 0
@@ -103352,7 +103353,7 @@ MonoBehaviour:
   count: 0
   maxCount: 3
   cardImage: {fileID: 21300000, guid: 2baf30935909f964586694a0ddb44583, type: 3}
-  cardName: insanity
+  cardName: Insanity
 --- !u!222 &1851563638
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -106252,7 +106253,7 @@ MonoBehaviour:
   count: 0
   maxCount: 3
   cardImage: {fileID: 21300000, guid: a6df2d35847187f4f9ab861e2ffe9367, type: 3}
-  cardName: exponent
+  cardName: Exponent
 --- !u!222 &1908774465
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -108584,7 +108585,7 @@ MonoBehaviour:
   count: 0
   maxCount: 3
   cardImage: {fileID: 21300000, guid: c45c89a21cab9274e92824724b8f0b00, type: 3}
-  cardName: shield
+  cardName: Shield
 --- !u!222 &1945119620
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -113663,7 +113664,7 @@ MonoBehaviour:
   count: 0
   maxCount: 3
   cardImage: {fileID: 21300000, guid: 89b7d19302c566d4ab99ce1991de32e7, type: 3}
-  cardName: resurrect
+  cardName: Resurrect
 --- !u!222 &2070389642
 CanvasRenderer:
   m_ObjectHideFlags: 0
