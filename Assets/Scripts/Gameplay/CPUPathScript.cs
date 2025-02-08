@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CPUPathScript : MonoBehaviour
+public class CPUPathScript : MonoBehaviour, CPUPathInterface
 {
     List<GameObject> pucksInPath = new();
     private List<GameObject> GetPucksInPath() { return pucksInPath; }
@@ -28,6 +28,7 @@ public class CPUPathScript : MonoBehaviour
 
     public int CalculateValue()
     {
+        DisablePathVisualization();
         List<GameObject> pucksCurrentlyInPath = GetPucksInPath();
         int numberOfPucksCurrentlyInPath = pucksCurrentlyInPath.Count;
         requiresExplosionPowerup = false;
@@ -42,7 +43,7 @@ public class CPUPathScript : MonoBehaviour
             else if (numberOfPucksCurrentlyInPath == 1 && pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsPlayersPuck() && !pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsHydra() && !pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsResurrect() && !requiresPhasePowerup && !isContactShot) // explosion shot
             {
                 requiresExplosionPowerup = true;
-                return pucksCurrentlyInPath[0].GetComponent<PuckScript>().ComputeValue();
+                return pucksCurrentlyInPath[0].GetComponent<PuckScript>().ComputeValue() - 2; // minus 2 because we need to consider the opportunity cost of exploding the CPU puck
             }
             else
             {
@@ -52,9 +53,14 @@ public class CPUPathScript : MonoBehaviour
         // if contact shot, we only shoot if we can contact an opp puck to push it out
         else
         {
-            if (numberOfPucksCurrentlyInPath <=1) return 0;
-
-            if (pucksCurrentlyInPath.TrueForAll(IsPlayersPuck) && pucksCurrentlyInPath.TrueForAll(IsNotLockedOrExposionOrPhase) && pucksCurrentlyInPath.TrueForAll(HasPostiveValue) && !WallIsActive())
+            if (numberOfPucksCurrentlyInPath < 1) return 0;
+            // contact shot for a single puck if it's valuable enough
+            else if (numberOfPucksCurrentlyInPath == 1 && IsPlayersPuck(pucksCurrentlyInPath[0]) && IsNotLockedOrExposionOrPhase(pucksCurrentlyInPath[0]) && HasPostiveValue(pucksCurrentlyInPath[0]) && !WallIsActive())
+            {
+                return pucksCurrentlyInPath[0].GetComponent<PuckScript>().ComputeValue();
+            }
+            // contact shot for any two pucks with positive value
+            else if (numberOfPucksCurrentlyInPath > 1 & pucksCurrentlyInPath.TrueForAll(IsPlayersPuck) && pucksCurrentlyInPath.TrueForAll(IsNotLockedOrExposionOrPhase) && pucksCurrentlyInPath.TrueForAll(HasPostiveValue) && !WallIsActive())
             {
                 return value;
             }
@@ -106,11 +112,6 @@ public class CPUPathScript : MonoBehaviour
             if (!pucksInPath.Contains(collision.gameObject))
             {
                 pucksInPath.Add(collision.gameObject);
-                // update CPU pathfinding
-                if (LogicScript.Instance.gameIsRunning && LogicScript.Instance.opponent.isShooting)
-                {
-                    LogicScript.Instance.FindOpenPath();
-                }
             }
 #if (UNITY_EDITOR)
             List<GameObject> pucksCurrentlyInPath = GetPucksInPath();
@@ -128,11 +129,6 @@ public class CPUPathScript : MonoBehaviour
         if (collision.gameObject.layer != 3) // ignore center puck collider
         { 
             pucksInPath.Remove(collision.gameObject);
-            // update CPU pathfinding
-            if (LogicScript.Instance.gameIsRunning && LogicScript.Instance.opponent.isShooting)
-            {
-                LogicScript.Instance.FindOpenPath();
-            }
 #if (UNITY_EDITOR)
             List<GameObject> pucksCurrentlyInPath = GetPucksInPath();
             int numberOfPucksCurrentlyInPath = pucksCurrentlyInPath.Count;

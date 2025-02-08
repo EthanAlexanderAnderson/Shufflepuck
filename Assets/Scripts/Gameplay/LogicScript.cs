@@ -337,17 +337,25 @@ public class LogicScript : MonoBehaviour
         else
         {
             if (difficulty >= 2 && !isLocal && powerupsAreEnabled && powerupsUsedThisTurn < 3) { CPUPreShotPowerups(); }
-            FindOpenPath();
-            if (difficulty >= 2 && !isLocal && powerupsAreEnabled && powerupsUsedThisTurn < 3) { CPUPostShotPowerups(); }
+            ReadyToFindPath = true;
         }
     }
 
+    bool ReadyToFindPath = false;
     private void OpponentShootingHelper()
     {
         // timestamp the beginning of CPU's turn for delays
         if (tempTime == 0)
         {
             tempTime = timer;
+        }
+
+        // after 1 seconds elapsed, CPU selects shot path and uses post shot powerups
+        if (0 < (timer - (tempTime + 1)) && ReadyToFindPath)
+        {
+            FindOpenPath();
+            if (difficulty >= 2 && !isLocal && powerupsAreEnabled && powerupsUsedThisTurn < 3) { CPUPostShotPowerups(); }
+            ReadyToFindPath = false;
         }
 
         // after 1.5 seconds elapsed, CPU selects angle
@@ -499,25 +507,29 @@ public class LogicScript : MonoBehaviour
 #if (UNITY_EDITOR)
         foreach (var path in CPUPaths)
         {
-            var pathi = path.GetComponent<CPUPathScript>();
+            pathi = path.GetComponent<CPUPathScript>();
+            if (pathi == null) { pathi = path.GetComponent<SmartScanCPUPathScript>(); }
+            if (pathi == null) { return; }
             pathi.DisablePathVisualization();
         }
 #endif
     }
 
     // this is the CPU AI for hard mode
+    CPUPathInterface pathi;
     public void FindOpenPath()
     {
         // if Fog is active and foresight isn't, shoot random
         if (FogScript.Instance.FogEnabled() && !HaloScript.Instance.HaloEnabled()) { (CPUShotAngle, CPUShotPower, CPUShotSpin) = (Random.Range(35.0f, 65.0f), Random.Range(40.0f, 70.0f), Random.Range(45.0f, 55.0f)); }
 
-        Debug.Log("start path find");
-        CPUPathScript best = null;
+        CPUPathInterface best = null;
         int highestValue = 0;
         // check all paths to see which are unblocked
         foreach (var path in CPUPaths)
         {
-            var pathi = path.GetComponent<CPUPathScript>();
+            pathi = path.GetComponent<CPUPathScript>();
+            if (pathi == null) { pathi = path.GetComponent<SmartScanCPUPathScript>(); }
+
             pathi.DisablePathVisualization();
             var pathiShotValue = pathi.CalculateValue();
             float randomValue = Random.Range(0f, 1f);

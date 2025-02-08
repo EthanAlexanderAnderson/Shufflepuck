@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 756732}
   - component: {fileID: 756735}
   - component: {fileID: 756734}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Orange C 3
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -493,7 +493,7 @@ GameObject:
   - component: {fileID: 6471919}
   - component: {fileID: 6471918}
   - component: {fileID: 6471917}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2137,7 +2137,7 @@ GameObject:
   m_Component:
   - component: {fileID: 40842741}
   m_Layer: 0
-  m_Name: Laser Arrow Parent
+  m_Name: Laser Parent Anchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2792,7 +2792,7 @@ GameObject:
   - component: {fileID: 65559125}
   - component: {fileID: 65559124}
   - component: {fileID: 65559123}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Contact Right 3
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -3400,7 +3400,7 @@ GameObject:
   - component: {fileID: 73639748}
   - component: {fileID: 73639751}
   - component: {fileID: 73639750}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Mini R 2 Curve
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -5148,7 +5148,7 @@ GameObject:
   - component: {fileID: 112330476}
   - component: {fileID: 112330475}
   - component: {fileID: 112330474}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Contact Left
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -6539,7 +6539,7 @@ GameObject:
   - component: {fileID: 141762927}
   - component: {fileID: 141762930}
   - component: {fileID: 141762929}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Red L 3 Curve
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -7781,7 +7781,7 @@ GameObject:
   - component: {fileID: 175755567}
   - component: {fileID: 175755566}
   - component: {fileID: 175755565}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Contact Left Arc
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -8195,7 +8195,7 @@ GameObject:
   - component: {fileID: 179528124}
   - component: {fileID: 179528123}
   - component: {fileID: 179528122}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Contact Left 3
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -8692,7 +8692,7 @@ GameObject:
   - component: {fileID: 203157388}
   - component: {fileID: 203157387}
   - component: {fileID: 203157386}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Red L 4 Phase
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -8899,7 +8899,7 @@ GameObject:
   - component: {fileID: 207078886}
   - component: {fileID: 207078889}
   - component: {fileID: 207078888}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Orange L 3
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -11071,7 +11071,7 @@ GameObject:
   - component: {fileID: 252435391}
   - component: {fileID: 252435395}
   - component: {fileID: 252435394}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Score Zone Red L 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11863,7 +11863,7 @@ GameObject:
   - component: {fileID: 258983589}
   - component: {fileID: 258983588}
   - component: {fileID: 258983587}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12131,7 +12131,7 @@ GameObject:
   - component: {fileID: 266553087}
   - component: {fileID: 266553086}
   - component: {fileID: 266553085}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Red L 4
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -13293,7 +13293,7 @@ GameObject:
   - component: {fileID: 299694976}
   - component: {fileID: 299694975}
   - component: {fileID: 299694974}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Red R 4 Curve Strong
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -13807,7 +13807,7 @@ GameObject:
   - component: {fileID: 309058970}
   - component: {fileID: 309058972}
   - component: {fileID: 309058971}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: 1L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16558,7 +16558,7 @@ GameObject:
   - component: {fileID: 381425717}
   - component: {fileID: 381425719}
   - component: {fileID: 381425718}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16842,7 +16842,7 @@ GameObject:
   - component: {fileID: 383451798}
   - component: {fileID: 383451802}
   - component: {fileID: 383451801}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Score Zone Yellow L 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17406,7 +17406,7 @@ GameObject:
   - component: {fileID: 386010251}
   - component: {fileID: 386010250}
   - component: {fileID: 386010249}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19274,7 +19274,7 @@ GameObject:
   - component: {fileID: 430628279}
   - component: {fileID: 430628281}
   - component: {fileID: 430628280}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: 2R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20430,7 +20430,7 @@ GameObject:
   - component: {fileID: 444219286}
   - component: {fileID: 444219288}
   - component: {fileID: 444219287}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21516,7 +21516,7 @@ GameObject:
   - component: {fileID: 459286196}
   - component: {fileID: 459286199}
   - component: {fileID: 459286198}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Red 3 R Curve
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -21891,7 +21891,7 @@ GameObject:
   - component: {fileID: 465139048}
   - component: {fileID: 465139050}
   - component: {fileID: 465139049}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: 2R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30056,7 +30056,7 @@ GameObject:
   - component: {fileID: 529565173}
   - component: {fileID: 529565175}
   - component: {fileID: 529565174}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: 3L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31021,7 +31021,7 @@ GameObject:
   - component: {fileID: 541556640}
   - component: {fileID: 541556643}
   - component: {fileID: 541556642}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Mini L 2 Curve
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -31707,7 +31707,7 @@ GameObject:
   - component: {fileID: 550694027}
   - component: {fileID: 550694029}
   - component: {fileID: 550694028}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: 3L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33405,7 +33405,7 @@ GameObject:
   - component: {fileID: 620282571}
   - component: {fileID: 620282570}
   - component: {fileID: 620282569}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Yellow C 2
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -34708,7 +34708,7 @@ GameObject:
   - component: {fileID: 644729819}
   - component: {fileID: 644729818}
   - component: {fileID: 644729817}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -35023,7 +35023,7 @@ GameObject:
   - component: {fileID: 651277310}
   - component: {fileID: 651277314}
   - component: {fileID: 651277313}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Score Zone Red R 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -35992,7 +35992,7 @@ GameObject:
   - component: {fileID: 663298585}
   - component: {fileID: 663298584}
   - component: {fileID: 663298583}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Yellow R 2
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -37005,7 +37005,7 @@ GameObject:
   - component: {fileID: 683211350}
   - component: {fileID: 683211353}
   - component: {fileID: 683211352}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Mini R 2
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -37298,7 +37298,7 @@ GameObject:
   - component: {fileID: 690633034}
   - component: {fileID: 690633038}
   - component: {fileID: 690633037}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Score Zone Orange L 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -38381,7 +38381,7 @@ GameObject:
   - component: {fileID: 707031245}
   - component: {fileID: 707031247}
   - component: {fileID: 707031246}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Score Zone Black
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -39851,7 +39851,7 @@ GameObject:
   - component: {fileID: 734195364}
   - component: {fileID: 734195366}
   - component: {fileID: 734195365}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Score Zone Orange C 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40929,7 +40929,7 @@ GameObject:
   - component: {fileID: 750069013}
   - component: {fileID: 750069012}
   - component: {fileID: 750069011}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Red L 4 Curve Weak
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -41169,7 +41169,7 @@ GameObject:
   - component: {fileID: 750931545}
   - component: {fileID: 750931547}
   - component: {fileID: 750931546}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Score Zone Safe Line
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41692,7 +41692,7 @@ GameObject:
   - component: {fileID: 765016193}
   - component: {fileID: 765016195}
   - component: {fileID: 765016194}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Score Zone Yellow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41778,7 +41778,7 @@ GameObject:
   - component: {fileID: 765299822}
   - component: {fileID: 765299821}
   - component: {fileID: 765299820}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -42176,7 +42176,7 @@ GameObject:
   - component: {fileID: 783013046}
   - component: {fileID: 783013048}
   - component: {fileID: 783013047}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: 2L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44437,7 +44437,7 @@ GameObject:
   - component: {fileID: 826075815}
   - component: {fileID: 826075814}
   - component: {fileID: 826075813}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Contact Nuke
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -45252,7 +45252,7 @@ GameObject:
   - component: {fileID: 835633549}
   - component: {fileID: 835633552}
   - component: {fileID: 835633551}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Red L 4 Curve Strong
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -48324,7 +48324,7 @@ GameObject:
   - component: {fileID: 898887450}
   - component: {fileID: 898887449}
   - component: {fileID: 898887448}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Contact Right
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -49135,7 +49135,7 @@ GameObject:
   - component: {fileID: 917655133}
   - component: {fileID: 917655136}
   - component: {fileID: 917655135}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Orange R 3
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -51467,7 +51467,7 @@ GameObject:
   - component: {fileID: 947933175}
   - component: {fileID: 947933174}
   - component: {fileID: 947933173}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -52322,7 +52322,7 @@ GameObject:
   - component: {fileID: 961933601}
   - component: {fileID: 961933600}
   - component: {fileID: 961933599}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -55633,7 +55633,7 @@ GameObject:
   - component: {fileID: 1019210497}
   - component: {fileID: 1019210496}
   - component: {fileID: 1019210495}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Yellow L 2
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -57152,7 +57152,7 @@ GameObject:
   - component: {fileID: 1036752857}
   - component: {fileID: 1036752859}
   - component: {fileID: 1036752858}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Score Zone Red C 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -57408,7 +57408,7 @@ GameObject:
   - component: {fileID: 1043637382}
   - component: {fileID: 1043637385}
   - component: {fileID: 1043637384}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Score Zone Mini Left 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -59827,7 +59827,7 @@ GameObject:
   - component: {fileID: 1096673911}
   - component: {fileID: 1096673913}
   - component: {fileID: 1096673912}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -63535,7 +63535,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1168541193}
   - component: {fileID: 1168541195}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Score Zones
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -69640,7 +69640,7 @@ GameObject:
   - component: {fileID: 1206316624}
   - component: {fileID: 1206316623}
   - component: {fileID: 1206316622}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Red C 4 Phase
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -70344,7 +70344,7 @@ GameObject:
   - component: {fileID: 1227803351}
   - component: {fileID: 1227803353}
   - component: {fileID: 1227803352}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: 3R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -70722,6 +70722,71 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1234496996}
   m_CullTransparentMesh: 1
+--- !u!1 &1234879942
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1234879943}
+  - component: {fileID: 1234879948}
+  - component: {fileID: 1234879950}
+  m_Layer: 2
+  m_Name: Smart Scan Path
+  m_TagString: cpu_path
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1234879943
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1234879942}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 20, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1878166878}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1234879948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1234879942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80e4721a56a522941aac74d3392866e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  anchorPoint: {fileID: 1878166877}
+  scanDistance: 30
+  puckLayer:
+    serializedVersion: 2
+    m_Bits: 1
+  bestAngle: 0
+  highestValue: 0
+  hitPoints: []
+--- !u!114 &1234879950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1234879942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b4f72c92bf747344a254d666c5c69fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1236191184
 GameObject:
   m_ObjectHideFlags: 0
@@ -70871,7 +70936,7 @@ GameObject:
   - component: {fileID: 1237600844}
   - component: {fileID: 1237600847}
   - component: {fileID: 1237600846}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Red C 4
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -71651,7 +71716,7 @@ GameObject:
   - component: {fileID: 1247150377}
   - component: {fileID: 1247150376}
   - component: {fileID: 1247150375}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Red R 4 Curve Weak
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -72025,7 +72090,7 @@ GameObject:
   - component: {fileID: 1248634180}
   - component: {fileID: 1248634182}
   - component: {fileID: 1248634181}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -72797,7 +72862,7 @@ GameObject:
   - component: {fileID: 1259272790}
   - component: {fileID: 1259272792}
   - component: {fileID: 1259272791}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: 3R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -73834,7 +73899,7 @@ GameObject:
   - component: {fileID: 1280224749}
   - component: {fileID: 1280224748}
   - component: {fileID: 1280224747}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Contact Center
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -74137,7 +74202,7 @@ GameObject:
   - component: {fileID: 1287340688}
   - component: {fileID: 1287340690}
   - component: {fileID: 1287340689}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: 2L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -74408,7 +74473,7 @@ GameObject:
   - component: {fileID: 1293446489}
   - component: {fileID: 1293446493}
   - component: {fileID: 1293446492}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Score Zone Yellow R 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -75403,7 +75468,7 @@ GameObject:
   - component: {fileID: 1303936217}
   - component: {fileID: 1303936216}
   - component: {fileID: 1303936215}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Orange 3 Curve
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -78578,7 +78643,7 @@ GameObject:
   - component: {fileID: 1351228537}
   - component: {fileID: 1351228536}
   - component: {fileID: 1351228535}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Contact Right 2
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -80454,7 +80519,7 @@ GameObject:
   - component: {fileID: 1383375519}
   - component: {fileID: 1383375518}
   - component: {fileID: 1383375517}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Score Zone Zero
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -81888,7 +81953,7 @@ GameObject:
   - component: {fileID: 1407344130}
   - component: {fileID: 1407344129}
   - component: {fileID: 1407344128}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -83215,7 +83280,7 @@ GameObject:
   - component: {fileID: 1426578335}
   - component: {fileID: 1426578337}
   - component: {fileID: 1426578336}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Score Zone Red
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -83840,7 +83905,7 @@ GameObject:
   - component: {fileID: 1433782957}
   - component: {fileID: 1433782956}
   - component: {fileID: 1433782955}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -84989,7 +85054,7 @@ GameObject:
   - component: {fileID: 1488933045}
   - component: {fileID: 1488933044}
   - component: {fileID: 1488933043}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Contact Right Arc
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -85822,7 +85887,7 @@ GameObject:
   - component: {fileID: 1503751600}
   - component: {fileID: 1503751599}
   - component: {fileID: 1503751598}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -91458,7 +91523,7 @@ GameObject:
   - component: {fileID: 1618170137}
   - component: {fileID: 1618170140}
   - component: {fileID: 1618170139}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Mini L 2
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -92359,7 +92424,7 @@ GameObject:
   - component: {fileID: 1629520049}
   - component: {fileID: 1629520048}
   - component: {fileID: 1629520047}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -93231,7 +93296,7 @@ GameObject:
   - component: {fileID: 1653973763}
   - component: {fileID: 1653973765}
   - component: {fileID: 1653973764}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: 1R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94033,7 +94098,7 @@ GameObject:
   - component: {fileID: 1675047165}
   - component: {fileID: 1675047164}
   - component: {fileID: 1675047163}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Contact Left 2
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -94878,7 +94943,7 @@ GameObject:
   - component: {fileID: 1686513495}
   - component: {fileID: 1686513494}
   - component: {fileID: 1686513493}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Orange L 3 (block avoider)
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -95730,7 +95795,7 @@ GameObject:
   - component: {fileID: 1701236835}
   - component: {fileID: 1701236837}
   - component: {fileID: 1701236836}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -98582,7 +98647,7 @@ GameObject:
   - component: {fileID: 1763336788}
   - component: {fileID: 1763336787}
   - component: {fileID: 1763336786}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -99370,7 +99435,7 @@ GameObject:
   - component: {fileID: 1770598291}
   - component: {fileID: 1770598290}
   - component: {fileID: 1770598289}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Red D 4 Phase
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -101013,7 +101078,7 @@ GameObject:
   - component: {fileID: 1805845573}
   - component: {fileID: 1805845576}
   - component: {fileID: 1805845575}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Score Zone Mini Right 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -102457,7 +102522,7 @@ GameObject:
   - component: {fileID: 1825203436}
   - component: {fileID: 1825203438}
   - component: {fileID: 1825203437}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Score Zone Orange
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -102870,7 +102935,7 @@ GameObject:
   - component: {fileID: 1834155018}
   - component: {fileID: 1834155017}
   - component: {fileID: 1834155016}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -104055,7 +104120,7 @@ GameObject:
   - component: {fileID: 1862222498}
   - component: {fileID: 1862222500}
   - component: {fileID: 1862222499}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: 1R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -104635,7 +104700,7 @@ GameObject:
   - component: {fileID: 1876184032}
   - component: {fileID: 1876184031}
   - component: {fileID: 1876184030}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Red R 4
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -104839,6 +104904,38 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.8, y: 14}
   m_EdgeRadius: 0
+--- !u!1 &1878166877
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1878166878}
+  m_Layer: 2
+  m_Name: Smart Scan Path Parent Anchor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1878166878
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1878166877}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.6, y: -10, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1234879943}
+  m_Father: {fileID: 2107086779}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1880681667
 GameObject:
   m_ObjectHideFlags: 0
@@ -107845,7 +107942,7 @@ GameObject:
   - component: {fileID: 1933260197}
   - component: {fileID: 1933260201}
   - component: {fileID: 1933260200}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Score Zone Orange R 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -108433,7 +108530,7 @@ GameObject:
   - component: {fileID: 1939587494}
   - component: {fileID: 1939587493}
   - component: {fileID: 1939587492}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -110405,7 +110502,7 @@ GameObject:
   - component: {fileID: 1993915130}
   - component: {fileID: 1993915132}
   - component: {fileID: 1993915131}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Score Zone Yellow C 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -112366,7 +112463,7 @@ GameObject:
   - component: {fileID: 2050891157}
   - component: {fileID: 2050891156}
   - component: {fileID: 2050891155}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Red R 4 Phase
   m_TagString: cpu_path
   m_Icon: {fileID: 0}
@@ -115199,7 +115296,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2107086779}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: CPU AI Paths
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -115219,6 +115316,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1878166878}
   - {fileID: 826075812}
   - {fileID: 1237600843}
   - {fileID: 266553084}
@@ -115419,7 +115517,7 @@ GameObject:
   - component: {fileID: 2112998698}
   - component: {fileID: 2112998700}
   - component: {fileID: 2112998699}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: 1L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
