@@ -31,22 +31,23 @@ public class SoundManagerScript : MonoBehaviour
     private float musicVolumeFromPref;
     private float SFXVolumeFromPref;
 
+    // win sfx
+    [SerializeField] private AudioSource winSFX;
+    private bool isInitialized = false;
+
     // click sfx
     private AudioSource[] clicks;
     [SerializeField] private AudioSource clickSFX1;
     [SerializeField] private AudioSource clickSFX2;
     [SerializeField] private AudioSource clickSFX3;
     [SerializeField] private AudioSource clickSFX4;
-
-
-    // win sfx
-    [SerializeField] private AudioSource winSFX;
-    private bool isInitialized = false;
+    [SerializeField] private AudioSource clickSFXUp;
+    [SerializeField] private AudioSource clickSFXDown;
 
     void Awake()
     {
         tracks = new AudioClip[] { music_Shufflepuck, game_1_Quirkii, game_2_Mana_Trail, menu_1_Play_It_Cool };
-        clicks = new AudioSource[] { clickSFX1, clickSFX2, clickSFX3, clickSFX4 };
+        clicks = new AudioSource[] { clickSFX1, clickSFX2, clickSFX3, clickSFX4, clickSFXUp, clickSFXDown };
 
         if (Instance == null)
             Instance = this;
