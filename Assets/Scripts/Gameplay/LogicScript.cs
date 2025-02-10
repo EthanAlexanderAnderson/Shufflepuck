@@ -216,7 +216,7 @@ public class LogicScript : MonoBehaviour
         }
 
         // if we start our turn with no pucks remaining, skip our turn
-        if (player.puckCount == 0 && opponent.puckCount > 0)
+        if (player.puckCount <= 0 && opponent.puckCount > 0)
         {
             player.isTurn = false;
             opponent.isTurn = true;
@@ -625,7 +625,22 @@ public class LogicScript : MonoBehaviour
         // last shot, cull
         else if (opponent.puckCount == 1 && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
         {
-            powerupManager.CullPowerup();
+            var allPucks = GameObject.FindGameObjectsWithTag("puck");
+            // don't use cull if player has resurrect that would trigger
+            var useCull = true;
+            foreach (var puck in allPucks)
+            {
+                if (!useCull) { continue; }
+                var puckScript = puck.GetComponent<PuckScript>();
+                if (puckScript.IsPlayersPuck() && puckScript.IsResurrect() && puckScript.ComputeValue() == 0 )
+                {
+                    useCull = false;
+                }
+            }
+            if (useCull)
+            {
+                powerupManager.CullPowerup();
+            }
         }
     }
 
