@@ -158,9 +158,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 }
                 if (phaseHasOverlap)
                 {
-                    explosionPowerup--;
-                    RemovePowerupText("explosion");
-                    DestroyPuck();
+                    Explode();
                     return;
                 }
 
@@ -221,10 +219,9 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
         if (transform.position.y < 0f)
         {
-            ClientLogicScript.Instance.client.activePuckScript = this;
-            ClientLogicScript.Instance.client.activePuckObject = gameObject;
+            LogicScript.Instance.activeCompetitor.activePuckScript = this;
+            LogicScript.Instance.activeCompetitor.activePuckObject = gameObject;
         }
-        ClientLogicScript.Instance.client.isPlayer = IsPlayersPuckParameter;
 
         if (transform.position.y > 0)
         {
@@ -445,10 +442,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             if (Vector2.Distance(col.gameObject.transform.position, transform.position) < 2.1f) // make sure it's nearby (trying to fix a weird bug)
             {
                 col.gameObject.GetComponent<PuckScript>().DestroyPuck();
-                explosionPowerup--;
-                RemovePowerupText("explosion");
-                // destroy self
-                DestroyPuck();
+                Explode();
             }
         }
     }
@@ -507,24 +501,11 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     public void DestroyPuck() // Destroys the puck with a particle and sound effect, used by powerups that say destroy
     {
+        if (ClientLogicScript.Instance.isRunning && !IsOwner) { return; } // only owner can destroy
+
         if (shieldPowerup > 0)
         {
-            shieldPowerup--;
-            RemovePowerupText("shield");
-            // Grey particles
-            ParticleSystem collisionParticleEffect = Instantiate(collisionParticleEffectPrefab, transform.position, Quaternion.identity);
-            ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
-            emission.rateOverTime = 500f;
-            ParticleSystem.MainModule main = collisionParticleEffect.main;
-            main.startSpeed = 50f;
-            main.startColor = new Color(0.5f, 0.5f, 0.5f, 1f);
-            collisionParticleEffect.Play();
-            Destroy(collisionParticleEffect.gameObject, 10f);
-            // Screen shake
-            ScreenShake.Instance.Shake(0.25f);
-            // play break sfx
-            breakSFX.volume *= SFXvolume;
-            breakSFX.Play();
+            TriggerShield();
             return;
         };
         // update score
@@ -536,6 +517,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         // hydra powerup
         while (hydraPowerup > 0)
         {
+            // todo: move the online check into PuckSpawnHelper and call PuckSpawnHelperServerRpc from there
             if (ClientLogicScript.Instance.isRunning)
             {
                 ServerLogicScript.Instance.PuckSpawnHelperServerRpc(playersPuck, transform.position.x, transform.position.y, 2);
@@ -616,7 +598,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         ClientLogicScript.OnOpponentShot -= IncrementExponentValue;
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void DestroyPuckServerRpc()
     {
         if (!IsServer) return;
@@ -728,10 +710,35 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
         }
     }
-
+    bool explodeFromRPC;
     public void EnableExplosion()
     {
         explosionPowerup++;
+    }
+
+    private void Explode()
+    {
+        if (ClientLogicScript.Instance.isRunning && !explodeFromRPC) {
+            ExplodeServerRpc();
+            return;
+        }
+        explosionPowerup--;
+        RemovePowerupText("explosion");
+        DestroyPuck();
+        explodeFromRPC = false;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void ExplodeServerRpc()
+    {
+        ExplodeClientRpc();
+    }
+
+    [ClientRpc]
+    private void ExplodeClientRpc()
+    {
+        explodeFromRPC = true;
+        Explode();
     }
 
     public void EnableHydra()
@@ -783,6 +790,46 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public void EnableShield()
     {
         shieldPowerup++;
+    }
+
+    bool shieldFromRPC;
+    private void TriggerShield()
+    {
+        if (ClientLogicScript.Instance.isRunning && !shieldFromRPC)
+        {
+            TriggerShieldServerRpc();
+            return;
+        }
+        shieldPowerup--;
+        RemovePowerupText("shield");
+        // Grey particles
+        ParticleSystem collisionParticleEffect = Instantiate(collisionParticleEffectPrefab, transform.position, Quaternion.identity);
+        ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
+        emission.rateOverTime = 500f;
+        ParticleSystem.MainModule main = collisionParticleEffect.main;
+        main.startSpeed = 50f;
+        main.startColor = new Color(0.5f, 0.5f, 0.5f, 1f);
+        collisionParticleEffect.Play();
+        Destroy(collisionParticleEffect.gameObject, 10f);
+        // Screen shake
+        ScreenShake.Instance.Shake(0.25f);
+        // play break sfx
+        breakSFX.volume *= SFXvolume;
+        breakSFX.Play();
+        shieldFromRPC = false;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void TriggerShieldServerRpc()
+    {
+        TriggerShieldClientRpc();
+    }
+
+    [ClientRpc]
+    private void TriggerShieldClientRpc()
+    {
+        shieldFromRPC = true;
+        TriggerShield();
     }
 
     public void EnableResurrect()

@@ -5,6 +5,7 @@ using Random = UnityEngine.Random;
 using Unity.Netcode;
 using System.Collections.Generic;
 using TMPro;
+using System.Linq;
 
 public class PowerupManager : NetworkBehaviour
 {
@@ -83,6 +84,7 @@ public class PowerupManager : NetworkBehaviour
 
     public int[] GetCost2Discard() { return cost2Discard; }
     private List<int> deck;
+    int[] hand = { -1, -1, -1 };
 
     private Competitor activeCompetitor;
     Action[] methodArray;
@@ -131,14 +133,8 @@ public class PowerupManager : NetworkBehaviour
 
     private void GetActiveCompetitor()
     {
-        if (!ClientLogicScript.Instance.isRunning) // offline
-        {
-            activeCompetitor = LogicScript.Instance.activeCompetitor;
-        }
-        else // online
-        {
-            activeCompetitor = ClientLogicScript.Instance.client;
-        }
+        activeCompetitor = LogicScript.Instance.activeCompetitor;
+        return;
     }
 
     public void LoadDeck()
@@ -153,9 +149,9 @@ public class PowerupManager : NetworkBehaviour
         return deck;
     }
 
-    int[] hand = { -1, -1, -1 };
     public void ShuffleDeck()
     {
+        chaosEnsuing = false;
         if (deck == null) { LoadDeck(); }
         var deckCount = deck.Count;
         var pay2DiscardPossible = deck.Count >= 3;
@@ -191,7 +187,7 @@ public class PowerupManager : NetworkBehaviour
             int index = i; // this has to be here for some technical closure reason idk
             powerupButtons[i].onClick.AddListener(() => PowerupsHUDUIManager.Instance.UsePowerup(index, randomCard));
             powerupButtons[i].onClick.AddListener(() => methodArray[randomCard]());
-            powerupButtons[i].onClick.AddListener(() => hand[index] = -1);
+            powerupButtons[i].onClick.AddListener(() => hand[index] = -1); // this is needed to not double remove from deck with research
             powerupButtons[i].onClick.AddListener(() => SoundManagerScript.Instance.PlayClickSFX(2));
         }
     }
@@ -211,7 +207,7 @@ public class PowerupManager : NetworkBehaviour
     private void DisableCost1PuckCardsIfNeeded()
     {
         // only do this if the active competitor has <= 1 puck remaining
-        if ((LogicScript.Instance.gameIsRunning && LogicScript.Instance.activeCompetitor.puckCount > 1) || (ClientLogicScript.Instance.isRunning && ClientLogicScript.Instance.client.puckCount > 1)) { return; }
+        if (LogicScript.Instance.activeCompetitor.puckCount > 1) { return; }
         Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
         for (int i = 0; i < 3; i++)
         {
@@ -233,8 +229,9 @@ public class PowerupManager : NetworkBehaviour
     public void PlusOnePowerup() // index 0 : give active puck +1 value
     {
         var index = Array.IndexOf(methodArray, PlusOnePowerup);
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
         activeCompetitor.activePuckScript.IncrementPuckBonusValue(1);
 
@@ -244,25 +241,34 @@ public class PowerupManager : NetworkBehaviour
     public void ForesightPowerup() // index 1 : enable the shot predicted location halo
     {
         var index = Array.IndexOf(methodArray, ForesightPowerup);
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
-        puckHalo.SetActive(true);
-        puckHalo.GetComponent<HaloScript>().EnableFogMask(true);
-        LineScript.Instance.HalfSpeed();
+        // user only
+        if (activeCompetitor.isPlayer)
+        {
+            puckHalo.SetActive(true);
+            puckHalo.GetComponent<HaloScript>().EnableFogMask(true);
+            LineScript.Instance.HalfSpeed();
+        }
     }
 
     public void BlockPowerup() // index 2 : create a valueless blocking puck
     {
         var index = Array.IndexOf(methodArray, BlockPowerup);
-        StartOfPowerupMethodHelper(index);
-        if (!fromClientRpc && ClientLogicScript.Instance.isRunning)
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
+
+        if (ClientLogicScript.Instance.isRunning)
         {
-            ServerLogicScript.Instance.BlockServerRpc();
-            deck.Remove(index);
-            return; // for online mode, this function always returns here, unlike other powerups, because it gets handed off to it's dedicated serverrpc function
+            if (activeCompetitor.isPlayer)
+            {
+                ServerLogicScript.Instance.BlockServerRpc();
+            }
+            return;
         }
-        fromClientRpc = false;
 
         int swap = activeCompetitor.isPlayer ? 1 : -1;
         GameObject blockPuckObject = Instantiate(puckPrefab, new Vector3(Random.Range(2f * swap, 4f * swap), Random.Range(2f, 4f), -1.0f), Quaternion.identity);
@@ -275,8 +281,9 @@ public class PowerupManager : NetworkBehaviour
     public void BoltPowerup() // index 3 : destroy a random puck with value greater than or equal to 1
     {
         var index = Array.IndexOf(methodArray, BoltPowerup);
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
         var allPucks = GameObject.FindGameObjectsWithTag("puck");
         int randomPuckIndex = Random.Range(0, allPucks.Length);
@@ -290,11 +297,11 @@ public class PowerupManager : NetworkBehaviour
         }
         if (pucki != null && pucki.ComputeValue() > 0)
         {
-            if (ClientLogicScript.Instance.isRunning)
+            if (ClientLogicScript.Instance.isRunning && activeCompetitor.isPlayer) // Online
             {
-                pucki.DestroyPuckServerRpc(); // for online. This only triggers once, because calling this requires ownership of the puck
+                pucki.DestroyPuckServerRpc();
             }
-            else
+            else if (!ClientLogicScript.Instance.isRunning) // vs CPU
             {
                 pucki.DestroyPuck();
             }
@@ -305,8 +312,9 @@ public class PowerupManager : NetworkBehaviour
     public void ForceFieldPowerup() // index 4 : forcefield pushes your pucks back from the off zone
     {
         var index = Array.IndexOf(methodArray, ForceFieldPowerup);
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
         forcefieldScript.EnableForcefield(activeCompetitor.isPlayer);
     }
@@ -314,8 +322,9 @@ public class PowerupManager : NetworkBehaviour
     public void PhasePowerup() // index 5 : phases through (doesn't collide with) other pucks until stops
     {
         var index = Array.IndexOf(methodArray, PhasePowerup);
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
         activeCompetitor.activePuckScript.SetPowerupText("phase");
         activeCompetitor.activePuckScript.SetPhase(true);
@@ -324,8 +333,9 @@ public class PowerupManager : NetworkBehaviour
     public void CullPowerup() // index 6 : destroy all pucks valued <= 0
     {
         var index = Array.IndexOf(methodArray, CullPowerup);
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
         var allPucks = GameObject.FindGameObjectsWithTag("puck");
         foreach (var puck in allPucks)
@@ -333,9 +343,9 @@ public class PowerupManager : NetworkBehaviour
             var pucki = puck.GetComponent<PuckScript>();
             if (pucki.ComputeValue() <= 0 && pucki.IsShot())
             {
-                if (ClientLogicScript.Instance.isRunning)
+                if (ClientLogicScript.Instance.isRunning && activeCompetitor.isPlayer)
                 {
-                    pucki.DestroyPuckServerRpc(); // for online. This only triggers once, because calling this requires ownership of the puck
+                    pucki.DestroyPuckServerRpc();
                 }
                 else
                 {
@@ -348,8 +358,9 @@ public class PowerupManager : NetworkBehaviour
     public void GrowthPowerup() // index 7 : +1 value every shot
     {
         var index = Array.IndexOf(methodArray, GrowthPowerup);
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
         activeCompetitor.activePuckScript.EnableGrowth();
 
@@ -359,8 +370,9 @@ public class PowerupManager : NetworkBehaviour
     public void LockPowerup() // index 8 : locked in place (can't be moved) after stopping
     {
         var index = Array.IndexOf(methodArray, LockPowerup);
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
         activeCompetitor.activePuckScript.EnableLock();
 
@@ -370,8 +382,9 @@ public class PowerupManager : NetworkBehaviour
     public void ExplosionPowerup() // index 9 : destroys itself and first touched puck
     {
         var index = Array.IndexOf(methodArray, ExplosionPowerup);
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
         activeCompetitor.activePuckScript.EnableExplosion();
 
@@ -381,9 +394,9 @@ public class PowerupManager : NetworkBehaviour
     public void FogPowerup() // index 10 : fog blocks your opponent's vision
     {
         var index = Array.IndexOf(methodArray, FogPowerup);
-        GetActiveCompetitor();
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
         FogScript.Instance.StartListeners(activeCompetitor.isPlayer);
     }
@@ -391,9 +404,9 @@ public class PowerupManager : NetworkBehaviour
     public void HydraPowerup() // index 11 : when destroyed, spawns 2 pucks
     {
         var index = Array.IndexOf(methodArray, HydraPowerup);
-        GetActiveCompetitor();
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
         activeCompetitor.activePuckScript.EnableHydra();
 
@@ -403,8 +416,9 @@ public class PowerupManager : NetworkBehaviour
     public void FactoryPowerup() // index 12 : active puck is valueless, but spawns a valued puck every shot
     {
         var index = Array.IndexOf(methodArray, FactoryPowerup);
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
         activeCompetitor.activePuckScript.EnableFactory();
 
@@ -414,8 +428,9 @@ public class PowerupManager : NetworkBehaviour
     public void ShieldPowerup() // index 13 : prevent being destroyed once
     {
         var index = Array.IndexOf(methodArray, ShieldPowerup);
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
         activeCompetitor.activePuckScript.EnableShield();
 
@@ -425,8 +440,9 @@ public class PowerupManager : NetworkBehaviour
     public void ShufflePowerup() // index 14 : randomize positions of all pucks
     {
         var index = Array.IndexOf(methodArray, ShufflePowerup);
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
         if (!IsServer && ClientLogicScript.Instance.isRunning)
         {
@@ -487,12 +503,19 @@ public class PowerupManager : NetworkBehaviour
     }
 
     private bool chaosEnsuing = false;
+    private void StopEnsuingChaos() { chaosEnsuing = false; }
     public void ChaosPowerup() // index 15 : activate 3 random powerup effects
     {
         var index = Array.IndexOf(methodArray, ChaosPowerup);
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
+        chaosEnsuing = true;
+        LogicScript.OnPlayerShot += StopEnsuingChaos;
+        LogicScript.OnOpponentShot += StopEnsuingChaos;
+        ClientLogicScript.OnPlayerShot += StopEnsuingChaos;
+        ClientLogicScript.OnOpponentShot += StopEnsuingChaos;
         if (activeCompetitor.isPlayer)
         {
             int[] blacklist = { Array.IndexOf(methodArray, ResearchPowerup) };
@@ -500,7 +523,6 @@ public class PowerupManager : NetworkBehaviour
             List<int> indexes = new List<int>();
             for (int i = 0; i < 3; i++)
             {
-                chaosEnsuing = true;
                 int randomIndex = Random.Range(0, methodArray.Length);
                 while (indexes.Contains(randomIndex) || Array.Exists(blacklist, x => x == randomIndex))
                 {
@@ -508,17 +530,16 @@ public class PowerupManager : NetworkBehaviour
                 }
                 indexes.Add(randomIndex);
                 methodArray[randomIndex].Invoke();
-                chaosEnsuing = true;
             }
-            chaosEnsuing = false;
         }
     }
 
     public void TimesTwoPowerup() // index 16 : give active puck x2 base value
     {
         var index = Array.IndexOf(methodArray, TimesTwoPowerup);
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
         activeCompetitor.activePuckScript.DoublePuckBaseValue();
 
@@ -528,8 +549,9 @@ public class PowerupManager : NetworkBehaviour
     public void ResurrectPowerup() // index 17 : +1 puck count when destroyed
     {
         var index = Array.IndexOf(methodArray, ResurrectPowerup);
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
         activeCompetitor.activePuckScript.EnableResurrect();
 
@@ -539,13 +561,15 @@ public class PowerupManager : NetworkBehaviour
     public void MillPowerup() // index 18 : discard half your opponent's deck rounded up
     {
         var index = Array.IndexOf(methodArray, MillPowerup);
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
         if (!activeCompetitor.isPlayer)
         {
             // Remove half the opponents deck, rounded up
             System.Random rand = new System.Random();
+            if (deck == null) { LoadDeck(); }
             int countToRemove = (deck.Count + 1) / 2; // Round up
             HashSet<int> indexesToRemove = new HashSet<int>();
 
@@ -574,8 +598,9 @@ public class PowerupManager : NetworkBehaviour
     public void ResearchPowerup() // index 19 : discard hand and draw 3
     {
         var index = Array.IndexOf(methodArray, ResearchPowerup);
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
         if (activeCompetitor.isPlayer)
         {
@@ -590,8 +615,9 @@ public class PowerupManager : NetworkBehaviour
     public void InsanityPowerup() // index 20 : add 3 copies of your last used card to deck
     {
         var index = Array.IndexOf(methodArray, InsanityPowerup);
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
         if (activeCompetitor.isPlayer && lastPlayedCard >= 0)
         {
@@ -607,35 +633,65 @@ public class PowerupManager : NetworkBehaviour
     public void TriplePowerup() // index 21 : shoots 3 pucks instead of 1. (two additional pucks per instance of triple).
     {
         var index = Array.IndexOf(methodArray, TriplePowerup);
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { LogicScript.Instance.triplePowerup += 2; }
-        // TODO: online
+        else if (ClientLogicScript.Instance.isRunning && activeCompetitor.isPlayer) { ServerLogicScript.Instance.IncrementTriplePowerupServerRpc(); }
     }
 
     public void ExponentPowerup() // index 22 : double base value every shot
     {
         var index = Array.IndexOf(methodArray, ExponentPowerup);
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
         activeCompetitor.activePuckScript.EnableExponent();
         activeCompetitor.activePuckScript.SetPowerupText("exponent");
     }
 
+    public GameObject laser;
     public void LaserPowerup() // index 23 : destroy all pucks in a line
     {
         var index = Array.IndexOf(methodArray, LaserPowerup);
-        StartOfPowerupMethodHelper(index);
-        OnlinePowerupMethodHelper(index);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
 
-        LogicScript.Instance.EnableLaserPowerup();
+        LaserScript.Instance.StartListeners(activeCompetitor.isPlayer);
     }
 
-    private void StartOfPowerupMethodHelper(int index)
+    private bool CanPayCosts(int index)
     {
         GetActiveCompetitor();
+
+        // make sure the powerup costs are payable
+        if (activeCompetitor.isPlayer && !chaosEnsuing)
+        {
+            // 2 discard (can't pay if two or more cards from our have already been played. must be two to allow card currently being used)
+            if (cost2Discard.Contains(index) && hand.Count(x => x == -1) >= 2)
+            {
+                Debug.Log("Cannot pay 2 discard.");
+                return false;
+            }
+
+            // 1 puck
+            if (Array.Exists(cost1Puck, x => x == index) && activeCompetitor.puckCount <= 1)
+            {
+                Debug.Log("Cannot pay 1 puck.");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void PayCosts(int index)
+    {
+        GetActiveCompetitor();
+
         // discard the played card from the deck and set the last played card for insanity (for just the person who played the card)
         if (activeCompetitor.isPlayer && !chaosEnsuing)
         {
@@ -654,30 +710,20 @@ public class PowerupManager : NetworkBehaviour
             {
                 deck.Remove(index);
             }
-
         }
         // if the played card costs 2 points, pay the cost
         if (Array.Exists(cost2Points, x => x == index) && !chaosEnsuing)
         {
-            if (LogicScript.Instance.gameIsRunning)
-            {
-                LogicScript.Instance.ModifyScoreBonus(activeCompetitor.isPlayer, -2);
-            }
-            else if (ClientLogicScript.Instance.isRunning)
-            {
-                // TODO: ModifyScoreBonus for online client
-            }
+            LogicScript.Instance.ModifyScoreBonus(activeCompetitor.isPlayer, -2);
         }
         // if the played card costs 1 puck, pay the cost
         if (Array.Exists(cost1Puck, x => x == index) && !chaosEnsuing)
         {
-            if (LogicScript.Instance.gameIsRunning)
+            LogicScript.Instance.IncrementPuckCount(activeCompetitor.isPlayer, -1);
+
+            if (ClientLogicScript.Instance.isRunning && activeCompetitor.isPlayer)
             {
-                LogicScript.Instance.IncrementPuckCount(activeCompetitor.isPlayer, -1);
-            }
-            else if (ClientLogicScript.Instance.isRunning)
-            {
-                // TODO: Modify puck count for online client
+                ServerLogicScript.Instance.AdjustPuckCountServerRpc(true, -1);
             }
         }
 
@@ -689,15 +735,16 @@ public class PowerupManager : NetworkBehaviour
         AddPowerupPopupEffectAnimationToQueue(index);
     }
 
-    private void OnlinePowerupMethodHelper(int index)
+    private bool NeedsToBeSentToServer(int index)
     {
+        // If used by the client before going to the server, instead send it to the server and stop the powerup functionality early
         if (!fromClientRpc && ClientLogicScript.Instance.isRunning)
         {
             PowerupServerRpc(index);
-            deck.Remove(index);
-            return;
+            return true;
         }
         fromClientRpc = false;
+        return false;
     }
 
     public void DisableForceFieldIfNecessary()

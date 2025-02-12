@@ -248,7 +248,7 @@ public class UIManagerScript : MonoBehaviour
 
         if (opponentScoreBonus != 0)
         {
-            opponentScoreBonusText.text = playerScoreBonus.ToString();
+            opponentScoreBonusText.text = opponentScoreBonus.ToString();
         }
         else
         {

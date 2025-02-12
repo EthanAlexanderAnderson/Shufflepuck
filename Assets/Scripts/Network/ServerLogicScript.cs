@@ -36,6 +36,13 @@ public class ServerLogicScript : NetworkBehaviour
 
     private bool sentGameResult = false;
 
+    // variables for triplePowerup
+    private int triplePowerup = 0;
+    private int triplePowerupUserCompetitorIndex = -1;
+    private float lastShotAngle;
+    private float lastShotPower;
+    private float lastShotSpin;
+
     private void Awake()
     {
         if (Instance == null)
@@ -60,6 +67,23 @@ public class ServerLogicScript : NetworkBehaviour
             Debug.Log("Shot Timer Exceeded");
             shotTimer = 60;
             clientLogic.AlertDisconnectClientRpc();
+        }
+
+        // do triple powerup
+        if (triplePowerup > 0)
+        {
+            var allPucks = GameObject.FindGameObjectsWithTag("puck");
+            foreach (var puck in allPucks)
+            {
+                // If any pucks are not safe, return
+                if (!puck.GetComponent<PuckScript>().IsSafe())
+                {
+                    return;
+                }
+            }
+            CreatePuck(triplePowerupUserCompetitorIndex == activeCompetitorIndex ? 0 : 1);
+            Shoot(lastShotAngle + Random.Range(-10.0f, 10.0f), lastShotPower + Random.Range(-10.0f, 10.0f), 50, triplePowerupUserCompetitorIndex == activeCompetitorIndex ? 0 : 1);
+            triplePowerup--;
         }
 
         // If both players have 0 pucks (aka game is over)
@@ -205,8 +229,11 @@ public class ServerLogicScript : NetworkBehaviour
                 $"Client Index #{activeCompetitorIndex} \n" +
                 $"Client ID : {clients[activeCompetitorIndex]}\n");
 
+            // tell both players to restart the game and who is going first
             clientLogic.RestartGameOnlineClientRpc(competitorList[0].puckSpriteID, competitorList[1].puckSpriteID, player1powerupsenabled && player2powerupsenabled);
-            clientLogic.StartTurnClientRpc(true, clientRpcParamsList[activeCompetitorIndex]);
+            clientLogic.StartTurnClientRpc(true, true, clientRpcParamsList[activeCompetitorIndex]);
+            clientLogic.StartTurnClientRpc(false, true, clientRpcParamsList[activeCompetitorIndex ^ 1]);
+            // reset the shot timer and set the game as running for server logic
             shotTimer = (player1powerupsenabled && player2powerupsenabled) ? 42 : 21;
             gameIsRunning = true;
         }
@@ -225,14 +252,16 @@ public class ServerLogicScript : NetworkBehaviour
         CreatePuck();
     }
 
-    private void CreatePuck()
+    // swapCompetitor is just for triple right now
+    private void CreatePuck(int isNonActiveCompetitorBit = 0)
     {
         try
         {
             // if both players have 0 pucks, end game
-            if (competitorList.All(n => n.puckCount <= 0))
+            if (competitorList.All(n => n.puckCount <= 0) && triplePowerup <= 0)
             {
                 clientLogic.GameOverConfirmationClientRpc();
+                gameIsRunning = false;
                 return;
             }
         }
@@ -243,10 +272,12 @@ public class ServerLogicScript : NetworkBehaviour
         }
         try
         {
-            Competitor competitor = competitorList[activeCompetitorIndex];
+            // isNonActiveCompetitorBit is just for triple powerup at the moment
+            Competitor competitor = competitorList[activeCompetitorIndex ^ isNonActiveCompetitorBit];
             int puckSpriteID = competitor.puckSpriteID;
 
-            float xpos = (startingPlayerIndex == activeCompetitorIndex ? -3.6f : 3.6f);
+            // determine the pucks starting position (left or right side) then spawn it
+            float xpos = (startingPlayerIndex == (activeCompetitorIndex ^ isNonActiveCompetitorBit) ? -3.6f : 3.6f);
             GameObject puckObject = Instantiate(puck, new Vector3(xpos, -10.0f, 0.0f), Quaternion.identity);
             puckObject.GetComponent<NetworkObject>().Spawn();
             competitor.activePuckObject = puckObject;
@@ -256,14 +287,14 @@ public class ServerLogicScript : NetworkBehaviour
             // tell the active competitor this new puck is theirs, tell non-active competitors it's not theirs
             for (int i = 0; i < competitorList.Count; i++)
             {
-                puckScript.InitPuckClientRpc(i == activeCompetitorIndex, puckSpriteID, clientRpcParamsList[i]);
+                puckScript.InitPuckClientRpc(i == (activeCompetitorIndex ^ isNonActiveCompetitorBit), puckSpriteID, clientRpcParamsList[i]);
             }
             competitor.activePuckScript = puckScript;
 
             Debug.Log(
                 $"Puck has been spawned. \n" +
-                $"Owned by Client Index #{activeCompetitorIndex} \n" +
-                $"Client ID : {clients[activeCompetitorIndex]} \n" +
+                $"Owned by Client Index #{activeCompetitorIndex ^ isNonActiveCompetitorBit} \n" +
+                $"Client ID : {clients[activeCompetitorIndex ^ isNonActiveCompetitorBit]} \n" +
                 $"Puck Skin ID: {competitor.puckSpriteID} \n");
         }
         catch (System.Exception e)
@@ -280,28 +311,44 @@ public class ServerLogicScript : NetworkBehaviour
     public void ShootServerRpc(float angleParameter, float powerParameter, float spinParameter)
     {
         if (!IsServer) return;
+        Shoot(angleParameter, powerParameter, spinParameter);
+    }
 
+    // Shoot the puck. swapCompetitor is just for triple right now
+    public void Shoot(float angleParameter, float powerParameter, float spinParameter, int isNonActiveCompetitorBit = 0)
+    {
         try
         {
-            competitorList[activeCompetitorIndex].activePuckScript.Shoot(angleParameter, powerParameter, spinParameter);
+            competitorList[activeCompetitorIndex ^ isNonActiveCompetitorBit].activePuckScript.Shoot(angleParameter, powerParameter, spinParameter);
 
-            // Update puck count
-            competitorList[activeCompetitorIndex].puckCount--;
-            // tell active their puck count decreased
-            clientLogic.UpdatePuckCountClientRpc(true, competitorList[activeCompetitorIndex].puckCount, clientRpcParamsList[activeCompetitorIndex]);
-            // tell non-active their opponent's count decreased, and swap competitors
-            clientLogic.UpdatePuckCountClientRpc(false, competitorList[activeCompetitorIndex].puckCount, clientRpcParamsList[SwapCompetitors()]);
-
-            CleanupDeadPucks();
-
-            // if a player would start their turn with 0 pucks, instead start the turn of the other player (who has pucks remaining)
-            if (competitorList[activeCompetitorIndex].puckCount <= 0 && competitorList[activeCompetitorIndex ^ 1].puckCount > 0)
+            if (isNonActiveCompetitorBit == 0) // if this is shot for turn (shooter is the active competitor), not shot from triple powerup
             {
-                SwapCompetitors();
-            }
+                // track last shot parameters (just for triple powerup for now)
+                lastShotAngle = angleParameter;
+                lastShotPower = powerParameter;
+                lastShotSpin = spinParameter;
 
-            clientLogic.StartTurnClientRpc(activeCompetitorIndex == startingPlayerIndex, clientRpcParamsList[activeCompetitorIndex]);
-            shotTimer = (player1powerupsenabled && player2powerupsenabled) ? 42 : 21;
+                // Update puck count
+                competitorList[activeCompetitorIndex].puckCount--;
+                // tell active their puck count decreased
+                clientLogic.UpdatePuckCountClientRpc(true, competitorList[activeCompetitorIndex].puckCount, true, clientRpcParamsList[activeCompetitorIndex]);
+                // tell non-active their opponent's count decreased, and swap competitors
+                clientLogic.UpdatePuckCountClientRpc(false, competitorList[activeCompetitorIndex].puckCount, true, clientRpcParamsList[SwapCompetitors()]);
+
+                CleanupDeadPucks();
+
+                // if a player would start their turn with 0 pucks, instead start the turn of the other player (who has pucks remaining)
+                if (competitorList[activeCompetitorIndex].puckCount <= 0 && competitorList[activeCompetitorIndex ^ 1].puckCount > 0)
+                {
+                    SwapCompetitors();
+                }
+
+                // tell both players the turn is swapping
+                clientLogic.StartTurnClientRpc(true, activeCompetitorIndex == startingPlayerIndex, clientRpcParamsList[activeCompetitorIndex]);
+                clientLogic.StartTurnClientRpc(false, activeCompetitorIndex == startingPlayerIndex, clientRpcParamsList[activeCompetitorIndex ^ 1]);
+                // reset shto clock
+                shotTimer = (player1powerupsenabled && player2powerupsenabled) ? 42 : 21;
+            }
         }
         catch (System.Exception e)
         {
@@ -481,7 +528,7 @@ public class ServerLogicScript : NetworkBehaviour
         }
     }
 
-    [ServerRpc(RequireOwnership = true)]
+    [ServerRpc(RequireOwnership = false)]
     public void AdjustPuckCountServerRpc(bool playersPuck, int value, ServerRpcParams rpcParams = default)
     {
         ulong clientId = rpcParams.Receive.SenderClientId;
@@ -489,7 +536,16 @@ public class ServerLogicScript : NetworkBehaviour
         if (!playersPuck) { competitorIndex ^= 1; }
 
         competitorList[competitorIndex].puckCount += value;
-        clientLogic.UpdatePuckCountClientRpc(true, competitorList[competitorIndex].puckCount, clientRpcParamsList[competitorIndex]);
-        clientLogic.UpdatePuckCountClientRpc(false, competitorList[competitorIndex].puckCount, clientRpcParamsList[competitorIndex ^ 1]);
+        clientLogic.UpdatePuckCountClientRpc(true, competitorList[competitorIndex].puckCount, false, clientRpcParamsList[competitorIndex]);
+        clientLogic.UpdatePuckCountClientRpc(false, competitorList[competitorIndex].puckCount, false, clientRpcParamsList[competitorIndex ^ 1]);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void IncrementTriplePowerupServerRpc(ServerRpcParams rpcParams = default)
+    {
+        ulong clientId = rpcParams.Receive.SenderClientId;
+        int competitorIndex = clients.IndexOf(clientId);
+        triplePowerupUserCompetitorIndex = competitorIndex;
+        triplePowerup += 2;
     }
 }

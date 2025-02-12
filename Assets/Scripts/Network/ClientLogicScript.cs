@@ -20,9 +20,6 @@ public class ClientLogicScript : NetworkBehaviour
     private PuckManager puckManager;
     private PowerupManager powerupManager;
 
-    // client competitor variable
-    public Competitor client;
-
     public bool isRunning { get; private set; }
     private float shotTimer;
 
@@ -85,21 +82,21 @@ public class ClientLogicScript : NetworkBehaviour
         }
 
         // start turn, do this once then start shooting
-        if (client.isTurn && puckManager.AllPucksAreSlowedClient())
+        if (logic.player.isTurn && puckManager.AllPucksAreSlowedClient())
         {
-            activeBar = bar.ChangeBar("angle", client.goingFirst);
+            activeBar = bar.ChangeBar("angle", logic.player.goingFirst);
             line.isActive = true;
             arrow.SetActive(true);
             GameHUDManager.Instance.ChangeTurnText("Your Turn");
             serverLogic.CreatePuckServerRpc();
-            client.isTurn = false;
-            client.isShooting = true;
+            logic.player.isTurn = false;
+            logic.player.isShooting = true;
             shotTimer = powerupsAreEnabled ? 30 : 18;
             if (powerupsAreEnabled) { powerupManager.ShuffleDeck(); }
             powerupsMenu.SetActive(powerupsAreEnabled);
         }
 
-        if (client.isShooting && Input.GetMouseButtonDown(0) && powerupsMenu.activeInHierarchy == false)
+        if (logic.player.isShooting && Input.GetMouseButtonDown(0) && powerupsMenu.activeInHierarchy == false)
         {
             // make sure click is on the bottom half of the screen
             if (logic.ClickNotOnPuck())
@@ -108,7 +105,7 @@ public class ClientLogicScript : NetworkBehaviour
                 {
                     case "angle":
                         angle = line.GetValue();
-                        activeBar = bar.ChangeBar("power", client.goingFirst);
+                        activeBar = bar.ChangeBar("power", logic.player.goingFirst);
                         break;
                     case "power":
                         power = line.GetValue();
@@ -119,26 +116,22 @@ public class ClientLogicScript : NetworkBehaviour
                         serverLogic.ShootServerRpc(angle, power, spin);
                         activeBar = bar.ChangeBar("none");
                         GameHUDManager.Instance.ChangeTurnText("Opponent's Turn");
+                        UI.shotClockText.text = ""; // clear shot clock
                         line.isActive = false;
                         arrow.SetActive(false);
-                        client.isShooting = false;
+                        logic.player.isShooting = false;
                         break;
                 }
             }
         }
 
         // update shot clock text under 10 secs
-        if (client.isShooting && shotTimer <= 10.5 && shotTimer > 0)
+        if (logic.player.isShooting && shotTimer <= 10.5 && shotTimer > 0)
         {
             UI.shotClockText.text = Mathf.RoundToInt(shotTimer).ToString();
         }
-        // clear shot clock when not turn
-        else if (!client.isShooting && !client.isTurn)
-        {
-            UI.shotClockText.text = "";
-        }
         // force shot after shot clock
-        else if (client.isShooting && shotTimer < 0)
+        else if (logic.player.isShooting && shotTimer < 0)
         {
             angle = UnityEngine.Random.Range(20.0f, 80.0f);
             power = UnityEngine.Random.Range(30.0f, 60.0f);
@@ -146,20 +139,21 @@ public class ClientLogicScript : NetworkBehaviour
             serverLogic.ShootServerRpc(angle, power, spin);
             activeBar = bar.ChangeBar("none");
             GameHUDManager.Instance.ChangeTurnText("Opponent's Turn");
+            UI.shotClockText.text = ""; // clear shot clock
             line.isActive = false;
             arrow.SetActive(false);
-            client.isShooting = false;
+            logic.player.isShooting = false;
             powerupsMenu.SetActive(false);
         }
         // if we have no pucks left, don't show any bar
-        if ((client.isTurn || client.isShooting) && isRunning && client.puckCount <= 0)
+        if ((logic.player.isTurn || logic.player.isShooting) && isRunning && logic.player.puckCount <= 0)
         {
             activeBar = bar.ChangeBar("none");
             line.isActive = false;
             arrow.SetActive(false);
             GameHUDManager.Instance.ChangeTurnText(String.Empty);
-            client.isTurn = false;
-            client.isShooting = false;
+            logic.player.isTurn = false;
+            logic.player.isShooting = false;
         }
         shotTimer -= Time.deltaTime;
     }
@@ -175,19 +169,20 @@ public class ClientLogicScript : NetworkBehaviour
 
     // Server tells the client to update in-game UI showing puck counts for each player
     [ClientRpc]
-    public void UpdatePuckCountClientRpc(bool isPlayer, int count, ClientRpcParams clientRpcParams = default)
+    public void UpdatePuckCountClientRpc(bool isPlayer, int count, bool wasShot, ClientRpcParams clientRpcParams = default)
     {
         if (!IsClient) return;
 
         if (isPlayer)
         {
-            client.puckCount = count;
-            GameHUDManager.Instance.ChangePuckCountText(isPlayer, count.ToString(), true);
+            logic.player.puckCount = count;
         }
         else
         {
-            GameHUDManager.Instance.ChangePuckCountText(isPlayer, count.ToString(), true);
+            logic.opponent.puckCount = count;
         }
+        GameHUDManager.Instance.ChangePuckCountText(isPlayer, count.ToString(), true);
+        if (!wasShot) { return; } // methods of changing puck count without shoot return here (resurrect, pay1puck)
         DecrementWallCount();
         PowerupManager.Instance.DisableForceFieldIfNecessary();
         if (isPlayer)
@@ -220,6 +215,7 @@ public class ClientLogicScript : NetworkBehaviour
         isRunning = false;
         GameHUDManager.Instance.ChangeTurnText(String.Empty);
         FogScript.Instance.DisableFog();
+        LaserScript.Instance.DisableLaser();
     }
 
     // Server updates us with match result, for now we fetch score local
@@ -234,6 +230,7 @@ public class ClientLogicScript : NetworkBehaviour
         arrow.SetActive(false);
         receivedGameResult = true;
         FogScript.Instance.DisableFog();
+        LaserScript.Instance.DisableLaser();
     }
 
     // Server tells the client to switch to game scene and start the game.
@@ -252,10 +249,12 @@ public class ClientLogicScript : NetworkBehaviour
         UI.UpdateWallText(wallCount);
         receivedGameResult = false;
         powerupsAreEnabled = powerupsEnabled;
-        client = new();
-        client.puckCount = 5;
-        client.clientID = NetworkManager.Singleton.LocalClientId;
-        logic.activeCompetitor = client;
+        logic.player.puckCount = 5;
+        logic.player.scoreBonus = 0;
+        logic.opponent.puckCount = 5;
+        logic.opponent.scoreBonus = 0;
+        logic.player.clientID = NetworkManager.Singleton.LocalClientId;
+        logic.activeCompetitor = logic.opponent;
         powerupManager.ClearPowerupPopupEffectAnimationQueue();
 
         Debug.Log("Client: Restarting game");
@@ -266,13 +265,13 @@ public class ClientLogicScript : NetworkBehaviour
         {
             var swapAlt = puckSpriteID_0 == puckSpriteID_1 ? -1 : 1;
             UI.SetOpponentPuckIcon(puckSkinManager.ColorIDtoPuckSprite(puckSpriteID_1 * swapAlt), Math.Abs(puckSpriteID_1) == 40);
-            client.puckSpriteID = puckSpriteID_0;
+            logic.player.puckSpriteID = puckSpriteID_0;
         }
         else
         {
             var swapAlt = puckSpriteID_0 == puckSpriteID_1 ? -1 : 1;
             UI.SetOpponentPuckIcon(puckSkinManager.ColorIDtoPuckSprite(puckSpriteID_0 * swapAlt), Math.Abs(puckSpriteID_0) == 40);
-            client.puckSpriteID = puckSpriteID_1;
+            logic.player.puckSpriteID = puckSpriteID_1;
         }
 
         puckHalo.SetActive(false);
@@ -285,13 +284,21 @@ public class ClientLogicScript : NetworkBehaviour
 
     // Server tells the client they can begin their turn
     [ClientRpc]
-    public void StartTurnClientRpc(bool isStartingPlayerParam, ClientRpcParams clientRpcParams = default)
+    public void StartTurnClientRpc(bool isPlayersTurn, bool isStartingPlayerParam, ClientRpcParams clientRpcParams = default)
     {
         if (!IsClient) return;
 
-        Debug.Log("Client: Starting turn");
-        client.isTurn = true;
-        client.goingFirst = isStartingPlayerParam;
+        if (isPlayersTurn)
+        {
+            Debug.Log("Client: Starting turn");
+            logic.player.isTurn = true;
+        }
+
+        logic.activeCompetitor = isPlayersTurn ? logic.player : logic.opponent;
+
+        logic.player.goingFirst = isStartingPlayerParam;
+
+        LogicScript.Instance.UpdateScores();
     }
 
     // Server tells the client to set the error message.
@@ -317,10 +324,10 @@ public class ClientLogicScript : NetworkBehaviour
         GameHUDManager.Instance.ChangeTurnText(String.Empty);
         activeBar = bar.ChangeBar("none");
         line.isActive = false;
-        if (client != null)
+        if (logic.player != null)
         {
-            client.isTurn = false;
-            client.isShooting = false;
+            logic.player.isTurn = false;
+            logic.player.isShooting = false;
         }
     }
 
@@ -331,6 +338,6 @@ public class ClientLogicScript : NetworkBehaviour
 
     public bool IsStartingPlayer()
     {
-        return client.goingFirst;
+        return logic.player.goingFirst;
     }
 }

@@ -4,6 +4,9 @@ using UnityEngine;
 //Attach this script to a GameObject to rotate around the target position.
 public class LaserScript : MonoBehaviour
 {
+    // self
+    public static LaserScript Instance;
+
     // dependancies
     private LineScript line;
     private LogicScript logic;
@@ -30,6 +33,14 @@ public class LaserScript : MonoBehaviour
 
     // pucks in laser path
     List<GameObject> pucksInPath = new();
+
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(Instance);
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -83,16 +94,39 @@ public class LaserScript : MonoBehaviour
         }
     }
 
-    public void EnableLaser()
+    public void StartListeners(bool playersPuck)
     {
+        if (!playersPuck) { return; } // only laser user
+
         laserEnabled = true;
         spriteRenderer.enabled = true;
+        LeanTween.alpha(gameObject, 1f, 0.5f).setEase(LeanTweenType.easeInQuart);
+
+        StopListeners();
+        if (ClientLogicScript.Instance.isRunning) // vs online
+        {
+            ClientLogicScript.OnPlayerShot += FireLaser;
+            ClientLogicScript.OnOpponentShot += FireLaser;
+        }
+        else if (LogicScript.Instance.gameIsRunning) // vs CPU
+        {
+            LogicScript.OnPlayerShot += FireLaser;
+            LogicScript.OnOpponentShot += FireLaser;
+        }
     }
 
     public void DisableLaser()
     {
         laserEnabled = false;
         spriteRenderer.enabled = false;
+    }
+
+    private void StopListeners()
+    {
+        ClientLogicScript.OnPlayerShot -= FireLaser;
+        ClientLogicScript.OnOpponentShot -= FireLaser;
+        LogicScript.OnPlayerShot -= FireLaser;
+        LogicScript.OnOpponentShot -= FireLaser;
     }
 
     public void FireLaser()
@@ -103,11 +137,18 @@ public class LaserScript : MonoBehaviour
         {
             if (puck != null)
             {
-                puck.GetComponent<PuckScript>().DestroyPuck();
+                if (ClientLogicScript.Instance.isRunning)
+                {
+                    puck.GetComponent<PuckScript>().DestroyPuckServerRpc();
+                }
+                else
+                {
+                    puck.GetComponent<PuckScript>().DestroyPuck();
+                }
             }
         }
         // turn off the laser
-        laserEnabled = false;
-        spriteRenderer.enabled = false;
+        StopListeners();
+        LeanTween.alpha(gameObject, 0f, 0.5f).setEase(LeanTweenType.easeInQuart).setOnComplete(DisableLaser);
     }
 }

@@ -79,10 +79,6 @@ public class LogicScript : MonoBehaviour
 
     // powerups TODO: move to powerups manager probably
     public int triplePowerup = 0;
-    public GameObject laser;
-    private bool laserPowerup = false;
-    public void EnableLaserPowerup() { laserPowerup = true; laser.GetComponent<LaserScript>().EnableLaser(); }
-
 
     private void Awake()
     {
@@ -395,7 +391,6 @@ public class LogicScript : MonoBehaviour
         GameHUDManager.Instance.ChangeTurnText(string.Empty);
         activeCompetitor.ShootActivePuck(angle, power, spin);
         (triplePower, tripleAngle, tripleSpin) = (angle, power, spin);
-        if (laserPowerup) { laserPowerup = false; laser.GetComponent<LaserScript>().FireLaser(); }
         UI.PostShotUpdate(player.puckCount, opponent.puckCount);
         UI.UpdateShotDebugText(angle, power, spin);
         if (activeCompetitor.isPlayer)
@@ -430,7 +425,7 @@ public class LogicScript : MonoBehaviour
         UpdateScores();
         powerupManager.ClearPowerupPopupEffectAnimationQueue();
         triplePowerup = 0;
-        laser.GetComponent<LaserScript>().DisableLaser();
+        LaserScript.Instance.DisableLaser();
 
         if (difficulty < 2) // for easy & medium
         {
@@ -503,7 +498,7 @@ public class LogicScript : MonoBehaviour
         powerupsMenu.SetActive(false);
         FogScript.Instance.DisableFog();
         WallScript.Instance.WallEnabled(false);
-        laser.GetComponent<LaserScript>().DisableLaser();
+        LaserScript.Instance.DisableLaser();
 #if (UNITY_EDITOR)
         foreach (var path in CPUPaths)
         {
