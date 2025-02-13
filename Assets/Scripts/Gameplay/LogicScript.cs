@@ -515,7 +515,7 @@ public class LogicScript : MonoBehaviour
     public void FindOpenPath()
     {
         // if Fog is active and foresight isn't, shoot random
-        if (FogScript.Instance.FogEnabled() && !HaloScript.Instance.HaloEnabled()) { (CPUShotAngle, CPUShotPower, CPUShotSpin) = (Random.Range(35.0f, 65.0f), Random.Range(40.0f, 70.0f), Random.Range(45.0f, 55.0f)); }
+        if (FogScript.Instance.FogEnabled() && !HaloScript.Instance.HaloEnabled()) { (CPUShotAngle, CPUShotPower, CPUShotSpin) = (Random.Range(35.0f, 65.0f), Random.Range(40.0f, 70.0f), Random.Range(45.0f, 55.0f)); return; }
 
         CPUPathInterface best = null;
         int highestValue = 0;

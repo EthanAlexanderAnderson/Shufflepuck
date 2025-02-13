@@ -245,8 +245,8 @@ public class PowerupManager : NetworkBehaviour
         if (NeedsToBeSentToServer(index)) { return; }
         PayCosts(index);
 
-        // user only
-        if (activeCompetitor.isPlayer)
+        // user only (or CPU)
+        if (activeCompetitor.isPlayer || (LogicScript.Instance.gameIsRunning && !ClientLogicScript.Instance.isRunning && !activeCompetitor.isPlayer))
         {
             puckHalo.SetActive(true);
             puckHalo.GetComponent<HaloScript>().EnableFogMask(true);
@@ -652,7 +652,6 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.SetPowerupText("exponent");
     }
 
-    public GameObject laser;
     public void LaserPowerup() // index 23 : destroy all pucks in a line
     {
         var index = Array.IndexOf(methodArray, LaserPowerup);

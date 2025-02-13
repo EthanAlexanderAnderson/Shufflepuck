@@ -43631,7 +43631,6 @@ MonoBehaviour:
   playedAGame: 0
   tutorialActive: 0
   triplePowerup: 0
-  laser: {fileID: 230386876}
   deckScreen: {fileID: 125596096}
   puckDestroySFX: {fileID: 817506630}
 --- !u!4 &817506626
