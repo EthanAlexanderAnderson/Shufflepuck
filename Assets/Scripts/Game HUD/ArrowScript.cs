@@ -51,13 +51,15 @@ public class ArrowScript : MonoBehaviour
             activeBar = clientLogic.activeBar;
         }
 
+        // set side
+        anchorPoint.transform.localPosition = new Vector3(sideModifier, 7f, 1);
+
         // calculate the pucks estimated position
         if (activeBar == "angle")
         {
             transform.localPosition = new Vector3(0, 9, 0);
             // Spin the object around the target at 20 degrees/second.
             anchorPoint.transform.rotation = Quaternion.Euler(0, 0, (-line.GetValue() + 50f) * angleParameter);
-            anchorPoint.transform.localPosition = new Vector3(sideModifier, 7f, 1);
             spriteRenderer.sprite = noSpin;
         }
         else if (activeBar == "power")

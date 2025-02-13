@@ -1,12 +1,9 @@
-// This is only used with CPUPathScript to help me create CPU paths
+// Draw line outlines around colliders. This script is partially based on the code from the link below (and also AI code)
+// https://stackoverflow.com/questions/39153239/how-to-make-a-highlight-around-a-polygoncollider2d-in-unity
 
 using UnityEngine;
-
-// https://stackoverflow.com/questions/39153239/how-to-make-a-highlight-around-a-polygoncollider2d-in-unity
 public class LineDrawerTest : MonoBehaviour
 {
-#if (UNITY_EDITOR)
-    //public GameObject myGameObject;
     private PolygonCollider2D pCollider;
     private BoxCollider2D bCollider;
     private CircleCollider2D cCollider;
@@ -27,11 +24,11 @@ public class LineDrawerTest : MonoBehaviour
         }
         else if (cCollider != null)
         {
-            //highlightAroundCollider(cCollider, Color.green, Color.green, 0.1f);
+            HighlightAroundCollider(cCollider, Color.green, Color.green, 0.1f);
         }
-
     }
-    void HighlightAroundCollider(Component cpType, Color beginColor, Color endColor, float hightlightSize = 0.3f)
+
+    void HighlightAroundCollider(Component cpType, Color beginColor, Color endColor, float highlightSize = 0.3f)
     {
         // 1. Create new Line Renderer
         LineRenderer lineRenderer = gameObject.GetComponent<LineRenderer>();
@@ -43,50 +40,50 @@ public class LineDrawerTest : MonoBehaviour
         // Set color and width
         lineRenderer.startColor = beginColor;
         lineRenderer.endColor = endColor;
-        lineRenderer.startWidth = hightlightSize;
-        lineRenderer.endWidth = hightlightSize;
+        lineRenderer.startWidth = highlightSize;
+        lineRenderer.endWidth = highlightSize;
+        lineRenderer.loop = false;
 
         float zPos = 10f; // Since this is 2D, make sure it is in front
 
-        if (cpType is PolygonCollider2D)
+        if (cpType is PolygonCollider2D polygonCollider)
         {
             // Handle PolygonCollider2D
-            Vector2[] pColliderPos = (cpType as PolygonCollider2D).points;
+            Vector2[] points = polygonCollider.points;
+            Vector3[] worldPoints = new Vector3[points.Length * 2 + 1];
 
-            for (int i = 0; i < pColliderPos.Length; i++)
+            for (int i = 0; i < points.Length; i++)
             {
-                pColliderPos[i] = cpType.transform.TransformPoint(pColliderPos[i]);
+                worldPoints[i] = polygonCollider.transform.TransformPoint(points[i]);
             }
 
-            lineRenderer.positionCount = pColliderPos.Length + 1;
-            for (int i = 0; i < pColliderPos.Length; i++)
+            worldPoints[points.Length] = worldPoints[0]; // Ensure closure
+
+            for (int i = 0; i < points.Length; i++)
             {
-                Vector3 finalLine = pColliderPos[i];
+                worldPoints[points.Length + 1 + i] = worldPoints[points.Length - i];
+            }
+
+            lineRenderer.positionCount = worldPoints.Length;
+            for (int i = 0; i < worldPoints.Length; i++)
+            {
+                Vector3 finalLine = worldPoints[i];
                 finalLine.z = zPos;
                 lineRenderer.SetPosition(i, finalLine);
-
-                if (i == (pColliderPos.Length - 1))
-                {
-                    finalLine = pColliderPos[0];
-                    finalLine.z = zPos;
-                    lineRenderer.SetPosition(pColliderPos.Length, finalLine);
-                }
             }
         }
-        else if (cpType is BoxCollider2D)
+        else if (cpType is BoxCollider2D boxCollider)
         {
             // Handle BoxCollider2D
-            BoxCollider2D boxCollider = cpType as BoxCollider2D;
-            Vector2[] corners = new Vector2[4];
-
-            // Calculate the corners of the BoxCollider2D in local space
             Vector2 size = boxCollider.size;
-            corners[0] = new Vector2(-size.x / 2, -size.y / 2); // Bottom-left
-            corners[1] = new Vector2(-size.x / 2, size.y / 2);  // Top-left
-            corners[2] = new Vector2(size.x / 2, size.y / 2);   // Top-right
-            corners[3] = new Vector2(size.x / 2, -size.y / 2);  // Bottom-right
+            Vector2[] corners = new Vector2[4]
+            {
+                new Vector2(-size.x / 2, -size.y / 2), // Bottom-left
+                new Vector2(-size.x / 2, size.y / 2),  // Top-left
+                new Vector2(size.x / 2, size.y / 2),   // Top-right
+                new Vector2(size.x / 2, -size.y / 2)   // Bottom-right
+            };
 
-            // Transform corners to world space
             for (int i = 0; i < corners.Length; i++)
             {
                 corners[i] = boxCollider.transform.TransformPoint(corners[i]);
@@ -98,15 +95,29 @@ public class LineDrawerTest : MonoBehaviour
                 Vector3 finalLine = corners[i];
                 finalLine.z = zPos;
                 lineRenderer.SetPosition(i, finalLine);
-
-                if (i == corners.Length - 1)
-                {
-                    finalLine = corners[0];
-                    finalLine.z = zPos;
-                    lineRenderer.SetPosition(corners.Length, finalLine);
-                }
             }
+            lineRenderer.SetPosition(corners.Length, lineRenderer.GetPosition(0)); // Close the box
+        }
+        else if (cpType is CircleCollider2D circleCollider)
+        {
+            // Handle CircleCollider2D
+            int segments = 36;
+            Vector3[] circlePoints = new Vector3[segments + 1];
+            float radius = circleCollider.radius * circleCollider.transform.lossyScale.x;
+            Vector3 center = circleCollider.transform.TransformPoint(circleCollider.offset);
+
+            for (int i = 0; i <= segments; i++)
+            {
+                float angle = i * (2 * Mathf.PI / segments);
+                circlePoints[i] = new Vector3(
+                    center.x + Mathf.Cos(angle) * radius,
+                    center.y + Mathf.Sin(angle) * radius,
+                    zPos
+                );
+            }
+
+            lineRenderer.positionCount = circlePoints.Length;
+            lineRenderer.SetPositions(circlePoints);
         }
     }
-#endif
 }

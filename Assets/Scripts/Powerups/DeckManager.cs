@@ -14,6 +14,8 @@ public class DeckManager : MonoBehaviour
 
     [SerializeField] private GameObject cardPreviewImage;
 
+    [SerializeField] private GameObject deckMenu;
+
     private void Awake()
     {
         if (Instance == null)
@@ -47,29 +49,10 @@ public class DeckManager : MonoBehaviour
     {
         var sum = deck.Sum();
         deckCount.text = sum.ToString();
-        if (sum < 10)
-        {
-            deckCount.color = new Color(0.9490197f, 0.4235294f, 0.3098039f); // red
-        }
-        else
-        {
-            deckCount.color = new Color(0.4862745f, 0.7725491f, 0.4627451f); // green
-        }
     }
 
     public List<int> GetDeck()
     {
-        // make sure our decklist is valid
-        var sum = deck.Sum();
-        if (sum < 10)
-        {
-            // if our deck is invalid, return the default deck
-            for (int i = 0; i < deck.Length; i++)
-            {
-                deck[i] = 1;
-            }
-        }
-
         // convert from a decklist to a playdeck
         List<int> playDeck = new List<int>();
         for (int i = 0; i < deck.Length; i++)
@@ -90,7 +73,8 @@ public class DeckManager : MonoBehaviour
         cardPreviewImage.GetComponent<Image>().sprite = img;
     }
 
-    string[] cardNames = { "plus one", "foresight", "block", "bolt", "force field", "phase", "cull", "growth", "lock", "explosion", "fog", "hydra" };
+    // Export the decklist to the clipboard
+    string[] cardNames = { "PlusOne", "Foresight", "Block", "Bolt", "ForceField", "Phase", "Cull", "Growth", "Lock", "Explosion", "Fog", "Hydra", "Factory", "Shield", "Shuffle", "Chaos", "TimesTwo", "Resurrect", "Mill", "Research", "Insanity", "Triple", "Exponent", "Laser" };
     public void ExportDeckList()
     {
         // Convert the decklist to string
@@ -112,8 +96,61 @@ public class DeckManager : MonoBehaviour
         // Export to clipboard
         GUIUtility.systemCopyBuffer = stringDeckList;
     }
+
+    // Import a decklist from the clipboard
     public void ImportDeckList()
     {
-        UIManagerScript.Instance.SetErrorMessage("Import deck feature coming soon");
+        // Get the clipboard contents
+        var stringDeckList = GUIUtility.systemCopyBuffer;
+
+        // Split the string into lines
+        var lines = stringDeckList.Split('\n');
+
+        // Reset the deck
+        for (int i = 0; i < deck.Length; i++)
+        {
+            deck[i] = 0;
+            PlayerPrefs.SetInt(cardNames[i] + "CardCount", 0);
+        }
+
+        // Parse the lines
+        foreach (var line in lines)
+        {
+            // Split the line into card name and count
+            var split = line.Split(':');
+            if (split.Length != 2)
+            {
+                continue;
+            }
+
+            // Find the card index
+            var cardIndex = -1;
+            for (int i = 0; i < cardNames.Length; i++)
+            {
+                if (cardNames[i] == split[0].Trim())
+                {
+                    cardIndex = i;
+                    break;
+                }
+            }
+
+            // If the card was found, set the count and save to playerprefs
+            if (cardIndex != -1)
+            {
+                int count;
+                if (int.TryParse(split[1].Trim(), out count))
+                {
+                    deck[cardIndex] = count;
+                    PlayerPrefs.SetInt(cardNames[cardIndex] + "CardCount", count);
+                }
+            }
+        }
+
+        // Update the deck count
+        UpdateDeckCount();
+
+        // finally, blink the UI to re-trigger the OnEnable to read from player prefs and set UI text
+        deckMenu.SetActive(false);
+        deckMenu.SetActive(true);
     }
 }

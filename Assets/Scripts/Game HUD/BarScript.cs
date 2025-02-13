@@ -56,6 +56,7 @@ public class BarScript : MonoBehaviour
             case "power":
                 // animation
                 transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
+                transform.localPosition = new Vector3(transform.localPosition.x, 0, transform.localPosition.z);
                 LeanTween.cancel(gameObject);
                 LeanTween.scale(gameObject, new Vector3(0.95f, 1f, 1f), 1f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
                 // set sprite
@@ -70,6 +71,7 @@ public class BarScript : MonoBehaviour
             case "spin":
                 // animation
                 transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
+                transform.localPosition = new Vector3(transform.localPosition.x, 0, transform.localPosition.z);
                 LeanTween.cancel(gameObject);
                 LeanTween.scale(gameObject, new Vector3(0.95f, 1f, 1f), 1f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
                 // set sprite

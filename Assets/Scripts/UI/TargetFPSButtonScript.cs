@@ -34,7 +34,9 @@ public class TargetFPSButtonScript : MonoBehaviour
             {
                 if (button != thisButton)
                 {
-                    button.GetComponent<TargetFPSButtonScript>().Deselect();
+                    var FPSButtonScript = button.GetComponent<TargetFPSButtonScript>();
+                    if (FPSButtonScript == null) { continue; }
+                    FPSButtonScript.Deselect();
                 }
             }
         }

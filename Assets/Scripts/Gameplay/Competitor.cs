@@ -14,6 +14,7 @@ public class Competitor
     public Sprite puckSprite;
     public int puckSpriteID;
     public int score;
+    public int scoreBonus;
     public int wins;
     public int puckCount = 5;
     public bool isTurn;
@@ -32,17 +33,23 @@ public class Competitor
         puckSprite = PuckSkinManager.Instance.ColorIDtoPuckSprite(puckID);
     }
 
-    public void ShootActivePuck(float angleParameter, float powerParameter, float spinParameter = 50)
+    public void ShootActivePuck(float angleParameter, float powerParameter, float spinParameter = 50, bool decrementPuckCount = true)
     {
         activePuckScript.Shoot(angleParameter, powerParameter, spinParameter);
         isShooting = false;
-        puckCount--;
+        if (decrementPuckCount) { puckCount--; } // this is necessary for Triple powerup
     }
 
     public void ResetProperties()
     {
         score = 0;
+        scoreBonus = 0;
         puckCount = 5;
         isShooting = false;
+    }
+
+    public int GetScore()
+    {
+        return score + scoreBonus;
     }
 }

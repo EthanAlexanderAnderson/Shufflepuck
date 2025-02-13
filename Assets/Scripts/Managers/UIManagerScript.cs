@@ -69,6 +69,8 @@ public class UIManagerScript : MonoBehaviour
 
     [SerializeField] private Text playerScoreText;
     [SerializeField] private Text opponentScoreText;
+    [SerializeField] private Text playerScoreBonusText;
+    [SerializeField] private Text opponentScoreBonusText;
 
     private int playerWins; // TODO: this should not be stored here
     private int opponentWins; // TODO: this should not be stored here
@@ -229,6 +231,30 @@ public class UIManagerScript : MonoBehaviour
         var newOpponentScore = Mathf.Max(0, opponentScore);
         GameHUDManager.Instance.ChangeScoreText(false, newOpponentScore.ToString(), newOpponentScore != prevOpponentScore);
         prevOpponentScore = newOpponentScore;
+    }
+
+    public void UpdateScoreBonuses(int playerScoreBonus, int opponentScoreBonus)
+    {
+        if (!playerScoreBonusText || !opponentScoreBonusText) { return; }
+
+        if (playerScoreBonus != 0)
+        {
+            playerScoreBonusText.text = playerScoreBonus.ToString();
+        }
+        else
+        {
+            playerScoreBonusText.text = string.Empty;
+        }
+
+        if (opponentScoreBonus != 0)
+        {
+            opponentScoreBonusText.text = opponentScoreBonus.ToString();
+        }
+        else
+        {
+            opponentScoreBonusText.text = string.Empty;
+        }
+
     }
 
     public void UpdateWallText(int wallCount)

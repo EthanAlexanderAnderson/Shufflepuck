@@ -46,14 +46,9 @@ public class HaloScript : MonoBehaviour
     {
         if (debuggingInProgress) return;
 
-        if (!ClientLogicScript.Instance.isRunning) // offline
-        {
-            sideModifier = LogicScript.Instance.activeCompetitor.isPlayer ? (-3.6f) : (3.6f);
-        }
-        else // online
-        {
-            sideModifier = ClientLogicScript.Instance.client.goingFirst ? (-3.6f) : (3.6f);
-        }
+        if (LogicScript.Instance.activeCompetitor.activePuckObject == null) return;
+
+        sideModifier = LogicScript.Instance.activeCompetitor.activePuckObject.transform.position.x < 0 ? (-3.6f) : (3.6f);
 
         var sr = GetComponent<SpriteRenderer>();
 
@@ -134,5 +129,10 @@ public class HaloScript : MonoBehaviour
     public void EnableFogMask(bool enabled)
     {
         fogHaloMask.SetActive(enabled);
+    }
+
+    public bool HaloEnabled()
+    {
+        return fogHaloMask.activeInHierarchy;
     }
 }

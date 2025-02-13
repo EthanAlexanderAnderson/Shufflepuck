@@ -7,6 +7,7 @@ using UnityEngine.EventSystems;
 using Unity.Netcode;
 using TMPro;
 using System;
+using System.Collections.Generic;
 
 public class PuckScript : NetworkBehaviour, IPointerClickHandler
 {
@@ -26,6 +27,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     [SerializeField] private AudioSource pointCPUSFX;
     [SerializeField] private AudioSource minusPlayerSFX;
     [SerializeField] private AudioSource minusCPUSFX;
+    [SerializeField] private AudioSource breakSFX;
     [SerializeField] private GameObject animationLayer;
     [SerializeField] private TrailRenderer trail;
 
@@ -51,7 +53,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     // floating text
     [SerializeField] private GameObject floatingTextPrefab;
-    private string powerupText;
+    List<string> powerupText = new List<string>();
 
     // sound effect volume
     private float SFXvolume;
@@ -60,10 +62,13 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     private Color[] color = { new Color(0.5f, 0.5f, 0.5f) };
 
     // for powerups
-    [SerializeField] private bool phase = false;
-    [SerializeField] private bool lockPowerup = false;
-    [SerializeField] private bool explosionPowerup = false;
-    [SerializeField] private bool hydraPowerup = false;
+    [SerializeField] private bool phasePowerup = false;
+    [SerializeField] private bool lockPowerup = false; // TODO: make lock stack
+    [SerializeField] private int explosionPowerup = 0;
+    [SerializeField] private int hydraPowerup = 0;
+    [SerializeField] private int shieldPowerup = 0;
+    [SerializeField] private int resurrectPowerup = 0;
+    [SerializeField] private bool factoryPowerup = false;
 
     void OnEnable()
     {
@@ -88,7 +93,8 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         // Calculate the magnitude of the velocity vector to determine the sliding noise volume
         velocity = Mathf.Sqrt(rb.velocity.x * rb.velocity.x + rb.velocity.y * rb.velocity.y);
         if (IsServer) { velocityNetworkedRounded.Value = velocity; }
-        noiseSFX.volume = logic.gameIsRunning ? (velocity / 15.0f) * SFXvolume : 0f; // only play noise if game is running (not plinko)
+        noiseSFX.volume = logic.gameIsRunning ? (velocity / 10.0f) * SFXvolume : 0f; // only play noise if game is running (not plinko)
+        noiseSFX.mute = noiseSFX.volume < 0.01;  // this is weird but it prevents the 0.1 seconds of noise on spawn
 
         // update particle emisson based on velocity
         var PS = GetComponent<ParticleSystem>();
@@ -99,7 +105,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         main.startColor = SetParticleColor();
 
         // phase powerup
-        if (phase && (velocity > 1 || velocityNetworkedRounded.Value > 1.0f || !IsShot()))
+        if (phasePowerup && (velocity > 1 || velocityNetworkedRounded.Value > 1.0f || !IsShot()))
         {
             spriteRenderer.color = new Color(1f, 1f, 1f, 0.5f);
             puckCollider.isTrigger = true;
@@ -133,23 +139,34 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         // for phase & lock powerup
         if (IsShot() && pastSafeLine && IsStopped() && (!ClientLogicScript.Instance.isRunning || velocityNetworkedRounded.Value < 0.05f))
         {
-            if (phase)
+            if (phasePowerup)
             {
                 // if this puck is within 2 units of the nearest puck, destroy it
+                var phaseHasOverlap = false;
                 var pucks = GameObject.FindGameObjectsWithTag("puck");
                 foreach (var puck in pucks)
                 {
                     if (puck != gameObject && Vector2.Distance(puck.transform.position, transform.position) < 2)
                     {
                         if (ClientLogicScript.Instance.isRunning && !IsServer) { break; }
-                        DestroyPuck();
-                        return;
+                        phaseHasOverlap = true;
+                        if (explosionPowerup > 0) // phase & explosion combo
+                        {
+                            puck.GetComponent<PuckScript>().DestroyPuck();
+                        }
                     }
                 }
+                if (phaseHasOverlap)
+                {
+                    Explode();
+                    return;
+                }
+
                 // othewrise, unphase it (make it visible again)
                 spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
                 puckCollider.isTrigger = false;
-                phase = false;
+                phasePowerup = false;
+                RemovePowerupText("phase");
             }
 
             if (lockPowerup)
@@ -178,6 +195,11 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             safe = true;
         }
 
+        // animation
+        gameObject.transform.localScale = new Vector3(0f, 0f, 0f);
+        LeanTween.cancel(gameObject);
+        LeanTween.scale(gameObject, new Vector3(0.2f, 0.2f, 0.2f), 0.5f).setEase(LeanTweenType.easeOutQuint).setDelay(0.01f);
+
         return this;
     }
 
@@ -197,16 +219,20 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
         if (transform.position.y < 0f)
         {
-            ClientLogicScript.Instance.client.activePuckScript = this;
-            ClientLogicScript.Instance.client.activePuckObject = gameObject;
+            LogicScript.Instance.activeCompetitor.activePuckScript = this;
+            LogicScript.Instance.activeCompetitor.activePuckObject = gameObject;
         }
-        ClientLogicScript.Instance.client.isPlayer = IsPlayersPuckParameter;
 
         if (transform.position.y > 0)
         {
             shot = true;
             safe = true;
         }
+
+        // animation
+        gameObject.transform.localScale = new Vector3(0f, 0f, 0f);
+        LeanTween.cancel(gameObject);
+        LeanTween.scale(gameObject, new Vector3(0.2f, 0.2f, 0.2f), 0.5f).setEase(LeanTweenType.easeOutQuint).setDelay(0.01f);
 
         Debug.Log($"Puck initialized. IsPlayersPuckParameter: {IsPlayersPuckParameter}. PuckSpriteID: {puckSpriteID}");
     }
@@ -246,8 +272,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         shotTorqueToAdd = spin;
         shot = true;
         // SFX
-        shotSFX.volume += volumeBoost;
-        shotSFX.volume *= SFXvolume;
+        shotSFX.volume = SFXvolume + volumeBoost;
         shotSFX.Play();
         // screen shake
         ScreenShake.Instance.Shake(powerParameter / 500);
@@ -271,19 +296,24 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public int GetZoneMultiplier() { return zoneMultiplier; }
     public void SetZoneMultiplier(int ZM) { zoneMultiplier = ZM; }
     public bool IsLocked() { return lockPowerup; }
-    public bool IsExplosion() { return explosionPowerup; }
-    public bool IsHydra() { return hydraPowerup; }
+    public bool IsExplosion() { return explosionPowerup > 0; }
+    public bool IsHydra() { return hydraPowerup > 0; }
+    public bool IsPhase() { return phasePowerup; }
+    public bool IsResurrect() { return resurrectPowerup > 0; }
+    public bool IsFactory() { return factoryPowerup; }
 
     // when a puck enters a scoring zone, update its score and play a SFX
-    public void EnterScoreZone(bool isZoneSafe, int enteredZoneMultiplier)
+    public void EnterScoreZone(bool isZoneSafe, int enteredZoneMultiplier, bool isBoundry)
     {
         // all zones are past safe line, so pastSafeLine can be set to true permanently
         pastSafeLine = true;
         safe = isZoneSafe;
         shot = true;
 
+        if (isBoundry) { return; } // don't update score or play SFX for the safe line boundry. This is important for hydra / factory powerups.
+
         // if puck moves into higher scoring zone and gains a point play SFX
-        if (enteredZoneMultiplier > zoneMultiplier)
+        if (enteredZoneMultiplier > zoneMultiplier && (puckBaseValue + puckBonusValue) > 0)
         {
             if (IsPlayersPuck())
             {
@@ -406,12 +436,14 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         angularVelocityModifier = 0;
 
         // explosion powerup
-        if (explosionPowerup && col.gameObject.CompareTag("puck"))
+        if (explosionPowerup > 0 && col.gameObject.CompareTag("puck"))
         {
             // Destroy the collided object
-            col.gameObject.GetComponent<PuckScript>().DestroyPuck();
-            // destroy self
-            DestroyPuck();
+            if (Vector2.Distance(col.gameObject.transform.position, transform.position) < 2.1f) // make sure it's nearby (trying to fix a weird bug)
+            {
+                col.gameObject.GetComponent<PuckScript>().DestroyPuck();
+                Explode();
+            }
         }
     }
 
@@ -427,16 +459,32 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         puckBonusValue = value;
     }
 
-    public void SetPowerupText(string text)
+    public void IncrementPuckBonusValue(int value)
     {
-        powerupText = text;
+        puckBonusValue += value;
+    }
+
+    public void DoublePuckBaseValue()
+    {
+        puckBaseValue *= 2;
+    }
+
+    public void SetPowerupText(string text, bool showFloatingText = true)
+    {
+        powerupText.Add(text);
+        if (showFloatingText) { CreatePowerupFloatingText(); }
+    }
+
+    public void RemovePowerupText(string text)
+    {
+        powerupText.Remove(text);
     }
 
     // text to show what powerup was used under the puck. Only fades, no up/shrink.
     public void CreatePowerupFloatingText()
     {
         var floatingText = Instantiate(floatingTextPrefab, transform.position + new Vector3(0, -1.5f, 0), Quaternion.identity, transform);
-        floatingText.GetComponent<FloatingTextScript>().Initialize(powerupText, 0, 0, 0.1f, 1, true);
+        floatingText.GetComponent<FloatingTextScript>().Initialize(string.Join("\n", powerupText), 0, 0, 0.1f, 1, true);
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -445,7 +493,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
         floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f + (ComputeValue() / 10), true);
         // if powerupText has been set, show it
-        if (powerupText != null)
+        if (powerupText.Count > 0)
         {
             CreatePowerupFloatingText();
         }
@@ -453,6 +501,13 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     public void DestroyPuck() // Destroys the puck with a particle and sound effect, used by powerups that say destroy
     {
+        if (ClientLogicScript.Instance.isRunning && !IsOwner) { return; } // only owner can destroy
+
+        if (shieldPowerup > 0)
+        {
+            TriggerShield();
+            return;
+        };
         // update score
         puckBaseValue = 0;
         puckBonusValue = 0;
@@ -460,17 +515,39 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         LogicScript.Instance.UpdateScores();
         logic.playDestroyPuckSFX(SFXvolume);
         // hydra powerup
-        if (hydraPowerup)
+        while (hydraPowerup > 0)
         {
+            // todo: move the online check into PuckSpawnHelper and call PuckSpawnHelperServerRpc from there
             if (ClientLogicScript.Instance.isRunning)
             {
-                ServerLogicScript.Instance.HydraServerRpc(playersPuck, transform.position.x, transform.position.y);
+                ServerLogicScript.Instance.PuckSpawnHelperServerRpc(playersPuck, transform.position.x, transform.position.y, 2);
+                hydraPowerup--;
+                RemovePowerupText("hydra");
             }
             else
             {
-                PowerupManager.Instance.HydraHelper(playersPuck, transform.position.x, transform.position.y);
+                PowerupManager.Instance.PuckSpawnHelper(playersPuck, transform.position.x, transform.position.y, 2);
+                hydraPowerup--;
+                RemovePowerupText("hydra");
             }
         }
+        // resurrect powerup
+        while (resurrectPowerup > 0)
+        {
+            if (ClientLogicScript.Instance.isRunning)
+            {
+                ServerLogicScript.Instance.AdjustPuckCountServerRpc(playersPuck, 1); // requires ownership
+                resurrectPowerup--;
+                RemovePowerupText("resurrect");
+            }
+            else
+            {
+                LogicScript.Instance.IncrementPuckCount(playersPuck);
+                resurrectPowerup--;
+                RemovePowerupText("resurrect");
+            }
+        }
+
         // Screen shake
         ScreenShake.Instance.Shake(0.25f);
         // actually destroy the gameobject
@@ -480,7 +557,6 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     override public void OnDestroy()
     {
         if (!logic.gameIsRunning && !ClientLogicScript.Instance.isRunning) { return; }
-        logic.playDestroyPuckSFX(SFXvolume); // TODO: investigate if this causes the SFX twice in any scenerio
         ParticleSystem collisionParticleEffect = Instantiate(collisionParticleEffectPrefab, transform.position, Quaternion.identity);
         ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
         emission.rateOverTime = 1000f;
@@ -504,17 +580,25 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         LogicScript.Instance.UpdateScores();
 
         // un sub from events
-        LogicScript.OnPlayerShot -= IncrementBonusValue;
-        LogicScript.OnOpponentShot -= IncrementBonusValue;
-        ClientLogicScript.OnPlayerShot -= IncrementBonusValue;
-        ClientLogicScript.OnOpponentShot -= IncrementBonusValue;
+        LogicScript.OnPlayerShot -= IncrementGrowthValue;
+        LogicScript.OnOpponentShot -= IncrementGrowthValue;
+        ClientLogicScript.OnPlayerShot -= IncrementGrowthValue;
+        ClientLogicScript.OnOpponentShot -= IncrementGrowthValue;
         LogicScript.OnPlayerShot -= DisableLock;
         LogicScript.OnOpponentShot -= DisableLock;
         ClientLogicScript.OnPlayerShot -= DisableLock;
         ClientLogicScript.OnOpponentShot -= DisableLock;
+        LogicScript.OnPlayerShot -= FactoryHelper;
+        LogicScript.OnOpponentShot -= FactoryHelper;
+        ClientLogicScript.OnPlayerShot -= FactoryHelper;
+        ClientLogicScript.OnOpponentShot -= FactoryHelper;
+        LogicScript.OnPlayerShot -= IncrementExponentValue;
+        LogicScript.OnOpponentShot -= IncrementExponentValue;
+        ClientLogicScript.OnPlayerShot -= IncrementExponentValue;
+        ClientLogicScript.OnOpponentShot -= IncrementExponentValue;
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void DestroyPuckServerRpc()
     {
         if (!IsServer) return;
@@ -523,50 +607,53 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     public void SetPhase(bool isPhase)
     {
-        phase = isPhase;
+        phasePowerup = isPhase;
     }
 
     [ClientRpc]
     public void InitBlockPuckClientRpc(ClientRpcParams clientRpcParams = default)
     {
         if (!IsClient) return;
+        InitBlockPuck();
+    }
+
+    public void InitBlockPuck()
+    {
         SetPuckBaseValue(0);
         SetPowerupText("valueless");
-        CreatePowerupFloatingText();
         shot = true;
         safe = true;
     }
 
     public void EnableGrowth()
     {
-        puckBonusValue--; // start one under, because it gets shot directly after this
         if (ClientLogicScript.Instance.isRunning) // growth online
         {
             if (playersPuck)
             {
-                ClientLogicScript.OnPlayerShot += IncrementBonusValue;
+                ClientLogicScript.OnPlayerShot += IncrementGrowthValue;
             }
             else
             {
-                ClientLogicScript.OnOpponentShot += IncrementBonusValue;
+                ClientLogicScript.OnOpponentShot += IncrementGrowthValue;
             }
         }
         else if (LogicScript.Instance.gameIsRunning) // growth vs CPU
         {
             if (playersPuck)
             {
-                LogicScript.OnPlayerShot += IncrementBonusValue;
+                LogicScript.OnPlayerShot += IncrementGrowthValue;
             }
             else
             {
-                LogicScript.OnOpponentShot += IncrementBonusValue;
+                LogicScript.OnOpponentShot += IncrementGrowthValue;
             }
         }
     }
 
-    private void IncrementBonusValue()
+    private void IncrementGrowthValue()
     {
-        if (this == null) { return; }
+        if (this == null || transform == null || transform.position.y < 0) { return; }
         puckBonusValue++;
         if (ComputeValue() == 0) { return; }
         LogicScript.Instance.UpdateScores();
@@ -623,15 +710,179 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
         }
     }
-
+    bool explodeFromRPC;
     public void EnableExplosion()
     {
-        explosionPowerup = true;
+        explosionPowerup++;
+    }
+
+    private void Explode()
+    {
+        if (ClientLogicScript.Instance.isRunning && !explodeFromRPC) {
+            ExplodeServerRpc();
+            return;
+        }
+        explosionPowerup--;
+        RemovePowerupText("explosion");
+        DestroyPuck();
+        explodeFromRPC = false;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void ExplodeServerRpc()
+    {
+        ExplodeClientRpc();
+    }
+
+    [ClientRpc]
+    private void ExplodeClientRpc()
+    {
+        explodeFromRPC = true;
+        Explode();
     }
 
     public void EnableHydra()
     {
-        hydraPowerup = true;
+        hydraPowerup++;
+    }
+
+    public void EnableFactory()
+    {
+        factoryPowerup = true;
+        puckBaseValue = 0; // set to valueless
+        if (ClientLogicScript.Instance.isRunning) // factory online
+        {
+            if (playersPuck)
+            {
+                ClientLogicScript.OnPlayerShot += FactoryHelper;
+            }
+            else
+            {
+                ClientLogicScript.OnOpponentShot += FactoryHelper;
+            }
+        }
+        else if (LogicScript.Instance.gameIsRunning) // factory vs CPU
+        {
+            if (playersPuck)
+            {
+                LogicScript.OnPlayerShot += FactoryHelper;
+            }
+            else
+            {
+                LogicScript.OnOpponentShot += FactoryHelper;
+            }
+        }
+    }
+
+    private void FactoryHelper()
+    {
+        if (this == null || transform == null || transform.position.y < 0) { return; }
+        if (ClientLogicScript.Instance.isRunning)
+        {
+            ServerLogicScript.Instance.PuckSpawnHelperServerRpc(playersPuck, transform.position.x, transform.position.y, 1);
+        }
+        else
+        {
+            PowerupManager.Instance.PuckSpawnHelper(playersPuck, transform.position.x, transform.position.y, 1);
+        }
+    }
+
+    public void EnableShield()
+    {
+        shieldPowerup++;
+    }
+
+    bool shieldFromRPC;
+    private void TriggerShield()
+    {
+        if (ClientLogicScript.Instance.isRunning && !shieldFromRPC)
+        {
+            TriggerShieldServerRpc();
+            return;
+        }
+        shieldPowerup--;
+        RemovePowerupText("shield");
+        // Grey particles
+        ParticleSystem collisionParticleEffect = Instantiate(collisionParticleEffectPrefab, transform.position, Quaternion.identity);
+        ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
+        emission.rateOverTime = 500f;
+        ParticleSystem.MainModule main = collisionParticleEffect.main;
+        main.startSpeed = 50f;
+        main.startColor = new Color(0.5f, 0.5f, 0.5f, 1f);
+        collisionParticleEffect.Play();
+        Destroy(collisionParticleEffect.gameObject, 10f);
+        // Screen shake
+        ScreenShake.Instance.Shake(0.25f);
+        // play break sfx
+        breakSFX.volume *= SFXvolume;
+        breakSFX.Play();
+        shieldFromRPC = false;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void TriggerShieldServerRpc()
+    {
+        TriggerShieldClientRpc();
+    }
+
+    [ClientRpc]
+    private void TriggerShieldClientRpc()
+    {
+        shieldFromRPC = true;
+        TriggerShield();
+    }
+
+    public void EnableResurrect()
+    {
+        resurrectPowerup++;
+    }
+
+    public void EnableExponent()
+    {
+        if (ClientLogicScript.Instance.isRunning) // exponent online
+        {
+            if (playersPuck)
+            {
+                ClientLogicScript.OnPlayerShot += IncrementExponentValue;
+            }
+            else
+            {
+                ClientLogicScript.OnOpponentShot += IncrementExponentValue;
+            }
+        }
+        else if (LogicScript.Instance.gameIsRunning) // exponent vs CPU
+        {
+            if (playersPuck)
+            {
+                LogicScript.OnPlayerShot += IncrementExponentValue;
+            }
+            else
+            {
+                LogicScript.OnOpponentShot += IncrementExponentValue;
+            }
+        }
+    }
+
+    private void IncrementExponentValue()
+    {
+        if (this == null || transform == null || transform.position.y < 0) { return; }
+        DoublePuckBaseValue();
+        if (ComputeValue() == 0) { return; }
+        LogicScript.Instance.UpdateScores();
+        if (IsPlayersPuck())
+        {
+            pointPlayerSFX.volume = SFXvolume;
+            pointPlayerSFX.pitch = 0.9f + (0.05f * ComputeValue());
+            pointPlayerSFX.Play();
+        }
+        else
+        {
+            pointCPUSFX.volume = SFXvolume;
+            pointCPUSFX.pitch = 0.8f + (0.05f * ComputeValue());
+            pointCPUSFX.Play();
+        }
+        var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
+        floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f + (ComputeValue() / 10), true);
     }
 
     public ParticleSystem.MinMaxGradient SetParticleColor()
@@ -652,6 +903,16 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     }
     Gradient CreateRandomGradient()
     {
+        while ( color.Length <= 4 ) // Double the colors until there are at least 4, to make the gradient switch colors more often
+        {
+            Color[] newColor = new Color[color.Length * 2];
+            for (int i = 0; i < color.Length; i++)
+            {
+                newColor[i] = color[i];
+                newColor[i + color.Length] = color[i];
+            }
+            color = newColor;
+        }
         Gradient gradient = new Gradient();
         GradientColorKey[] colorKeys = new GradientColorKey[color.Length];
         GradientAlphaKey[] alphaKeys = new GradientAlphaKey[1]; // One alpha key for consistent transparency
