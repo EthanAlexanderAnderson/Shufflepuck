@@ -130,6 +130,11 @@ public class ClientLogicScript : NetworkBehaviour
         {
             UI.shotClockText.text = Mathf.RoundToInt(shotTimer).ToString();
         }
+        // otherwise, clear the shot clock
+        else if (UI.shotClockText.text != string.Empty)
+        {
+            UI.shotClockText.text = string.Empty;
+        }
         // force shot after shot clock
         else if (logic.player.isShooting && shotTimer < 0)
         {
@@ -339,5 +344,11 @@ public class ClientLogicScript : NetworkBehaviour
     public bool IsStartingPlayer()
     {
         return logic.player.goingFirst;
+    }
+
+    [ClientRpc]
+    public void AddPlayerACKClientRPC(ClientRpcParams clientRpcParams = default)
+    {
+        UI.DisableReadyButton();
     }
 }

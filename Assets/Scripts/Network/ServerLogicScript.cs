@@ -154,6 +154,13 @@ public class ServerLogicScript : NetworkBehaviour
         {
             var clientId = serverRpcParams.Receive.SenderClientId;
 
+            // make sure we don't add the same client twice
+            if (clients.Contains(clientId))
+            {
+                Debug.Log("Client already added.");
+                return;
+            }
+
             clients.Add(clientId);
 
             Competitor newCompetitor = new(puckID);
@@ -174,6 +181,9 @@ public class ServerLogicScript : NetworkBehaviour
 
             if (powerupsEnabled && player1powerupsenabled) { player2powerupsenabled = true; }
             if (powerupsEnabled) { player1powerupsenabled = true; }
+
+            // acknowledge the client has been added
+            clientLogic.AddPlayerACKClientRPC(clientRpcParamsList[clients.Count - 1]);
 
             Debug.Log(
                 $"Client added to client list. \n" +

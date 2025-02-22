@@ -1298,9 +1298,9 @@ MonoBehaviour:
   SyncScaleX: 0
   SyncScaleY: 0
   SyncScaleZ: 0
-  PositionThreshold: 0.001
+  PositionThreshold: 0.0001
   RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
+  ScaleThreshold: 9999999
   UseQuaternionSynchronization: 0
   UseQuaternionCompression: 0
   UseHalfFloatPrecision: 0

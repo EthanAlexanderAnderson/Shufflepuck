@@ -216,7 +216,7 @@ public class MatchmakerClient : MonoBehaviour
     }
 
     public TMP_InputField lobbyCodeInputField;
-
+    [SerializeField] private GameObject joinButtion;
     // only show the Join button when 6 characters are entered, helps misinput
     public void ChangeJoinButtonVisibiity()
     {
@@ -231,6 +231,7 @@ public class MatchmakerClient : MonoBehaviour
             string lobbyCode = lobbyCodeInputField.text;
             if (lobbyCode.Length != 6)
             {
+                Debug.LogError("Invalid lobby code.");
                 UI.SetErrorMessage("Invalid lobby code.");
                 return;
             }
@@ -247,12 +248,13 @@ public class MatchmakerClient : MonoBehaviour
 
             //if (NetworkManager.Singleton.IsHost) { NetworkManager.Singleton.Shutdown(); }
             NetworkManager.Singleton.StartClient(); // Start as Client
+
             hostLobby = lobby;
             isHost = false;
 
             Debug.Log("Joined Lobby with Relay. Lobby Code: " + lobbyCode);
             UI.lobbyCodeText.text = "Lobby Code: " + lobbyCode;
-            UI.EnableReadyButton();
+            tryToEnableReadyButton = true;
         }
         catch (LobbyServiceException)
         {
@@ -280,10 +282,18 @@ public class MatchmakerClient : MonoBehaviour
         }
     }
 
-    [SerializeField] private GameObject joinButtion;
+    bool tryToEnableReadyButton;
     private void Update()
     {
         Heartbeat();
+        if (tryToEnableReadyButton)
+        {
+            if (!isHost && NetworkManager.Singleton.IsConnectedClient)
+            {
+                UI.EnableReadyButton();
+                tryToEnableReadyButton = false;
+            }
+        }
     }
 
     // Keep lobby open while waiting for joiner
