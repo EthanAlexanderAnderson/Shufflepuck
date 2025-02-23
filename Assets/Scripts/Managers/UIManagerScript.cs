@@ -161,7 +161,10 @@ public class UIManagerScript : MonoBehaviour
         if (enabledReadyButton && cooldownTime <= 0f)
         {
             readyButton.SetActive(true);
-            waitingText.text = "0/2 Players Ready";
+            if (waitingText.text != "1/2 Players Ready")
+            {
+                waitingText.text = "0/2 Players Ready";
+            }
             waitingGif.SetActive(false);
             enabledReadyButton = false;
         }

@@ -93,7 +93,19 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         // Calculate the magnitude of the velocity vector to determine the sliding noise volume
         velocity = Mathf.Sqrt(rb.velocity.x * rb.velocity.x + rb.velocity.y * rb.velocity.y);
         if (IsServer) { velocityNetworkedRounded.Value = velocity; }
-        noiseSFX.volume = logic.gameIsRunning ? (velocity / 10.0f) * SFXvolume : 0f; // only play noise if game is running (not plinko)
+        // sliding noise SFX
+        if (logic.gameIsRunning)
+        {
+            noiseSFX.volume = (velocity / 10.0f) * SFXvolume;
+        }
+        else if (ClientLogicScript.Instance.isRunning)
+        {
+            noiseSFX.volume = (velocityNetworkedRounded.Value / 10.0f) * SFXvolume;
+        }
+        else
+        {
+            noiseSFX.volume = 0f;
+        }
         noiseSFX.mute = noiseSFX.volume < 0.01;  // this is weird but it prevents the 0.1 seconds of noise on spawn
 
         // update particle emisson based on velocity
@@ -177,6 +189,12 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 rb.velocity = Vector2.zero;
                 lockPowerup = false;
             }
+
+            if (trail.endColor == Color.yellow)
+            {
+                trail.startColor = Color.white;
+                trail.endColor = Color.white;
+            }
         }
     }
 
@@ -247,19 +265,13 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             Debug.LogError("Invalid input: One or more parameters are out of the valid range (-5 to 105).");
         }
         // give high power shots an extra oomf
-        var volumeBoost = 0f;
+        var boostedPowerParameter = powerParameter;
         if (powerParameter >= 95)
         {
-            powerParameter += (powerParameter - 95) * powerModifier + 10;
-            if (trail != null)
-            {
-                trail.startColor = new Color(1, 0.8f, 0);
-                trail.endColor = Color.yellow;
-            }
-            volumeBoost += 0.2f;
+            boostedPowerParameter += (powerParameter - 95) * powerModifier + 10;
         }
         // normalize power and then scale
-        power = (powerParameter - (powerParameter - 50) * 0.5f) * powerModifier;
+        power = (boostedPowerParameter - (boostedPowerParameter - 50) * 0.5f) * powerModifier;
         // convert angle from 0-100 range to 60-120 range
         angle = (float)((-angleParameter * 0.6) + 120);
         float xcomponent = Mathf.Cos(angle * Mathf.PI / 180) * power;
@@ -271,17 +283,35 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         shotForceToAdd = vector;
         shotTorqueToAdd = spin;
         shot = true;
-        // SFX
-        shotSFX.volume = SFXvolume + volumeBoost;
-        shotSFX.Play();
-        // screen shake
-        ScreenShake.Instance.Shake(powerParameter / 500);
+        // FX
+        if (ClientLogicScript.Instance.isRunning) { ShotFXClientRpc(powerParameter); }
+        else if (LogicScript.Instance.gameIsRunning) { ShotFX(powerParameter); }
     }
 
     [ServerRpc]
     public void ShootServerRpc(float angleParameter, float powerParameter, float spinParameter = 50)
     {
         Shoot(angleParameter, powerParameter, spinParameter);
+    }
+
+    [ClientRpc]
+    public void ShotFXClientRpc(float powerParameter)
+    {
+        ShotFX(powerParameter);
+    }
+
+    private void ShotFX(float powerParameter)
+    {
+        ScreenShake.Instance.Shake(powerParameter / 500);
+        var volumeBoost = 0f;
+        if (trail != null && powerParameter >= 95)
+        {
+            volumeBoost += 0.2f;
+            trail.startColor = powerParameter >= 99 ? Color.red : Color.yellow;
+            trail.endColor = Color.yellow;
+        }
+        shotSFX.volume = SFXvolume + volumeBoost;
+        shotSFX.Play();
     }
 
     // ---------- GETTERS AND SETTERS ----------
@@ -399,40 +429,9 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     // play bonk SFX when pucks collide
     void OnCollisionEnter2D(Collision2D col)
     {
-        // Calculate the magnitude of the velocity vector to determine the bonk volume
-        velocity = Mathf.Sqrt(rb.velocity.x * rb.velocity.x + rb.velocity.y * rb.velocity.y);
-
-        if (velocity > 0.5f)
-        {
-            if (velocity > 3f)
-            {
-                bonkHeavySFX.volume = SFXvolume;
-                bonkHeavySFX.Play();
-            }
-            else
-            {
-                bonkLightSFX.volume = (SFXvolume * velocity) / 3f;
-                bonkLightSFX.Play();
-            }
-            // play collision particle effect
-            ParticleSystem collisionParticleEffect = Instantiate(collisionParticleEffectPrefab, col.GetContact(0).point, Quaternion.identity);
-            collisionParticleEffect.transform.position = col.GetContact(0).point;
-            ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
-            emission.rateOverTime = (velocity) * 75f;
-            ParticleSystem.MainModule main = collisionParticleEffect.main;
-            main.startSpeed = (velocity) * 5f;
-
-            main.startColor = SetParticleColor();
-
-            collisionParticleEffect.Play();
-            Destroy(collisionParticleEffect.gameObject, 5f);
-
-            // Screen shake
-            if (col.gameObject.CompareTag("puck"))
-            {
-                ScreenShake.Instance.Shake(velocity / 20);
-            }
-        }
+        // FX
+        if (ClientLogicScript.Instance.isRunning) { CollisionFXClientRpc(col.GetContact(0).point); }
+        else if (LogicScript.Instance.gameIsRunning) { CollisionFX(col.GetContact(0).point); }
         angularVelocityModifier = 0;
 
         // explosion powerup
@@ -444,6 +443,43 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 col.gameObject.GetComponent<PuckScript>().DestroyPuck();
                 Explode();
             }
+        }
+    }
+
+    [ClientRpc]
+    public void CollisionFXClientRpc(Vector2 colPoint)
+    {
+        CollisionFX(colPoint);
+    }
+
+    private void CollisionFX(Vector2 colPoint)
+    {
+        var velocityy = Math.Max(velocity, velocityNetworkedRounded.Value); // adapt vs cpu or online (weird way to code this but whatev)
+        if (velocityy > 0.5f)
+        {
+            if (velocityy > 3f)
+            {
+                bonkHeavySFX.volume = SFXvolume;
+                bonkHeavySFX.Play();
+            }
+            else
+            {
+                bonkLightSFX.volume = (SFXvolume * velocityy) / 3f;
+                bonkLightSFX.Play();
+            }
+            // play collision particle effect
+            ParticleSystem collisionParticleEffect = Instantiate(collisionParticleEffectPrefab, colPoint, Quaternion.identity);
+            collisionParticleEffect.transform.position = colPoint;
+            ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
+            emission.rateOverTime = (velocityy) * 75f;
+            ParticleSystem.MainModule main = collisionParticleEffect.main;
+            main.startSpeed = (velocityy) * 5f;
+
+            main.startColor = SetParticleColor();
+
+            collisionParticleEffect.Play();
+            Destroy(collisionParticleEffect.gameObject, 5f);
+            ScreenShake.Instance.Shake(velocityy / 20);
         }
     }
 
@@ -513,7 +549,6 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         puckBonusValue = 0;
         zoneMultiplier = 0;
         LogicScript.Instance.UpdateScores();
-        logic.playDestroyPuckSFX(SFXvolume);
         // hydra powerup
         while (hydraPowerup > 0)
         {
@@ -548,10 +583,30 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             }
         }
 
-        // Screen shake
-        ScreenShake.Instance.Shake(0.25f);
+        // SFX & screen shake
+        if (ClientLogicScript.Instance.isRunning)
+        {
+            DestroyPuckFXClientRpc();
+        }
+        else
+        {
+            DestroyPuckFX();
+        }
+
         // actually destroy the gameobject
         Destroy(gameObject);
+    }
+
+    private void DestroyPuckFX()
+    {
+        logic.playDestroyPuckSFX(SFXvolume);
+        ScreenShake.Instance.Shake(0.25f);
+    }
+
+    [ClientRpc]
+    public void DestroyPuckFXClientRpc()
+    {
+        DestroyPuckFX();
     }
 
     override public void OnDestroy()

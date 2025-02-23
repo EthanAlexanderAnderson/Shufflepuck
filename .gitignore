@@ -85,3 +85,13 @@ crashlytics-build.properties
 Assets/TextMesh Pro/
 .editorconfig
 *.txt
+*.txt.meta
+
+# Ignore Smooth Sync metadata and unnecessary files
+Assets/Smooth Sync/Common/Example Scene Resources/
+Assets/Smooth Sync/Common/Example Scene Resources.meta
+Assets/Smooth Sync/Netcode for GameObjects/Smooth Sync Example Scene/
+Assets/Smooth Sync/Netcode for GameObjects/Smooth Sync Example Scene.meta
+Assets/Smooth Sync/*.unitypackage
+Assets/Smooth Sync/README.txt
+Assets/Smooth Sync/README.txt.meta
