@@ -774,6 +774,12 @@ public class PowerupManager : NetworkBehaviour
         DisableCost2DiscardCards();
         // disable any cards that cost 1 puck if the player only has 1 puck left
         DisableCost1PuckCardsIfNeeded();
+        // enable insanity cards (only relevant for first hand)
+        Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
+        for (int i = 0; i < 3; i++)
+        {
+            if (lastPlayedCard >= 0 && hand[i] == Array.IndexOf(methodArray, InsanityPowerup)) { powerupButtons[i].gameObject.GetComponent<Button>().interactable = true; }
+        }
         // add the powerup animation to the animation queue
         AddPowerupPopupEffectAnimationToQueue(index);
     }
