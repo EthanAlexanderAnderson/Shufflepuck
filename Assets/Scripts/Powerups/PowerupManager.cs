@@ -6,6 +6,7 @@ using Unity.Netcode;
 using System.Collections.Generic;
 using TMPro;
 using System.Linq;
+using System.Collections;
 
 public class PowerupManager : NetworkBehaviour
 {
@@ -485,7 +486,6 @@ public class PowerupManager : NetworkBehaviour
         for (int i = 0; i < numOfValidPucks; i++)
         {
             oldPuckPositions[i] = validPucks[i].transform.position;
-            validPucks[i].transform.position = new Vector3(0, 20f * (i+1), validPucks[i].transform.position.z); // move it far away temporarily
         }
         // randomize their position (every puck must switch, that's why we don't do a built-in randomize)
         for (int i = 0; i < oldPuckPositions.Length; i++)
@@ -507,8 +507,21 @@ public class PowerupManager : NetworkBehaviour
         // move the pucks
         for (int i = 0; i < numOfValidPucks; i++)
         {
-            validPucks[i].transform.position = newPuckPositions[i]; // move the puck
+            StartCoroutine(MoveToPosition(validPucks[i], newPuckPositions[i], 10f));
         }
+    }
+
+    IEnumerator MoveToPosition(GameObject puck, Vector2 targetPosition, float speed)
+    {
+        puck.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0.5f);
+        puck.GetComponent<CircleCollider2D>().isTrigger = true;
+        while ((Vector2)puck.transform.position != targetPosition)
+        {
+            puck.transform.position = Vector2.MoveTowards(puck.transform.position, targetPosition, speed * Time.deltaTime);
+            yield return null; // Wait for the next frame
+        }
+        puck.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 1f);
+        puck.GetComponent<CircleCollider2D>().isTrigger = false;
     }
 
     private bool chaosEnsuing = false;
