@@ -69,6 +69,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     [SerializeField] private int shieldPowerup = 0;
     [SerializeField] private int resurrectPowerup = 0;
     [SerializeField] private bool factoryPowerup = false;
+    [SerializeField] private bool pushPowerup = false;
 
     void OnEnable()
     {
@@ -151,6 +152,12 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         // for phase & lock powerup
         if (IsShot() && pastSafeLine && IsStopped() && (!ClientLogicScript.Instance.isRunning || velocityNetworkedRounded.Value < 0.05f))
         {
+            if (pushPowerup)
+            {
+                GetComponentInChildren<NearbyPuckScript>().TriggerPush();
+                pushPowerup = false;
+            }
+
             if (phasePowerup)
             {
                 // if this puck is within 2 units of the nearest puck, destroy it
@@ -545,9 +552,9 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             return;
         };
         // update score
-        puckBaseValue = 0;
-        puckBonusValue = 0;
-        zoneMultiplier = 0;
+        SetPuckBaseValue(0);
+        SetPuckBonusValue(0);
+        SetZoneMultiplier(0);
         LogicScript.Instance.UpdateScores();
         // hydra powerup
         while (hydraPowerup > 0)
@@ -629,9 +636,9 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
 
         // update score
-        puckBaseValue = 0;
-        puckBonusValue = 0;
-        zoneMultiplier = 0;
+        SetPuckBaseValue(0);
+        SetPuckBonusValue(0);
+        SetZoneMultiplier(0);
         LogicScript.Instance.UpdateScores();
 
         // un sub from events
@@ -709,7 +716,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     private void IncrementGrowthValue()
     {
         if (this == null || transform == null || transform.position.y < 0) { return; }
-        puckBonusValue++;
+        IncrementPuckBonusValue(1);
         if (ComputeValue() == 0) { return; }
         LogicScript.Instance.UpdateScores();
         if (IsPlayersPuck())
@@ -804,7 +811,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public void EnableFactory()
     {
         factoryPowerup = true;
-        puckBaseValue = 0; // set to valueless
+        SetPuckBaseValue(0); // set to valueless
         if (ClientLogicScript.Instance.isRunning) // factory online
         {
             if (playersPuck)
@@ -938,6 +945,67 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
         var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
         floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f + (ComputeValue() / 10), true);
+    }
+
+    public void EnablePush()
+    {
+        pushPowerup = true;
+    }
+
+    public void EnableErratic()
+    {
+        if (ClientLogicScript.Instance.isRunning) // Erratic online
+        {
+            if (playersPuck)
+            {
+                ClientLogicScript.OnOpponentShot += Erratic;
+            }
+            else
+            {
+                ClientLogicScript.OnPlayerShot += Erratic;
+            }
+        }
+        else if (LogicScript.Instance.gameIsRunning) // Erratic vs CPU
+        {
+            if (playersPuck)
+            {
+                LogicScript.OnOpponentShot += Erratic;
+            }
+            else
+            {
+                LogicScript.OnPlayerShot += Erratic;
+            }
+        }
+    }
+
+    private void Erratic()
+    {
+        if (this == null || transform == null || transform.position.y < 0 || rb == null) { return; }
+        // move the puck with physics impulse, default random
+        float x = UnityEngine.Random.Range(-1f, 1f);
+        float y = UnityEngine.Random.Range(-1f, 1f);
+        // if greater than y=17, move down
+        if (transform.position.y > 17)
+        {
+            y = UnityEngine.Random.Range(-1f, -0.5f);
+        }
+        // if less than y=4.5, move up
+        else if (transform.position.y < 4.5)
+        {
+            y = UnityEngine.Random.Range(0.5f, 1f);
+        }
+        // if greater than x=10, move left (negative x)
+        if (transform.position.x > 10)
+        {
+            x = UnityEngine.Random.Range(-1f, -0.5f);
+        }
+        // if less than than x=-10, move right (positive x)
+        else if (transform.position.x < -10)
+        {
+            x = UnityEngine.Random.Range(0.5f, 1f);
+        }
+
+        rb.AddForce(new Vector2(x, y).normalized*5, ForceMode2D.Impulse);
     }
 
     public ParticleSystem.MinMaxGradient SetParticleColor()

@@ -51,6 +51,9 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private Sprite tripleImage;
     [SerializeField] private Sprite exponentImage;
     [SerializeField] private Sprite laserImage;
+    [SerializeField] private Sprite auraImage;
+    [SerializeField] private Sprite pushImage;
+    [SerializeField] private Sprite erraticImage;
 
     [SerializeField] private Sprite plusOneIcon;
     [SerializeField] private Sprite foresightIcon;
@@ -76,6 +79,9 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private Sprite tripleIcon;
     [SerializeField] private Sprite exponentIcon;
     [SerializeField] private Sprite laserIcon;
+    [SerializeField] private Sprite auraIcon;
+    [SerializeField] private Sprite pushIcon;
+    [SerializeField] private Sprite erraticIcon;
 
     // additional costs indexes
     private int[] cost2Discard = { 15, 16, 17}; // TODO: use indexOf in start method
@@ -122,7 +128,10 @@ public class PowerupManager : NetworkBehaviour
             InsanityPowerup, // 20
             TriplePowerup, // 21
             ExponentPowerup, // 22
-            LaserPowerup //23
+            LaserPowerup, //23
+            AuraPowerup, //24
+            PushPowerup, //25
+            ErraticPowerup //26
         };
     }
 
@@ -157,7 +166,7 @@ public class PowerupManager : NetworkBehaviour
         var pay2DiscardPossible = deck.Count >= 3;
         GetActiveCompetitor();
         Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
-        Sprite[] powerupSprites = { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage, cullImage, growthImage, lockImage, explosionImage, fogImage, hydraImage, factoryImage, shieldImage, shuffleImage, chaosImage, timesTwoImage, resurrectImage, millImage, researchImage, insanityImage, tripleImage, exponentImage, laserImage };
+        Sprite[] powerupSprites = { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage, cullImage, growthImage, lockImage, explosionImage, fogImage, hydraImage, factoryImage, shieldImage, shuffleImage, chaosImage, timesTwoImage, resurrectImage, millImage, researchImage, insanityImage, tripleImage, exponentImage, laserImage, auraImage, pushImage, erraticImage };
 
         // generate 3 unique random powerups
         int[] previouslyGeneratedIndexes = { -1, -1, -1 };
@@ -662,6 +671,41 @@ public class PowerupManager : NetworkBehaviour
         LaserScript.Instance.StartListeners(activeCompetitor.isPlayer);
     }
 
+    public void AuraPowerup() // index 24 : give +1 to nearby pucks
+    {
+        var index = Array.IndexOf(methodArray, AuraPowerup);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
+
+        activeCompetitor.activePuckObject.GetComponentInChildren<NearbyPuckScript>().EnableAura();
+
+        activeCompetitor.activePuckScript.SetPowerupText("aura");
+    }
+
+    public void PushPowerup() // index 25 : upon stopping, push all pucks away from the active puck
+    {
+        var index = Array.IndexOf(methodArray, PushPowerup);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
+
+        activeCompetitor.activePuckObject.GetComponentInChildren<NearbyPuckScript>().EnablePush();
+        activeCompetitor.activePuckScript.EnablePush();
+    }
+
+    public void ErraticPowerup() // index 26 : move randomly each shot
+    {
+        var index = Array.IndexOf(methodArray, ErraticPowerup);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
+
+        activeCompetitor.activePuckScript.EnableErratic();
+
+        activeCompetitor.activePuckScript.SetPowerupText("erratic");
+    }
+
     private bool CanPayCosts(int index)
     {
         GetActiveCompetitor();
@@ -837,8 +881,8 @@ public class PowerupManager : NetworkBehaviour
 
     public void PlayPowerupPopupEffectAnimation(int index)
     {
-        Sprite[] powerupIcon = { plusOneIcon, foresightIcon, blockIcon, boltIcon, forceFieldIcon, phaseIcon, cullIcon, growthIcon, lockIcon, explosionIcon, fogIcon, hydraIcon, factoryIcon, shieldIcon, shuffleIcon, chaosIcon, timesTwoIcon, resurrectIcon, millIcon, researchIcon, insanityIcon, tripleIcon, exponentIcon, laserIcon };
-        String[] powerupText = { "plus one", "foresight", "block", "bolt", "force field", "phase", "cull", "growth", "lock", "explosion", "fog", "hydra", "factory", "shield", "shuffle", "chaos", "times two", "resurrect", "mill", "research", "insanity", "triple", "exponent", "laser" };
+        Sprite[] powerupIcon = { plusOneIcon, foresightIcon, blockIcon, boltIcon, forceFieldIcon, phaseIcon, cullIcon, growthIcon, lockIcon, explosionIcon, fogIcon, hydraIcon, factoryIcon, shieldIcon, shuffleIcon, chaosIcon, timesTwoIcon, resurrectIcon, millIcon, researchIcon, insanityIcon, tripleIcon, exponentIcon, laserIcon, auraIcon, pushIcon, erraticIcon };
+        String[] powerupText = { "plus one", "foresight", "block", "bolt", "force field", "phase", "cull", "growth", "lock", "explosion", "fog", "hydra", "factory", "shield", "shuffle", "chaos", "times two", "resurrect", "mill", "research", "insanity", "triple", "exponent", "laser", "aura", "push", "erratic" };
 
         popupEffectIcon.sprite = powerupIcon[index];
         popupEffectText.text = powerupText[index];
