@@ -466,6 +466,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         angularVelocityModifier = 0;
 
         // explosion powerup
+        if (ClientLogicScript.Instance.isRunning && !IsServer) return; // stop explosion shuffle bug
         if (explosionPowerup > 0 && col.gameObject.CompareTag("puck"))
         {
             // Destroy the collided object
