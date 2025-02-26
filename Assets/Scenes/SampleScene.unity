@@ -3645,7 +3645,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30119a0734817b04a8239ae71211b0e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  angle: 82
+  angle: 84
   power: 88
   spin: 0
   value: 2
