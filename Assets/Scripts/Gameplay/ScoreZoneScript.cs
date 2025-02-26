@@ -33,7 +33,15 @@ public class ScoreZoneScript : MonoBehaviour
         {
             FlashZoneBorder();
             puck = collision.gameObject.transform.parent.gameObject.GetComponent<PuckScript>();
-            puck.EnterScoreZone(true, zoneMultiplier, boundary);
+            if (LogicScript.Instance.gameIsRunning)
+            {
+                puck.EnterScoreZone(true, zoneMultiplier, boundary);
+
+            }
+            else if (ClientLogicScript.Instance.isRunning)
+            {
+                puck.EnterScoreZoneClientRpc(true, zoneMultiplier, boundary);
+            }
             logic.UpdateScores();
         }
     }
@@ -46,7 +54,14 @@ public class ScoreZoneScript : MonoBehaviour
         if (collision.gameObject.layer == 3)
         {
             puck = collision.gameObject.transform.parent.gameObject.GetComponent<PuckScript>();
-            puck.ExitScoreZone(boundary, zoneMultiplier);
+            if (LogicScript.Instance.gameIsRunning)
+            {
+                puck.ExitScoreZone(boundary, zoneMultiplier);
+            }
+            else if (ClientLogicScript.Instance.isRunning)
+            {
+                puck.ExitScoreZoneClientRpc(boundary, zoneMultiplier);
+            }
             logic.UpdateScores();
         }
     }
