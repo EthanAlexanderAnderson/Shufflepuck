@@ -314,13 +314,16 @@ public class ClientLogicScript : NetworkBehaviour
     public void StopGame()
     {
         isRunning = false;
-        GameHUDManager.Instance.ChangeTurnText(String.Empty);
         activeBar = bar.ChangeBar("none");
         line.isActive = false;
         if (logic.player != null)
         {
             logic.player.isTurn = false;
             logic.player.isShooting = false;
+        }
+        if (GameHUDManager.Instance != null)
+        {
+            GameHUDManager.Instance.ChangeTurnText(String.Empty);
         }
     }
 

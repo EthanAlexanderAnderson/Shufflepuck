@@ -246,7 +246,7 @@ public class MatchmakerClient : MonoBehaviour
             RelayServerData relayServerData = new RelayServerData(joinAllocation, "dtls");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
-            //if (NetworkManager.Singleton.IsHost) { NetworkManager.Singleton.Shutdown(); }
+            if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsHost) { NetworkManager.Singleton.Shutdown(); }
             NetworkManager.Singleton.StartClient(); // Start as Client
 
             hostLobby = lobby;
@@ -314,21 +314,23 @@ public class MatchmakerClient : MonoBehaviour
     // Called by the back button, shutdowns down the lobby and stops the heartbeat
     public async void ShutdownLobby()
     {
-        try 
+        if (hostLobby != null && isHost)
         {
-            if (hostLobby != null && isHost)
+            try
             {
                 await LobbyService.Instance.DeleteLobbyAsync(hostLobby.Id);
+                Debug.Log("Lobby successfully deleted.");
             }
-        }
-        catch (LobbyServiceException e)
-        {
-            Debug.LogError(e);
+            catch (LobbyServiceException e)
+            {
+                Debug.LogError($"Failed to delete lobby: {e.Message}");
+            }
         }
 
         hostLobby = null;
         isHost = false;
     }
+
 
     // Called by the ready button
     public void AddPlayer()
@@ -346,11 +348,21 @@ public class MatchmakerClient : MonoBehaviour
     }
 
     // Stop Client
-    public void StopClient()
+    public async void StopClient()
     {
-        clientLogic.StopGame();
-        serverLogic.AlertDisconnectServerRpc();
-        serverLogic.ResetSeverVariables();
-        NetworkManager.Singleton.Shutdown();
+        ClientLogicScript.Instance.StopGame();
+        ServerLogicScript.Instance.AlertDisconnectServerRpc();
+        ServerLogicScript.Instance.ResetSeverVariables();
+
+        if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsHost)
+        {
+            NetworkManager.Singleton.Shutdown();
+        }
+
+        await Task.Delay(1000); // Add delay to ensure full shutdown
+
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(default);
+
+        Debug.Log("Client successfully shut down.");
     }
 }

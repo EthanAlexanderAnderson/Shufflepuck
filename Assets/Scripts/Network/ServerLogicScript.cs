@@ -108,7 +108,7 @@ public class ServerLogicScript : NetworkBehaviour
 
     private IEnumerator TryToEndGame()
     {
-        Debug.Log("called TryToEndGame()");
+        Debug.Log("Ending game...");
         yield return new WaitForSeconds(1f);
         clientLogic.GameResultClientRpc();
         clientLogic.ShowRematchButton();
