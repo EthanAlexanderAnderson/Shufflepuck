@@ -447,6 +447,8 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.SetPowerupText("shield");
     }
 
+    private bool isShuffling = false; // Flag to prevent multiple calls
+    private int activeMovements = 0; // Counter for tracking active movements
     public void ShufflePowerup() // index 14 : randomize positions of all pucks
     {
         var index = Array.IndexOf(methodArray, ShufflePowerup);
@@ -459,53 +461,51 @@ public class PowerupManager : NetworkBehaviour
             return;
         }
 
+        if (isShuffling) { return; } // Prevent multiple calls
+        isShuffling = true;
+
         // sort by valid / non-valid
         var allPucks = GameObject.FindGameObjectsWithTag("puck");
-        int numOfValidPucks = 0;
-        for (int i = 0; i < allPucks.Length; i++)
+        List<GameObject> validPucks = new();
+
+        foreach (var puck in allPucks)
         {
-            if (allPucks[i].transform.position.y > 0 && allPucks[i].transform.position.y < 20 && allPucks[i].transform.position.x > -12 && allPucks[i].transform.position.x < 12)
+            if (puck.transform.position.y > 0 && puck.transform.position.y < 20 &&
+                puck.transform.position.x > -12 && puck.transform.position.x < 12)
             {
-                numOfValidPucks++;
-            }
-        }
-        GameObject[] validPucks = new GameObject[numOfValidPucks];
-        int j = 0;
-        for (int i = 0; i < allPucks.Length; i++)
-        {
-            if (allPucks[i].transform.position.y > 0 && allPucks[i].transform.position.y < 20 && allPucks[i].transform.position.x > -12 && allPucks[i].transform.position.x < 12)
-            {
-                validPucks[j] = allPucks[i];
-                j++;
+                validPucks.Add(puck);
             }
         }
 
-        // get old positions of all pucks
-        Vector3[] oldPuckPositions = new Vector3[numOfValidPucks];
-        Vector3[] newPuckPositions = new Vector3[numOfValidPucks];
-        for (int i = 0; i < numOfValidPucks; i++)
-        {
-            oldPuckPositions[i] = validPucks[i].transform.position;
-        }
-        // randomize their position (every puck must switch, that's why we don't do a built-in randomize)
+        // Get old and new positions
+        Vector3[] oldPuckPositions = validPucks.Select(p => p.transform.position).ToArray();
+        Vector3[] newPuckPositions = new Vector3[validPucks.Count];
+
+        // Randomize new positions
         for (int i = 0; i < oldPuckPositions.Length; i++)
         {
+            int newIndex = Random.Range(0, newPuckPositions.Length);
             int iterations = 0;
-            var newIndex = Random.Range(0, newPuckPositions.Length);
+
             // while the new position has already been chosen (not null & not zero) OR the new position is the same as the old one, reroll
-            while (((newPuckPositions[newIndex] != null && newPuckPositions[newIndex] != Vector3.zero) || newIndex == i) && iterations < 1000)
+            while (((newPuckPositions[newIndex] != Vector3.zero) || newIndex == i) && iterations < 1000)
             {
                 newIndex = Random.Range(0, newPuckPositions.Length);
                 iterations++;
             }
-            if (iterations >= 1000) // fail case
+
+            if (iterations >= 1000)
             {
-                newIndex = i;
+                newIndex = i; // Fail-safe
             }
+
             newPuckPositions[newIndex] = oldPuckPositions[i];
         }
+
+        activeMovements = validPucks.Count; // Set movement count
+
         // move the pucks
-        for (int i = 0; i < numOfValidPucks; i++)
+        for (int i = 0; i < validPucks.Count; i++)
         {
             StartCoroutine(MoveToPosition(validPucks[i], newPuckPositions[i], 10f));
         }
@@ -513,6 +513,7 @@ public class PowerupManager : NetworkBehaviour
 
     IEnumerator MoveToPosition(GameObject puck, Vector2 targetPosition, float speed)
     {
+
         puck.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0.5f);
         puck.GetComponent<CircleCollider2D>().isTrigger = true;
         while ((Vector2)puck.transform.position != targetPosition)
@@ -522,6 +523,13 @@ public class PowerupManager : NetworkBehaviour
         }
         puck.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 1f);
         puck.GetComponent<CircleCollider2D>().isTrigger = false;
+
+        activeMovements--; // Decrease active movements count
+
+        if (activeMovements <= 0)
+        {
+            isShuffling = false; // Allow next shuffle
+        }
     }
 
     private bool chaosEnsuing = false;
