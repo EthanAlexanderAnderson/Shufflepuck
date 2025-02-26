@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 606487036771505317}
   - component: {fileID: 101564020506686078}
   - component: {fileID: 6914501702572560244}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: NearbyCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -370,6 +370,7 @@ MonoBehaviour:
   shieldPowerup: 0
   resurrectPowerup: 0
   factoryPowerup: 0
+  pushPowerup: 0
   collisionParticleEffectPrefab: {fileID: 4929346313033784861, guid: 9f76c534760375c468d38282f074644f, type: 3}
 --- !u!96 &6188019625278550676
 TrailRenderer:

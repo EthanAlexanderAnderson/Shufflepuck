@@ -162,6 +162,8 @@ public class PowerupManager : NetworkBehaviour
     public void ShuffleDeck()
     {
         chaosEnsuing = false;
+        isShuffling = false;
+        activeMovements = 0;
         if (deck == null) { LoadDeck(); }
         var deckCount = deck.Count;
         var pay2DiscardPossible = deck.Count >= 3;

@@ -43,6 +43,7 @@ public class PowerupsHUDUIManager : MonoBehaviour
         if (cardsInHand > 0)
         {
             AlphaHelper(true); // fade in menu if we have cards in hand
+            disablingMenuAlreadyInProgress = false;
         }
         else
         {
@@ -57,21 +58,21 @@ public class PowerupsHUDUIManager : MonoBehaviour
             // if paid 2 discard cost, discard the other 2 cards
             if (Array.Exists(PowerupManager.Instance.GetCost2Discard(), x => x == powerupID) && i != index && i != 3)
             {
+                cardsInHand--;
                 LeanTween.cancel(powerupButtonObjects[i]);
                 powerupButtonObjects[i].GetComponent<Button>().onClick.RemoveAllListeners();
                 var tempindex = i;
                 LeanTween.moveLocalX(powerupButtonObjects[i], -startXLocalPos, 0.5f).setEase(LeanTweenType.easeInBack).setDelay((0.1f * i) + 0.01f).setOnComplete(() => powerupButtonObjects[tempindex].SetActive(false));
-                cardsInHand--;
             }
             // regular card usage
             if (i == index)
             {
+                cardsInHand--;
                 powerupButtonObjects[i].GetComponent<Button>().onClick.RemoveAllListeners();
                 powerupButtonObjects[i].transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
                 LeanTween.cancel(powerupButtonObjects[i]);
                 LeanTween.scale(powerupButtonObjects[i], new Vector3(1f, 1f, 1f), 0.5f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f).setOnComplete(DisableMenuIfHandEmpty);
                 LeanTween.scale(powerupButtonObjects[i], new Vector3(0f, 0f, 0f), 0.5f).setEase(LeanTweenType.easeOutElastic).setDelay(0.81f).setOnComplete(() => powerupButtonObjects[index].SetActive(false));
-                cardsInHand--;
             }
         }
     }

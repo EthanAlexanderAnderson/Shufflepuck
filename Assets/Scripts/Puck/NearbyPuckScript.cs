@@ -57,14 +57,17 @@ public class NearbyPuckScript : MonoBehaviour
     {
         if (collision.gameObject.layer != 3 && collision.gameObject.CompareTag("puck")) // ignore center puck collider & nearby collider
         {
-            pucksInPath.Remove(collision.gameObject);
-            if (auraEnabled)
+            if (pucksInPath.Contains(collision.gameObject))
             {
-                var puckScript = collision.GetComponent<PuckScript>();
-                if (puckScript.IsPlayersPuck() == isPlayersPuck)
+                pucksInPath.Remove(collision.gameObject);
+                if (auraEnabled)
                 {
-                    puckScript.IncrementPuckBonusValue(-auraCount);
-                    LogicScript.Instance.UpdateScores();
+                    var puckScript = collision.GetComponent<PuckScript>();
+                    if (puckScript.IsPlayersPuck() == isPlayersPuck)
+                    {
+                        puckScript.IncrementPuckBonusValue(-auraCount);
+                        LogicScript.Instance.UpdateScores();
+                    }
                 }
             }
         }
