@@ -99,6 +99,7 @@ public class UIManagerScript : MonoBehaviour
     private GameObject previousActiveUI;
 
     [SerializeField] private TMP_Text wallText;
+    [SerializeField] private GameObject fade;
 
     // dark / light mode assets
     private bool darkMode = false;
@@ -515,17 +516,9 @@ public class UIManagerScript : MonoBehaviour
         if (newUI == gameHud)
         {
             ResetHUD();
-            titleScreenBackground.SetActive(false);
-            //ApplyDarkMode();
-        }
-        else if (newUI == gameResultScreen)
-        {
-            titleScreenBackground.SetActive(false);
-            //ApplyDarkMode();
         }
         else if (newUI == titleScreen)
         {
-            titleScreenBackground.SetActive(true);
             // blink puck screen for unlocks
             customizeScreen.SetActive(true);
             UpdateLocks();
@@ -535,13 +528,10 @@ public class UIManagerScript : MonoBehaviour
         }
         else if (newUI == profileScreen)
         {
-            titleScreenBackground.SetActive(true);
             dailyChallenge.SetText();
         }
-        else
-        {
-            titleScreenBackground.SetActive(true);
-        }
+        titleScreenBackground.SetActive(newUI != gameHud && newUI != gameResultScreen);
+        fade.SetActive(newUI == gameHud || newUI == gameResultScreen);
         ApplyDarkMode();
     }
 
