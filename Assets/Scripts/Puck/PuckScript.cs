@@ -1033,23 +1033,23 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         // move the puck with physics impulse, default random
         float x = UnityEngine.Random.Range(-1f, 1f);
         float y = UnityEngine.Random.Range(-1f, 1f);
-        // if greater than y=17, move down
-        if (transform.position.y > 17)
+        // if greater than this y, move down
+        if (transform.position.y > 15.5)
         {
             y = UnityEngine.Random.Range(-1f, -0.5f);
         }
-        // if less than y=4.5, move up
-        else if (transform.position.y < 4.5)
+        // if less than this y, move up
+        else if (transform.position.y < 8.5)
         {
             y = UnityEngine.Random.Range(0.5f, 1f);
         }
-        // if greater than x=10, move left (negative x)
-        if (transform.position.x > 10)
+        // if greater than this x, move left (negative x)
+        if (transform.position.x > 7)
         {
             x = UnityEngine.Random.Range(-1f, -0.5f);
         }
-        // if less than than x=-10, move right (positive x)
-        else if (transform.position.x < -10)
+        // if less than than this x, move right (positive x)
+        else if (transform.position.x < -7)
         {
             x = UnityEngine.Random.Range(0.5f, 1f);
         }
