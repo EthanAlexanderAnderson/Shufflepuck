@@ -60,9 +60,10 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
                 if (isVisible)
                 {
                     float angle = GetAngleToAnchor(puckPosition);
-                    if (puckValue > highestValue)
+                    if ((puckValue + tempValueModifier) > (highestValue + valueModifier))
                     {
-                        highestValue = puckValue + tempValueModifier;
+                        highestValue = puckValue;
+                        valueModifier = tempValueModifier;
                         bestAngle = angle;
                         powerModifier = tempPowerModifier;
                     }
@@ -74,11 +75,11 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
         bestAngle = (bestAngle + 180f) % 360f;
 
         // make sure we have good values
-        if (highestValue <= 0) { return 0; } // this is just here so we don't Debug.Log for 0 value paths
+        if (highestValue <= 0 || (highestValue * 3 + valueModifier) <= 0) { return 0; } // this is just here so we don't Debug.Log for 0 value paths
         if (bestAngle < 60 || bestAngle > 120) { Debug.LogError("SMART SCAN ERROR: BAD ANGLE " + bestAngle); return 0; }
 
         // return best puck
-        Debug.Log($"Best Puck Found! Value: {highestValue * 3 + valueModifier} at Angle: {bestAngle}");
+        Debug.Log($"Smart Scan Value: {highestValue * 3} + {valueModifier} at Angle: {bestAngle}");
         return highestValue * 3 + valueModifier;
     }
 
@@ -91,7 +92,7 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
     {
         float tempPowerModifier = 0;
         int tempValueModifier = 0;
-        Vector3[] offsets = { new(-1.1f, 0, 0), new(1.1f, 0, 0) }; // 1 for puck width + small 0.1 offsets to leave some room for error or movement
+        Vector3[] offsets = { new(-1f, 0, 0), new(1f, 0, 0) }; // 1 for puck width
         List<Vector3> directions = new();
         List<Vector3> rayOrigins = new();
 
@@ -137,7 +138,19 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
                 {
                     var puckScript = hit.collider.GetComponent<PuckScript>();
                     if (puckScript.GetZoneMultiplier() <= 0) continue; // Ignore pucks in the offzone
-                    if (puckScript.IsPlayersPuck() && !puckScript.IsLocked()) { tempPowerModifier += 2.5f; tempValueModifier += puckScript.ComputeValue(); continue; }
+                    if (!puckScript.IsLocked()) // locked puck behind prevents knockout
+                    {
+                        if (puckScript.IsPlayersPuck())
+                        {
+                            tempValueModifier += puckScript.ComputeValue();
+                        }
+                        else // it's okay to have CPU pucks behind, it just makes the path less valuable
+                        {
+                            tempValueModifier -= (puckScript.ComputeValue() * 4);
+                        }
+                        tempPowerModifier += 2.5f;
+                        continue;
+                    }
                 }
 
                 hitPoints.Add(hit.point);
