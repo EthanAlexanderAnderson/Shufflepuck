@@ -5,6 +5,7 @@
  * This code will show me exactly which function caused the error without digging in server logs.
  */
 
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
@@ -98,45 +99,19 @@ public class ServerLogicScript : NetworkBehaviour
                     return;
                 }
             }
-            clientLogic.GameResultClientRpc();
-            // host only, show rematch button
-            clientLogic.ShowRematchButton();
-            // take note of winner (functionally this does nothing rn lol)
-            try
-            {
-                var (hosterScore, joinerScore, clientID) = PuckManager.Instance.UpdateScoresOnlineHelper();
-                //Debug.Log("[SERVER] Scores: " + hosterScore + " : " + joinerScore);
-                //Debug.Log("[SERVER] " + clientID);
-                for (int i = 0; i < competitorList.Count; i++)
-                {
-                    //Debug.Log("[SERVER]" + " " + i + " " + competitorList[i].clientID);
-                    if (i > 1) { Debug.LogError("TOO MANY PLAYERS"); break; }
-                    if (clients[i] == clientID)
-                    {
-                        competitorList[i].score = hosterScore;
-                    }
-                    else
-                    {
-                        competitorList[i].score = joinerScore;
-                    }
-                }
-                if (competitorList[0].score > competitorList[1].score)
-                {
-                    competitorList[0].wins++;
-                }
-                else if (competitorList[0].score < competitorList[1].score)
-                {
-                    competitorList[1].wins++;
-                }
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError(e);
-                clientLogic.SetErrorMessageClientRpc(6);
-            }
+            gameIsRunning = false;
+            StartCoroutine(TryToEndGame());
             // this is here so this block doesn't get called repeatedly
             sentGameResult = true;
         }
+    }
+
+    private IEnumerator TryToEndGame()
+    {
+        Debug.Log("Ending game...");
+        yield return new WaitForSeconds(1f);
+        clientLogic.GameResultClientRpc();
+        clientLogic.ShowRematchButton();
     }
 
     public Competitor GetActiveCompetitor()
@@ -153,6 +128,13 @@ public class ServerLogicScript : NetworkBehaviour
         try
         {
             var clientId = serverRpcParams.Receive.SenderClientId;
+
+            // make sure we don't add the same client twice
+            if (clients.Contains(clientId))
+            {
+                Debug.Log("Client already added.");
+                return;
+            }
 
             clients.Add(clientId);
 
@@ -174,6 +156,9 @@ public class ServerLogicScript : NetworkBehaviour
 
             if (powerupsEnabled && player1powerupsenabled) { player2powerupsenabled = true; }
             if (powerupsEnabled) { player1powerupsenabled = true; }
+
+            // acknowledge the client has been added
+            clientLogic.AddPlayerACKClientRPC(clientRpcParamsList[clients.Count - 1]);
 
             Debug.Log(
                 $"Client added to client list. \n" +
@@ -252,7 +237,7 @@ public class ServerLogicScript : NetworkBehaviour
         CreatePuck();
     }
 
-    // swapCompetitor is just for triple right now
+    // isNonActiveCompetitorBit is just for triple right now
     private void CreatePuck(int isNonActiveCompetitorBit = 0)
     {
         try
@@ -260,7 +245,6 @@ public class ServerLogicScript : NetworkBehaviour
             // if both players have 0 pucks, end game
             if (competitorList.All(n => n.puckCount <= 0) && triplePowerup <= 0)
             {
-                clientLogic.GameOverConfirmationClientRpc();
                 gameIsRunning = false;
                 return;
             }
@@ -314,7 +298,7 @@ public class ServerLogicScript : NetworkBehaviour
         Shoot(angleParameter, powerParameter, spinParameter);
     }
 
-    // Shoot the puck. swapCompetitor is just for triple right now
+    // Shoot the puck. isNonActiveCompetitorBit is just for triple right now
     public void Shoot(float angleParameter, float powerParameter, float spinParameter, int isNonActiveCompetitorBit = 0)
     {
         try
@@ -346,7 +330,7 @@ public class ServerLogicScript : NetworkBehaviour
                 // tell both players the turn is swapping
                 clientLogic.StartTurnClientRpc(true, activeCompetitorIndex == startingPlayerIndex, clientRpcParamsList[activeCompetitorIndex]);
                 clientLogic.StartTurnClientRpc(false, activeCompetitorIndex == startingPlayerIndex, clientRpcParamsList[activeCompetitorIndex ^ 1]);
-                // reset shto clock
+                // reset shot clock
                 shotTimer = (player1powerupsenabled && player2powerupsenabled) ? 42 : 21;
             }
         }
@@ -365,6 +349,12 @@ public class ServerLogicScript : NetworkBehaviour
             activeCompetitorIndex = 0;
         }
         return activeCompetitorIndex;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void CleanupDeadPucksServerRpc()
+    {
+        CleanupDeadPucks();
     }
 
     // Server cleans up out of bounds pucks

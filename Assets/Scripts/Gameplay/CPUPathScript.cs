@@ -107,7 +107,7 @@ public class CPUPathScript : MonoBehaviour, CPUPathInterface
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.layer != 3) // ignore center puck collider
+        if (collision.gameObject.layer != 3 && collision.gameObject.CompareTag("puck")) // ignore center puck collider & nearby collider
         {
             if (!pucksInPath.Contains(collision.gameObject))
             {
@@ -126,7 +126,7 @@ public class CPUPathScript : MonoBehaviour, CPUPathInterface
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.layer != 3) // ignore center puck collider
+        if (collision.gameObject.layer != 3 && collision.gameObject.CompareTag("puck")) // ignore center puck collider & nearby collider
         { 
             pucksInPath.Remove(collision.gameObject);
 #if (UNITY_EDITOR)

@@ -14,6 +14,11 @@ public class PlinkoBucketScript : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (!collision.gameObject.CompareTag("puck"))
+        {
+            return;
+        }
+
         if (plinkoManager == null)
         {
             plinkoManager = PlinkoManager.Instance;

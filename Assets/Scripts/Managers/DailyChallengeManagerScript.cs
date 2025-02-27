@@ -31,7 +31,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
     private int[] easyChallengeReward = { 0, 40, 60, 60, 80, 80 };
     private int[,] easyChallengeCondition = { { 0, 0, 0 }, { 0, 1, 0 }, { 1, 1, 0 }, { 0, 3, 0 }, { 1, 3, 0 }, { 0, 5, 0 } }; // {difficulty, score difference, isOnline}
     private string[] hardChallengeText = { "Claimed", "Beat the hard CPU", "Beat the hard CPU by 3 or more points", "Beat the medium CPU by 5 or more points", "Beat the hard CPU by 5 or more points", "Win an online match" };
-    private int[] hardChallengeReward = { 0, 80, 100, 100, 120, 200 };
+    private int[] hardChallengeReward = { 0, 80, 150, 100, 300, 250 };
     private int[,] hardChallengeCondition = { { 0, 0, 0 }, { 2, 1, 0 }, { 2, 3, 0 }, { 1, 5, 0 }, { 2, 5, 0 }, { 2, 1, 1 } }; // {difficulty, score difference, isOnline}
 
     // Daily streak stuff

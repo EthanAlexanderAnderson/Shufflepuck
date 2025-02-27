@@ -85,6 +85,10 @@ public class SoundManagerScript : MonoBehaviour
     {
         float roundedMusic = Mathf.Round(musicSlider.value * 100f) / 100f;
         musicComponent.volume = roundedMusic;
+        if (isInitialized)
+        {
+            musicComponent.mute = false;
+        }
         PlayerPrefs.SetFloat("MusicVolume", roundedMusic);
     }
 

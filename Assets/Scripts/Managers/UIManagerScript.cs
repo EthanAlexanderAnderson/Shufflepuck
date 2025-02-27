@@ -99,6 +99,7 @@ public class UIManagerScript : MonoBehaviour
     private GameObject previousActiveUI;
 
     [SerializeField] private TMP_Text wallText;
+    [SerializeField] private GameObject fade;
 
     // dark / light mode assets
     private bool darkMode = false;
@@ -161,7 +162,10 @@ public class UIManagerScript : MonoBehaviour
         if (enabledReadyButton && cooldownTime <= 0f)
         {
             readyButton.SetActive(true);
-            waitingText.text = "0/2 Players Ready";
+            if (waitingText.text != "1/2 Players Ready")
+            {
+                waitingText.text = "0/2 Players Ready";
+            }
             waitingGif.SetActive(false);
             enabledReadyButton = false;
         }
@@ -512,17 +516,9 @@ public class UIManagerScript : MonoBehaviour
         if (newUI == gameHud)
         {
             ResetHUD();
-            titleScreenBackground.SetActive(false);
-            //ApplyDarkMode();
-        }
-        else if (newUI == gameResultScreen)
-        {
-            titleScreenBackground.SetActive(false);
-            //ApplyDarkMode();
         }
         else if (newUI == titleScreen)
         {
-            titleScreenBackground.SetActive(true);
             // blink puck screen for unlocks
             customizeScreen.SetActive(true);
             UpdateLocks();
@@ -532,13 +528,10 @@ public class UIManagerScript : MonoBehaviour
         }
         else if (newUI == profileScreen)
         {
-            titleScreenBackground.SetActive(true);
             dailyChallenge.SetText();
         }
-        else
-        {
-            titleScreenBackground.SetActive(true);
-        }
+        titleScreenBackground.SetActive(newUI != gameHud && newUI != gameResultScreen);
+        fade.SetActive(newUI == gameHud || newUI == gameResultScreen);
         ApplyDarkMode();
     }
 
@@ -594,9 +587,15 @@ public class UIManagerScript : MonoBehaviour
     public void EnableReadyButton()
     {
         enabledReadyButton = true;
-        cooldownTime = 5.0f;
+        cooldownTime = 1f;
         waitingBackButton.SetActive(false);
         // the waiting text & gif also update after cooldown to prevent confusion
+    }
+
+    public void DisableReadyButton()
+    {
+        enabledReadyButton = false;
+        readyButton.SetActive(false);
     }
 
     public void FailedToFindMatch()

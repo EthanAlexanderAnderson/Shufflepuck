@@ -6,6 +6,7 @@ using Unity.Netcode;
 using System.Collections.Generic;
 using TMPro;
 using System.Linq;
+using System.Collections;
 
 public class PowerupManager : NetworkBehaviour
 {
@@ -51,6 +52,9 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private Sprite tripleImage;
     [SerializeField] private Sprite exponentImage;
     [SerializeField] private Sprite laserImage;
+    [SerializeField] private Sprite auraImage;
+    [SerializeField] private Sprite pushImage;
+    [SerializeField] private Sprite erraticImage;
 
     [SerializeField] private Sprite plusOneIcon;
     [SerializeField] private Sprite foresightIcon;
@@ -76,6 +80,9 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private Sprite tripleIcon;
     [SerializeField] private Sprite exponentIcon;
     [SerializeField] private Sprite laserIcon;
+    [SerializeField] private Sprite auraIcon;
+    [SerializeField] private Sprite pushIcon;
+    [SerializeField] private Sprite erraticIcon;
 
     // additional costs indexes
     private int[] cost2Discard = { 15, 16, 17}; // TODO: use indexOf in start method
@@ -122,7 +129,10 @@ public class PowerupManager : NetworkBehaviour
             InsanityPowerup, // 20
             TriplePowerup, // 21
             ExponentPowerup, // 22
-            LaserPowerup //23
+            LaserPowerup, //23
+            AuraPowerup, //24
+            PushPowerup, //25
+            ErraticPowerup //26
         };
     }
 
@@ -152,12 +162,14 @@ public class PowerupManager : NetworkBehaviour
     public void ShuffleDeck()
     {
         chaosEnsuing = false;
+        isShuffling = false;
+        activeMovements = 0;
         if (deck == null) { LoadDeck(); }
         var deckCount = deck.Count;
         var pay2DiscardPossible = deck.Count >= 3;
         GetActiveCompetitor();
         Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
-        Sprite[] powerupSprites = { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage, cullImage, growthImage, lockImage, explosionImage, fogImage, hydraImage, factoryImage, shieldImage, shuffleImage, chaosImage, timesTwoImage, resurrectImage, millImage, researchImage, insanityImage, tripleImage, exponentImage, laserImage };
+        Sprite[] powerupSprites = { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage, cullImage, growthImage, lockImage, explosionImage, fogImage, hydraImage, factoryImage, shieldImage, shuffleImage, chaosImage, timesTwoImage, resurrectImage, millImage, researchImage, insanityImage, tripleImage, exponentImage, laserImage, auraImage, pushImage, erraticImage };
 
         // generate 3 unique random powerups
         int[] previouslyGeneratedIndexes = { -1, -1, -1 };
@@ -437,6 +449,8 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.SetPowerupText("shield");
     }
 
+    private bool isShuffling = false; // Flag to prevent multiple calls
+    private int activeMovements = 0; // Counter for tracking active movements
     public void ShufflePowerup() // index 14 : randomize positions of all pucks
     {
         var index = Array.IndexOf(methodArray, ShufflePowerup);
@@ -449,56 +463,74 @@ public class PowerupManager : NetworkBehaviour
             return;
         }
 
+        if (isShuffling) { return; } // Prevent multiple calls
+        isShuffling = true;
+
         // sort by valid / non-valid
         var allPucks = GameObject.FindGameObjectsWithTag("puck");
-        int numOfValidPucks = 0;
-        for (int i = 0; i < allPucks.Length; i++)
+        List<GameObject> validPucks = new();
+
+        foreach (var puck in allPucks)
         {
-            if (allPucks[i].transform.position.y > 0 && allPucks[i].transform.position.y < 20 && allPucks[i].transform.position.x > -12 && allPucks[i].transform.position.x < 12)
+            if (puck.transform.position.y > 0 && puck.transform.position.y < 20 &&
+                puck.transform.position.x > -12 && puck.transform.position.x < 12)
             {
-                numOfValidPucks++;
-            }
-        }
-        GameObject[] validPucks = new GameObject[numOfValidPucks];
-        int j = 0;
-        for (int i = 0; i < allPucks.Length; i++)
-        {
-            if (allPucks[i].transform.position.y > 0 && allPucks[i].transform.position.y < 20 && allPucks[i].transform.position.x > -12 && allPucks[i].transform.position.x < 12)
-            {
-                validPucks[j] = allPucks[i];
-                j++;
+                validPucks.Add(puck);
             }
         }
 
-        // get old positions of all pucks
-        Vector3[] oldPuckPositions = new Vector3[numOfValidPucks];
-        Vector3[] newPuckPositions = new Vector3[numOfValidPucks];
-        for (int i = 0; i < numOfValidPucks; i++)
-        {
-            oldPuckPositions[i] = validPucks[i].transform.position;
-            validPucks[i].transform.position = new Vector3(0, 20f * (i+1), validPucks[i].transform.position.z); // move it far away temporarily
-        }
-        // randomize their position (every puck must switch, that's why we don't do a built-in randomize)
+        // Get old and new positions
+        Vector3[] oldPuckPositions = validPucks.Select(p => p.transform.position).ToArray();
+        Vector3[] newPuckPositions = new Vector3[validPucks.Count];
+
+        // Randomize new positions
         for (int i = 0; i < oldPuckPositions.Length; i++)
         {
+            int newIndex = Random.Range(0, newPuckPositions.Length);
             int iterations = 0;
-            var newIndex = Random.Range(0, newPuckPositions.Length);
+
             // while the new position has already been chosen (not null & not zero) OR the new position is the same as the old one, reroll
-            while (((newPuckPositions[newIndex] != null && newPuckPositions[newIndex] != Vector3.zero) || newIndex == i) && iterations < 1000)
+            while (((newPuckPositions[newIndex] != Vector3.zero) || newIndex == i) && iterations < 1000)
             {
                 newIndex = Random.Range(0, newPuckPositions.Length);
                 iterations++;
             }
-            if (iterations >= 1000) // fail case
+
+            if (iterations >= 1000)
             {
-                newIndex = i;
+                newIndex = i; // Fail-safe
             }
+
             newPuckPositions[newIndex] = oldPuckPositions[i];
         }
+
+        activeMovements = validPucks.Count; // Set movement count
+
         // move the pucks
-        for (int i = 0; i < numOfValidPucks; i++)
+        for (int i = 0; i < validPucks.Count; i++)
         {
-            validPucks[i].transform.position = newPuckPositions[i]; // move the puck
+            StartCoroutine(MoveToPosition(validPucks[i], newPuckPositions[i], 10f));
+        }
+    }
+
+    IEnumerator MoveToPosition(GameObject puck, Vector2 targetPosition, float speed)
+    {
+
+        puck.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0.5f);
+        puck.GetComponent<CircleCollider2D>().isTrigger = true;
+        while ((Vector2)puck.transform.position != targetPosition)
+        {
+            puck.transform.position = Vector2.MoveTowards(puck.transform.position, targetPosition, speed * Time.deltaTime);
+            yield return null; // Wait for the next frame
+        }
+        puck.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 1f);
+        puck.GetComponent<CircleCollider2D>().isTrigger = false;
+
+        activeMovements--; // Decrease active movements count
+
+        if (activeMovements <= 0)
+        {
+            isShuffling = false; // Allow next shuffle
         }
     }
 
@@ -662,6 +694,41 @@ public class PowerupManager : NetworkBehaviour
         LaserScript.Instance.StartListeners(activeCompetitor.isPlayer);
     }
 
+    public void AuraPowerup() // index 24 : give +1 to nearby pucks
+    {
+        var index = Array.IndexOf(methodArray, AuraPowerup);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
+
+        activeCompetitor.activePuckObject.GetComponentInChildren<NearbyPuckScript>().EnableAura();
+
+        activeCompetitor.activePuckScript.SetPowerupText("aura");
+    }
+
+    public void PushPowerup() // index 25 : upon stopping, push all pucks away from the active puck
+    {
+        var index = Array.IndexOf(methodArray, PushPowerup);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
+
+        activeCompetitor.activePuckObject.GetComponentInChildren<NearbyPuckScript>().EnablePush();
+        activeCompetitor.activePuckScript.EnablePush();
+    }
+
+    public void ErraticPowerup() // index 26 : move randomly each shot
+    {
+        var index = Array.IndexOf(methodArray, ErraticPowerup);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
+
+        activeCompetitor.activePuckScript.EnableErratic();
+
+        activeCompetitor.activePuckScript.SetPowerupText("erratic");
+    }
+
     private bool CanPayCosts(int index)
     {
         GetActiveCompetitor();
@@ -730,6 +797,12 @@ public class PowerupManager : NetworkBehaviour
         DisableCost2DiscardCards();
         // disable any cards that cost 1 puck if the player only has 1 puck left
         DisableCost1PuckCardsIfNeeded();
+        // enable insanity cards (only relevant for first hand)
+        Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
+        for (int i = 0; i < 3; i++)
+        {
+            if (lastPlayedCard >= 0 && hand[i] == Array.IndexOf(methodArray, InsanityPowerup)) { powerupButtons[i].gameObject.GetComponent<Button>().interactable = true; }
+        }
         // add the powerup animation to the animation queue
         AddPowerupPopupEffectAnimationToQueue(index);
     }
@@ -837,8 +910,8 @@ public class PowerupManager : NetworkBehaviour
 
     public void PlayPowerupPopupEffectAnimation(int index)
     {
-        Sprite[] powerupIcon = { plusOneIcon, foresightIcon, blockIcon, boltIcon, forceFieldIcon, phaseIcon, cullIcon, growthIcon, lockIcon, explosionIcon, fogIcon, hydraIcon, factoryIcon, shieldIcon, shuffleIcon, chaosIcon, timesTwoIcon, resurrectIcon, millIcon, researchIcon, insanityIcon, tripleIcon, exponentIcon, laserIcon };
-        String[] powerupText = { "plus one", "foresight", "block", "bolt", "force field", "phase", "cull", "growth", "lock", "explosion", "fog", "hydra", "factory", "shield", "shuffle", "chaos", "times two", "resurrect", "mill", "research", "insanity", "triple", "exponent", "laser" };
+        Sprite[] powerupIcon = { plusOneIcon, foresightIcon, blockIcon, boltIcon, forceFieldIcon, phaseIcon, cullIcon, growthIcon, lockIcon, explosionIcon, fogIcon, hydraIcon, factoryIcon, shieldIcon, shuffleIcon, chaosIcon, timesTwoIcon, resurrectIcon, millIcon, researchIcon, insanityIcon, tripleIcon, exponentIcon, laserIcon, auraIcon, pushIcon, erraticIcon };
+        String[] powerupText = { "plus one", "foresight", "block", "bolt", "force field", "phase", "cull", "growth", "lock", "explosion", "fog", "hydra", "factory", "shield", "shuffle", "chaos", "times two", "resurrect", "mill", "research", "insanity", "triple", "exponent", "laser", "aura", "push", "erratic" };
 
         popupEffectIcon.sprite = powerupIcon[index];
         popupEffectText.text = powerupText[index];

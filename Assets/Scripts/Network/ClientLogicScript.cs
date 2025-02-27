@@ -84,6 +84,7 @@ public class ClientLogicScript : NetworkBehaviour
         // start turn, do this once then start shooting
         if (logic.player.isTurn && puckManager.AllPucksAreSlowedClient())
         {
+            ServerLogicScript.Instance.CleanupDeadPucksServerRpc();
             activeBar = bar.ChangeBar("angle", logic.player.goingFirst);
             line.isActive = true;
             arrow.SetActive(true);
@@ -129,6 +130,11 @@ public class ClientLogicScript : NetworkBehaviour
         if (logic.player.isShooting && shotTimer <= 10.5 && shotTimer > 0)
         {
             UI.shotClockText.text = Mathf.RoundToInt(shotTimer).ToString();
+        }
+        // otherwise, clear the shot clock
+        else if (UI.shotClockText.text != string.Empty)
+        {
+            UI.shotClockText.text = string.Empty;
         }
         // force shot after shot clock
         else if (logic.player.isShooting && shotTimer < 0)
@@ -203,19 +209,6 @@ public class ClientLogicScript : NetworkBehaviour
         if (!IsClient) return;
 
         UI.waitingText.text = "1/2 Players Ready";
-    }
-
-    // Server tells the client the game is over, and to display "game over" to the player
-    [ClientRpc]
-    public void GameOverConfirmationClientRpc()
-    {
-        if (!IsClient) return;
-
-        Debug.Log("Game Over");
-        isRunning = false;
-        GameHUDManager.Instance.ChangeTurnText(String.Empty);
-        FogScript.Instance.DisableFog();
-        LaserScript.Instance.DisableLaser();
     }
 
     // Server updates us with match result, for now we fetch score local
@@ -321,13 +314,16 @@ public class ClientLogicScript : NetworkBehaviour
     public void StopGame()
     {
         isRunning = false;
-        GameHUDManager.Instance.ChangeTurnText(String.Empty);
         activeBar = bar.ChangeBar("none");
         line.isActive = false;
         if (logic.player != null)
         {
             logic.player.isTurn = false;
             logic.player.isShooting = false;
+        }
+        if (GameHUDManager.Instance != null)
+        {
+            GameHUDManager.Instance.ChangeTurnText(String.Empty);
         }
     }
 
@@ -339,5 +335,11 @@ public class ClientLogicScript : NetworkBehaviour
     public bool IsStartingPlayer()
     {
         return logic.player.goingFirst;
+    }
+
+    [ClientRpc]
+    public void AddPlayerACKClientRPC(ClientRpcParams clientRpcParams = default)
+    {
+        UI.DisableReadyButton();
     }
 }

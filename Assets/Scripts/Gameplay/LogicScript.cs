@@ -141,9 +141,6 @@ public class LogicScript : MonoBehaviour
         // only do this stuff when game is running (not in menu etc.)
         if (gameIsRunning && (player.puckCount > 0 || opponent.puckCount > 0))
         {
-            // clear pucks in non-safe zones
-            puckManager.CleanupDeadPucks();
-
             // update wall status
             if (wallCount == 0 && puckManager.AllPucksAreSlowedMore())
             {
@@ -383,6 +380,7 @@ public class LogicScript : MonoBehaviour
     private float triplePower, tripleAngle, tripleSpin;
     private void Shoot(float angle, float power, float spin = 50.0f)
     {
+        puckManager.CleanupDeadPucks();
         powerupManager.DisableForceFieldIfNecessary();
         Debug.Log("Shooting: " + angle + " | " + power + " | " + spin);
         activeBar = bar.ChangeBar("none");

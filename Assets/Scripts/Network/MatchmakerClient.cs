@@ -216,7 +216,7 @@ public class MatchmakerClient : MonoBehaviour
     }
 
     public TMP_InputField lobbyCodeInputField;
-
+    [SerializeField] private GameObject joinButtion;
     // only show the Join button when 6 characters are entered, helps misinput
     public void ChangeJoinButtonVisibiity()
     {
@@ -231,6 +231,7 @@ public class MatchmakerClient : MonoBehaviour
             string lobbyCode = lobbyCodeInputField.text;
             if (lobbyCode.Length != 6)
             {
+                Debug.LogError("Invalid lobby code.");
                 UI.SetErrorMessage("Invalid lobby code.");
                 return;
             }
@@ -245,14 +246,15 @@ public class MatchmakerClient : MonoBehaviour
             RelayServerData relayServerData = new RelayServerData(joinAllocation, "dtls");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
-            //if (NetworkManager.Singleton.IsHost) { NetworkManager.Singleton.Shutdown(); }
+            if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsHost) { NetworkManager.Singleton.Shutdown(); }
             NetworkManager.Singleton.StartClient(); // Start as Client
+
             hostLobby = lobby;
             isHost = false;
 
             Debug.Log("Joined Lobby with Relay. Lobby Code: " + lobbyCode);
             UI.lobbyCodeText.text = "Lobby Code: " + lobbyCode;
-            UI.EnableReadyButton();
+            tryToEnableReadyButton = true;
         }
         catch (LobbyServiceException)
         {
@@ -280,10 +282,18 @@ public class MatchmakerClient : MonoBehaviour
         }
     }
 
-    [SerializeField] private GameObject joinButtion;
+    bool tryToEnableReadyButton;
     private void Update()
     {
         Heartbeat();
+        if (tryToEnableReadyButton)
+        {
+            if (!isHost && NetworkManager.Singleton.IsConnectedClient)
+            {
+                UI.EnableReadyButton();
+                tryToEnableReadyButton = false;
+            }
+        }
     }
 
     // Keep lobby open while waiting for joiner
@@ -304,21 +314,23 @@ public class MatchmakerClient : MonoBehaviour
     // Called by the back button, shutdowns down the lobby and stops the heartbeat
     public async void ShutdownLobby()
     {
-        try 
+        if (hostLobby != null && isHost)
         {
-            if (hostLobby != null && isHost)
+            try
             {
                 await LobbyService.Instance.DeleteLobbyAsync(hostLobby.Id);
+                Debug.Log("Lobby successfully deleted.");
             }
-        }
-        catch (LobbyServiceException e)
-        {
-            Debug.LogError(e);
+            catch (LobbyServiceException e)
+            {
+                Debug.LogError($"Failed to delete lobby: {e.Message}");
+            }
         }
 
         hostLobby = null;
         isHost = false;
     }
+
 
     // Called by the ready button
     public void AddPlayer()
@@ -336,11 +348,21 @@ public class MatchmakerClient : MonoBehaviour
     }
 
     // Stop Client
-    public void StopClient()
+    public async void StopClient()
     {
-        clientLogic.StopGame();
-        serverLogic.AlertDisconnectServerRpc();
-        serverLogic.ResetSeverVariables();
-        NetworkManager.Singleton.Shutdown();
+        ClientLogicScript.Instance.StopGame();
+        ServerLogicScript.Instance.AlertDisconnectServerRpc();
+        ServerLogicScript.Instance.ResetSeverVariables();
+
+        if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsHost)
+        {
+            NetworkManager.Singleton.Shutdown();
+        }
+
+        await Task.Delay(1000); // Add delay to ensure full shutdown
+
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(default);
+
+        Debug.Log("Client successfully shut down.");
     }
 }

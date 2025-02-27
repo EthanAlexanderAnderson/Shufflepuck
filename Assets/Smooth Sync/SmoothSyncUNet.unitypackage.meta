@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 95ccc935878dd2e41bcff2cc50b7cc7d
+timeCreated: 1552252938
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 96925
+  packageName: Smooth Sync
+  packageVersion: 3.41
+  assetPath: Assets/Smooth Sync/SmoothSyncUNet.unitypackage
+  uploadId: 559966
