@@ -64,7 +64,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     // for powerups
     [SerializeField] private bool phasePowerup = false;
-    [SerializeField] private bool lockPowerup = false; // TODO: make lock stack
+    [SerializeField] private int lockPowerup = 0;
     [SerializeField] private int explosionPowerup = 0;
     [SerializeField] private int hydraPowerup = 0;
     [SerializeField] private int shieldPowerup = 0;
@@ -187,13 +187,12 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 RemovePowerupText("phase");
             }
 
-            if (lockPowerup)
+            if (lockPowerup > 0 && rb.bodyType == RigidbodyType2D.Dynamic)
             {
                 rb.bodyType = RigidbodyType2D.Kinematic;
                 spriteRenderer.color = new Color(0.5f, 0.5f, 0.5f, 1f);
                 rb.angularVelocity = 0;
                 rb.velocity = Vector2.zero;
-                lockPowerup = false;
             }
 
             if (trail.endColor == Color.yellow)
@@ -344,7 +343,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public int ComputeValue() { return (puckBaseValue * zoneMultiplier) + (zoneMultiplier > 0 ? puckBonusValue : 0); }
     public int GetZoneMultiplier() { return zoneMultiplier; }
     public void SetZoneMultiplier(int ZM) { zoneMultiplier = ZM; }
-    public bool IsLocked() { return lockPowerup; }
+    public bool IsLocked() { return lockPowerup > 0; }
     public bool IsExplosion() { return explosionPowerup > 0; }
     public bool IsHydra() { return hydraPowerup > 0; }
     public bool IsPhase() { return phasePowerup; }
@@ -785,7 +784,9 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     public void EnableLock()
     {
-        lockPowerup = true;
+        lockPowerup++;
+
+        if (lockPowerup != 1) { return; } // we only want to add one lock listener (only one lock instance gets removed per opp shot)
 
         if (ClientLogicScript.Instance.isRunning) // lock online
         {
@@ -814,13 +815,19 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     private void DisableLock()
     {
         if (this == null) { return; }
+
         if (transform.position.y > -9)
         {
-            rb.bodyType = RigidbodyType2D.Dynamic;
-            spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+            lockPowerup--;
+            if (lockPowerup <= 0)
+            {
+                rb.bodyType = RigidbodyType2D.Dynamic;
+                spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+            }
             RemovePowerupText("lock");
         }
     }
+
     bool explodeFromRPC;
     public void EnableExplosion()
     {
