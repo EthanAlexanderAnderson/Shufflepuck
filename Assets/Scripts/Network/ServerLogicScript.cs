@@ -538,4 +538,10 @@ public class ServerLogicScript : NetworkBehaviour
         triplePowerupUserCompetitorIndex = competitorIndex;
         triplePowerup += 2;
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void ShotTimerBoostServerRpc()
+    {
+        shotTimer += 10;
+    }
 }

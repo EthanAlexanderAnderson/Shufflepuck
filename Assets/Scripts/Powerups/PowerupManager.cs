@@ -300,6 +300,7 @@ public class PowerupManager : NetworkBehaviour
             puckHalo.SetActive(true);
             puckHalo.GetComponent<HaloScript>().EnableFogMask(true);
             LineScript.Instance.HalfSpeed();
+            ShotTimerBoost();
         }
     }
 
@@ -600,6 +601,7 @@ public class PowerupManager : NetworkBehaviour
                 indexes.Add(randomIndex);
                 methodArray[randomIndex].Invoke();
             }
+            ShotTimerBoost();
         }
     }
 
@@ -1032,5 +1034,14 @@ public class PowerupManager : NetworkBehaviour
 
         LeanTween.scale(popupEffectIconObject, new Vector3(0f, 0f, 0f), 0.5f).setEase(LeanTweenType.easeInElastic).setDelay(1.51f);
         LeanTween.scale(popupEffectTextObject, new Vector3(0f, 0f, 0f), 0.5f).setEase(LeanTweenType.easeInElastic).setDelay(1.7f).setOnComplete(FinishCurrentPowerupPopupEffectAnimationInQueue);
+    }
+
+    private void ShotTimerBoost()
+    {
+        if (activeCompetitor.isPlayer && ClientLogicScript.Instance.isRunning)
+        {
+            ServerLogicScript.Instance.ShotTimerBoostServerRpc();
+            ClientLogicScript.Instance.ShotTimerBoost();
+        }
     }
 }

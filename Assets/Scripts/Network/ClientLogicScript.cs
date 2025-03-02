@@ -342,4 +342,9 @@ public class ClientLogicScript : NetworkBehaviour
     {
         UI.DisableReadyButton();
     }
+
+    public void ShotTimerBoost()
+    {
+        shotTimer += 10;
+    }
 }
