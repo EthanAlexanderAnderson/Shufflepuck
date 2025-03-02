@@ -997,7 +997,8 @@ public class PowerupManager : NetworkBehaviour
     public void PlayNextPowerupPopupEffectAnimationInQueue()
     {
         if (PowerupPopupEffectAnimationQueue.Count <= 0) { return; }
-        PlayPowerupPopupEffectAnimation(PowerupPopupEffectAnimationQueue.Peek());
+        float speedMultiplier = (PowerupPopupEffectAnimationQueue.Count - 1) / 3 + 1;
+        PlayPowerupPopupEffectAnimation(PowerupPopupEffectAnimationQueue.Peek(), speedMultiplier);
     }
 
     public void FinishCurrentPowerupPopupEffectAnimationInQueue()
@@ -1010,7 +1011,7 @@ public class PowerupManager : NetworkBehaviour
         }
     }
 
-    public void PlayPowerupPopupEffectAnimation(int index)
+    public void PlayPowerupPopupEffectAnimation(int index, float speedMultiplier)
     {
         Sprite[] powerupIcon = { plusOneIcon, foresightIcon, blockIcon, boltIcon, forceFieldIcon, phaseIcon, cullIcon, growthIcon, lockIcon, explosionIcon, fogIcon, hydraIcon, factoryIcon, shieldIcon, shuffleIcon, chaosIcon, timesTwoIcon, resurrectIcon, millIcon, researchIcon, insanityIcon, tripleIcon, exponentIcon, laserIcon, auraIcon, pushIcon, erraticIcon, denyIcon, investmentIcon, omniscienceIcon, plusThreeIcon };
         String[] powerupText = { "plus one", "foresight", "block", "bolt", "force field", "phase", "cull", "growth", "lock", "explosion", "fog", "hydra", "factory", "shield", "shuffle", "chaos", "times two", "resurrect", "mill", "research", "insanity", "triple", "exponent", "laser", "aura", "push", "erratic", "deny", "investment", "omniscience", "plus three" };
@@ -1024,11 +1025,13 @@ public class PowerupManager : NetworkBehaviour
         popupEffectIconObject.transform.localScale = new Vector3(0f, 0f, 0f);
         popupEffectTextObject.transform.localScale = new Vector3(0f, 0f, 0f);
 
-        LeanTween.scale(popupEffectIconObject, new Vector3(1f, 1f, 1f), 0.5f).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
-        LeanTween.scale(popupEffectTextObject, new Vector3(1f, 1f, 1f), 0.5f).setEase(LeanTweenType.easeOutElastic).setDelay(0.2f);
+        float duration = 0.5f / speedMultiplier;
 
-        LeanTween.scale(popupEffectIconObject, new Vector3(0f, 0f, 0f), 0.5f).setEase(LeanTweenType.easeInElastic).setDelay(1.51f);
-        LeanTween.scale(popupEffectTextObject, new Vector3(0f, 0f, 0f), 0.5f).setEase(LeanTweenType.easeInElastic).setDelay(1.7f).setOnComplete(FinishCurrentPowerupPopupEffectAnimationInQueue);
+        LeanTween.scale(popupEffectIconObject, new Vector3(1f, 1f, 1f), duration).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
+        LeanTween.scale(popupEffectTextObject, new Vector3(1f, 1f, 1f), duration).setEase(LeanTweenType.easeOutElastic).setDelay(0.2f);
+
+        LeanTween.scale(popupEffectIconObject, new Vector3(0f, 0f, 0f), duration).setEase(LeanTweenType.easeInElastic).setDelay(duration * 3 + 0.01f);
+        LeanTween.scale(popupEffectTextObject, new Vector3(0f, 0f, 0f), duration).setEase(LeanTweenType.easeInElastic).setDelay(duration * 3 + 0.2f).setOnComplete(FinishCurrentPowerupPopupEffectAnimationInQueue);
     }
 
     private void ShotTimerBoost()
