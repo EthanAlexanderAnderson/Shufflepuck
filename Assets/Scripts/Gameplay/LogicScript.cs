@@ -153,6 +153,7 @@ public class LogicScript : MonoBehaviour
             // do triple powerup
             if (triplePowerup > 0 && activeCompetitor.activePuckScript != null && activeCompetitor.activePuckScript.IsSafe())
             {
+                activeCompetitor.activePuckScript.RemovePowerupText("triple");
                 puckManager.CreatePuck(activeCompetitor);
                 activeCompetitor.ShootActivePuck(triplePower + Random.Range(-10.0f, 10.0f), tripleAngle + Random.Range(-10.0f, 10.0f), 50, false);
                 triplePowerup--;

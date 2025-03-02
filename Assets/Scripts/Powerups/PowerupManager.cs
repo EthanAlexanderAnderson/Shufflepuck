@@ -708,6 +708,8 @@ public class PowerupManager : NetworkBehaviour
 
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { LogicScript.Instance.triplePowerup += 2; }
         else if (ClientLogicScript.Instance.isRunning && activeCompetitor.isPlayer) { ServerLogicScript.Instance.IncrementTriplePowerupServerRpc(); }
+
+        if (activeCompetitor.isPlayer) { activeCompetitor.activePuckScript.SetPowerupText("triple"); }
     }
 
     public void ExponentPowerup() // index 22 : double base value every shot
@@ -752,6 +754,8 @@ public class PowerupManager : NetworkBehaviour
 
         activeCompetitor.activePuckObject.GetComponentInChildren<NearbyPuckScript>().EnablePush();
         activeCompetitor.activePuckScript.EnablePush();
+
+        activeCompetitor.activePuckScript.SetPowerupText("push");
     }
 
     public void ErraticPowerup() // index 26 : move randomly each shot

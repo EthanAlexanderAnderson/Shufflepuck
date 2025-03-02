@@ -151,6 +151,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             {
                 GetComponentInChildren<NearbyPuckScript>().TriggerPush();
                 pushPowerup = false;
+                RemovePowerupText("push");
             }
         }
 
@@ -213,6 +214,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 ServerLogicScript.Instance.CleanupDeadPucksServerRpc();
             }
             requestedCleanup = true;
+            RemovePowerupText("triple"); // i have nowhere else to remove triple so its going here lol
         }
     }
 
