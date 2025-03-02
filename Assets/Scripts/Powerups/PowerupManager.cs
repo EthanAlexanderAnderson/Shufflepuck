@@ -95,7 +95,7 @@ public class PowerupManager : NetworkBehaviour
     // additional costs indexes
     private int[] cost2Discard = { 15, 16, 17 };
     Dictionary<int, int> costPoints = new Dictionary<int, int> { { 18, 1 }, { 19, 2 }, { 20, 2 }, { 28, 1 } };
-    Dictionary<int, int> costPucks = new Dictionary<int, int> { { 21, 1 }, { 22, 1 }, { 23, 1 }, { 29, 3 } };
+    Dictionary<int, int> costPucks = new Dictionary<int, int> { { 21, 1 }, { 22, 1 }, { 23, 1 }, { 29, 2 } };
 
     public int[] GetCost2Discard() { return cost2Discard; }
     private List<int> deck;
@@ -163,7 +163,8 @@ public class PowerupManager : NetworkBehaviour
     {
         deck = DeckManager.Instance.GetDeck();
         lastPlayedCard = -1;
-        omnisciencePowerup = false;
+        LogicScript.Instance.player.isOmniscient = false;
+        LogicScript.Instance.opponent.isOmniscient = false;
         denyPowerup = 0;
     }
 
@@ -207,7 +208,7 @@ public class PowerupManager : NetworkBehaviour
             // enable it
             powerupButtons[i].gameObject.SetActive(true);
             // disable Discard Cost cards if needed
-            powerupButtons[i].gameObject.GetComponent<Button>().interactable = pay2DiscardPossible || !Array.Exists(cost2Discard, x => x == randomCard) || omnisciencePowerup;
+            powerupButtons[i].gameObject.GetComponent<Button>().interactable = pay2DiscardPossible || !Array.Exists(cost2Discard, x => x == randomCard) || activeCompetitor.isOmniscient;
             // disable Puck Cost cards if needed
             DisableCostPuckCardsIfNeeded();
             // disable insanity in hand #1
@@ -243,7 +244,7 @@ public class PowerupManager : NetworkBehaviour
 
     private void DisableCost2DiscardCards()
     {
-        if (omnisciencePowerup) { return; }
+        if (activeCompetitor.isOmniscient) { return; }
         Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
         for (int i = 0; i < 3; i++)
         {
@@ -256,7 +257,7 @@ public class PowerupManager : NetworkBehaviour
 
     private void DisableCostPuckCardsIfNeeded()
     {
-        if (omnisciencePowerup) { return; }
+        if (activeCompetitor.isOmniscient) { return; }
         Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
         for (int i = 0; i < 3; i++)
         {
@@ -790,8 +791,6 @@ public class PowerupManager : NetworkBehaviour
         }
     }
 
-    //private int investmentPowerup;
-    //private bool playerInvested;
     public void InvestmentPowerup() // index 28 : add a plus three card to your deck
     {
         var index = Array.IndexOf(methodArray, InvestmentPowerup);
@@ -817,8 +816,7 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.SetPowerupText("plus three");
     }
 
-    private bool omnisciencePowerup;
-    public bool IsOmniscient() { return omnisciencePowerup; }
+    public bool IsOmniscient() { return activeCompetitor.isOmniscient; }
     public void OmnisciencePowerup() // index 29 : play cards without paying their cost
     {
         var index = Array.IndexOf(methodArray, OmnisciencePowerup);
@@ -826,10 +824,7 @@ public class PowerupManager : NetworkBehaviour
         if (NeedsToBeSentToServer(index)) { return; }
         PayCosts(index);
 
-        if (activeCompetitor.isPlayer)
-        {
-            omnisciencePowerup = true;
-        }
+        activeCompetitor.isOmniscient = true;
     }
 
     private bool CanPayCosts(int index)
@@ -837,7 +832,7 @@ public class PowerupManager : NetworkBehaviour
         GetActiveCompetitor();
 
         // make sure the powerup costs are payable
-        if (activeCompetitor.isPlayer && !chaosEnsuing && !omnisciencePowerup)
+        if (activeCompetitor.isPlayer && !chaosEnsuing && !activeCompetitor.isOmniscient)
         {
             // 2 discard (can't pay if two or more cards from our have already been played. must be two to allow card currently being used)
             if (cost2Discard.Contains(index) && hand.Count(x => x == -1) >= 2)
@@ -870,7 +865,7 @@ public class PowerupManager : NetworkBehaviour
                 lastPlayedCard = index;
             }
             // if the played card costs 2 discards, discard the whole hand
-            if (Array.Exists(cost2Discard, x => x == index) && !omnisciencePowerup)
+            if (Array.Exists(cost2Discard, x => x == index) && !activeCompetitor.isOmniscient)
             {
                 DiscardHand();
             }
@@ -881,12 +876,12 @@ public class PowerupManager : NetworkBehaviour
             }
         }
         // if the played card costs 2 points, pay the cost
-        if (costPoints.ContainsKey(index) && !chaosEnsuing && !omnisciencePowerup)
+        if (costPoints.ContainsKey(index) && !chaosEnsuing && !activeCompetitor.isOmniscient)
         {
             LogicScript.Instance.ModifyScoreBonus(activeCompetitor.isPlayer, -costPoints[index]);
         }
         // if the played card costs 1 puck, pay the cost
-        if (costPucks.ContainsKey(index) && !chaosEnsuing && !omnisciencePowerup)
+        if (costPucks.ContainsKey(index) && !chaosEnsuing && !activeCompetitor.isOmniscient)
         {
             LogicScript.Instance.IncrementPuckCount(activeCompetitor.isPlayer, -costPucks[index]);
 

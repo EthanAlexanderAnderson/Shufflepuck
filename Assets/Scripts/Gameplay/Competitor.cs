@@ -21,6 +21,9 @@ public class Competitor
     public bool isShooting;
     public bool goingFirst;
 
+    // powerups
+    public bool isOmniscient;
+
     // default constructor
     public Competitor() { return; }
 
