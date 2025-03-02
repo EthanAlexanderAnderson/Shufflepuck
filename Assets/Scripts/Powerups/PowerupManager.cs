@@ -55,6 +55,10 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private Sprite auraImage;
     [SerializeField] private Sprite pushImage;
     [SerializeField] private Sprite erraticImage;
+    [SerializeField] private Sprite denyImage;
+    [SerializeField] private Sprite investmentImage;
+    [SerializeField] private Sprite omniscienceImage;
+    [SerializeField] private Sprite plusThreeImage;
 
     [SerializeField] private Sprite plusOneIcon;
     [SerializeField] private Sprite foresightIcon;
@@ -83,11 +87,15 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private Sprite auraIcon;
     [SerializeField] private Sprite pushIcon;
     [SerializeField] private Sprite erraticIcon;
+    [SerializeField] private Sprite denyIcon;
+    [SerializeField] private Sprite investmentIcon;
+    [SerializeField] private Sprite omniscienceIcon;
+    [SerializeField] private Sprite plusThreeIcon;
 
     // additional costs indexes
-    private int[] cost2Discard = { 15, 16, 17}; // TODO: use indexOf in start method
-    private int[] cost2Points = { 18, 19, 20 };
-    private int[] cost1Puck = { 21, 22, 23 };
+    private int[] cost2Discard = { 15, 16, 17 };
+    Dictionary<int, int> costPoints = new Dictionary<int, int> { { 18, 1 }, { 19, 2 }, { 20, 2 }, { 28, 1 } };
+    Dictionary<int, int> costPucks = new Dictionary<int, int> { { 21, 1 }, { 22, 1 }, { 23, 1 }, { 29, 3 } };
 
     public int[] GetCost2Discard() { return cost2Discard; }
     private List<int> deck;
@@ -129,10 +137,14 @@ public class PowerupManager : NetworkBehaviour
             InsanityPowerup, // 20
             TriplePowerup, // 21
             ExponentPowerup, // 22
-            LaserPowerup, //23
-            AuraPowerup, //24
-            PushPowerup, //25
-            ErraticPowerup //26
+            LaserPowerup, // 23
+            AuraPowerup, // 24
+            PushPowerup, // 25
+            ErraticPowerup, // 26
+            DenyPowerup, // 27
+            InvestmentPowerup, // 28
+            OmnisciencePowerup, // 29
+            PlusThreePowerup // 30
         };
     }
 
@@ -151,6 +163,8 @@ public class PowerupManager : NetworkBehaviour
     {
         deck = DeckManager.Instance.GetDeck();
         lastPlayedCard = -1;
+        omnisciencePowerup = false;
+        denyPowerup = 0;
     }
 
     // used by CPU during gameplay to check what the player has left in their deck
@@ -169,7 +183,7 @@ public class PowerupManager : NetworkBehaviour
         var pay2DiscardPossible = deck.Count >= 3;
         GetActiveCompetitor();
         Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
-        Sprite[] powerupSprites = { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage, cullImage, growthImage, lockImage, explosionImage, fogImage, hydraImage, factoryImage, shieldImage, shuffleImage, chaosImage, timesTwoImage, resurrectImage, millImage, researchImage, insanityImage, tripleImage, exponentImage, laserImage, auraImage, pushImage, erraticImage };
+        Sprite[] powerupSprites = { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage, cullImage, growthImage, lockImage, explosionImage, fogImage, hydraImage, factoryImage, shieldImage, shuffleImage, chaosImage, timesTwoImage, resurrectImage, millImage, researchImage, insanityImage, tripleImage, exponentImage, laserImage, auraImage, pushImage, erraticImage, denyImage, investmentImage, omniscienceImage, plusThreeImage };
 
         // generate 3 unique random powerups
         int[] previouslyGeneratedIndexes = { -1, -1, -1 };
@@ -187,25 +201,49 @@ public class PowerupManager : NetworkBehaviour
             }
             previouslyGeneratedIndexes[i] = randomIndex;
 
+            // put card in hand
             randomCard = deck[randomIndex];
             hand[i] = randomCard;
+            // enable it
             powerupButtons[i].gameObject.SetActive(true);
-            powerupButtons[i].gameObject.GetComponent<Button>().interactable = pay2DiscardPossible || !Array.Exists(cost2Discard, x => x == randomCard); // disable cost2Discard cards if hand size < 3
-            DisableCost1PuckCardsIfNeeded();
-            if (lastPlayedCard < 0 && randomCard == Array.IndexOf(methodArray, InsanityPowerup)) { powerupButtons[i].gameObject.GetComponent<Button>().interactable = false; } // special case for insanity in hand #1
+            // disable Discard Cost cards if needed
+            powerupButtons[i].gameObject.GetComponent<Button>().interactable = pay2DiscardPossible || !Array.Exists(cost2Discard, x => x == randomCard) || omnisciencePowerup;
+            // disable Puck Cost cards if needed
+            DisableCostPuckCardsIfNeeded();
+            // disable insanity in hand #1
+            if (lastPlayedCard < 0 && randomCard == Array.IndexOf(methodArray, InsanityPowerup)) { powerupButtons[i].gameObject.GetComponent<Button>().interactable = false; }
+            // disable cards from Deny powerup
+            if (denyPowerup == 1 && i < 2)
+            {
+                powerupButtons[i].gameObject.GetComponent<Button>().interactable = false;
+                powerupButtons[i].gameObject.transform.GetChild(0).GetComponent<Image>().enabled = true;
+            }
+            else if (denyPowerup >= 2)
+            {
+                powerupButtons[i].gameObject.GetComponent<Button>().interactable = false;
+                powerupButtons[i].gameObject.transform.GetChild(0).GetComponent<Image>().enabled = true;
+            }
+            else
+            {
+                powerupButtons[i].gameObject.transform.GetChild(0).GetComponent<Image>().enabled = false;
+            }
+            // set the card sprite
             powerupButtons[i].image.sprite = powerupSprites[randomCard];
+            // set button listeners (effects)
             powerupButtons[i].onClick.RemoveAllListeners();
-            // add disable powerupmenu object function as listener
             int index = i; // this has to be here for some technical closure reason idk
             powerupButtons[i].onClick.AddListener(() => PowerupsHUDUIManager.Instance.UsePowerup(index, randomCard));
             powerupButtons[i].onClick.AddListener(() => methodArray[randomCard]());
             powerupButtons[i].onClick.AddListener(() => hand[index] = -1); // this is needed to not double remove from deck with research
             powerupButtons[i].onClick.AddListener(() => SoundManagerScript.Instance.PlayClickSFX(2));
         }
+
+        denyPowerup = 0;
     }
 
     private void DisableCost2DiscardCards()
     {
+        if (omnisciencePowerup) { return; }
         Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
         for (int i = 0; i < 3; i++)
         {
@@ -216,14 +254,13 @@ public class PowerupManager : NetworkBehaviour
         }
     }
 
-    private void DisableCost1PuckCardsIfNeeded()
+    private void DisableCostPuckCardsIfNeeded()
     {
-        // only do this if the active competitor has <= 1 puck remaining
-        if (LogicScript.Instance.activeCompetitor.puckCount > 1) { return; }
+        if (omnisciencePowerup) { return; }
         Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
         for (int i = 0; i < 3; i++)
         {
-            if (Array.Exists(cost1Puck, x => x == hand[i]))
+            if (costPucks.ContainsKey(hand[i]) && LogicScript.Instance.activeCompetitor.puckCount <= costPucks[hand[i]])
             {
                 powerupButtons[i].gameObject.GetComponent<Button>().interactable = false;
             }
@@ -550,7 +587,7 @@ public class PowerupManager : NetworkBehaviour
         ClientLogicScript.OnOpponentShot += StopEnsuingChaos;
         if (activeCompetitor.isPlayer)
         {
-            int[] blacklist = { Array.IndexOf(methodArray, ResearchPowerup) };
+            int[] blacklist = { Array.IndexOf(methodArray, ResearchPowerup), Array.IndexOf(methodArray, PlusThreePowerup) };
             // call 3 different random methods from methodArray
             List<int> indexes = new List<int>();
             for (int i = 0; i < 3; i++)
@@ -729,12 +766,72 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.SetPowerupText("erratic");
     }
 
+    private int denyPowerup;
+    public void DenyPowerup() // index 27 : disable 2 cards in your opponent’s hand
+    {
+        var index = Array.IndexOf(methodArray, DenyPowerup);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
+
+        if (!activeCompetitor.isPlayer)
+        {
+            denyPowerup++;
+        }
+        else if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) // deny against CPU
+        {
+            LogicScript.Instance.denyPowerup++;
+        }
+    }
+
+    //private int investmentPowerup;
+    //private bool playerInvested;
+    public void InvestmentPowerup() // index 28 : add a plus three card to your deck
+    {
+        var index = Array.IndexOf(methodArray, InvestmentPowerup);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
+
+        if (activeCompetitor.isPlayer)
+        {
+            deck.Add(Array.IndexOf(methodArray, PlusThreePowerup));
+        }
+    }
+
+    public void PlusThreePowerup() // index 30 : give active puck +3 value, this card isn't directly add-able, it is a product of the investment card
+    {
+        var index = Array.IndexOf(methodArray, PlusThreePowerup);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
+
+        activeCompetitor.activePuckScript.IncrementPuckBonusValue(3);
+
+        activeCompetitor.activePuckScript.SetPowerupText("plus three");
+    }
+
+    private bool omnisciencePowerup;
+    public bool IsOmniscient() { return omnisciencePowerup; }
+    public void OmnisciencePowerup() // index 29 : play cards without paying their cost
+    {
+        var index = Array.IndexOf(methodArray, OmnisciencePowerup);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(index)) { return; }
+        PayCosts(index);
+
+        if (activeCompetitor.isPlayer)
+        {
+            omnisciencePowerup = true;
+        }
+    }
+
     private bool CanPayCosts(int index)
     {
         GetActiveCompetitor();
 
         // make sure the powerup costs are payable
-        if (activeCompetitor.isPlayer && !chaosEnsuing)
+        if (activeCompetitor.isPlayer && !chaosEnsuing && !omnisciencePowerup)
         {
             // 2 discard (can't pay if two or more cards from our have already been played. must be two to allow card currently being used)
             if (cost2Discard.Contains(index) && hand.Count(x => x == -1) >= 2)
@@ -744,9 +841,9 @@ public class PowerupManager : NetworkBehaviour
             }
 
             // 1 puck
-            if (Array.Exists(cost1Puck, x => x == index) && activeCompetitor.puckCount <= 1)
+            if (costPucks.ContainsKey(index) && activeCompetitor.puckCount <= costPucks[index])
             {
-                Debug.Log("Cannot pay 1 puck.");
+                Debug.Log("Cannot pay pucks.");
                 return false;
             }
         }
@@ -767,7 +864,7 @@ public class PowerupManager : NetworkBehaviour
                 lastPlayedCard = index;
             }
             // if the played card costs 2 discards, discard the whole hand
-            if (Array.Exists(cost2Discard, x => x == index))
+            if (Array.Exists(cost2Discard, x => x == index) && !omnisciencePowerup)
             {
                 DiscardHand();
             }
@@ -778,25 +875,29 @@ public class PowerupManager : NetworkBehaviour
             }
         }
         // if the played card costs 2 points, pay the cost
-        if (Array.Exists(cost2Points, x => x == index) && !chaosEnsuing)
+        if (costPoints.ContainsKey(index) && !chaosEnsuing && !omnisciencePowerup)
         {
-            LogicScript.Instance.ModifyScoreBonus(activeCompetitor.isPlayer, -2);
+            LogicScript.Instance.ModifyScoreBonus(activeCompetitor.isPlayer, -costPoints[index]);
         }
         // if the played card costs 1 puck, pay the cost
-        if (Array.Exists(cost1Puck, x => x == index) && !chaosEnsuing)
+        if (costPucks.ContainsKey(index) && !chaosEnsuing && !omnisciencePowerup)
         {
-            LogicScript.Instance.IncrementPuckCount(activeCompetitor.isPlayer, -1);
+            LogicScript.Instance.IncrementPuckCount(activeCompetitor.isPlayer, -costPucks[index]);
 
             if (ClientLogicScript.Instance.isRunning && activeCompetitor.isPlayer)
             {
-                ServerLogicScript.Instance.AdjustPuckCountServerRpc(true, -1);
+                ServerLogicScript.Instance.AdjustPuckCountServerRpc(true, -costPucks[index]);
             }
         }
 
-        // disable any cards that cost 2 discards from hand
-        DisableCost2DiscardCards();
-        // disable any cards that cost 1 puck if the player only has 1 puck left
-        DisableCost1PuckCardsIfNeeded();
+        if (index != Array.IndexOf(methodArray, OmnisciencePowerup))
+        {
+            // disable any cards that cost 2 discards from hand
+            DisableCost2DiscardCards();
+            // disable any cards that cost 1 puck if the player only has 1 puck left
+            DisableCostPuckCardsIfNeeded();
+        }
+
         // enable insanity cards (only relevant for first hand)
         Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
         for (int i = 0; i < 3; i++)
@@ -910,8 +1011,8 @@ public class PowerupManager : NetworkBehaviour
 
     public void PlayPowerupPopupEffectAnimation(int index)
     {
-        Sprite[] powerupIcon = { plusOneIcon, foresightIcon, blockIcon, boltIcon, forceFieldIcon, phaseIcon, cullIcon, growthIcon, lockIcon, explosionIcon, fogIcon, hydraIcon, factoryIcon, shieldIcon, shuffleIcon, chaosIcon, timesTwoIcon, resurrectIcon, millIcon, researchIcon, insanityIcon, tripleIcon, exponentIcon, laserIcon, auraIcon, pushIcon, erraticIcon };
-        String[] powerupText = { "plus one", "foresight", "block", "bolt", "force field", "phase", "cull", "growth", "lock", "explosion", "fog", "hydra", "factory", "shield", "shuffle", "chaos", "times two", "resurrect", "mill", "research", "insanity", "triple", "exponent", "laser", "aura", "push", "erratic" };
+        Sprite[] powerupIcon = { plusOneIcon, foresightIcon, blockIcon, boltIcon, forceFieldIcon, phaseIcon, cullIcon, growthIcon, lockIcon, explosionIcon, fogIcon, hydraIcon, factoryIcon, shieldIcon, shuffleIcon, chaosIcon, timesTwoIcon, resurrectIcon, millIcon, researchIcon, insanityIcon, tripleIcon, exponentIcon, laserIcon, auraIcon, pushIcon, erraticIcon, denyIcon, investmentIcon, omniscienceIcon, plusThreeIcon };
+        String[] powerupText = { "plus one", "foresight", "block", "bolt", "force field", "phase", "cull", "growth", "lock", "explosion", "fog", "hydra", "factory", "shield", "shuffle", "chaos", "times two", "resurrect", "mill", "research", "insanity", "triple", "exponent", "laser", "aura", "push", "erratic", "deny", "investment", "omniscience", "plus three" };
 
         popupEffectIcon.sprite = powerupIcon[index];
         popupEffectText.text = powerupText[index];

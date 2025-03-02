@@ -17,7 +17,7 @@ public class PlusMinusPowerup : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     private void OnEnable()
     {
-        count = PlayerPrefs.GetInt(cardName + "CardCount", 1);
+        count = PlayerPrefs.GetInt(cardName + "CardCount", 0);
         if (!Application.isEditor && count > maxCount) // in editor we have no max per card
         {
             count = maxCount;

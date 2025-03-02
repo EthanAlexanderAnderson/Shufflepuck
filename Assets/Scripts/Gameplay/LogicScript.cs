@@ -78,7 +78,8 @@ public class LogicScript : MonoBehaviour
     public bool tutorialActive;
 
     // powerups TODO: move to powerups manager probably
-    public int triplePowerup = 0;
+    public int triplePowerup;
+    public int denyPowerup;
 
     private void Awake()
     {
@@ -219,12 +220,6 @@ public class LogicScript : MonoBehaviour
         activeCompetitor = player;
         nonActiveCompetitor = opponent;
 
-        if (difficulty >= 2 && !isLocal)
-        {
-            if (powerupsAreEnabled) { powerupManager.ShuffleDeck(); }
-            powerupsMenu.SetActive(powerupsAreEnabled);
-            powerupsUsedThisTurn = 0;
-        }
         puckHalo.SetActive(difficulty == 0);
         activeBar = bar.ChangeBar("angle", activeCompetitor.isPlayer);
         bar.ToggleDim(false);
@@ -242,6 +237,13 @@ public class LogicScript : MonoBehaviour
         {
             wallCount--;
             if (wallCount > 0) { UI.UpdateWallText(wallCount); }
+        }
+
+        if (difficulty >= 2 && !isLocal)
+        {
+            if (powerupsAreEnabled) { powerupManager.ShuffleDeck(); }
+            powerupsMenu.SetActive(powerupsAreEnabled);
+            powerupsUsedThisTurn = 0;
         }
     }
 
@@ -373,6 +375,7 @@ public class LogicScript : MonoBehaviour
         if (Mathf.Abs(line.GetValue() - CPUShotSpin) < (timer - (tempTime + 4.5)) && activeBar == "spin")
         {
             Shoot(CPUShotAngle, CPUShotPower, CPUShotSpin);
+            denyPowerup = 0;
             tempTime = 0;
         }
     }
@@ -578,6 +581,7 @@ public class LogicScript : MonoBehaviour
 
     private void CPUPreShotPowerups()
     {
+        if (denyPowerup > 0) { return; }
         float randomValue = Random.Range(0f, 1f);
         // first two shots use block
         if (opponent.puckCount > 3 && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
@@ -654,7 +658,7 @@ public class LogicScript : MonoBehaviour
             powerupManager.HydraPowerup();
         }
         powerupsUsedThisTurn++;
-        if (powerupsUsedThisTurn >= 3) { return; }
+        if (powerupsUsedThisTurn >= 3 - denyPowerup * 2) { return; }
 
         // lock, fog
         randomValue = Random.Range(0f, 1f);
@@ -667,7 +671,7 @@ public class LogicScript : MonoBehaviour
             powerupManager.FogPowerup();
         }
         powerupsUsedThisTurn++;
-        if (powerupsUsedThisTurn >= 3) { return; }
+        if (powerupsUsedThisTurn >= 3 - denyPowerup * 2) { return; }
 
         // shield
         randomValue = Random.Range(0f, 1f);
@@ -676,7 +680,7 @@ public class LogicScript : MonoBehaviour
             powerupManager.ShieldPowerup();
         }
         powerupsUsedThisTurn++;
-        if (powerupsUsedThisTurn >= 3) { return; }
+        if (powerupsUsedThisTurn >= 3 - denyPowerup * 2) { return; }
 
         // factory
         randomValue = Random.Range(0f, 1f);
@@ -685,7 +689,7 @@ public class LogicScript : MonoBehaviour
             powerupManager.FactoryPowerup();
         }
         powerupsUsedThisTurn++;
-        if (powerupsUsedThisTurn >= 3) { return; }
+        if (powerupsUsedThisTurn >= 3 - denyPowerup * 2) { return; }
 
         // mill
         randomValue = Random.Range(0f, 1f);
@@ -694,7 +698,7 @@ public class LogicScript : MonoBehaviour
             powerupManager.MillPowerup();
         }
         powerupsUsedThisTurn++;
-        if (powerupsUsedThisTurn >= 3) { return; }
+        if (powerupsUsedThisTurn >= 3 - denyPowerup * 2) { return; }
 
         // resurrect
         randomValue = Random.Range(0f, 1f);
@@ -703,7 +707,7 @@ public class LogicScript : MonoBehaviour
             powerupManager.MillPowerup();
         }
         powerupsUsedThisTurn++;
-        if (powerupsUsedThisTurn >= 3) { return; }
+        if (powerupsUsedThisTurn >= 3 - denyPowerup * 2) { return; }
     }
 
     public void IncrementPuckCount(bool playersPuck, int value = 1)
