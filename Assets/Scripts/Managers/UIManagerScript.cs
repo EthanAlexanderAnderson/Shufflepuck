@@ -23,6 +23,7 @@ public class UIManagerScript : MonoBehaviour
     public GameObject customizeScreen;
     public GameObject profileScreen;
     public GameObject plinkoScreen;
+    public GameObject waitingScreen;
 
     // title
     [SerializeField] private GameObject playerPuckIcon;
@@ -538,10 +539,18 @@ public class UIManagerScript : MonoBehaviour
     // handle android back button / esc key
     void HandleBackButton()
     {
-        if (previousActiveUI != gameHud && activeUI != plinkoScreen)
+        // don't allow android back button if...
+        if (
+            activeUI == gameHud || // we're in game
+            previousActiveUI == gameHud || // trying to go back to game HUD
+            previousActiveUI == gameResultScreen || // trying to go back to game result screen
+            activeUI == plinkoScreen || // we're on the plinko screen
+            activeUI == waitingScreen // we're joining/hosting an online game
+            )
         {
-            ChangeUI(previousActiveUI);
+            return;
         }
+        ChangeUI(previousActiveUI);
     }
     // reset in-game HUD
     public void ResetHUD()

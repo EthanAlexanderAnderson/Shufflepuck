@@ -309,6 +309,7 @@ public class ClientLogicScript : NetworkBehaviour
     {
         if (!IsClient) return;
         UI.SetErrorMessage("Your opponent has disconnected.");
+        UI.DisableReadyButton();
     }
 
     public void StopGame()

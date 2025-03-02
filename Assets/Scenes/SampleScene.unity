@@ -38920,6 +38920,7 @@ MonoBehaviour:
   customizeScreen: {fileID: 68518742}
   profileScreen: {fileID: 1498383606}
   plinkoScreen: {fileID: 839140264}
+  waitingScreen: {fileID: 573404777}
   playerPuckIcon: {fileID: 1133283555}
   playerPuckIconAnimation: {fileID: 1610451029}
   opponentPuckIcon: {fileID: 1349874435}

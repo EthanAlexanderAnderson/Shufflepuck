@@ -247,6 +247,9 @@ public class MatchmakerClient : MonoBehaviour
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
             if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsHost) { NetworkManager.Singleton.Shutdown(); }
+
+            await Task.Delay(1050); // Add delay to ensure full shutdown
+
             NetworkManager.Singleton.StartClient(); // Start as Client
 
             hostLobby = lobby;
@@ -259,7 +262,7 @@ public class MatchmakerClient : MonoBehaviour
         catch (LobbyServiceException)
         {
             Debug.LogError("LobbyServiceException: Failed to join Lobby (Invalid Join Code or Lobby is full)");
-            UI.SetErrorMessage("Failed to join Lobby with Relay.");
+            UI.SetErrorMessage("Failed to join Lobby (Invalid Join Code or Lobby is full).");
         }
         catch (Exception e)
         {
@@ -350,19 +353,34 @@ public class MatchmakerClient : MonoBehaviour
     // Stop Client
     public async void StopClient()
     {
-        ClientLogicScript.Instance.StopGame();
-        ServerLogicScript.Instance.AlertDisconnectServerRpc();
-        ServerLogicScript.Instance.ResetSeverVariables();
-
-        if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsHost)
+        try
         {
-            NetworkManager.Singleton.Shutdown();
+            ClientLogicScript.Instance.StopGame();
+            ServerLogicScript.Instance.AlertDisconnectServerRpc();
+            ServerLogicScript.Instance.ResetSeverVariables();
         }
 
-        await Task.Delay(1000); // Add delay to ensure full shutdown
+        catch (Exception e)
+        {
+            Debug.LogError(e);
+        }
+        try
+        {
+            if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsHost)
+            {
+                NetworkManager.Singleton.Shutdown();
+            }
 
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(default);
+            await Task.Delay(1000); // Add delay to ensure full shutdown
 
-        Debug.Log("Client successfully shut down.");
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(default);
+
+            Debug.Log("Client successfully shut down.");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e);
+            UI.SetErrorMessage("Server Error: -3 - Contact developer.");
+        }
     }
 }
