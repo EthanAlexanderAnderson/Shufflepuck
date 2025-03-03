@@ -114,23 +114,36 @@ public class PlinkoManager : MonoBehaviour
             if (DateTime.Today.Subtract(lastChallengeDate).Days >= 1)
             {
                 AssignNewPlinkoReward();
+                // subtract welcome bonus
+                var welcomeBonus = PlayerPrefs.GetInt("WelcomeBonus");
+                if (welcomeBonus > 0)
+                {
+                    PlayerPrefs.SetInt("WelcomeBonus", welcomeBonus - 1);
+                }
+
             }
             else
             {
                 Debug.Log("Today's Plinko Reward is already assigned. " + PlayerPrefs.GetInt("PlinkoReward"));
             }
-            // if the lastChallengeDate is 7 or more days ago or XP is under 200, enable welcome back bonus buckets
+            // if the lastChallengeDate is 7 or more days ago or XP is under 200, set welcome bonus
             if (DateTime.Today.Subtract(lastChallengeDate).Days >= 7 || PlayerPrefs.GetInt("XP") < 200)
             {
-                bonusBucketLeft.SetActive(true);
-                bonusBucketRight.SetActive(true);
+                PlayerPrefs.SetInt("WelcomeBonus", (int)DateTime.Today.Subtract(lastChallengeDate).Days / 7);
             }
         }
         else // no date ever written
         {
             AssignNewPlinkoReward();
+            PlayerPrefs.SetInt("WelcomeBonus", 3);
+        }
+
+        // enable welcome bonus buckets
+        if (PlayerPrefs.GetInt("WelcomeBonus") > 0)
+        {
             bonusBucketLeft.SetActive(true);
             bonusBucketRight.SetActive(true);
+            Debug.Log("Remaining Welcome Bonus Days: " + PlayerPrefs.GetInt("WelcomeBonus"));
         }
     }
 
@@ -187,6 +200,7 @@ public class PlinkoManager : MonoBehaviour
             if (rand < threshold)
             {
                 PlayerPrefs.SetInt("PlinkoReward", plinkoUnlockableIDsCopy[i, 0]);
+                Debug.Log("New Plinko Reward: " + PlayerPrefs.GetInt("PlinkoReward"));
                 return;
             }
         }
