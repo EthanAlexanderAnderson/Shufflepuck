@@ -88,6 +88,10 @@ public class DailyChallengeManagerScript : MonoBehaviour
         challenge2Text.text = hardChallengeText[Mathf.Abs(DC2)];
         reward1Text.text = easyChallengeReward[Mathf.Abs(DC1)].ToString() + " XP";
         reward2Text.text = hardChallengeReward[Mathf.Abs(DC2)].ToString() + " XP";
+        if (levelManager == null)
+        {
+            levelManager = LevelManager.Instance;
+        }
         levelManager.SetText();
     }
 
