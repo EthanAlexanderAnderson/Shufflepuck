@@ -647,6 +647,7 @@ public class LogicScript : MonoBehaviour
             if (useCull)
             {
                 powerupManager.CullPowerup();
+                powerupsUsedThisTurn++;
             }
         }
     }
