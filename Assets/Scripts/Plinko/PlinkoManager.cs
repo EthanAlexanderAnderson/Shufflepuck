@@ -1,4 +1,6 @@
 using System;
+//using System.Collections.Generic;
+//using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -26,8 +28,22 @@ public class PlinkoManager : MonoBehaviour
     // floating text
     [SerializeField] private GameObject floatingTextPrefab;
 
-    // Plinko Unlockable Ids
-    private int[] plinkoUnlockableIDs = { 37, 33, 34, 38, 35, 39, 36, 40 };
+    // Plinko Unlockable Ids & probability weights
+    int[,] plinkoUnlockableIDs =
+    {
+        { 37, 15 },
+        { 34, 15 },
+        { 41, 15 },
+        { 42, 10 },
+        { 33, 10 },
+        { 38, 10 },
+        { 35, 6 },
+        { 43, 6 },
+        { 39, 6 },
+        { 36, 3 },
+        { 44, 3 },
+        { 40, 1 }
+    };
 
     private void Awake()
     {
@@ -49,6 +65,7 @@ public class PlinkoManager : MonoBehaviour
         if (PlinkoReward >= 100) // 100+ = XP REWARD
         {
             rewardText.text = "+" + PlinkoReward.ToString() + "XP";
+            rewardImageAnimation.SetActive(false);
         }
         else // skin reward
         {
@@ -122,66 +139,56 @@ public class PlinkoManager : MonoBehaviour
     {
         PlayerPrefs.SetString("LastPlinkoRewardDate", DateTime.Today.ToString("yyyy-MM-dd"));
 
-        // Already unlocked IDs
-        int[] plinkoUnlockedIDs = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        for (int i = 0; i < plinkoUnlockableIDs.Length; i++)
+        int currentReward = PlayerPrefs.GetInt("PlinkoReward", 100);
+
+        int totalWeight = 0;
+
+        // Shallow copy so we don't override real weights
+        int[,] plinkoUnlockableIDsCopy = (int[,])plinkoUnlockableIDs.Clone();
+
+        for (int i = 0; i < plinkoUnlockableIDsCopy.GetLength(0); i++)
         {
-            if (PlayerPrefs.GetInt("puck" + plinkoUnlockableIDs[i] + "unlocked") == 1)
+            int puckID = plinkoUnlockableIDsCopy[i, 0];
+            // if a puck has been unlocked already or was the previous reward, set it's weight (probability of being the next reward) to be zero
+            if (PlayerPrefs.GetInt("puck" + puckID + "unlocked") == 1 || puckID == currentReward)
             {
-                plinkoUnlockedIDs[i] = plinkoUnlockableIDs[i];
+                plinkoUnlockableIDsCopy[i, 1] = 0;
+            }
+            else
+            {
+                totalWeight += plinkoUnlockableIDsCopy[i, 1];
             }
         }
 
-        int currentReward = PlayerPrefs.GetInt("PlinkoReward", 100);
-        int randMax = (int)Math.Pow(2, plinkoUnlockableIDs.Length);
-        int rand = Random.Range(0, (randMax-1));
-        int count = 0;
-
-        for (int i = 0; i < plinkoUnlockableIDs.Length; i++)
+        // if we have no pucks remaining
+        if (totalWeight == 0 && currentReward < 100)
         {
-            double threshold = randMax - Math.Pow(2, (plinkoUnlockableIDs.Length - 1) - i); // 256 - 2^(7 - i)
+            // no pucks are left to unlock
+            if (PlayerPrefs.GetInt("puck" + currentReward + "unlocked") == 1)
+            {
+                Debug.Log("No puck skin rewards remain.");
+                PlayerPrefs.SetInt("PlinkoReward", 999);
+                rewardImage.enabled = false;
+                return;
+            }
+            // only one puck left to unlock
+            else
+            {
+                return;
+            }
+        }
+
+        int rand = Random.Range(0, (totalWeight - 1));
+        int threshold = 0;
+
+        for (int i = 0; i < plinkoUnlockableIDsCopy.GetLength(0); i++)
+        {
+            threshold += plinkoUnlockableIDsCopy[i, 1];
+
             if (rand < threshold)
             {
-                // i = 0 : rand must be less than 128 ( 128/256 : 50%)
-                // i = 1 : rand must be less than 192 (  64/256 : 25%)
-                // i = 2 : rand must be less than 224 (  32/256 : 12.5%)
-                // i = 3 : rand must be less than 240 (  16/256 : 6.25%)
-                // i = 4 : rand must be less than 248 (   8/256 : 3.125%)
-                // i = 5 : rand must be less than 252 (   4/256 : 1.5625%)
-                // i = 6 : rand must be less than 254 (   2/256 : 0.78125%)
-                // i = 7 : rand must be less than 255 (   1/256 : 0.390625%)
-
-                // set the new reward if it's not the current reward and not already unlocked
-                if (currentReward != plinkoUnlockableIDs[i] && Array.IndexOf(plinkoUnlockedIDs, plinkoUnlockableIDs[i]) == -1)
-                {
-                    PlayerPrefs.SetInt("PlinkoReward", plinkoUnlockableIDs[i]);
-                    return;
-                }
-                // otherwise, reroll
-                else
-                {
-                    rand = Random.Range(0, (randMax-1));
-                    i = 0;
-                    count++;
-                    // infinite loop stopper
-                    if (count > 100000)
-                    {
-                        // interate through all unlockable IDs and pick first one that is not already unlocked
-                        for (int j = 0; j < plinkoUnlockableIDs.Length; j++)
-                        {
-                            if (Array.IndexOf(plinkoUnlockedIDs, plinkoUnlockableIDs[j]) == -1)
-                            {
-                                PlayerPrefs.SetInt("PlinkoReward", plinkoUnlockableIDs[j]);
-                                return;
-                            }
-                        }
-                        // if all skins are unlocked, XP reward
-                        Debug.Log("No puck skin rewards remain.");
-                        PlayerPrefs.SetInt("PlinkoReward", 999);
-                        rewardImage.enabled = false;
-                        return;
-                    }
-                }
+                PlayerPrefs.SetInt("PlinkoReward", plinkoUnlockableIDsCopy[i, 0]);
+                return;
             }
         }
     }
