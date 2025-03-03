@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -6,10 +5,6 @@ using Random = UnityEngine.Random;
 
 public class PlinkoDropButtonScript : MonoBehaviour
 {
-    //dependacies
-    private LevelManager levelManager;
-    private LogicScript logic;
-
     // imports
     public Button dropButton;
     public Button backButton;
@@ -28,8 +23,6 @@ public class PlinkoDropButtonScript : MonoBehaviour
 
     private void OnEnable()
     {
-        levelManager = LevelManager.Instance;
-        logic = LogicScript.Instance;
         previousDropsValue = -1;
         SetDropButtonText();
         playerXPonEnable = PlayerPrefs.GetInt("XP");
@@ -67,9 +60,9 @@ public class PlinkoDropButtonScript : MonoBehaviour
         dropButton.interactable = ((Time.time - cooldown) > 2 && drops > 0);
     }
 
-    private void SetDropButtonText()
+    public void SetDropButtonText()
     {
-        (int XP, int level) = levelManager.GetXPAndLevel();
+        (int XP, int level) = LevelManager.Instance.GetXPAndLevel();
         dropped = PlayerPrefs.GetInt("PlinkoPegsDropped", 0);
         drops = level - dropped;
         count.text = drops.ToString();
@@ -95,7 +88,7 @@ public class PlinkoDropButtonScript : MonoBehaviour
 
         GameObject puckObject = Instantiate(puck, new Vector3(Random.Range(-xAxisRandomRange, xAxisRandomRange), 8f, 0.0f), Quaternion.identity);
         PuckScript puckScript = puckObject.GetComponent<PuckScript>();
-        puckScript.InitPuck(true, logic.player.puckSpriteID);
+        puckScript.InitPuck(true, LogicScript.Instance.player.puckSpriteID);
         // set gravity scale to 1 on puckObject
         puckObject.GetComponent<Rigidbody2D>().gravityScale = 1;
         // set order in layer to 3

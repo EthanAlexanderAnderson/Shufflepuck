@@ -49191,6 +49191,7 @@ MonoBehaviour:
   countdownText: {fileID: 1550373408}
   bonusBucketLeft: {fileID: 32856638}
   bonusBucketRight: {fileID: 1402876001}
+  plinkoDropButton: {fileID: 623927575}
   floatingTextPrefab: {fileID: 4579905589776270658, guid: a4af9b0b007a49c4ca9fa4d76af0f273, type: 3}
 --- !u!1 &839156785
 GameObject:

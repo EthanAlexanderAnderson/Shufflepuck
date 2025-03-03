@@ -1,6 +1,4 @@
 using System;
-//using System.Collections.Generic;
-//using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,6 +22,7 @@ public class PlinkoManager : MonoBehaviour
     [SerializeField] private TMP_Text countdownText;
     [SerializeField] private GameObject bonusBucketLeft;
     [SerializeField] private GameObject bonusBucketRight;
+    [SerializeField] private GameObject plinkoDropButton;
 
     // floating text
     [SerializeField] private GameObject floatingTextPrefab;
@@ -246,5 +245,8 @@ public class PlinkoManager : MonoBehaviour
         // floating text for visual feedback
         var floatingText = Instantiate(floatingTextPrefab, self.position, Quaternion.identity, transform);
         floatingText.GetComponent<FloatingTextScript>().Initialize("+100XP", 0.5f, 15);
+
+        // add a drop if we leveled up
+        plinkoDropButton.GetComponent<PlinkoDropButtonScript>().SetDropButtonText();
     }
 }
