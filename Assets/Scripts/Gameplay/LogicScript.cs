@@ -585,15 +585,18 @@ public class LogicScript : MonoBehaviour
     private void CPUPreShotPowerups()
     {
         if (denyPowerup > 0) { return; }
+        float millSubtractor = (mill * 0.25f);
+        float scoreSubtractor = ((opponent.score - player.score) * 0.02f);
+        float totalSubtractor = millSubtractor + scoreSubtractor;
         float randomValue = Random.Range(0f, 1f);
         // first two shots use block
-        if (opponent.puckCount > 3 && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
+        if (opponent.puckCount > 3 && randomValue < (0.75 - totalSubtractor))
         {
             powerupManager.BlockPowerup();
             powerupsUsedThisTurn++;
         }
         // shot three and four check if bolt is needed, if it isn't use foresight
-        else if (opponent.puckCount > 1 && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
+        else if (opponent.puckCount > 1 && randomValue < (0.75 - totalSubtractor))
         {
             // if the ratio of player pucks to opponent pucks is greater than 2, use bolt
             var allPucks = GameObject.FindGameObjectsWithTag("puck");
@@ -623,7 +626,7 @@ public class LogicScript : MonoBehaviour
             }
         }
         // last shot, cull
-        else if (opponent.puckCount == 1 && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
+        else if (opponent.puckCount == 1 && randomValue < (0.75 - totalSubtractor))
         {
             var allPucks = GameObject.FindGameObjectsWithTag("puck");
             // don't use cull if player has resurrect that would trigger
@@ -633,6 +636,10 @@ public class LogicScript : MonoBehaviour
                 if (!useCull) { continue; }
                 var puckScript = puck.GetComponent<PuckScript>();
                 if (puckScript.IsPlayersPuck() && puckScript.IsResurrect() && puckScript.ComputeValue() == 0 )
+                {
+                    useCull = false;
+                }
+                if (!puckScript.IsPlayersPuck() && puckScript.IsFactory())
                 {
                     useCull = false;
                 }
@@ -646,30 +653,43 @@ public class LogicScript : MonoBehaviour
 
     private void CPUPostShotPowerups()
     {
-        // plus one, growth, hydra
+        float millSubtractor = (mill * 0.25f);
+        float scoreSubtractor = ((opponent.score - player.score) * 0.02f);
+        float totalSubtractor = millSubtractor + scoreSubtractor;
         float randomValue = Random.Range(0f, 1f);
-        if (opponent.puckCount > 3 && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
+        // plus one, growth, hydra
+        if (opponent.puckCount > 3 && randomValue < (0.75 - totalSubtractor))
         {
             powerupManager.GrowthPowerup();
         }
-        else if (opponent.puckCount < 3 && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
-        {
-            powerupManager.PlusOnePowerup();
-        }
-        else if (opponent.puckCount == 3 && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
+        else if (opponent.puckCount == 3 && randomValue < (0.75 - totalSubtractor))
         {
             powerupManager.HydraPowerup();
         }
+        else if (opponent.puckCount == 2 && randomValue < (0.75 - totalSubtractor))
+        {
+            powerupManager.AuraPowerup();
+        }
+        else if (opponent.puckCount <= 1 && randomValue < (0.75 - totalSubtractor))
+        {
+            if (powerupsUsedThisTurn == 0)
+            {
+                powerupManager.TimesTwoPowerup();
+                return;
+            }
+            powerupManager.PlusOnePowerup();
+        }
+
         powerupsUsedThisTurn++;
         if (powerupsUsedThisTurn >= 3 - denyPowerup * 2) { return; }
 
         // lock, fog
         randomValue = Random.Range(0f, 1f);
-        if (opponent.puckCount > 3 && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
+        if (opponent.puckCount > 3 && randomValue < (0.55 - totalSubtractor))
         {
             powerupManager.LockPowerup();
         }
-        else if ((opponent.puckCount == 3 || opponent.puckCount == 2) && player.puckCount > 0 && randomValue < (0.50 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
+        else if ((opponent.puckCount == 3 || opponent.puckCount == 2) && player.puckCount > 0 && randomValue < (0.55 - totalSubtractor))
         {
             powerupManager.FogPowerup();
         }
@@ -678,7 +698,7 @@ public class LogicScript : MonoBehaviour
 
         // shield
         randomValue = Random.Range(0f, 1f);
-        if ((opponent.puckCount == 3 || opponent.puckCount == 2) && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
+        if ((opponent.puckCount == 2) && randomValue < (0.55 - totalSubtractor))
         {
             powerupManager.ShieldPowerup();
         }
@@ -687,27 +707,18 @@ public class LogicScript : MonoBehaviour
 
         // factory
         randomValue = Random.Range(0f, 1f);
-        if ((opponent.puckCount == 5 || opponent.puckCount == 4) && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
+        if ((opponent.puckCount == 5 || opponent.puckCount == 4) && randomValue < (0.55 - totalSubtractor))
         {
             powerupManager.FactoryPowerup();
         }
         powerupsUsedThisTurn++;
         if (powerupsUsedThisTurn >= 3 - denyPowerup * 2) { return; }
 
-        // mill
-        randomValue = Random.Range(0f, 1f);
-        if (powerupsUsedThisTurn == 0 && (opponent.puckCount == 4 || opponent.puckCount == 3) && player.puckCount > 0 && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
-        {
-            powerupManager.MillPowerup();
-        }
-        powerupsUsedThisTurn++;
-        if (powerupsUsedThisTurn >= 3 - denyPowerup * 2) { return; }
-
         // resurrect
         randomValue = Random.Range(0f, 1f);
-        if (powerupsUsedThisTurn == 0 && (opponent.puckCount == 5 || opponent.puckCount == 2) && randomValue < (0.75 - (mill * 0.25)) - ((opponent.score - player.score) * 0.02))
+        if (powerupsUsedThisTurn == 0 && (opponent.puckCount == 5 || opponent.puckCount == 4) && randomValue < (0.75 - totalSubtractor))
         {
-            powerupManager.MillPowerup();
+            powerupManager.ResurrectPowerup();
         }
         powerupsUsedThisTurn++;
         if (powerupsUsedThisTurn >= 3 - denyPowerup * 2) { return; }
