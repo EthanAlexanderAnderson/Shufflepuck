@@ -20,6 +20,8 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
     private List<Vector3> gizRayOrigin = new();
     private List<Vector3> gizDirection = new();
 
+    bool powerupsEnabled;
+
     public (float, float, float) GetPath() => (((180f - bestAngle) - 60f) * 1.66666f, System.Math.Min(95f + powerModifier, 105), 50f); // convert angel to line-readable format
     public bool DoesPathRequirePhasePowerup() => false;
     public bool DoesPathRequireExplosionPowerup() => false;
@@ -29,12 +31,14 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
     {
         if (WallIsActive()) { return 0; }
 
+        powerupsEnabled = PlayerPrefs.GetInt("PowerupsEnabled", 0) == 1;
+
         highestValue = 0;
         bestAngle = 0;
         powerModifier = 0;
         valueModifier = 0;
 
-        // these 4 lists are just for gizmos
+        // these 3 lists are just for gizmos
         gizRayOrigin.Clear();
         gizDirection.Clear();
         hitPoints.Clear();
@@ -77,6 +81,15 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
         // make sure we have good values
         if (highestValue <= 0 || (highestValue * 3 + valueModifier) <= 0) { return 0; } // this is just here so we don't Debug.Log for 0 value paths
         if (bestAngle < 60 || bestAngle > 120) { Debug.LogError("SMART SCAN ERROR: BAD ANGLE " + bestAngle); return 0; }
+
+        // temporary nerf for non-powerups mode. (don't shoot unless two or more opponent pucks are in path, 25% chance override)
+        float randomValue = Random.Range(0f, 1f);
+        // if powerups are disabled AND only 1 puck in path : 70% chance to nerf
+        // if above conditions AND the path value is less than 10 : 90% chance to nerf
+        if (!powerupsEnabled && powerModifier <= 0 && randomValue <= (0.70 + ((highestValue * 3 + valueModifier) < 10 ? 0.2 : 0)))
+        {
+            return 0;
+        }
 
         // return best puck
         Debug.Log($"Smart Scan Value: {highestValue * 3} + {valueModifier} at Angle: {bestAngle}");
