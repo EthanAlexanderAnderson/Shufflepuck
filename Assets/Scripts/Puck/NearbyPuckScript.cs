@@ -31,6 +31,21 @@ public class NearbyPuckScript : MonoBehaviour
             // push each puck away from the center
             rb.AddForce((puck.transform.position - transform.position).normalized*5, ForceMode2D.Impulse);
         }
+        // animation
+        gameObject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        GetComponent<SpriteRenderer>().enabled = true;
+        GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0.6f);
+        LeanTween.scale(gameObject, new Vector3(1f, 1f, 1f), 0.5f).setEase(LeanTweenType.easeOutElastic).setOnComplete(DisableSpriteRenderer);
+    }
+
+    private void DisableSpriteRenderer()
+    {
+        GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0.2980392f);
+        if (auraEnabled)
+        {
+            return;
+        }
+        GetComponent<SpriteRenderer>().enabled = false;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
