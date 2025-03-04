@@ -408,8 +408,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
             zoneMultiplier = enteredZoneMultiplier;
             // show floating text
-            var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
-            floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f + (ComputeValue() / 10), true);
+            CreateScoreFloatingText();
         }
         zoneMultiplier = enteredZoneMultiplier;
     }
@@ -562,6 +561,11 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         SetZoneMultiplier(0);
     }
 
+    private void CreateScoreFloatingText()
+    {
+        var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
+        floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f + (ComputeValue() / 10), true);
+    }
 
     public void SetPowerupText(string text, bool showFloatingText = true)
     {
@@ -575,7 +579,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     }
 
     // text to show what powerup was used under the puck. Only fades, no up/shrink.
-    public void CreatePowerupFloatingText()
+    private void CreatePowerupFloatingText()
     {
         var floatingText = Instantiate(floatingTextPrefab, transform.position + new Vector3(0, -1.5f, 0), Quaternion.identity, transform);
         floatingText.GetComponent<FloatingTextScript>().Initialize(string.Join("\n", powerupText), 0, 0, 0.1f, 1, true);
@@ -584,8 +588,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public void OnPointerClick(PointerEventData eventData)
     {
         // show puck score when clicked
-        var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
-        floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f + (ComputeValue() / 10), true);
+        CreateScoreFloatingText();
         // if powerupText has been set, show it
         if (powerupText.Count > 0)
         {
@@ -780,8 +783,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             pointCPUSFX.pitch = 0.8f + (0.05f * ComputeValue());
             pointCPUSFX.Play();
         }
-        var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
-        floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f + (ComputeValue() / 10), true);
+        CreateScoreFloatingText();
     }
 
     public void EnableLock()
@@ -1001,8 +1003,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             pointCPUSFX.pitch = 0.8f + (0.05f * ComputeValue());
             pointCPUSFX.Play();
         }
-        var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
-        floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f + (ComputeValue() / 10), true);
+        CreateScoreFloatingText();
     }
 
     public void EnablePush()

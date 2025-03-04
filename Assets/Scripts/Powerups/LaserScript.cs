@@ -119,6 +119,7 @@ public class LaserScript : MonoBehaviour
     {
         laserEnabled = false;
         spriteRenderer.enabled = false;
+        transform.localPosition = new Vector3(xBase, -30f, zBase);
     }
 
     private void StopListeners()
