@@ -554,16 +554,22 @@ public class PowerupManager : NetworkBehaviour
 
     IEnumerator MoveToPosition(GameObject puck, Vector2 targetPosition, float speed)
     {
+        var spriteRenderer = puck.GetComponent<SpriteRenderer>();
+        var circleCollider = puck.GetComponent<CircleCollider2D>();
 
-        puck.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0.5f);
-        puck.GetComponent<CircleCollider2D>().isTrigger = true;
+        spriteRenderer.color = new Color(1f, 1f, 1f, 0.5f);
+        circleCollider.isTrigger = true;
         while ((Vector2)puck.transform.position != targetPosition)
         {
             puck.transform.position = Vector2.MoveTowards(puck.transform.position, targetPosition, speed * Time.deltaTime);
             yield return null; // Wait for the next frame
         }
-        puck.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 1f);
-        puck.GetComponent<CircleCollider2D>().isTrigger = false;
+        spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+        if (puck.GetComponent<PuckScript>().IsLocked())
+        {
+            spriteRenderer.color = new Color(0.5f, 0.5f, 0.5f, 1f);
+        }
+        circleCollider.isTrigger = false;
 
         activeMovements--; // Decrease active movements count
 
