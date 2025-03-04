@@ -641,7 +641,9 @@ public class UIManagerScript : MonoBehaviour
         {
             if (text.tag == "blackText")
             {
+                var alpha = text.alpha;
                 text.color = darkMode ? Color.white : Color.black;
+                text.alpha = alpha;
             }
         }
         // swap text color to white for all children Text objects with the blackText tag

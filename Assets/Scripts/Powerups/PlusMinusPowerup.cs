@@ -24,6 +24,7 @@ public class PlusMinusPowerup : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         }
         DeckManager.Instance.SetCardCount(index, count);
         text.text = count.ToString();
+        text.alpha = count > 0 ? 1f : 0.3f;
         UpdateMinusAndPlusUIButtonInteractability();
     }
     public void Minus()
@@ -51,6 +52,10 @@ public class PlusMinusPowerup : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     {
         DeckManager.Instance.SetCardCount(index, count);
         text.text = count.ToString();
+
+        // if zero cards, grey out
+        text.alpha = count > 0 ? 1f : 0.3f;
+
         PlayerPrefs.SetInt(cardName + "CardCount", count);
     }
 
