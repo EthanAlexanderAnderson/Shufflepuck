@@ -272,7 +272,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         LeanTween.cancel(gameObject);
         LeanTween.scale(gameObject, new Vector3(0.2f, 0.2f, 0.2f), 0.5f).setEase(LeanTweenType.easeOutQuint).setDelay(0.01f);
 
-        Debug.Log($"Puck initialized. IsPlayersPuckParameter: {IsPlayersPuckParameter}. PuckSpriteID: {puckSpriteID}");
+        Debug.Log($"Puck initialized. Players: {IsPlayersPuckParameter}. SpriteID: {puckSpriteID}");
     }
 
     private float angle;
