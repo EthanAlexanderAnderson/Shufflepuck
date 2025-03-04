@@ -304,8 +304,13 @@ public class UIManagerScript : MonoBehaviour
                 gameResultText.text = "You Win!";
                 gameResultHighscoreMessageText.text = "You won by " + System.Math.Abs(scoreDifference) + " points.";
                 IncrementPlayerPref("onlineWin");
-                gameResultHighscoreMessageText.text += dailyChallenge.EvaluateChallenge(2, scoreDifference, 1);
                 playerWins++;
+                if (playerWins + opponentWins >= 2)
+                {
+                    gameResultHighscoreMessageText.text +=  $"\nWins: {playerWins} - {opponentWins}";
+
+                }
+                gameResultHighscoreMessageText.text += dailyChallenge.EvaluateChallenge(2, scoreDifference, 1);
                 playerWinsText.text = playerWins.ToString();
                 opponentWinsText.text = opponentWins.ToString();
             }
@@ -315,6 +320,11 @@ public class UIManagerScript : MonoBehaviour
                 gameResultHighscoreMessageText.text = "They won by " + System.Math.Abs(scoreDifference) + " points.";
                 IncrementPlayerPref("onlineLoss");
                 opponentWins++;
+                if (playerWins + opponentWins >= 2)
+                {
+                    gameResultHighscoreMessageText.text += $"\nWins: {playerWins} - {opponentWins}";
+
+                }
                 playerWinsText.text = playerWins.ToString();
                 opponentWinsText.text = opponentWins.ToString();
             }
@@ -323,6 +333,11 @@ public class UIManagerScript : MonoBehaviour
                 gameResultText.text = "Tie";
                 gameResultHighscoreMessageText.text = "";
                 IncrementPlayerPref("onlineTie");
+                if (playerWins + opponentWins >= 2)
+                {
+                    gameResultHighscoreMessageText.text += $"\nWins: {playerWins} - {opponentWins}";
+
+                }
             }
             return;
         }
