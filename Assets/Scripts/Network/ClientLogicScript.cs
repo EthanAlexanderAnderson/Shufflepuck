@@ -309,6 +309,7 @@ public class ClientLogicScript : NetworkBehaviour
     {
         if (!IsClient) return;
         UI.SetErrorMessage("Your opponent has disconnected.");
+        UI.DisableReadyButton();
     }
 
     public void StopGame()
@@ -341,5 +342,10 @@ public class ClientLogicScript : NetworkBehaviour
     public void AddPlayerACKClientRPC(ClientRpcParams clientRpcParams = default)
     {
         UI.DisableReadyButton();
+    }
+
+    public void ShotTimerBoost()
+    {
+        shotTimer += 10;
     }
 }

@@ -24,10 +24,10 @@ public class DeckManager : MonoBehaviour
             Destroy(Instance);
 
         deck = new int[PowerupManager.Instance.GetMethodArrayLength()];
-        // default deck is one of each card
+        // default deck is empty
         for (int i = 0; i < PowerupManager.Instance.GetMethodArrayLength(); i++)
         {
-            deck[i] = 1;
+            deck[i] = 0;
         }
     }
 
@@ -74,7 +74,7 @@ public class DeckManager : MonoBehaviour
     }
 
     // Export the decklist to the clipboard
-    string[] cardNames = { "PlusOne", "Foresight", "Block", "Bolt", "ForceField", "Phase", "Cull", "Growth", "Lock", "Explosion", "Fog", "Hydra", "Factory", "Shield", "Shuffle", "Chaos", "TimesTwo", "Resurrect", "Mill", "Research", "Insanity", "Triple", "Exponent", "Laser", "Aura", "Push", "Erratic" };
+    string[] cardNames = { "PlusOne", "Foresight", "Block", "Bolt", "ForceField", "Phase", "Cull", "Growth", "Lock", "Explosion", "Fog", "Hydra", "Factory", "Shield", "Shuffle", "Chaos", "TimesTwo", "Resurrect", "Mill", "Research", "Insanity", "Triple", "Exponent", "Laser", "Aura", "Push", "Erratic", "Deny", "Investment", "Omniscience", null };
     public void ExportDeckList()
     {
         // Convert the decklist to string
@@ -127,7 +127,7 @@ public class DeckManager : MonoBehaviour
             var cardIndex = -1;
             for (int i = 0; i < cardNames.Length; i++)
             {
-                if (cardNames[i] == split[0].Trim())
+                if (!string.IsNullOrEmpty(cardNames[i]) && cardNames[i] == split[0].Trim())
                 {
                     cardIndex = i;
                     break;

@@ -219,7 +219,7 @@ public class ServerLogicScript : NetworkBehaviour
             clientLogic.StartTurnClientRpc(true, true, clientRpcParamsList[activeCompetitorIndex]);
             clientLogic.StartTurnClientRpc(false, true, clientRpcParamsList[activeCompetitorIndex ^ 1]);
             // reset the shot timer and set the game as running for server logic
-            shotTimer = (player1powerupsenabled && player2powerupsenabled) ? 42 : 21;
+            shotTimer = (player1powerupsenabled && player2powerupsenabled) ? 42 : 30;
             gameIsRunning = true;
         }
         catch (System.Exception e)
@@ -331,7 +331,7 @@ public class ServerLogicScript : NetworkBehaviour
                 clientLogic.StartTurnClientRpc(true, activeCompetitorIndex == startingPlayerIndex, clientRpcParamsList[activeCompetitorIndex]);
                 clientLogic.StartTurnClientRpc(false, activeCompetitorIndex == startingPlayerIndex, clientRpcParamsList[activeCompetitorIndex ^ 1]);
                 // reset shot clock
-                shotTimer = (player1powerupsenabled && player2powerupsenabled) ? 42 : 21;
+                shotTimer = (player1powerupsenabled && player2powerupsenabled) ? 42 : 30;
             }
         }
         catch (System.Exception e)
@@ -537,5 +537,11 @@ public class ServerLogicScript : NetworkBehaviour
         int competitorIndex = clients.IndexOf(clientId);
         triplePowerupUserCompetitorIndex = competitorIndex;
         triplePowerup += 2;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void ShotTimerBoostServerRpc()
+    {
+        shotTimer += 10;
     }
 }

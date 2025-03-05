@@ -56,7 +56,7 @@ public class PowerupsHUDUIManager : MonoBehaviour
         for (int i = 0; i < powerupButtonObjects.Length; i++)
         {
             // if paid 2 discard cost, discard the other 2 cards
-            if (Array.Exists(PowerupManager.Instance.GetCost2Discard(), x => x == powerupID) && i != index && i != 3)
+            if (Array.Exists(PowerupManager.Instance.GetCost2Discard(), x => x == powerupID) && i != index && i != 3 && !PowerupManager.Instance.IsOmniscient())
             {
                 cardsInHand--;
                 LeanTween.cancel(powerupButtonObjects[i]);

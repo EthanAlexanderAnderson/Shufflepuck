@@ -17,13 +17,14 @@ public class PlusMinusPowerup : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     private void OnEnable()
     {
-        count = PlayerPrefs.GetInt(cardName + "CardCount", 1);
+        count = PlayerPrefs.GetInt(cardName + "CardCount", 0);
         if (!Application.isEditor && count > maxCount) // in editor we have no max per card
         {
             count = maxCount;
         }
         DeckManager.Instance.SetCardCount(index, count);
         text.text = count.ToString();
+        text.alpha = count > 0 ? 1f : 0.3f;
         UpdateMinusAndPlusUIButtonInteractability();
     }
     public void Minus()
@@ -51,6 +52,10 @@ public class PlusMinusPowerup : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     {
         DeckManager.Instance.SetCardCount(index, count);
         text.text = count.ToString();
+
+        // if zero cards, grey out
+        text.alpha = count > 0 ? 1f : 0.3f;
+
         PlayerPrefs.SetInt(cardName + "CardCount", count);
     }
 

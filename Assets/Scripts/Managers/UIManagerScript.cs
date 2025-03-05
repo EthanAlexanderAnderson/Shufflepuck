@@ -23,6 +23,7 @@ public class UIManagerScript : MonoBehaviour
     public GameObject customizeScreen;
     public GameObject profileScreen;
     public GameObject plinkoScreen;
+    public GameObject waitingScreen;
 
     // title
     [SerializeField] private GameObject playerPuckIcon;
@@ -303,8 +304,13 @@ public class UIManagerScript : MonoBehaviour
                 gameResultText.text = "You Win!";
                 gameResultHighscoreMessageText.text = "You won by " + System.Math.Abs(scoreDifference) + " points.";
                 IncrementPlayerPref("onlineWin");
-                gameResultHighscoreMessageText.text += dailyChallenge.EvaluateChallenge(2, scoreDifference, 1);
                 playerWins++;
+                if (playerWins + opponentWins >= 2)
+                {
+                    gameResultHighscoreMessageText.text +=  $"\nWins: {playerWins} - {opponentWins}";
+
+                }
+                gameResultHighscoreMessageText.text += dailyChallenge.EvaluateChallenge(2, scoreDifference, 1);
                 playerWinsText.text = playerWins.ToString();
                 opponentWinsText.text = opponentWins.ToString();
             }
@@ -314,6 +320,11 @@ public class UIManagerScript : MonoBehaviour
                 gameResultHighscoreMessageText.text = "They won by " + System.Math.Abs(scoreDifference) + " points.";
                 IncrementPlayerPref("onlineLoss");
                 opponentWins++;
+                if (playerWins + opponentWins >= 2)
+                {
+                    gameResultHighscoreMessageText.text += $"\nWins: {playerWins} - {opponentWins}";
+
+                }
                 playerWinsText.text = playerWins.ToString();
                 opponentWinsText.text = opponentWins.ToString();
             }
@@ -322,6 +333,11 @@ public class UIManagerScript : MonoBehaviour
                 gameResultText.text = "Tie";
                 gameResultHighscoreMessageText.text = "";
                 IncrementPlayerPref("onlineTie");
+                if (playerWins + opponentWins >= 2)
+                {
+                    gameResultHighscoreMessageText.text += $"\nWins: {playerWins} - {opponentWins}";
+
+                }
             }
             return;
         }
@@ -538,10 +554,18 @@ public class UIManagerScript : MonoBehaviour
     // handle android back button / esc key
     void HandleBackButton()
     {
-        if (previousActiveUI != gameHud && activeUI != plinkoScreen)
+        // don't allow android back button if...
+        if (
+            activeUI == gameHud || // we're in game
+            previousActiveUI == gameHud || // trying to go back to game HUD
+            previousActiveUI == gameResultScreen || // trying to go back to game result screen
+            activeUI == plinkoScreen || // we're on the plinko screen
+            activeUI == waitingScreen // we're joining/hosting an online game
+            )
         {
-            ChangeUI(previousActiveUI);
+            return;
         }
+        ChangeUI(previousActiveUI);
     }
     // reset in-game HUD
     public void ResetHUD()
@@ -632,7 +656,9 @@ public class UIManagerScript : MonoBehaviour
         {
             if (text.tag == "blackText")
             {
+                var alpha = text.alpha;
                 text.color = darkMode ? Color.white : Color.black;
+                text.alpha = alpha;
             }
         }
         // swap text color to white for all children Text objects with the blackText tag

@@ -54,6 +54,10 @@ public class PuckSkinManager : MonoBehaviour
     [SerializeField] private Sprite puckShuriken;
     [SerializeField] private Sprite puckLifesaver;
     [SerializeField] private Sprite puckAtom;
+    [SerializeField] private Sprite puckMatrix;
+    [SerializeField] private Sprite puckLucky;
+    [SerializeField] private Sprite puckSkull;
+    [SerializeField] private Sprite puckButterfly;
 
     [SerializeField] private Sprite puckBlueAlt;
     [SerializeField] private Sprite puckGreenAlt;
@@ -96,6 +100,10 @@ public class PuckSkinManager : MonoBehaviour
     [SerializeField] private Sprite puckShurikenAlt;
     [SerializeField] private Sprite puckLifesaverAlt;
     [SerializeField] private Sprite puckAtomAlt;
+    [SerializeField] private Sprite puckMatrixAlt;
+    [SerializeField] private Sprite puckLuckyAlt;
+    [SerializeField] private Sprite puckSkullAlt;
+    [SerializeField] private Sprite puckButterflyAlt;
 
     void Awake()
     {
@@ -115,8 +123,8 @@ public class PuckSkinManager : MonoBehaviour
 
     public Sprite ColorIDtoPuckSprite(int id)
     {
-        Sprite[] puckSprites = { puckFlower, puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain, puckNuke, puckWreath, puckSky, puckDragon, puckNinja, puckEgg, puckMonster, puckEye, puckCamo, puckYingYang, puckCow, puckCraft, puckPlanet, puckLove, puckAura, puckCheese, puckScotia, puckPoker, puckPumpkin, puckWeb, puckCoin, puckMagic, puckStar, puckSnake, puckHexagon, puckShuriken, puckLifesaver, puckAtom };
-        Sprite[] puckAltSprites = { puckMissing, puckBlueAlt, puckGreenAlt, puckGreyAlt, puckOrangeAlt, puckPinkAlt, puckPurpleAlt, puckRedAlt, puckYellowAlt, puckRainbowAlt, puckCanadaAlt, puckDonutAlt, puckCaptainAlt, puckNukeAlt, puckWreathAlt, puckSkyAlt, puckDragonAlt, puckNinjaAlt, puckEggAlt, puckMonsterAlt, puckEyeAlt, puckCamoAlt, puckYingYangAlt, puckCowAlt, puckCraftAlt, puckPlanetAlt, puckLoveAlt, puckAuraAlt, puckCheeseAlt, puckScotiaAlt, puckPokerAlt, puckPumpkinAlt, puckWebAlt, puckCoinAlt, puckMagicAlt, puckStarAlt, puckSnakeAlt, puckHexagonAlt, puckShurikenAlt, puckLifesaverAlt, puckAtomAlt };
+        Sprite[] puckSprites = { puckFlower, puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain, puckNuke, puckWreath, puckSky, puckDragon, puckNinja, puckEgg, puckMonster, puckEye, puckCamo, puckYingYang, puckCow, puckCraft, puckPlanet, puckLove, puckAura, puckCheese, puckScotia, puckPoker, puckPumpkin, puckWeb, puckCoin, puckMagic, puckStar, puckSnake, puckHexagon, puckShuriken, puckLifesaver, puckAtom, puckMatrix, puckLucky, puckSkull, puckButterfly };
+        Sprite[] puckAltSprites = { puckMissing, puckBlueAlt, puckGreenAlt, puckGreyAlt, puckOrangeAlt, puckPinkAlt, puckPurpleAlt, puckRedAlt, puckYellowAlt, puckRainbowAlt, puckCanadaAlt, puckDonutAlt, puckCaptainAlt, puckNukeAlt, puckWreathAlt, puckSkyAlt, puckDragonAlt, puckNinjaAlt, puckEggAlt, puckMonsterAlt, puckEyeAlt, puckCamoAlt, puckYingYangAlt, puckCowAlt, puckCraftAlt, puckPlanetAlt, puckLoveAlt, puckAuraAlt, puckCheeseAlt, puckScotiaAlt, puckPokerAlt, puckPumpkinAlt, puckWebAlt, puckCoinAlt, puckMagicAlt, puckStarAlt, puckSnakeAlt, puckHexagonAlt, puckShurikenAlt, puckLifesaverAlt, puckAtomAlt, puckMatrixAlt, puckLuckyAlt, puckSkullAlt, puckButterflyAlt };
 
         // if out of range, return missing
         if ((id >= puckSprites.Length) || (id <= puckAltSprites.Length * -1))
@@ -305,6 +313,10 @@ public class PuckSkinManager : MonoBehaviour
         new Color[] { new Color(1.0000000f, 1.0000000f, 1.0000000f) }, // shuriken
         new Color[] { new Color(0.9490196f, 0.4235294f, 0.3098039f), new Color(1.0000000f, 1.0000000f, 1.0000000f), new Color(1.0000000f, 1.0000000f, 1.0000000f), new Color(1.0000000f, 1.0000000f, 1.0000000f) }, // lifesaver
         new Color[] { new Color(0.0117647f, 0.4039216f, 0.5215686f) }, // atom
+        new Color[] { new Color(0.0000000f, 1.0000000f, 0.0000000f) }, // matrix
+        new Color[] { new Color(1.0000000f, 0.9607844f, 0.4078432f), new Color(0.4862745f, 0.7725491f, 0.4627451f) }, // lucky
+        new Color[] { new Color(1.0000000f, 1.0000000f, 1.0000000f) }, // skull
+        new Color[] { new Color(1.0000000f, 1.0000000f, 1.0000000f), new Color(0.0000000f, 0.7490196f, 0.9529412f), new Color(0.9411765f, 0.4313726f, 0.6666667f) }, // butterfly
     };
 
     Color[][] puckAltColors = {
@@ -349,5 +361,9 @@ public class PuckSkinManager : MonoBehaviour
         new Color[] { new Color(0.2000000f, 0.2000000f, 0.2000000f) }, // shuriken alt
         new Color[] { new Color(0.0117647f, 0.7490196f, 0.9450980f), new Color(1.0000000f, 1.0000000f, 1.0000000f), new Color(1.0000000f, 1.0000000f, 1.0000000f), new Color(1.0000000f, 1.0000000f, 1.0000000f) }, // lifesaver alt
         new Color[] { new Color(0.4941176f, 0.2313725f, 0.3607843f) }, // atom alt
+        new Color[] { new Color(1.0000000f, 1.0000000f, 1.0000000f) }, // matrix alt
+        new Color[] { new Color(1.0000000f, 0.9607844f, 0.4078432f), new Color(0.0000000f, 0.7490196f, 0.9529412f) }, // lucky alt
+        new Color[] { new Color(1.0000000f, 1.0000000f, 1.0000000f), new Color(0.9490197f, 0.4235294f, 0.3098039f) }, // skull alt
+        new Color[] { new Color(1.0000000f, 1.0000000f, 1.0000000f), new Color(0.0000000f, 0.7490196f, 0.9529412f), new Color(0.9411765f, 0.4313726f, 0.6666667f) }, // butterfly alt
     };
 }
