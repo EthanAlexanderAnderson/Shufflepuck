@@ -549,6 +549,12 @@ public class UIManagerScript : MonoBehaviour
         titleScreenBackground.SetActive(newUI != gameHud && newUI != gameResultScreen);
         fade.SetActive(newUI == gameHud || newUI == gameResultScreen);
         ApplyDarkMode();
+        if (newUI != gameHud)
+        {
+            newUI.transform.localScale = new Vector3(0.95f, 0.95f, 0.95f);
+            LeanTween.cancel(newUI);
+            LeanTween.scale(newUI, new Vector3(1f, 1f, 1f), 0.1f).setEase(LeanTweenType.easeOutBack).setDelay(0.01f);
+        }
     }
 
     // handle android back button / esc key
