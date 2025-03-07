@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections.Generic;
 
 public class DailyChallengeManagerScript : MonoBehaviour
 {
@@ -10,7 +11,6 @@ public class DailyChallengeManagerScript : MonoBehaviour
     // dependencies
     private LevelManager levelManager;
     private SoundManagerScript sound;
-    private UIManagerScript UI;
 
     [SerializeField] private GameObject titleScreen;
 
@@ -27,23 +27,10 @@ public class DailyChallengeManagerScript : MonoBehaviour
     [SerializeField] private GameObject glow1;
     [SerializeField] private GameObject glow2;
 
-    private string[] easyChallengeText = { "Claimed", "Beat the easy CPU", "Beat the medium CPU", "Beat the easy CPU by 3 or more points", "Beat the medium CPU by 3 or more points", "Beat the easy CPU by 5 or more points" };
-    private int[] easyChallengeReward = { 0, 40, 60, 60, 80, 80 };
-    private int[,] easyChallengeCondition = { { 0, 0, 0 }, { 0, 1, 0 }, { 1, 1, 0 }, { 0, 3, 0 }, { 1, 3, 0 }, { 0, 5, 0 } }; // {difficulty, score difference, isOnline}
-    private string[] hardChallengeText = { "Claimed", "Beat the hard CPU", "Beat the hard CPU by 3 or more points", "Beat the medium CPU by 5 or more points", "Beat the hard CPU by 5 or more points", "Win an online match" };
-    private int[] hardChallengeReward = { 0, 80, 150, 100, 300, 250 };
-    private int[,] hardChallengeCondition = { { 0, 0, 0 }, { 2, 1, 0 }, { 2, 3, 0 }, { 1, 5, 0 }, { 2, 5, 0 }, { 2, 1, 1 } }; // {difficulty, score difference, isOnline}
-
-    // Daily streak stuff
-    [SerializeField] private GameObject streakCounter1;
-    [SerializeField] private GameObject streakCounter2;
-    [SerializeField] private GameObject streakCounter3;
-    [SerializeField] private GameObject streakCounter4;
-    [SerializeField] private GameObject streakCounter5;
-    [SerializeField] private GameObject streakCounter6;
-    [SerializeField] private GameObject streakCounter7;
-    [SerializeField] private GameObject[] streakCounters;
-    [SerializeField] private TMP_Text streakRewardText;
+    List<Challenge> easyDailyChallenges;
+    List<Challenge> hardDailyChallenges;
+    int numberOfEasyDailyChallenges;
+    int numberOfHardDailyChallenges;
 
     private void Awake()
     {
@@ -57,12 +44,10 @@ public class DailyChallengeManagerScript : MonoBehaviour
     {
         levelManager = LevelManager.Instance;
         sound = SoundManagerScript.Instance;
-        UI = UIManagerScript.Instance;
     }
 
     public void SetText()
     {
-        IncrementStreak();
         CheckForNewDailyChallenge();
         int DC1 = PlayerPrefs.GetInt("DailyChallenge1", 0);
         int DC2 = PlayerPrefs.GetInt("DailyChallenge2", 0);
@@ -72,22 +57,28 @@ public class DailyChallengeManagerScript : MonoBehaviour
         glow1.SetActive(claim1.interactable);
         glow2.SetActive(claim2.interactable);
 
+        easyDailyChallenges = ChallengeManager.Instance.challengeData.easyDailyChallenges;
+        hardDailyChallenges = ChallengeManager.Instance.challengeData.hardDailyChallenges;
+        numberOfEasyDailyChallenges = easyDailyChallenges.Count;
+        numberOfHardDailyChallenges = hardDailyChallenges.Count;
+
         // assert the challenge ID is within range, prevent index error
-        if (DC1 >= easyChallengeText.Length || DC1 <= (easyChallengeText.Length * -1) || DC1 <= (easyChallengeReward.Length * -1) || DC1 <= (easyChallengeReward.Length * -1))
+        if (DC1 >= numberOfEasyDailyChallenges || DC1 <= (numberOfEasyDailyChallenges * -1) || DC1 <= (numberOfEasyDailyChallenges * -1) || DC1 <= (numberOfEasyDailyChallenges * -1))
         {
             DC1 = 0;
             PlayerPrefs.SetInt("DailyChallenge1", 0);
         }
-        if (DC2 >= hardChallengeText.Length || DC2 <= (hardChallengeText.Length * -1) || DC2 >= hardChallengeReward.Length || DC2 <= (hardChallengeReward.Length * -1))
+        if (DC2 >= numberOfHardDailyChallenges || DC2 <= (numberOfHardDailyChallenges * -1) || DC2 >= numberOfHardDailyChallenges || DC2 <= (numberOfHardDailyChallenges * -1))
         {
             DC2 = 0;
             PlayerPrefs.SetInt("DailyChallenge2", 0);
         }
 
-        challenge1Text.text = easyChallengeText[Mathf.Abs(DC1)];
-        challenge2Text.text = hardChallengeText[Mathf.Abs(DC2)];
-        reward1Text.text = easyChallengeReward[Mathf.Abs(DC1)].ToString() + " XP";
-        reward2Text.text = hardChallengeReward[Mathf.Abs(DC2)].ToString() + " XP";
+        challenge1Text.text = easyDailyChallenges[Mathf.Abs(DC1)].challengeText;
+        challenge2Text.text = hardDailyChallenges[Mathf.Abs(DC2)].challengeText;
+        // TODO: make this dynamic to support non-XP rewards on daily challenges
+        reward1Text.text = easyDailyChallenges[Mathf.Abs(DC1)].GetXPReward().ToString() + " XP";
+        reward2Text.text = hardDailyChallenges[Mathf.Abs(DC2)].GetXPReward().ToString() + " XP";
         if (levelManager == null)
         {
             levelManager = LevelManager.Instance;
@@ -152,13 +143,13 @@ public class DailyChallengeManagerScript : MonoBehaviour
         // only overwrite the challenge if it's not already completed (not a negative int id)
         if (PlayerPrefs.GetInt("DailyChallenge1", 0) >= 0)
         {
-            PlayerPrefs.SetInt("DailyChallenge1", UnityEngine.Random.Range(1, easyChallengeText.Length));
+            PlayerPrefs.SetInt("DailyChallenge1", UnityEngine.Random.Range(1, numberOfEasyDailyChallenges));
             // early game override
             if (PlayerPrefs.GetInt("easyHighscore", 0) == 0) { PlayerPrefs.SetInt("DailyChallenge1", 1); }
         }
         if (PlayerPrefs.GetInt("DailyChallenge2", 0) >= 0)
         {
-            PlayerPrefs.SetInt("DailyChallenge2", UnityEngine.Random.Range(1, hardChallengeText.Length));
+            PlayerPrefs.SetInt("DailyChallenge2", UnityEngine.Random.Range(1, numberOfHardDailyChallenges));
             // early game override
             if (PlayerPrefs.GetInt("hardHighscore", 0) == 0) { PlayerPrefs.SetInt("DailyChallenge2", 1); }
         }
@@ -166,6 +157,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         Debug.Log($"New daily challenges assigned. " + PlayerPrefs.GetInt("DailyChallenge1", 0) + " " + PlayerPrefs.GetInt("DailyChallenge2", 0));
     }
 
+    // TODO: seperate xpfeedback & point bonus from daily challenges
     public string EvaluateChallenge(int difficulty, int scoreDifference, int isOnline)
     {
         // base XP for winning
@@ -197,27 +189,27 @@ public class DailyChallengeManagerScript : MonoBehaviour
         }
 
         // assert the daily challenges IDs are within range, prevent index error
-        int challenge1 = PlayerPrefs.GetInt("DailyChallenge1", 0);
-        int challenge2 = PlayerPrefs.GetInt("DailyChallenge2", 0);
-        if (challenge1 >= easyChallengeCondition.Length || challenge1 <= (easyChallengeCondition.Length * -1))
+        int DC1 = PlayerPrefs.GetInt("DailyChallenge1", 0);
+        int DC2 = PlayerPrefs.GetInt("DailyChallenge2", 0);
+        if (DC1 >= numberOfEasyDailyChallenges || DC1 <= (numberOfEasyDailyChallenges * -1))
         {
-            challenge1 = 0;
+            DC1 = 0;
             PlayerPrefs.SetInt("DailyChallenge1", 0);
         }
-        if (challenge2 >= hardChallengeCondition.Length || challenge2 <= (hardChallengeCondition.Length * -1))
+        if (DC1 >= numberOfHardDailyChallenges || DC1 <= (numberOfHardDailyChallenges * -1))
         {
-            challenge2 = 0;
+            DC1 = 0;
             PlayerPrefs.SetInt("DailyChallenge2", 0);
         }
 
-        // Evaluate daily challenges
-        if (challenge1 > 0 && difficulty == easyChallengeCondition[challenge1, 0] && scoreDifference >= easyChallengeCondition[challenge1, 1] && isOnline == easyChallengeCondition[challenge1, 2])
+        // Evalute condition is met
+        if (easyDailyChallenges[DC1].CheckCompletion(scoreDifference, difficulty))
         {
-            PlayerPrefs.SetInt("DailyChallenge1", -challenge1);
+            PlayerPrefs.SetInt("DailyChallenge1", -DC1);
         }
-        if (challenge2 > 0 && difficulty == hardChallengeCondition[challenge2, 0] && scoreDifference >= hardChallengeCondition[challenge2, 1] && isOnline == hardChallengeCondition[challenge2, 2])
+        if (hardDailyChallenges[DC2].CheckCompletion(scoreDifference, difficulty))
         {
-            PlayerPrefs.SetInt("DailyChallenge2", -challenge2);
+            PlayerPrefs.SetInt("DailyChallenge2", -DC2);
         }
 
         if (scoreDifference > 0 && isOnline == 0)
@@ -243,7 +235,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         // Check if the reward is complete (negative value)
         if (DC1 < 0)
         {
-            try { levelManager.AddXP(easyChallengeReward[Mathf.Abs(DC1)]); } // add the reward to the player's XP
+            try { levelManager.AddXP(easyDailyChallenges[Mathf.Abs(DC1)].GetXPReward()); } // add the reward to the player's XP
             catch (IndexOutOfRangeException e) { levelManager.AddXP(50); Debug.LogError(e); }
             Debug.Log("Claimed reward 1!");
             PlayerPrefs.SetInt("DailyChallenge1", 0); // 0 means the reward is claimed
@@ -260,7 +252,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         // Check if the reward is complete (negative value)
         if (DC2 < 0)
         {
-            try { levelManager.AddXP(hardChallengeReward[Mathf.Abs(DC2)]); } // add the reward to the player's XP
+            try { levelManager.AddXP(hardDailyChallenges[Mathf.Abs(DC2)].GetXPReward()); } // add the reward to the player's XP
             catch (IndexOutOfRangeException e) { levelManager.AddXP(100); Debug.LogError(e); }
             Debug.Log("Claimed reward 2!");
             PlayerPrefs.SetInt("DailyChallenge2", 0); // 0 means the reward is claimed
@@ -268,69 +260,5 @@ public class DailyChallengeManagerScript : MonoBehaviour
             sound.PlayWinSFX();
         }
         titleScreen.GetComponent<TitleScreenScript>().UpdateAlerts();
-    }
-
-    private void IncrementStreak()
-    {
-        var streak = PlayerPrefs.GetInt("Streak", 1);
-
-        // Get the last saved date or use a default if it's the first time
-        string lastSavedDate = PlayerPrefs.GetString("LastChallengeDate", string.Empty);
-        DateTime lastChallengeDate;
-
-        if (DateTime.TryParse(lastSavedDate, out lastChallengeDate))
-        {
-            // If the last recored date is yesterday, increment the streak
-            if (lastChallengeDate.Date == DateTime.Today.AddDays(-1))
-            {
-                PlayerPrefs.SetInt("Streak", streak + 1);
-                streak++;
-                if (((streak % 7) == 0 && streak > 0))
-                {
-                    var reward = ((streak - 1) / 7 + 1);
-                    var dropped = PlayerPrefs.GetInt("PlinkoPegsDropped", 0);
-                    PlayerPrefs.SetInt("PlinkoPegsDropped", dropped - reward);
-                    Debug.Log("Unlocked: +" + reward + " drops for streak reward!");
-                    UI.SetErrorMessage("Unlocked: +" + reward + " drops for streak reward!");
-                }
-            }
-            // If the last recorded date is not yesterday or today, reset the streak
-            else if (lastChallengeDate.Date != DateTime.Today)
-            {
-                PlayerPrefs.SetInt("Streak", 1);
-                streak = 1;
-            }
-        }
-        else // no date ever written
-        {
-            PlayerPrefs.SetInt("Streak", 1);
-        }
-
-        Debug.Log("Streak: " + streak);
-        // set the correct number of streak counters to green, 1-7 for a week
-        for (int i = 0; i < streakCounters.Length; i++)
-        {
-            // since our streak is weekly, we mod the streak by 7. If the streak is divisible by 7 (a full week), we set all counters to green
-            var streakModded = ((streak % 7) == 0 && streak > 0) ? 7 : streak % 7;
-            if (i < streakModded)
-            {
-                streakCounters[i].GetComponent<Image>().color = new Color(0.4862745f, 0.7725491f, 0.4627451f);
-            }
-            else
-            {
-                streakCounters[i].GetComponent<Image>().color = new Color(1, 1, 1);
-            }
-        }
-
-        // set the streak reward text, +1 drop for each 7 days of streak, rounded up
-        var dropDrops = streak > 7 ? " Drops" : " Drop";
-        streakRewardText.text = "+" + ((streak - 1) / 7 + 1) + dropDrops;
-
-        // if streak is divisible by 7, set the streak reward text to green to indicate a reward was granted
-        // NOTE: this doesn't work right now because of darkmode text color switching, may or may not fix this later if i feel like it
-        if (((streak % 7) == 0 && streak > 0))
-        {
-            streakRewardText.color = new Color(0.4862745f, 0.7725491f, 0.4627451f);
-        }
     }
 }

@@ -20,8 +20,12 @@ public class UIManagerScript : MonoBehaviour
     public GameObject titleScreen;
     public GameObject gameHud;
     public GameObject gameResultScreen;
-    public GameObject customizeScreen;
+    public GameObject puckScreen;
+    public GameObject deckScreen;
+    public GameObject rewardsScreen;
+    public GameObject questsScreen;
     public GameObject profileScreen;
+    public GameObject shopScreen;
     public GameObject plinkoScreen;
     public GameObject waitingScreen;
 
@@ -141,9 +145,9 @@ public class UIManagerScript : MonoBehaviour
         puckAlert.SetActive(PlayerPrefs.GetInt("ShowNewSkinAlert", 0) == 1);
         profileAlert.SetActive(PlayerPrefs.GetInt("DailyChallenge1", 0) < 0 || PlayerPrefs.GetInt("DailyChallenge2", 0) < 0);
 
-        customizeScreen.SetActive(true);
+        puckScreen.SetActive(true);
         UpdateLocks();
-        customizeScreen.SetActive(false);
+        puckScreen.SetActive(false);
         if (!PlayerPrefs.HasKey("DailyChallenge1")) { PlayerPrefs.SetInt("DailyChallenge1", 1); }
         if (!PlayerPrefs.HasKey("DailyChallenge2")) { PlayerPrefs.SetInt("DailyChallenge2", 1); }
 
@@ -294,6 +298,8 @@ public class UIManagerScript : MonoBehaviour
         {
             IncrementPlayerPref("tie");
         }
+
+        OngoingChallengeManagerScript.Instance.EvaluateChallenge(difficulty, scoreDifference, isOnline);
 
         if (isOnline)
         {
@@ -536,15 +542,20 @@ public class UIManagerScript : MonoBehaviour
         else if (newUI == titleScreen)
         {
             // blink puck screen for unlocks
-            customizeScreen.SetActive(true);
+            puckScreen.SetActive(true);
             UpdateLocks();
-            customizeScreen.SetActive(false);
+            puckScreen.SetActive(false);
             playerWins = 0;
             opponentWins = 0;
         }
-        else if (newUI == profileScreen)
+        else if (newUI == questsScreen)
         {
-            dailyChallenge.SetText();
+            DailyChallengeManagerScript.Instance.SetText();
+            OngoingChallengeManagerScript.Instance.SetText();
+        }
+        else if (newUI == rewardsScreen)
+        {
+            StreakManager.Instance.SetText();
         }
         titleScreenBackground.SetActive(newUI != gameHud && newUI != gameResultScreen);
         fade.SetActive(newUI == gameHud || newUI == gameResultScreen);

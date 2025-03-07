@@ -17,7 +17,7 @@ public class TitleScreenScript : MonoBehaviour
     public void UpdateAlerts()
     {
         puckAlert.SetActive(PlayerPrefs.GetInt("ShowNewSkinAlert", 0) == 1);
-        profileAlert.SetActive(PlayerPrefs.GetInt("DailyChallenge1", 0) < 0 || PlayerPrefs.GetInt("DailyChallenge2", 0) < 0);
+        profileAlert.SetActive(PlayerPrefs.GetInt("DailyChallenge1", 0) < 0 || PlayerPrefs.GetInt("DailyChallenge2", 0) < 0 || PlayerPrefs.GetInt("OngoingChallenge", 0) < 0);
         (int XP, int level) = levelManager.GetXPAndLevel();
         plinkoAlert.SetActive(PlayerPrefs.GetInt("PlinkoPegsDropped", 0) < level);
     }

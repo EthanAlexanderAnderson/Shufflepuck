@@ -128,8 +128,6 @@ public class LogicScript : MonoBehaviour
         CPUPaths = GameObject.FindGameObjectsWithTag("cpu_path");
         // make sure we're on title screen
         UI.ChangeUI(UI.titleScreen);
-        // load daily challenges
-        DailyChallengeManagerScript.Instance.SetText();
     }
 
     // Update is called once per frame
