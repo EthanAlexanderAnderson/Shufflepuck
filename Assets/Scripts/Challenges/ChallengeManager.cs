@@ -42,8 +42,8 @@ public class ChallengeManager : MonoBehaviour
 
         challengeData.easyDailyChallenges.Add(new Challenge
         {
-            challengeText = "Beat the medium CPU",
-            condition = new BeatByCondition { winByTargetPoints = 1, difficultyLevel = 1 },
+            challengeText = "Beat the easy CPU by 3 points",
+            condition = new BeatByCondition { winByTargetPoints = 3, difficultyLevel = 0 },
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 60 }
@@ -52,8 +52,78 @@ public class ChallengeManager : MonoBehaviour
 
         challengeData.easyDailyChallenges.Add(new Challenge
         {
-            challengeText = "Beat the easy CPU by 3 points",
-            condition = new BeatByCondition { winByTargetPoints = 3, difficultyLevel = 0 },
+            challengeText = "Beat the easy CPU by 5 points",
+            condition = new BeatByCondition { winByTargetPoints = 5, difficultyLevel = 0 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 80 }
+            }
+        });
+
+        challengeData.easyDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the easy CPU by 7 points",
+            condition = new BeatByCondition { winByTargetPoints = 7, difficultyLevel = 0 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 120 }
+            }
+        });
+
+        challengeData.easyDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the easy CPU by 9 points",
+            condition = new BeatByCondition { winByTargetPoints = 9, difficultyLevel = 0 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 160 }
+            }
+        });
+
+        challengeData.easyDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the easy CPU by 11 points",
+            condition = new BeatByCondition { winByTargetPoints = 11, difficultyLevel = 0 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 240 }
+            }
+        });
+
+        challengeData.easyDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the easy CPU by 13 points",
+            condition = new BeatByCondition { winByTargetPoints = 13, difficultyLevel = 0 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 320 }
+            }
+        });
+
+        challengeData.easyDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the easy CPU by 15 points",
+            condition = new BeatByCondition { winByTargetPoints = 15, difficultyLevel = 0 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 480 }
+            }
+        });
+
+        challengeData.easyDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the easy CPU by 17 points",
+            condition = new BeatByCondition { winByTargetPoints = 17, difficultyLevel = 0 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 640 }
+            }
+        });
+
+        challengeData.easyDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the medium CPU",
+            condition = new BeatByCondition { winByTargetPoints = 1, difficultyLevel = 1 },
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 60 }
@@ -72,11 +142,21 @@ public class ChallengeManager : MonoBehaviour
 
         challengeData.easyDailyChallenges.Add(new Challenge
         {
-            challengeText = "Beat the easy CPU by 5 points",
-            condition = new BeatByCondition { winByTargetPoints = 5, difficultyLevel = 0 },
+            challengeText = "Beat the medium CPU by 5 points",
+            condition = new BeatByCondition { winByTargetPoints = 5, difficultyLevel = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 80 }
+                new Reward { type = RewardType.XP, amount = 120 }
+            }
+        });
+
+        challengeData.easyDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the medium CPU by 7 points",
+            condition = new BeatByCondition { winByTargetPoints = 7, difficultyLevel = 1 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 180 }
             }
         });
 
@@ -112,21 +192,111 @@ public class ChallengeManager : MonoBehaviour
 
         challengeData.hardDailyChallenges.Add(new Challenge
         {
-            challengeText = "Beat the medium CPU by 5 points",
-            condition = new BeatByCondition { winByTargetPoints = 5, difficultyLevel = 1 },
-            rewards = new List<Reward>
-            {
-                new Reward { type = RewardType.XP, amount = 120 }
-            }
-        });
-
-        challengeData.hardDailyChallenges.Add(new Challenge
-        {
             challengeText = "Beat the hard CPU by 5 points",
             condition = new BeatByCondition { winByTargetPoints = 5, difficultyLevel = 2 },
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 160 }
+            }
+        });
+
+        challengeData.hardDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the hard CPU by 7 points",
+            condition = new BeatByCondition { winByTargetPoints = 7, difficultyLevel = 2 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 240 }
+            }
+        });
+
+        challengeData.hardDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the hard CPU by 9 points",
+            condition = new BeatByCondition { winByTargetPoints = 9, difficultyLevel = 2 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 320 }
+            }
+        });
+
+        challengeData.hardDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the hard CPU by 11 points",
+            condition = new BeatByCondition { winByTargetPoints = 11, difficultyLevel = 2 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 480 }
+            }
+        });
+
+        challengeData.hardDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the hard CPU by 13 points",
+            condition = new BeatByCondition { winByTargetPoints = 13, difficultyLevel = 2 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 640 }
+            }
+        });
+
+        challengeData.hardDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the hard CPU by 15 points",
+            condition = new BeatByCondition { winByTargetPoints = 15, difficultyLevel = 2 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 960 }
+            }
+        });
+
+        challengeData.hardDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the medium CPU by 9 points",
+            condition = new BeatByCondition { winByTargetPoints = 9, difficultyLevel = 1 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 240 }
+            }
+        });
+
+        challengeData.hardDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the medium CPU by 11 points",
+            condition = new BeatByCondition { winByTargetPoints = 11, difficultyLevel = 1 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 360 }
+            }
+        });
+
+        challengeData.hardDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the medium CPU by 13 points",
+            condition = new BeatByCondition { winByTargetPoints = 13, difficultyLevel = 1 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 480 }
+            }
+        });
+
+        challengeData.hardDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the medium CPU by 15 points",
+            condition = new BeatByCondition { winByTargetPoints = 15, difficultyLevel = 1 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 720 }
+            }
+        });
+
+        challengeData.hardDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the medium CPU by 17 points",
+            condition = new BeatByCondition { winByTargetPoints = 17, difficultyLevel = 1 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 960 }
             }
         });
 

@@ -138,20 +138,63 @@ public class DailyChallengeManagerScript : MonoBehaviour
 
     private void AssignNewChallenge()
     {
+        easyDailyChallenges = ChallengeManager.Instance.challengeData.easyDailyChallenges;
+        hardDailyChallenges = ChallengeManager.Instance.challengeData.hardDailyChallenges;
+        numberOfEasyDailyChallenges = easyDailyChallenges.Count;
+        numberOfHardDailyChallenges = hardDailyChallenges.Count;
+
         PlayerPrefs.SetString("LastChallengeDate", DateTime.Today.ToString("yyyy-MM-dd"));
 
         // only overwrite the challenge if it's not already completed (not a negative int id)
         if (PlayerPrefs.GetInt("DailyChallenge1", 0) >= 0)
         {
-            PlayerPrefs.SetInt("DailyChallenge1", UnityEngine.Random.Range(1, numberOfEasyDailyChallenges));
-            // early game override
-            if (PlayerPrefs.GetInt("easyHighscore", 0) == 0) { PlayerPrefs.SetInt("DailyChallenge1", 1); }
+            int DC1 = UnityEngine.Random.Range(1, numberOfEasyDailyChallenges);
+
+            // ensure challenge is assignable
+            if (PlayerPrefs.GetInt("easyHighscore", 0) == 0)
+            {
+                PlayerPrefs.SetInt("DailyChallenge1", 1);
+            }
+            else
+            {
+                Challenge selectedChallenge = easyDailyChallenges[DC1];
+                int failsafe = 0;
+                while (!selectedChallenge.condition.IsAssignable() && failsafe < 1000)
+                {
+                    selectedChallenge = easyDailyChallenges[UnityEngine.Random.Range(1, numberOfEasyDailyChallenges)];
+                    failsafe++;
+                    if (failsafe >= 1000)
+                    {
+                        selectedChallenge = easyDailyChallenges[1];
+                    }
+                }
+                PlayerPrefs.SetInt("DailyChallenge1", easyDailyChallenges.IndexOf(selectedChallenge));
+            }
         }
         if (PlayerPrefs.GetInt("DailyChallenge2", 0) >= 0)
         {
-            PlayerPrefs.SetInt("DailyChallenge2", UnityEngine.Random.Range(1, numberOfHardDailyChallenges));
-            // early game override
-            if (PlayerPrefs.GetInt("hardHighscore", 0) == 0) { PlayerPrefs.SetInt("DailyChallenge2", 1); }
+            int DC2 = UnityEngine.Random.Range(1, numberOfHardDailyChallenges);
+
+            // ensure challenge is assignable
+            if (PlayerPrefs.GetInt("hardHighscore", 0) == 0)
+            {
+                PlayerPrefs.SetInt("DailyChallenge2", 1);
+            }
+            else
+            {
+                Challenge selectedChallenge = hardDailyChallenges[DC2];
+                int failsafe = 0;
+                while (!selectedChallenge.condition.IsAssignable() && failsafe < 1000)
+                {
+                    selectedChallenge = hardDailyChallenges[UnityEngine.Random.Range(1, numberOfHardDailyChallenges)];
+                    failsafe++;
+                    if (failsafe >= 1000)
+                    {
+                        selectedChallenge = hardDailyChallenges[1];
+                    }
+                }
+                PlayerPrefs.SetInt("DailyChallenge2", hardDailyChallenges.IndexOf(selectedChallenge));
+            }
         }
 
         Debug.Log($"New daily challenges assigned. " + PlayerPrefs.GetInt("DailyChallenge1", 0) + " " + PlayerPrefs.GetInt("DailyChallenge2", 0));

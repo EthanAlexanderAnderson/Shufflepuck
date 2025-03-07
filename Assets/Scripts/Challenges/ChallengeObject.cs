@@ -8,6 +8,7 @@ public class ChallengeObject
     public List<Challenge> ongoingChallenges = new List<Challenge>();
 }
 
+// TODO: add weights for dailt challenges maybe
 public class Challenge
 {
     public string challengeText; // Challenge description to display to the user
@@ -37,6 +38,7 @@ public class Challenge
 public abstract class ChallengeCondition
 {
     public abstract bool IsConditionMet(params object[] args);
+    public abstract bool IsAssignable();
 }
 
 // Beat By Condition (
@@ -51,6 +53,20 @@ public class BeatByCondition : ChallengeCondition
         int difficulty = (int)args[1];
 
         return pointsWonBy >= winByTargetPoints && (difficulty == difficultyLevel || difficultyLevel == -3) ;
+    }
+
+    public override bool IsAssignable()
+    {
+        if (
+            (difficultyLevel == 0 && PlayerPrefs.GetInt("easyHighscore") < (winByTargetPoints + 2)) ||
+            (difficultyLevel == 1 && PlayerPrefs.GetInt("mediumHighscore") < (winByTargetPoints + 2)) ||
+            (difficultyLevel == 2 && PlayerPrefs.GetInt("hardHighscore") < (winByTargetPoints + 2))
+            )
+        {
+            return false;
+        }
+
+        return true;
     }
 }
 public class MatchesCondition : ChallengeCondition
@@ -102,6 +118,8 @@ public class MatchesCondition : ChallengeCondition
 
         return currentValue >= targetMacthes;
     }
+
+    public override bool IsAssignable() { return true; }
 }
 
 // Highscore Condition
@@ -144,6 +162,8 @@ public class HighscoreCondition : ChallengeCondition
 
         return currentValue >= targetHighscore;
     }
+
+    public override bool IsAssignable() { return true; }
 }
 
 // Card Condition (Example: Play a specific card X times)
@@ -160,6 +180,9 @@ public class CardCondition : ChallengeCondition
 
         return playedCardID == cardID && timesPlayed >= targetNumberPlayed;
     }
+
+    // TODO: make sure player has the card
+    public override bool IsAssignable() { return true; }
 }
 
 public class Reward
