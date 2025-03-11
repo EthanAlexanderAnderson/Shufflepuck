@@ -20,7 +20,9 @@ public class PlayerDataManager : MonoBehaviour
         "DailyChallenge1", "DailyChallenge2", "OngoingChallenge",
         "PlinkoReward", "PlinkoPegsDropped", "WelcomeBonus", "Streak", "XP",
         "puck33unlocked", "puck34unlocked", "puck35unlocked", "puck36unlocked", "puck37unlocked", "puck38unlocked", "puck39unlocked", "puck40unlocked", "puck41unlocked", "puck42unlocked", "puck43unlocked", "puck44unlocked"
-        };
+    };
+
+    string[] stringKeys = { "LastChallengeDate", "LastPlinkoRewardDate" };
 
     private void Awake()
     {
@@ -108,7 +110,6 @@ public class PlayerDataManager : MonoBehaviour
         }
 
         // Handle string keys
-        string[] stringKeys = { "LastChallengeDate" };
         foreach (string key in stringKeys)
         {
             if (PlayerPrefs.HasKey(key))
@@ -141,6 +142,11 @@ public class PlayerDataManager : MonoBehaviour
             await LoadDataInt(key);
         }
 
+        foreach (string key in stringKeys)
+        {
+            await LoadDataString(key);
+        }
+
         ProcessLoadedData();
     }
 
@@ -162,6 +168,32 @@ public class PlayerDataManager : MonoBehaviour
             catch (CloudSaveException e)
             {
                 Debug.LogError($"Failed to convert {key} to int: {e.Message}");
+            }
+        }
+        else
+        {
+            Debug.Log($"{key} key not found in Cloud Save.");
+        }
+    }
+
+    // generic load for strings
+    private async Task LoadDataString(string key)
+    {
+        if (!AuthenticationService.Instance.IsSignedIn) return;
+
+        var results = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { key });
+
+        if (results.TryGetValue(key, out var outValue))
+        {
+            try
+            {
+                string valueFromFile = outValue.Value.GetAs<string>(); // Convert JSON object to int
+                Debug.Log($"Loaded data: {key} = {valueFromFile}");
+                PlayerPrefs.SetString(key, valueFromFile);
+            }
+            catch (CloudSaveException e)
+            {
+                Debug.LogError($"Failed to convert {key} to string: {e.Message}");
             }
         }
         else
