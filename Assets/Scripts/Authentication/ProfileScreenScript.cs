@@ -14,6 +14,7 @@ public class ProfileScreenScript : MonoBehaviour
     [SerializeField] private Image profilepicture;
     [SerializeField] private TMP_Text usernameText;
     [SerializeField] GameObject authenticationButtonsParent;
+    [SerializeField] GameObject saveButtonsParent;
 
     private void OnEnable()
     {
@@ -32,12 +33,12 @@ public class ProfileScreenScript : MonoBehaviour
             if (username != "")
             {
                 authenticationButtonsParent.SetActive(false);
+                saveButtonsParent.SetActive(true);
             }
             else
             {
                 authenticationButtonsParent.SetActive(true);
             }
-            Debug.Log(id);
         }
         else
         {
@@ -64,6 +65,6 @@ public class ProfileScreenScript : MonoBehaviour
     public void LogUnityPlayerID()
     {
         Debug.Log(AuthenticationService.Instance.PlayerId);
+        GUIUtility.systemCopyBuffer = AuthenticationService.Instance.PlayerId;
     }
-
 }

@@ -27,6 +27,11 @@ public class LevelManager : MonoBehaviour
 
     void OnEnable()
     {
+        LoadXP();
+    }
+
+    public void LoadXP()
+    {
         XP = PlayerPrefs.GetInt("XP", 0);
     }
 

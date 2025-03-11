@@ -75,7 +75,7 @@ public class LogicScript : MonoBehaviour
     public Competitor activeCompetitor;
     public Competitor nonActiveCompetitor;
     public bool playedAGame = false;
-    public bool tutorialActive;
+    public bool tutorialActive = true;
 
     // powerups TODO: move to powerups manager probably
     public int triplePowerup;
@@ -119,8 +119,6 @@ public class LogicScript : MonoBehaviour
         PuckSkinManager.Instance.SelectPlayerPuckSprite(PlayerPrefs.GetInt("puck") == 0 && PlayerPrefs.GetInt("hardHighscore") <= 5 ? 1 : PlayerPrefs.GetInt("puck"));
         activeCompetitor = opponent;
         nonActiveCompetitor = player;
-        // check if tutorial should be active
-        tutorialActive = PlayerPrefs.GetInt("tutorialCompleted") == 0 && PlayerPrefs.GetInt("easyWin") == 0 && PlayerPrefs.GetInt("easyHighscore") == 0;
         // load if powerups should be active
         powerupsAreEnabled = PlayerPrefs.GetInt("PowerupsEnabled", 0) == 1;
         powerupsToggle.GetComponent<Toggle>().isOn = powerupsAreEnabled;
@@ -133,7 +131,6 @@ public class LogicScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
         if (tutorialActive && UI.iPage < 6)
         {
             return;
@@ -411,6 +408,11 @@ public class LogicScript : MonoBehaviour
 
     public void RestartGame(int diff)
     {
+        if (tutorialActive)
+        {
+            // check if tutorial should be active
+            tutorialActive = PlayerPrefs.GetInt("tutorialCompleted") == 0 && PlayerPrefs.GetInt("easyWin") == 0 && PlayerPrefs.GetInt("easyHighscore") == 0;
+        }
         playedAGame = true;
         // organize scene
         puckManager.ClearAllPucks();

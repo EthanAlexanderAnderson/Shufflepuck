@@ -18,6 +18,11 @@ public class CustomUnlockScript : MonoBehaviour
     {
         Unlock();
     }
+    private void OnEnable()
+    {
+        Unlock();
+    }
+
     public int Unlock()
     {
         // wins
@@ -75,6 +80,6 @@ public class CustomUnlockScript : MonoBehaviour
                 return ID;
             }
         }
-            return 0;
+        return 0;
     }
 }
