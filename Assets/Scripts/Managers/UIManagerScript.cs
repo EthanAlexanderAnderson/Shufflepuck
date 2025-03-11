@@ -104,7 +104,7 @@ public class UIManagerScript : MonoBehaviour
     private GameObject previousActiveUI;
 
     [SerializeField] private TMP_Text wallText;
-    [SerializeField] private GameObject fade;
+    [SerializeField] private GameObject table;
 
     // dark / light mode assets
     private bool darkMode = false;
@@ -113,7 +113,6 @@ public class UIManagerScript : MonoBehaviour
     [SerializeField] private Sprite titleScreenDark;
     [SerializeField] private Sprite titleScreenBackgroundLight;
     [SerializeField] private Sprite titleScreenBackgroundDark;
-    [SerializeField] private GameObject table;
     [SerializeField] private Sprite tableLight;
     [SerializeField] private Sprite tableDark;
     public string TurnText
@@ -558,7 +557,7 @@ public class UIManagerScript : MonoBehaviour
             StreakManager.Instance.SetText();
         }
         titleScreenBackground.SetActive(newUI != gameHud && newUI != gameResultScreen);
-        fade.SetActive(newUI == gameHud || newUI == gameResultScreen);
+        table.SetActive(newUI == gameHud || newUI == gameResultScreen);
         ApplyDarkMode();
         if (newUI != gameHud)
         {
