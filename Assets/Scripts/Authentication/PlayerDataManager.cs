@@ -203,28 +203,42 @@ public class PlayerDataManager : MonoBehaviour
     }
 
     // generic save for ints
-    private async Task SaveDataInt(string key, int value)
+    private async Task SaveDataInt(string key)
     {
         if (!AuthenticationService.Instance.IsSignedIn) return;
 
-        var results = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { key });
+        var playerData = new Dictionary<string, object>();
 
-        if (results.TryGetValue(key, out var outValue))
+        playerData[key] = PlayerPrefs.GetInt(key);
+
+        try
         {
-            try
-            {
-                int valueFromFile = outValue.Value.GetAs<int>(); // Convert JSON object to int
-                Debug.Log($"Loaded data: {key} = {valueFromFile}");
-                PlayerPrefs.SetInt(key, valueFromFile);
-            }
-            catch (CloudSaveException e)
-            {
-                Debug.LogError($"Failed to convert {key} to int: {e.Message}");
-            }
+            await CloudSaveService.Instance.Data.Player.SaveAsync(playerData);
+            Debug.Log("Player data successfully saved to Cloud Save.");
         }
-        else
+        catch (CloudSaveException e)
         {
-            Debug.Log($"{key} key not found in Cloud Save.");
+            Debug.LogError($"Failed to save {key} : {e.Message}");
+        }
+    }
+
+    // generic save for ints
+    private async Task SaveDataString(string key)
+    {
+        if (!AuthenticationService.Instance.IsSignedIn) return;
+
+        var playerData = new Dictionary<string, object>();
+
+        playerData[key] = PlayerPrefs.GetString(key);
+
+        try
+        {
+            await CloudSaveService.Instance.Data.Player.SaveAsync(playerData);
+            Debug.Log("Player data successfully saved to Cloud Save.");
+        }
+        catch (CloudSaveException e)
+        {
+            Debug.LogError($"Failed to save {key} : {e.Message}");
         }
     }
 
