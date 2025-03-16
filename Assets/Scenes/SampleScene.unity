@@ -100658,6 +100658,7 @@ GameObject:
   - component: {fileID: 1593171485}
   - component: {fileID: 1593171486}
   - component: {fileID: 1593171484}
+  - component: {fileID: 1593171488}
   - component: {fileID: 1593171487}
   m_Layer: 0
   m_Name: PowerupManager
@@ -100684,10 +100685,6 @@ MonoBehaviour:
   powerupButton1: {fileID: 508192274}
   powerupButton2: {fileID: 233410804}
   powerupButton3: {fileID: 1062224065}
-  popupEffectIconObject: {fileID: 243732009}
-  popupEffectIcon: {fileID: 243732011}
-  popupEffectTextObject: {fileID: 1057303604}
-  popupEffectText: {fileID: 1057303606}
   plusOneImage: {fileID: 21300000, guid: bd2a310a40921dd44865acc9ee7e150c, type: 3}
   foresightImage: {fileID: 21300000, guid: 16fabfde1fb9e15479957ea4d237ba0e, type: 3}
   blockImage: {fileID: 21300000, guid: 342459d2bf890e24d969429f103b9db3, type: 3}
@@ -100750,6 +100747,8 @@ MonoBehaviour:
   investmentIcon: {fileID: 21300000, guid: b1557d38fd99f314786576e3a7792134, type: 3}
   omniscienceIcon: {fileID: 21300000, guid: 0c2b6a524d548e442bd5654c2013468e, type: 3}
   plusThreeIcon: {fileID: 21300000, guid: 49258044cf705bc4cb37319c82dcb11d, type: 3}
+  powerupIcons: []
+  powerupTexts: []
   forcefieldScript: {fileID: 553278802}
 --- !u!4 &1593171485
 Transform:
@@ -100801,6 +100800,23 @@ MonoBehaviour:
   deckCount: {fileID: 1162092566}
   cardPreviewImage: {fileID: 1763827461}
   deckMenu: {fileID: 125596096}
+--- !u!114 &1593171488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1593171483}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3a74bacabee8ff4ab50c78fa646e987, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  floatingIconPrefab: {fileID: 1036254919072404138, guid: 2004d4c60e4c34d49a115435f2fbab0f, type: 3}
+  popupEffectIconObject: {fileID: 243732009}
+  popupEffectIcon: {fileID: 243732011}
+  popupEffectTextObject: {fileID: 1057303604}
+  popupEffectText: {fileID: 1057303606}
 --- !u!1 &1596321423
 GameObject:
   m_ObjectHideFlags: 0
@@ -114100,7 +114116,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1819542759
 MonoBehaviour:
   m_ObjectHideFlags: 0

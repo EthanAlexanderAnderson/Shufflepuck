@@ -22,11 +22,6 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private Button powerupButton2;
     [SerializeField] private Button powerupButton3;
 
-    [SerializeField] private GameObject popupEffectIconObject;
-    [SerializeField] private Image popupEffectIcon;
-    [SerializeField] private GameObject popupEffectTextObject;
-    [SerializeField] private TMP_Text popupEffectText;
-
     // images
     [SerializeField] private Sprite plusOneImage;
     [SerializeField] private Sprite foresightImage;
@@ -92,6 +87,9 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private Sprite omniscienceIcon;
     [SerializeField] private Sprite plusThreeIcon;
 
+    public Sprite[] powerupIcons;
+    public String[] powerupTexts;
+
     // additional costs indexes
     private int[] cost2Discard = { 15, 16, 17 };
     Dictionary<int, int> costPoints = new Dictionary<int, int> { { 18, 1 }, { 19, 2 }, { 20, 2 }, { 28, 1 } };
@@ -102,7 +100,7 @@ public class PowerupManager : NetworkBehaviour
     int[] hand = { -1, -1, -1 };
 
     private Competitor activeCompetitor;
-    Action[] methodArray;
+    public Action[] methodArray;
     private bool fromClientRpc;
 
     private void Awake()
@@ -146,6 +144,9 @@ public class PowerupManager : NetworkBehaviour
             OmnisciencePowerup, // 29
             PlusThreePowerup // 30
         };
+
+        powerupIcons = new Sprite[] { plusOneIcon, foresightIcon, blockIcon, boltIcon, forceFieldIcon, phaseIcon, cullIcon, growthIcon, lockIcon, explosionIcon, fogIcon, hydraIcon, factoryIcon, shieldIcon, shuffleIcon, chaosIcon, timesTwoIcon, resurrectIcon, millIcon, researchIcon, insanityIcon, tripleIcon, exponentIcon, laserIcon, auraIcon, pushIcon, erraticIcon, denyIcon, investmentIcon, omniscienceIcon, plusThreeIcon };
+        powerupTexts = new String[] { "plus one", "foresight", "block", "bolt", "force field", "phase", "cull", "growth", "lock", "explosion", "fog", "hydra", "factory", "shield", "shuffle", "chaos", "times two", "resurrect", "mill", "research", "insanity", "triple", "exponent", "laser", "aura", "push", "erratic", "deny", "investment", "omniscience", "plus three" };
     }
 
     public int GetMethodArrayLength()
@@ -350,11 +351,11 @@ public class PowerupManager : NetworkBehaviour
         {
             if (ClientLogicScript.Instance.isRunning && activeCompetitor.isPlayer) // Online
             {
-                pucki.DestroyPuckServerRpc();
+                pucki.DestroyPuckServerRpc(index);
             }
             else if (!ClientLogicScript.Instance.isRunning) // vs CPU
             {
-                pucki.DestroyPuck();
+                pucki.DestroyPuck(index);
             }
         }
     }
@@ -396,11 +397,11 @@ public class PowerupManager : NetworkBehaviour
             {
                 if (ClientLogicScript.Instance.isRunning && activeCompetitor.isPlayer)
                 {
-                    pucki.DestroyPuckServerRpc();
+                    pucki.DestroyPuckServerRpc(index);
                 }
                 else
                 {
-                    pucki.DestroyPuck();
+                    pucki.DestroyPuck(index);
                 }
             }
         }
@@ -912,7 +913,7 @@ public class PowerupManager : NetworkBehaviour
             if (lastPlayedCard >= 0 && hand[i] == Array.IndexOf(methodArray, InsanityPowerup)) { powerupButtons[i].gameObject.GetComponent<Button>().interactable = true; }
         }
         // add the powerup animation to the animation queue
-        AddPowerupPopupEffectAnimationToQueue(index);
+        PowerupAnimationManager.Instance.AddPowerupPopupEffectAnimationToQueue(index);
     }
 
     private bool NeedsToBeSentToServer(int index)
@@ -986,58 +987,6 @@ public class PowerupManager : NetworkBehaviour
             PuckScript puckScript = puckObject.GetComponent<PuckScript>();
             puckScript.InitPuck(hydraCompetitor.isPlayer, hydraCompetitor.puckSpriteID);
         }
-    }
-
-    Queue<int> PowerupPopupEffectAnimationQueue = new Queue<int>();
-    public void ClearPowerupPopupEffectAnimationQueue() { PowerupPopupEffectAnimationQueue.Clear(); }
-
-    public void AddPowerupPopupEffectAnimationToQueue(int index)
-    {
-        PowerupPopupEffectAnimationQueue.Enqueue(index);
-        if (PowerupPopupEffectAnimationQueue.Count == 1)
-        {
-            PlayNextPowerupPopupEffectAnimationInQueue();
-        }
-    }
-
-    public void PlayNextPowerupPopupEffectAnimationInQueue()
-    {
-        if (PowerupPopupEffectAnimationQueue.Count <= 0) { return; }
-        float speedMultiplier = (PowerupPopupEffectAnimationQueue.Count - 1) / 3 + 1;
-        PlayPowerupPopupEffectAnimation(PowerupPopupEffectAnimationQueue.Peek(), speedMultiplier);
-    }
-
-    public void FinishCurrentPowerupPopupEffectAnimationInQueue()
-    {
-        if (PowerupPopupEffectAnimationQueue.Count <= 0) { return; }
-        PowerupPopupEffectAnimationQueue.Dequeue();
-        if (PowerupPopupEffectAnimationQueue.Count >= 1)
-        {
-            PlayNextPowerupPopupEffectAnimationInQueue();
-        }
-    }
-
-    public void PlayPowerupPopupEffectAnimation(int index, float speedMultiplier)
-    {
-        Sprite[] powerupIcon = { plusOneIcon, foresightIcon, blockIcon, boltIcon, forceFieldIcon, phaseIcon, cullIcon, growthIcon, lockIcon, explosionIcon, fogIcon, hydraIcon, factoryIcon, shieldIcon, shuffleIcon, chaosIcon, timesTwoIcon, resurrectIcon, millIcon, researchIcon, insanityIcon, tripleIcon, exponentIcon, laserIcon, auraIcon, pushIcon, erraticIcon, denyIcon, investmentIcon, omniscienceIcon, plusThreeIcon };
-        String[] powerupText = { "plus one", "foresight", "block", "bolt", "force field", "phase", "cull", "growth", "lock", "explosion", "fog", "hydra", "factory", "shield", "shuffle", "chaos", "times two", "resurrect", "mill", "research", "insanity", "triple", "exponent", "laser", "aura", "push", "erratic", "deny", "investment", "omniscience", "plus three" };
-
-        popupEffectIcon.sprite = powerupIcon[index];
-        popupEffectText.text = powerupText[index];
-
-        LeanTween.cancel(popupEffectIconObject);
-        LeanTween.cancel(popupEffectTextObject);
-
-        popupEffectIconObject.transform.localScale = new Vector3(0f, 0f, 0f);
-        popupEffectTextObject.transform.localScale = new Vector3(0f, 0f, 0f);
-
-        float duration = 0.5f / speedMultiplier;
-
-        LeanTween.scale(popupEffectIconObject, new Vector3(1f, 1f, 1f), duration).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
-        LeanTween.scale(popupEffectTextObject, new Vector3(1f, 1f, 1f), duration).setEase(LeanTweenType.easeOutElastic).setDelay(0.2f);
-
-        LeanTween.scale(popupEffectIconObject, new Vector3(0f, 0f, 0f), duration).setEase(LeanTweenType.easeInElastic).setDelay(duration * 3 + 0.01f);
-        LeanTween.scale(popupEffectTextObject, new Vector3(0f, 0f, 0f), duration).setEase(LeanTweenType.easeInElastic).setDelay(duration * 3 + 0.2f).setOnComplete(FinishCurrentPowerupPopupEffectAnimationInQueue);
     }
 
     private void ShotTimerBoost()

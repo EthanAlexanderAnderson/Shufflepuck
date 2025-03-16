@@ -45,7 +45,6 @@ public class UIManagerScript : MonoBehaviour
     [SerializeField] private GameObject puckAlert;
     [SerializeField] private GameObject profileAlert;
 
-
     // Lobby
     public TMP_Text lobbyCodeText;
     public GameObject waitingGif;
@@ -108,6 +107,7 @@ public class UIManagerScript : MonoBehaviour
 
     // dark / light mode assets
     private bool darkMode = false;
+    public bool GetDarkMode() { return darkMode; }
     [SerializeField] private GameObject darkModeToggle;
     [SerializeField] private Sprite titleScreenLight;
     [SerializeField] private Sprite titleScreenDark;
@@ -115,6 +115,7 @@ public class UIManagerScript : MonoBehaviour
     [SerializeField] private Sprite titleScreenBackgroundDark;
     [SerializeField] private Sprite tableLight;
     [SerializeField] private Sprite tableDark;
+
     public string TurnText
     {
         get => turnText.text;

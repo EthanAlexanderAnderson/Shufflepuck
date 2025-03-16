@@ -427,7 +427,7 @@ public class LogicScript : MonoBehaviour
         opponent.ResetProperties();
         UI.PostShotUpdate(player.puckCount, opponent.puckCount);
         UpdateScores();
-        powerupManager.ClearPowerupPopupEffectAnimationQueue();
+        PowerupAnimationManager.Instance.ClearPowerupPopupEffectAnimationQueue();
         triplePowerup = 0;
         LaserScript.Instance.DisableLaser();
 
