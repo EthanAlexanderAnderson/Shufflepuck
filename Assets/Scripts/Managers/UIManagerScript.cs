@@ -240,6 +240,8 @@ public class UIManagerScript : MonoBehaviour
         var newOpponentScore = Mathf.Max(0, opponentScore);
         GameHUDManager.Instance.ChangeScoreText(false, newOpponentScore.ToString(), newOpponentScore != prevOpponentScore);
         prevOpponentScore = newOpponentScore;
+
+        GameHUDManager.Instance.UpdateParticleEffects(playerScore, opponentScore);
     }
 
     public void UpdateScoreBonuses(int playerScoreBonus, int opponentScoreBonus)
