@@ -142,8 +142,10 @@ public class UIManagerScript : MonoBehaviour
         logic = LogicScript.Instance;
         sound = SoundManagerScript.Instance;
         dailyChallenge = DailyChallengeManagerScript.Instance;
+
+        // TODO: This is duplicate from TitleScreenScript, remove one of them
         puckAlert.SetActive(PlayerPrefs.GetInt("ShowNewSkinAlert", 0) == 1);
-        profileAlert.SetActive(PlayerPrefs.GetInt("DailyChallenge1", 0) < 0 || PlayerPrefs.GetInt("DailyChallenge2", 0) < 0);
+        profileAlert.SetActive(PlayerPrefs.GetInt("DailyChallenge1", 0) < 0 || PlayerPrefs.GetInt("DailyChallenge2", 0) < 0 || PlayerPrefs.GetInt("OngoingChallenge", 0) < 0);
 
         puckScreen.SetActive(true);
         UpdateLocks();
