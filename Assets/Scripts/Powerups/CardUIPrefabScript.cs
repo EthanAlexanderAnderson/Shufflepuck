@@ -11,7 +11,9 @@ public class CardUIPrefabScript : MonoBehaviour, IPointerDownHandler, IPointerUp
     [SerializeField] private GameObject background;
     [SerializeField] private GameObject header;
     [SerializeField] private GameObject body;
+    [SerializeField] private GameObject minusButtonObject;
     [SerializeField] private Button minusButton;
+    [SerializeField] private GameObject plusButtonObject;
     [SerializeField] private Button plusButton;
 
     private int index;     // which card is this
@@ -63,10 +65,31 @@ public class CardUIPrefabScript : MonoBehaviour, IPointerDownHandler, IPointerUp
     [SerializeField] private Sprite collapseSprite;
     private bool expanded = false;
 
-    public void InitializeCardUI(int index, GameObject deckMenuScrollView)
+    public void InitializeCardUI(int index, GameObject deckMenuScrollView, bool anyOwned = false)
     {
         this.index = index;
         this.deckMenuScrollView = deckMenuScrollView;
+
+        // auto-collapse
+        body.transform.localScale = new Vector3(body.transform.localScale.x, 0, body.transform.localScale.z);
+
+        // Divider
+        if (index < 0)
+        {
+            cardNameText.text = "undiscovered:";
+            cardNameText.color = UIManagerScript.Instance.GetDarkMode() ? new Color(0f, 0f, 0f, 1f) : new Color(1f, 1f, 1f, 1f);
+            cardNameText.gameObject.tag = "Untagged";
+            cardIcon.sprite = craftCreditsImage2.sprite;
+            cardIcon.color = UIManagerScript.Instance.GetDarkMode() ? new Color(0f, 0f, 0f, 1f) : new Color(1f, 1f, 1f, 1f);
+            cardIcon.gameObject.tag = "Untagged";
+            minusButtonObject.SetActive(false);
+            plusButtonObject.SetActive(false);
+            expandCollapseObject.SetActive(false);
+            countText.text = "";
+            // swap BG color
+            background.GetComponent<Image>().color = UIManagerScript.Instance.GetDarkMode() ? new Color(1f, 1f, 1f, 1f) : new Color(0.2f, 0.2f, 0.2f, 1f);
+            return;
+        }
 
         // load card data
         cardIcon.sprite = PowerupManager.Instance.powerupIcons[index];
@@ -88,15 +111,21 @@ public class CardUIPrefabScript : MonoBehaviour, IPointerDownHandler, IPointerUp
         countText.alpha = count > 0 ? 1f : 0.3f;
         UpdateMinusAndPlusUIButtonInteractability();
 
-        // auto-collapse
-        body.transform.localScale = new Vector3(body.transform.localScale.x, 0, body.transform.localScale.z);
-
         // load crafting data
         craftingCredits = PlayerPrefs.GetInt("CraftingCredits");
         ownedCount2.text = craftingCredits.ToString();
 
         // set background color for light/dark mode
         background.GetComponent<Image>().color = UIManagerScript.Instance.GetDarkMode() ? new Color(0.2f, 0.2f, 0.2f, 1f) : new Color(1f, 1f, 1f, 1f);
+
+        // TODO: make crafting re-enable these
+        if (!anyOwned)
+        //if (!anyOwned && !Application.isEditor)
+        {
+            minusButtonObject.SetActive(false);
+            plusButtonObject.SetActive(false);
+            countText.text = "";
+        }
     }
 
     public void Minus()

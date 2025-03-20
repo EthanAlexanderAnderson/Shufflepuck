@@ -8,11 +8,35 @@ public class DeckScreenScript : MonoBehaviour
     private void OnEnable()
     {
         var count = PowerupCardData.GetCardCount();
+
+        bool[] owned = new bool[count];
+        // check owned
         for (int i = 0; i < count; i++)
         {
-            if (PowerupCardData.GetCardName(i) == null) return;
+            if (PowerupCardData.GetCardName(i) == null) continue;
+            owned[i] = PowerupCardData.CheckIfCardIsOwned(i);
+        }
+
+        // load owned
+        for (int i = 0; i < count; i++)
+        {
+            if (PowerupCardData.GetCardName(i) == null) continue;
+            if (!owned[i]) continue;
             GameObject cardUI = Instantiate(cardUIPrefab, deckMenuScrollView.transform);
-            cardUI.GetComponent<CardUIPrefabScript>().InitializeCardUI(i, deckMenuScrollView.gameObject);
+            cardUI.GetComponent<CardUIPrefabScript>().InitializeCardUI(i, deckMenuScrollView.gameObject, true);
+        }
+
+        // divider
+        GameObject cardUIDivider = Instantiate(cardUIPrefab, deckMenuScrollView.transform);
+        cardUIDivider.GetComponent<CardUIPrefabScript>().InitializeCardUI(-1, deckMenuScrollView.gameObject);
+
+        // load not owned
+        for (int i = 0; i < count; i++)
+        {
+            if (PowerupCardData.GetCardName(i) == null) continue;
+            if (owned[i]) continue;
+            GameObject cardUI = Instantiate(cardUIPrefab, deckMenuScrollView.transform);
+            cardUI.GetComponent<CardUIPrefabScript>().InitializeCardUI(i, deckMenuScrollView.gameObject, false);
         }
     }
 
