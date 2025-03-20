@@ -74,16 +74,15 @@ public class DeckManager : MonoBehaviour
     }
 
     // Export the decklist to the clipboard
-    string[] cardNames = { "PlusOne", "Foresight", "Block", "Bolt", "ForceField", "Phase", "Cull", "Growth", "Lock", "Explosion", "Fog", "Hydra", "Factory", "Shield", "Shuffle", "Chaos", "TimesTwo", "Resurrect", "Mill", "Research", "Insanity", "Triple", "Exponent", "Laser", "Aura", "Push", "Erratic", "Deny", "Investment", "Omniscience", null };
     public void ExportDeckList()
     {
         // Convert the decklist to string
         var stringDeckList = "";
-        for (int i = 0; i < cardNames.Length; i++)
+        for (int i = 0; i < PowerupCardData.GetCardCount(); i++)
         {
             if (deck[i] > 0)
             {
-                stringDeckList += cardNames[i] + ": " + deck[i] + "\n";
+                stringDeckList += PowerupCardData.GetCardName(i) + ": " + deck[i] + "\n";
             }
         }
 
@@ -110,7 +109,7 @@ public class DeckManager : MonoBehaviour
         for (int i = 0; i < deck.Length; i++)
         {
             deck[i] = 0;
-            PlayerPrefs.SetInt(cardNames[i] + "CardCount", 0);
+            PlayerPrefs.SetInt(PowerupCardData.GetCardName(i) + "CardCount", 0);
         }
 
         // Parse the lines
@@ -125,9 +124,9 @@ public class DeckManager : MonoBehaviour
 
             // Find the card index
             var cardIndex = -1;
-            for (int i = 0; i < cardNames.Length; i++)
+            for (int i = 0; i < PowerupCardData.GetCardCount(); i++)
             {
-                if (!string.IsNullOrEmpty(cardNames[i]) && cardNames[i] == split[0].Trim())
+                if (!string.IsNullOrEmpty(PowerupCardData.GetCardName(i)) && PowerupCardData.GetCardName(i) == split[0].Trim())
                 {
                     cardIndex = i;
                     break;
@@ -141,7 +140,7 @@ public class DeckManager : MonoBehaviour
                 if (int.TryParse(split[1].Trim(), out count))
                 {
                     deck[cardIndex] = count;
-                    PlayerPrefs.SetInt(cardNames[cardIndex] + "CardCount", count);
+                    PlayerPrefs.SetInt(PowerupCardData.GetCardName(cardIndex) + "CardCount", count);
                 }
             }
         }
