@@ -4,7 +4,9 @@ public class ShineScript : MonoBehaviour
 {
     private void OnEnable()
     {
-        Shine();
+        LeanTween.cancel(gameObject);
+        transform.localPosition = new Vector3(-1000, transform.position.y, transform.position.z);
+        LeanTween.moveLocalX(gameObject, 1000, 1f).setOnComplete(Shine);
     }
 
     private void Shine()

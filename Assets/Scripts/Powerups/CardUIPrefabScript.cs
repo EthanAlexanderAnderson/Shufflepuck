@@ -238,8 +238,12 @@ public class CardUIPrefabScript : MonoBehaviour, IPointerDownHandler, IPointerUp
 
     private void UpdateRankUI()
     {
+        // rank color (standard, bronze, gold, diamond)
         cardImage.color = rankColors[selectedRankIndex];
 
+        // turn shine & sparkle off then on to retrigger effect
+        shine.SetActive(false);
+        particleParent.SetActive(false);
         shine.SetActive(selectedRankIndex > 0);
         particleParent.SetActive(selectedRankIndex > 0);
 
