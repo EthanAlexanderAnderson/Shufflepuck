@@ -68,6 +68,7 @@ public class CardUIPrefabScript : MonoBehaviour, IPointerDownHandler, IPointerUp
         this.index = index;
         this.deckMenuScrollView = deckMenuScrollView;
 
+        // load card data
         cardIcon.sprite = PowerupManager.Instance.powerupIcons[index];
 
         cardName = PowerupCardData.GetCardName(index);
@@ -76,6 +77,7 @@ public class CardUIPrefabScript : MonoBehaviour, IPointerDownHandler, IPointerUp
         cardImageSprite = PowerupManager.Instance.powerupSprites[index];
         cardImage.sprite = cardImageSprite;
 
+        // load deck data
         count = PlayerPrefs.GetInt(cardName + "CardCount", 0);
         if (!Application.isEditor && count > maxCount) // in editor we have no max per card
         {
@@ -86,10 +88,15 @@ public class CardUIPrefabScript : MonoBehaviour, IPointerDownHandler, IPointerUp
         countText.alpha = count > 0 ? 1f : 0.3f;
         UpdateMinusAndPlusUIButtonInteractability();
 
+        // auto-collapse
         body.transform.localScale = new Vector3(body.transform.localScale.x, 0, body.transform.localScale.z);
 
+        // load crafting data
         craftingCredits = PlayerPrefs.GetInt("CraftingCredits");
         ownedCount2.text = craftingCredits.ToString();
+
+        // set background color for light/dark mode
+        background.GetComponent<Image>().color = UIManagerScript.Instance.GetDarkMode() ? new Color(0.2f, 0.2f, 0.2f, 1f) : new Color(1f, 1f, 1f, 1f);
     }
 
     public void Minus()
