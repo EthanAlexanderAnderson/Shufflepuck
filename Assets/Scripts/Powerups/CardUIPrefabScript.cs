@@ -31,13 +31,15 @@ public class CardUIPrefabScript : MonoBehaviour, IPointerDownHandler, IPointerUp
 
     // --- RANKS
     private int selectedRankIndex;
-    private int[] rankToCraftCosts = new int[] { 10, 100, 200, 400 };
-    private Color[] rankColors = new Color[] { new Color(1f, 1f, 1f, 1f), new Color(1f, 0.5f, 0f, 1f), new Color(1f, 1f, 0f, 1f), new Color(0f, 1f, 1f, 1f) };
+    private int[] rankToCraftCosts = new int[] { 10, 0, 100, 0, 200, 0, 400, 0, 0, 0 };
+    private Color[] rankColors = new Color[] { new Color(0.9f, 0.9f, 0.9f, 1f), new Color(0.9f, 0.9f, 0.9f, 1f), new Color(0.9f, 0.4f, 0f, 1f), new Color(0.9f, 0.4f, 0f, 1f), new Color(0.95f, 0.80f, 0f, 1f), new Color(0.95f, 0.80f, 0f, 1f), new Color(0f, 1f, 1f, 1f), new Color(0f, 1f, 1f, 1f), new Color(1f, 0f, 1f, 1f), new Color(1f, 0f, 1f, 1f) };
     [SerializeField] private Button previousRankButton;
     [SerializeField] private Button nextRankButton;
     // for shiny effect
     [SerializeField] private GameObject particleParent;
     [SerializeField] private GameObject shine;
+    // for holo effect
+    [SerializeField] private GameObject holoParent;
 
     // --- CRAFTING
     private int owned;
@@ -280,8 +282,10 @@ public class CardUIPrefabScript : MonoBehaviour, IPointerDownHandler, IPointerUp
         // turn shine & sparkle off then on to retrigger effect
         shine.SetActive(false);
         particleParent.SetActive(false);
-        shine.SetActive(selectedRankIndex > 0);
-        particleParent.SetActive(selectedRankIndex > 0);
+        shine.SetActive(selectedRankIndex > 1);
+        particleParent.SetActive(selectedRankIndex > 1);
+
+        holoParent.SetActive(selectedRankIndex > 0 && selectedRankIndex%2 == 1);
 
         // update UI arrows
         previousRankButton.image.enabled = (selectedRankIndex > 0);
@@ -324,6 +328,6 @@ public class CardUIPrefabScript : MonoBehaviour, IPointerDownHandler, IPointerUp
         // buttons
         craftMinusButton.interactable = (toCraftCount > 0);
         craftConfirmButton.interactable = (toCraftCount > 0 && remainingCredits > 0);
-        craftPlusButton.interactable = ((remainingCredits - rankToCraftCosts[selectedRankIndex]) > 0);
+        craftPlusButton.interactable = ((remainingCredits - rankToCraftCosts[selectedRankIndex]) > 0 && rankToCraftCosts[selectedRankIndex] > 0);
     }
 }
