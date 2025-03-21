@@ -661,7 +661,7 @@ public class UIManagerScript : MonoBehaviour
         PlayerPrefs.SetInt("darkMode", darkMode ? 1 : 0);
     }
 
-    private void ApplyDarkMode()
+    public void ApplyDarkMode()
     {
         if (activeUI == gameHud)
         {

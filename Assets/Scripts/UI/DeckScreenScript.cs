@@ -38,6 +38,9 @@ public class DeckScreenScript : MonoBehaviour
             GameObject cardUI = Instantiate(cardUIPrefab, deckMenuScrollView.transform);
             cardUI.GetComponent<CardUIPrefabScript>().InitializeCardUI(i, deckMenuScrollView.gameObject, false);
         }
+
+        deckMenuScrollView.transform.position = new Vector3(deckMenuScrollView.transform.position.x, -100 * count, deckMenuScrollView.transform.position.z);
+        UIManagerScript.Instance.ApplyDarkMode();
     }
 
     private void OnDisable()
