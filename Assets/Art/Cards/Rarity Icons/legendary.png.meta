@@ -1,10 +1,16 @@
 fileFormatVersion: 2
-guid: 4d8992ad6b7ba1a43887bda4c491a0dc
+guid: d4b631fc2637e034dbe487c851c92256
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2496828161889257060
-    second: block icon_0
+      213: -8326712265333833893
+    second: legendary_0
+  - first:
+      213: -7539295142465989727
+    second: legendary_1
+  - first:
+      213: 7437852084044539696
+    second: legendary_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -74,8 +80,8 @@ TextureImporter:
     buildTarget: DefaultTexturePlatform
     maxTextureSize: 2048
     resizeAlgorithm: 0
-    textureFormat: 1
-    textureCompression: 0
+    textureFormat: -1
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -126,13 +132,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: block icon_0
+      name: legendary_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 210
-        height: 210
+        width: 82
+        height: 80
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -140,8 +146,50 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c993669f30c795dd0800000000000000
-      internalID: -2496828161889257060
+      spriteID: b5f73edbf43917c80800000000000000
+      internalID: -8326712265333833893
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: legendary_1
+      rect:
+        serializedVersion: 2
+        x: 87
+        y: 0
+        width: 84
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1a39c78430b0f5790800000000000000
+      internalID: -7539295142465989727
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: legendary_2
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 0
+        width: 82
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 037af51201f883760800000000000000
+      internalID: 7437852084044539696
       vertices: []
       indices: 
       edges: []
@@ -157,7 +205,9 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      block icon_0: -2496828161889257060
+      legendary_0: -8326712265333833893
+      legendary_1: -7539295142465989727
+      legendary_2: 7437852084044539696
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -28,6 +28,7 @@ public class UIManagerScript : MonoBehaviour
     public GameObject shopScreen;
     public GameObject plinkoScreen;
     public GameObject waitingScreen;
+    public GameObject packOpenScreen;
 
     // title
     [SerializeField] private GameObject playerPuckIcon;
@@ -104,6 +105,7 @@ public class UIManagerScript : MonoBehaviour
 
     [SerializeField] private TMP_Text wallText;
     [SerializeField] private GameObject table;
+    [SerializeField] private GameObject slider;
 
     // dark / light mode assets
     private bool darkMode = false;
@@ -563,6 +565,7 @@ public class UIManagerScript : MonoBehaviour
         }
         titleScreenBackground.SetActive(newUI != gameHud && newUI != gameResultScreen);
         table.SetActive(newUI == gameHud || newUI == gameResultScreen);
+        slider.SetActive(newUI == gameHud || newUI == gameResultScreen || newUI == titleScreen);
         ApplyDarkMode();
         if (newUI != gameHud)
         {
@@ -671,6 +674,12 @@ public class UIManagerScript : MonoBehaviour
         {
             titleScreenBackground.GetComponent<Image>().sprite = darkMode ? titleScreenBackgroundDark : titleScreenBackgroundLight;
             activeUI.GetComponent<Image>().sprite = darkMode ? titleScreenDark : titleScreenLight;
+        }
+        // force dark mode for pack open because it looks better with particle effects (lame i know)
+        else if (activeUI == packOpenScreen)
+        {
+            titleScreenBackground.GetComponent<Image>().sprite = titleScreenBackgroundDark;
+            activeUI.GetComponent<Image>().sprite = titleScreenDark;
         }
         // swap text color to white for all children TMP objects with the blackText tag
         foreach (TMP_Text text in activeUI.GetComponentsInChildren<TMP_Text>())

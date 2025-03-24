@@ -139,6 +139,14 @@ public class DeckManager : MonoBehaviour
                 int count;
                 if (int.TryParse(split[1].Trim(), out count))
                 {
+                    // if we are importing more than we own or above maxCount, don't lol
+                    int owned = PowerupCardData.GetCardOwnedCount(cardIndex);
+                    int maxCount = 5 - PowerupCardData.GetCardRarity(cardIndex);
+                    if (count > owned || count > maxCount)
+                    {
+                        count = Mathf.Min(owned, maxCount);
+                    }
+                    // set new imported count
                     deck[cardIndex] = count;
                     PlayerPrefs.SetInt(PowerupCardData.GetCardName(cardIndex) + "CardCount", count);
                 }
