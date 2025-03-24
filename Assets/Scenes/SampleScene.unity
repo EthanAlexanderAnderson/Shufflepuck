@@ -11943,6 +11943,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardOpenPrefab: {fileID: 4322888780505142026, guid: 9e15adaa6ac76bb44944a03c0ac15826, type: 3}
   packParent: {fileID: 1186353994}
+  standardPackCountText: {fileID: 1812286839}
+  plusPackCountText: {fileID: 1526438305}
+  openOneStandardButton: {fileID: 293264753}
+  openTenStandardButton: {fileID: 1878691392}
+  openOnePlusButton: {fileID: 2146115831}
+  openTenPlusButton: {fileID: 894742025}
 --- !u!4 &188209707
 Transform:
   m_ObjectHideFlags: 0

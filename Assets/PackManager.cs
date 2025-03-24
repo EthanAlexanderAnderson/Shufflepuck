@@ -1,4 +1,6 @@
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PackManager : MonoBehaviour
 {
@@ -6,15 +8,68 @@ public class PackManager : MonoBehaviour
 
     [SerializeField] private GameObject packParent;
 
+    [SerializeField] private TMP_Text standardPackCountText;
+    [SerializeField] private TMP_Text plusPackCountText;
+
+    [SerializeField] private Button openOneStandardButton;
+    [SerializeField] private Button openTenStandardButton;
+    [SerializeField] private Button openOnePlusButton;
+    [SerializeField] private Button openTenPlusButton;
+
+
+    private void OnEnable()
+    {
+        UpdatePackSreenUI();
+    }
+
+    private void UpdatePackSreenUI()
+    {
+        int standardPackCount = PlayerPrefs.GetInt("StandardPacks");
+        int plusPackCount = PlayerPrefs.GetInt("PlusPacks");
+
+        openOneStandardButton.interactable = standardPackCount >= 1;
+        openTenStandardButton.interactable = standardPackCount >= 10;
+        openOnePlusButton.interactable = plusPackCount >= 1;
+        openTenPlusButton.interactable = plusPackCount >= 10;
+
+        standardPackCountText.text = standardPackCount.ToString();
+        plusPackCountText.text = plusPackCount.ToString();
+    }
+
     public void OpenStandardOne()
     {
+        // validate we own a pack
+        int standardPackCount = PlayerPrefs.GetInt("StandardPacks");
+        if (standardPackCount < 1)
+        {
+            UIManagerScript.Instance.SetErrorMessage("not enough packs");
+            return;
+        }
+
+        // consume pack
+        PlayerPrefs.SetInt("StandardPacks", standardPackCount - 1);
+
+        // open the pack
         GameObject pack = Instantiate(cardOpenPrefab, packParent.transform);
         pack.transform.localScale = new Vector3(3f, 3f, 3f);
         pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(Random.Range(0, 30), RollRankStandard(), Random.Range(0, 100) < 5);
+
+        UpdatePackSreenUI();
     }
 
     public void OpenStandardTen()
     {
+        // validate we own 10 packs
+        int standardPackCount = PlayerPrefs.GetInt("StandardPacks");
+        if (standardPackCount < 10)
+        {
+            UIManagerScript.Instance.SetErrorMessage("not enough packs");
+            return;
+        }
+
+        // consume pack
+        PlayerPrefs.SetInt("StandardPacks", standardPackCount - 10);
+
         // god pack chance
         bool godpack = false;
         if (Random.Range(0, 1000) < 1) // 1 in 1000 : 0.1% chance
@@ -22,6 +77,7 @@ public class PackManager : MonoBehaviour
             godpack = true;
         }
 
+        // open the packs
         for (int i = 0; i < 10; i++)
         {
             GameObject pack = Instantiate(cardOpenPrefab, packParent.transform);
@@ -42,17 +98,43 @@ public class PackManager : MonoBehaviour
 
             pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(Random.Range(0, 30), RollRankStandard(), (Random.Range(0, 100) < 5) || godpack);
         }
+
+        UpdatePackSreenUI();
     }
 
     public void OpenPlusOne()
     {
+        // validate we own a plus pack
+        int plusPackCount = PlayerPrefs.GetInt("PlusPacks");
+        if (plusPackCount < 1)
+        {
+            UIManagerScript.Instance.SetErrorMessage("not enough packs");
+            return;
+        }
+
+        // consume pack
+        PlayerPrefs.SetInt("PlusPacks", plusPackCount - 1);
+
         GameObject pack = Instantiate(cardOpenPrefab, packParent.transform);
         pack.transform.localScale = new Vector3(3f, 3f, 3f);
         pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(Random.Range(0, 30), RollRankPlus(), Random.Range(0, 100) < 25);
+
+        UpdatePackSreenUI();
     }
 
     public void OpenPlusTen()
     {
+        // validate we own 10 plus packs
+        int plusPackCount = PlayerPrefs.GetInt("PlusPacks");
+        if (plusPackCount < 10)
+        {
+            UIManagerScript.Instance.SetErrorMessage("not enough packs");
+            return;
+        }
+
+        // consume pack
+        PlayerPrefs.SetInt("PlusPacks", plusPackCount - 10);
+
         // god pack chance
         bool godpack = false;
         if (Random.Range(0, 100) < 1) // 1 in 100 : 1% chance
@@ -60,6 +142,7 @@ public class PackManager : MonoBehaviour
             godpack = true;
         }
 
+        // open packs
         for (int i = 0; i < 10; i++)
         {
             GameObject pack = Instantiate(cardOpenPrefab, packParent.transform);
@@ -80,6 +163,8 @@ public class PackManager : MonoBehaviour
 
             pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(Random.Range(0, 30), RollRankPlus(), (Random.Range(0, 100) < 25) || godpack);
         }
+
+        UpdatePackSreenUI();
     }
 
     private int RollRankStandard()
