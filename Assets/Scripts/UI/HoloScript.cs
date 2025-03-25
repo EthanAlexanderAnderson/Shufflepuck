@@ -12,13 +12,13 @@ public class HoloScript : MonoBehaviour
 
     private void HoloLeft()
     {
-        transform.localPosition = new Vector3(-edge, transform.position.y, transform.position.z);
+        transform.localPosition = new Vector3(-edge, 0, 0);
         LeanTween.moveLocalX(gameObject, edge, time).setEaseInOutSine().setOnComplete(HoloRight);
     }
 
     private void HoloRight()
     {
-        transform.localPosition = new Vector3(edge, transform.position.y, transform.position.z);
+        transform.localPosition = new Vector3(edge, 0, 0);
         LeanTween.moveLocalX(gameObject, -edge, time).setEaseInOutSine().setOnComplete(HoloLeft);
     }
 }

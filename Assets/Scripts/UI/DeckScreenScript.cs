@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class DeckScreenScript : MonoBehaviour
@@ -14,13 +15,14 @@ public class DeckScreenScript : MonoBehaviour
 
         // in deck divider
         GameObject cardUIInDeckDivider = Instantiate(cardUIPrefab, deckMenuScrollView.transform);
-        cardUIInDeckDivider.GetComponent<CardUIPrefabScript>().InitializeCardUI(-1, deckMenuScrollView.gameObject);
+        cardUIInDeckDivider.GetComponent<DeckbuilderCardUIPrefabScript>().InitializeDeckbuilderCardUI(-1, deckMenuScrollView);
 
         // check in deck
-        for (int i = 0; i < count; i++)
+        List<int> deck = DeckManager.Instance.GetDecklist();
+        foreach (var encodedCard in deck)
         {
-            if (PowerupCardData.GetCardName(i) == null) continue;
-            inDeck[i] = PlayerPrefs.GetInt($"{ PowerupCardData.GetCardName(i)}CardCount") > 0;
+            var decodedCard = PowerupCardData.DecodeCard(encodedCard);
+            inDeck[decodedCard.cardIndex] = true;
         }
 
         // load in deck
@@ -29,18 +31,18 @@ public class DeckScreenScript : MonoBehaviour
             if (PowerupCardData.GetCardName(i) == null) continue;
             if (!inDeck[i]) continue;
             GameObject cardUI = Instantiate(cardUIPrefab, deckMenuScrollView.transform);
-            cardUI.GetComponent<CardUIPrefabScript>().InitializeCardUI(i, deckMenuScrollView.gameObject, true);
+            cardUI.GetComponent<DeckbuilderCardUIPrefabScript>().InitializeDeckbuilderCardUI(i, deckMenuScrollView, true);
         }
 
         // collection divider
         GameObject cardUICollectionDivider = Instantiate(cardUIPrefab, deckMenuScrollView.transform);
-        cardUICollectionDivider.GetComponent<CardUIPrefabScript>().InitializeCardUI(-2, deckMenuScrollView.gameObject);
+        cardUICollectionDivider.GetComponent<DeckbuilderCardUIPrefabScript>().InitializeDeckbuilderCardUI(-2, deckMenuScrollView);
 
-        // check owned
-        for (int i = 0; i < count; i++)
+        var sums = PowerupCardData.GetAllCardsOwnedSums();
+        for (int i = 0; i < sums.Length; i++)
         {
             if (PowerupCardData.GetCardName(i) == null) continue;
-            owned[i] = PowerupCardData.CheckIfCardIsOwned(i);
+            owned[i] = sums[i] > 0;
         }
 
         // load owned
@@ -49,12 +51,12 @@ public class DeckScreenScript : MonoBehaviour
             if (PowerupCardData.GetCardName(i) == null) continue;
             if (!owned[i] || inDeck[i]) continue;
             GameObject cardUI = Instantiate(cardUIPrefab, deckMenuScrollView.transform);
-            cardUI.GetComponent<CardUIPrefabScript>().InitializeCardUI(i, deckMenuScrollView.gameObject, true);
+            cardUI.GetComponent<DeckbuilderCardUIPrefabScript>().InitializeDeckbuilderCardUI(i, deckMenuScrollView, true);
         }
 
         // undiscovered divider
         GameObject cardUIUndiscoveredDivider = Instantiate(cardUIPrefab, deckMenuScrollView.transform);
-        cardUIUndiscoveredDivider.GetComponent<CardUIPrefabScript>().InitializeCardUI(-3, deckMenuScrollView.gameObject);
+        cardUIUndiscoveredDivider.GetComponent<DeckbuilderCardUIPrefabScript>().InitializeDeckbuilderCardUI(-3, deckMenuScrollView);
 
         // load not owned
         for (int i = 0; i < count; i++)
@@ -62,11 +64,11 @@ public class DeckScreenScript : MonoBehaviour
             if (PowerupCardData.GetCardName(i) == null) continue;
             if (owned[i]) continue;
             GameObject cardUI = Instantiate(cardUIPrefab, deckMenuScrollView.transform);
-            cardUI.GetComponent<CardUIPrefabScript>().InitializeCardUI(i, deckMenuScrollView.gameObject, false);
+            cardUI.GetComponent<DeckbuilderCardUIPrefabScript>().InitializeDeckbuilderCardUI(i, deckMenuScrollView, false);
         }
 
         // no idea why the y pos here is that magic number, it works tho
-        deckMenuScrollView.transform.localPosition = new Vector3(deckMenuScrollView.transform.localPosition.x, -4100, deckMenuScrollView.transform.localPosition.z);
+        deckMenuScrollView.transform.localPosition = new Vector3(0, -4100, 0);
         UIManagerScript.Instance.ApplyDarkMode();
     }
 

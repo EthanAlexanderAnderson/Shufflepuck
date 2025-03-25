@@ -2,6 +2,7 @@
  * it controls most things happening in game and directs other scripts.
  */
 
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -92,11 +93,17 @@ public class LogicScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        PowerupCardData.EncodeDecodeTest();
+
 #if (UNITY_EDITOR)
         PlayerPrefs.SetInt("easyWin", 0);
         PlayerPrefs.SetInt("easyHighscore", 14);
         PlayerPrefs.SetInt("mediumHighscore", 12);
         PlayerPrefs.SetInt("hardHighscore", 10);
+        // TODO: REMOVE
+        PlayerPrefs.SetInt("CraftingCredits", 999);
+        PlayerPrefs.SetInt("StandardPacks", 999);
+        PlayerPrefs.SetInt("PlusPacks", 999);
 #endif
 
         // connect scripts
@@ -558,17 +565,17 @@ public class LogicScript : MonoBehaviour
             // handle powerup shots
             if (best.DoesPathRequirePhasePowerup() && powerupsAreEnabled && powerupsUsedThisTurn < 3)
             {
-                powerupManager.PhasePowerup();
+                CPUCallPowerupHelper("phase");
                 powerupsUsedThisTurn++;
             }
             else if (best.DoesPathRequireExplosionPowerup() && powerupsAreEnabled && powerupsUsedThisTurn < 3)
             {
-                powerupManager.ExplosionPowerup();
+                CPUCallPowerupHelper("explosion");
                 powerupsUsedThisTurn++;
             }
             else if (best.IsPathAContactShot() && powerupsAreEnabled && powerupsUsedThisTurn < 3)
             {
-                powerupManager.ForceFieldPowerup();
+                CPUCallPowerupHelper("force field");
                 powerupsUsedThisTurn++;
             }
 
@@ -582,6 +589,12 @@ public class LogicScript : MonoBehaviour
         }
     }
 
+    private void CPUCallPowerupHelper(string name)
+    {
+        int index = Array.IndexOf(powerupManager.powerupTexts, name);
+        powerupManager.CallMethodArray(PowerupCardData.EncodeCard(index, 0, false, 1));
+    }
+
     private void CPUPreShotPowerups()
     {
         if (denyPowerup > 0) { return; }
@@ -592,7 +605,7 @@ public class LogicScript : MonoBehaviour
         // first two shots use block
         if (opponent.puckCount > 3 && randomValue < (0.75 - totalSubtractor))
         {
-            powerupManager.BlockPowerup();
+            CPUCallPowerupHelper("block");
             powerupsUsedThisTurn++;
         }
         // shot three and four check if bolt is needed, if it isn't use foresight
@@ -616,12 +629,12 @@ public class LogicScript : MonoBehaviour
             }
             if (playerPucks / opponentPucks > 2)
             {
-                powerupManager.BoltPowerup();
+                CPUCallPowerupHelper("bolt");
                 powerupsUsedThisTurn++;
             }
             else if (FogScript.Instance.FogEnabled())
             {
-                powerupManager.ForesightPowerup();
+                CPUCallPowerupHelper("foresight");
                 powerupsUsedThisTurn++;
             }
         }
@@ -646,7 +659,7 @@ public class LogicScript : MonoBehaviour
             }
             if (useCull)
             {
-                powerupManager.CullPowerup();
+                CPUCallPowerupHelper("cull");
                 powerupsUsedThisTurn++;
             }
         }
@@ -661,24 +674,24 @@ public class LogicScript : MonoBehaviour
         // plus one, growth, hydra
         if (opponent.puckCount > 3 && randomValue < (0.75 - totalSubtractor))
         {
-            powerupManager.GrowthPowerup();
+            CPUCallPowerupHelper("growth");
         }
         else if (opponent.puckCount == 3 && randomValue < (0.75 - totalSubtractor))
         {
-            powerupManager.HydraPowerup();
+            CPUCallPowerupHelper("hydra");
         }
         else if (opponent.puckCount == 2 && randomValue < (0.75 - totalSubtractor))
         {
-            powerupManager.AuraPowerup();
+            CPUCallPowerupHelper("aura");
         }
         else if (opponent.puckCount <= 1 && randomValue < (0.75 - totalSubtractor))
         {
             if (powerupsUsedThisTurn == 0)
             {
-                powerupManager.TimesTwoPowerup();
+                CPUCallPowerupHelper("times two");
                 return;
             }
-            powerupManager.PlusOnePowerup();
+            CPUCallPowerupHelper("plus one");
         }
 
         powerupsUsedThisTurn++;
@@ -688,11 +701,11 @@ public class LogicScript : MonoBehaviour
         randomValue = Random.Range(0f, 1f);
         if (opponent.puckCount > 3 && randomValue < (0.55 - totalSubtractor))
         {
-            powerupManager.LockPowerup();
+            CPUCallPowerupHelper("lock");
         }
         else if ((opponent.puckCount == 3 || opponent.puckCount == 2) && player.puckCount > 0 && randomValue < (0.55 - totalSubtractor))
         {
-            powerupManager.FogPowerup();
+            CPUCallPowerupHelper("fog");
         }
         powerupsUsedThisTurn++;
         if (powerupsUsedThisTurn >= 3 - denyPowerup * 2) { return; }
@@ -701,7 +714,7 @@ public class LogicScript : MonoBehaviour
         randomValue = Random.Range(0f, 1f);
         if ((opponent.puckCount == 2) && randomValue < (0.55 - totalSubtractor))
         {
-            powerupManager.ShieldPowerup();
+            CPUCallPowerupHelper("shield");
         }
         powerupsUsedThisTurn++;
         if (powerupsUsedThisTurn >= 3 - denyPowerup * 2) { return; }
@@ -710,7 +723,7 @@ public class LogicScript : MonoBehaviour
         randomValue = Random.Range(0f, 1f);
         if ((opponent.puckCount == 5 || opponent.puckCount == 4) && randomValue < (0.55 - totalSubtractor))
         {
-            powerupManager.FactoryPowerup();
+            CPUCallPowerupHelper("factory");
         }
         powerupsUsedThisTurn++;
         if (powerupsUsedThisTurn >= 3 - denyPowerup * 2) { return; }
@@ -719,7 +732,7 @@ public class LogicScript : MonoBehaviour
         randomValue = Random.Range(0f, 1f);
         if (powerupsUsedThisTurn == 0 && (opponent.puckCount == 5 || opponent.puckCount == 4) && randomValue < (0.75 - totalSubtractor))
         {
-            powerupManager.ResurrectPowerup();
+            CPUCallPowerupHelper("resurrect");
         }
         powerupsUsedThisTurn++;
         if (powerupsUsedThisTurn >= 3 - denyPowerup * 2) { return; }
@@ -764,6 +777,7 @@ public class LogicScript : MonoBehaviour
         Application.Quit();
     }
 
+    // TODO: remove this whole thing
     [SerializeField] GameObject deckScreen;
     public void SetPowerups(bool value)
     {

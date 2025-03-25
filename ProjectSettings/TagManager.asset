@@ -76,9 +76,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: FogLayer
-    uniqueID: 1489932561
-    locked: 0
   - name: HoloLayer
     uniqueID: 4129569943
+    locked: 0
+  - name: FogLayer
+    uniqueID: 1489932561
     locked: 0

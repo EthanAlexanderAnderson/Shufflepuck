@@ -233,6 +233,8 @@ public class ClientLogicScript : NetworkBehaviour
     {
         if (!IsClient) return;
 
+        UI.ChangeUI(UI.gameHud);
+
         UI.SetReButtons(false);
         if (powerupsAreEnabled) { powerupManager.LoadDeck(); }
 
@@ -270,7 +272,6 @@ public class ClientLogicScript : NetworkBehaviour
         puckHalo.SetActive(false);
         bar.ToggleDim(false);
         UI.onlineRematchButton.SetActive(false);
-        UI.ChangeUI(UI.gameHud);
         GameHUDManager.Instance.ChangeTurnText("Opponent's Turn");
         line.GetComponent<LineScript>().FullSpeed();
     }
