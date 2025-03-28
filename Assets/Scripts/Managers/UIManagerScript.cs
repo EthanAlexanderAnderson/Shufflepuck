@@ -664,8 +664,11 @@ public class UIManagerScript : MonoBehaviour
         PlayerPrefs.SetInt("darkMode", darkMode ? 1 : 0);
     }
 
-    public void ApplyDarkMode()
+    public void ApplyDarkMode(GameObject parentObject = null)
     {
+        // hacky way of enabling darkmode for disabled objects (run this with parameter onenable)
+        if (parentObject == null) { parentObject = activeUI; }
+
         if (activeUI == gameHud)
         {
             table.GetComponent<SpriteRenderer>().sprite = darkMode ? tableDark : tableLight;
@@ -682,7 +685,7 @@ public class UIManagerScript : MonoBehaviour
             activeUI.GetComponent<Image>().sprite = titleScreenDark;
         }
         // swap text color to white for all children TMP objects with the blackText tag
-        foreach (TMP_Text text in activeUI.GetComponentsInChildren<TMP_Text>())
+        foreach (TMP_Text text in parentObject.GetComponentsInChildren<TMP_Text>())
         {
             if (text.tag == "blackText")
             {
@@ -692,7 +695,7 @@ public class UIManagerScript : MonoBehaviour
             }
         }
         // swap text color to white for all children Text objects with the blackText tag
-        foreach (Text text in activeUI.GetComponentsInChildren<Text>())
+        foreach (Text text in parentObject.GetComponentsInChildren<Text>())
         {
             if (text.tag == "blackText")
             {
@@ -700,7 +703,7 @@ public class UIManagerScript : MonoBehaviour
             }
         }
         // swap color to white for all children sprite renderer objects with the blackText tag
-        foreach (SpriteRenderer sr in activeUI.GetComponentsInChildren<SpriteRenderer>())
+        foreach (SpriteRenderer sr in parentObject.GetComponentsInChildren<SpriteRenderer>())
         {
             if (sr.tag == "blackText")
             {
@@ -708,7 +711,7 @@ public class UIManagerScript : MonoBehaviour
             }
         }
         // swap color to white for all children image objects with the blackText tag
-        foreach (Image img in activeUI.GetComponentsInChildren<Image>())
+        foreach (Image img in parentObject.GetComponentsInChildren<Image>())
         {
             if (img.tag == "blackText")
             {

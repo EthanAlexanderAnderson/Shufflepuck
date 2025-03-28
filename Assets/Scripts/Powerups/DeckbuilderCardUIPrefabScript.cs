@@ -199,6 +199,7 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
         UpdateMinusAndPlusUIButtonInteractability();
         UpdateCardCountUI();
         SaveCardCount();
+        SoundManagerScript.Instance.PlayClickSFX(5);
     }
 
     public void Plus()
@@ -210,6 +211,7 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
         UpdateMinusAndPlusUIButtonInteractability();
         UpdateCardCountUI();
         SaveCardCount();
+        SoundManagerScript.Instance.PlayClickSFX(4);
     }
 
     private void UpdateCardCountUI()
@@ -291,6 +293,7 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
             // Expand body / card image
             LeanTween.cancel(body);
             body.SetActive(true);
+            UIManagerScript.Instance.ApplyDarkMode(body);
             LeanTween.scaleY(body, 1f, expandAnimationTime).setEaseOutQuint();
             LeanTween.moveLocalY(body, anyOwned ? 0f : expandedBodyYPositionUnowned, expandAnimationTime).setEaseOutQuint();
             // slide scrollview up
@@ -338,6 +341,7 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
         }
         UpdateCardCountUI();
         UpdateMinusAndPlusUIButtonInteractability();
+        SoundManagerScript.Instance.PlayClickSFX(0);
     }
 
     // RANKS
@@ -350,6 +354,7 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
         UpdateRankUI();
         UpdateCardCountUI();
         UpdateMinusAndPlusUIButtonInteractability();
+        SoundManagerScript.Instance.PlayClickSFX(5);
     }
 
     public void NextRank()
@@ -361,6 +366,7 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
         UpdateRankUI();
         UpdateCardCountUI();
         UpdateMinusAndPlusUIButtonInteractability();
+        SoundManagerScript.Instance.PlayClickSFX(4);
     }
 
     private void UpdateRankUI()
@@ -395,12 +401,14 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
             toCraftCount--;
         }
         UpdateCraftUI();
+        SoundManagerScript.Instance.PlayClickSFX(5);
     }
 
     public void PlusCraft()
     {
         toCraftCount++;
         UpdateCraftUI();
+        SoundManagerScript.Instance.PlayClickSFX(4);
     }
 
     private void UpdateCraftUI()
