@@ -63,6 +63,7 @@ public class DeckManager : MonoBehaviour
                 if (count == 0)
                 {
                     deck.RemoveAt(i); // only store cards above 0 count
+                    UpdateTotalDeckCountUI();
                     return;
                 }
                 deck[i] = PowerupCardData.EncodeCard(cardIndex, rank, holo, count);

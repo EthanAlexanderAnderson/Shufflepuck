@@ -69,6 +69,7 @@ public class DeckScreenScript : MonoBehaviour
 
         // no idea why the y pos here is that magic number, it works tho
         deckMenuScrollView.transform.localPosition = new Vector3(0, -4100, 0);
+        DeckManager.Instance.UpdateTotalDeckCountUI();
         UIManagerScript.Instance.ApplyDarkMode();
     }
 

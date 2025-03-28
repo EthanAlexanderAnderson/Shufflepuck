@@ -14,6 +14,7 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
     private int cardIndex; // what card this is
     private int cardRarity;// what rarity this card is
     private bool anyOwned; // do we own any of these cards
+    private int totalOwned; // how many we own of any variation total
 
     private int[] inDeckCounts;  // how many of each variation do we have in deck currently, parallel to ownedCardVariationList
     private int maxCount;  // how many are we allowed to have in deck
@@ -164,8 +165,13 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
             ownedCardVariationList = new();
             ownedCardVariationList.Add(new CardVariation(0, false, 0));
         }
-
+        // TODO: crafting should update totalOwned
+        totalOwned = ownedCardVariationList.Sum(card => card.count);
         inDeckCounts = new int[ownedCardVariationList.Count];
+
+        // load crafting data
+        craftingCredits = PlayerPrefs.GetInt("CraftingCredits");
+        ownedCount2.text = craftingCredits.ToString();
 
         // load indeck card data 
         if (anyOwned)
@@ -180,42 +186,67 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
             countText.alpha = sum > 0 ? 1f : 0.3f;
 
             UpdateSelectedCardVariationIndex();
+            UpdateRankUI();
+            UpdateMinusAndPlusUIButtonInteractability();
         }
-
-        // load crafting data
-        craftingCredits = PlayerPrefs.GetInt("CraftingCredits");
-        ownedCount2.text = craftingCredits.ToString();
-
-        UpdateRankUI();
-        UpdateMinusAndPlusUIButtonInteractability();
     }
 
     public void Minus()
     {
+        // remove one from the deck
         if (inDeckCounts[selectedCardVariationIndex] > 0)
         {
             inDeckCounts[selectedCardVariationIndex]--;
         }
-        UpdateMinusAndPlusUIButtonInteractability();
+        // if UI is collapsed & currently selected has zero count & we have a card still in deck to remove, try to decrement from lowest in-deck rarity
+        else if (!expanded && inDeckCounts[selectedCardVariationIndex] <= 0 && inDeckCounts.Sum() > 0)
+        {
+            for (int i = 0; i < inDeckCounts.Length; i++)
+            {
+                if (inDeckCounts[i] > 0)
+                {
+                    selectedCardVariationIndex = i;
+                    inDeckCounts[selectedCardVariationIndex]--;
+                    break;
+                }
+            }
+        }
+        SaveCardCountToDeckManager();
         UpdateCardCountUI();
-        SaveCardCount();
+        UpdateMinusAndPlusUIButtonInteractability();
         SoundManagerScript.Instance.PlayClickSFX(5);
     }
 
     public void Plus()
     {
+        // add one to the deck
         if (inDeckCounts.Sum() < maxCount && inDeckCounts[selectedCardVariationIndex] < ownedCardVariationList[selectedCardVariationIndex].count)
         {
             inDeckCounts[selectedCardVariationIndex]++;
         }
-        UpdateMinusAndPlusUIButtonInteractability();
+        // if UI is collapsed & currently selected has all owned equipped & we have a card still owned to add, swap selected variation so we add the highest addable rank
+        else if (!expanded && inDeckCounts[selectedCardVariationIndex] >= ownedCardVariationList[selectedCardVariationIndex].count && inDeckCounts[selectedCardVariationIndex] < totalOwned)
+        {
+            for (int i = (inDeckCounts.Length - 1); i >= 0; i--)
+            {
+                if (ownedCardVariationList[i].count > 0 && inDeckCounts[i] < ownedCardVariationList[i].count)
+                {
+                    selectedCardVariationIndex = i;
+                    inDeckCounts[selectedCardVariationIndex]++;
+                    break;
+                }
+            }
+        }
+        SaveCardCountToDeckManager();
         UpdateCardCountUI();
-        SaveCardCount();
+        UpdateMinusAndPlusUIButtonInteractability();
         SoundManagerScript.Instance.PlayClickSFX(4);
     }
 
     private void UpdateCardCountUI()
     {
+        if (!anyOwned) { return; }
+
         if (!expanded)
         {
             var sum = inDeckCounts.Sum();
@@ -231,15 +262,24 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
         }
     }
 
-    private void SaveCardCount()
+    private void SaveCardCountToDeckManager()
     {
         DeckManager.Instance.SetCardCount(cardIndex, ownedCardVariationList[selectedCardVariationIndex].rank, ownedCardVariationList[selectedCardVariationIndex].holo, inDeckCounts[selectedCardVariationIndex]);
     }
 
     private void UpdateMinusAndPlusUIButtonInteractability()
     {
-        minusButton.interactable = (inDeckCounts[selectedCardVariationIndex] > 0);
-        plusButton.interactable = (inDeckCounts.Sum() < maxCount && inDeckCounts[selectedCardVariationIndex] < ownedCardVariationList[selectedCardVariationIndex].count);
+        // if collapsed, check total owned, not per variation
+        if (!expanded)
+        {
+            minusButton.interactable = (inDeckCounts.Sum() > 0);
+            plusButton.interactable = (inDeckCounts.Sum() < maxCount && inDeckCounts.Sum() < totalOwned);
+        }
+        else
+        {
+            minusButton.interactable = (inDeckCounts[selectedCardVariationIndex] > 0);
+            plusButton.interactable = (inDeckCounts.Sum() < maxCount && inDeckCounts[selectedCardVariationIndex] < ownedCardVariationList[selectedCardVariationIndex].count);
+        }
     }
 
     // Called when the user presses down on the image
@@ -334,11 +374,11 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
             }).setEaseOutQuint();
             // reset rank & craft UI
             UpdateSelectedCardVariationIndex();
-            UpdateRankUI();
             toCraftCount = 0;
             UpdateCraftUI();
             expanded = false;
         }
+        UpdateRankUI();
         UpdateCardCountUI();
         UpdateMinusAndPlusUIButtonInteractability();
         SoundManagerScript.Instance.PlayClickSFX(0);
@@ -373,7 +413,7 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
     {
         if (cardIndex < 0) return;
         if (ownedCardVariationList == null) return;
-        if (selectedCardVariationIndex > ownedCardVariationList.Count - 1 || ownedCardVariationList[selectedCardVariationIndex] == null) selectedCardVariationIndex = 0;
+        if (selectedCardVariationIndex > ownedCardVariationList.Count - 1 || ownedCardVariationList[selectedCardVariationIndex] == null) UpdateSelectedCardVariationIndex();
 
 
         // INITIALIZE (cardIndex, rank, holo)
@@ -390,7 +430,6 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
 
         // reset crafting
         toCraftCount = 0;
-        UpdateCraftUI();
     }
 
     // CRAFTING
@@ -445,8 +484,10 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
 
     private void UpdateSelectedCardVariationIndex()
     {
-        // set active to first non-zero count variation in deck
-        for (int i = 0; i < inDeckCounts.Length; i++)
+        // default to highest owned variation
+        selectedCardVariationIndex = ownedCardVariationList.Count - 1;
+        // if deck is non-empty, default to highest in-deck variation
+        for (int i = inDeckCounts.Length - 1; i >= 0; i--)
         {
             if (inDeckCounts[i] > 0)
             {
