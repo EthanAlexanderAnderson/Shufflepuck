@@ -52,7 +52,7 @@ public class PackManager : MonoBehaviour
         // open the pack
         GameObject pack = Instantiate(cardOpenPrefab, packParent.transform);
         pack.transform.localScale = new Vector3(3f, 3f, 3f);
-        pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(Random.Range(0, 30), RollRankStandard(), Random.Range(0, 100) < 5);
+        pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(RollRarity(), RollRankStandard(), Random.Range(0, 100) < 5);
 
         UpdatePackSreenUI();
     }
@@ -96,7 +96,7 @@ public class PackManager : MonoBehaviour
                 pack.transform.localPosition = new Vector3(600f, 350f - 500f * (i-7), 0f);
             }
 
-            pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(Random.Range(0, 30), RollRankStandard(), (Random.Range(0, 100) < 5) || godpack);
+            pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(RollRarity(), RollRankStandard(), (Random.Range(0, 100) < 5) || godpack);
         }
 
         UpdatePackSreenUI();
@@ -117,7 +117,7 @@ public class PackManager : MonoBehaviour
 
         GameObject pack = Instantiate(cardOpenPrefab, packParent.transform);
         pack.transform.localScale = new Vector3(3f, 3f, 3f);
-        pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(Random.Range(0, 30), RollRankPlus(), Random.Range(0, 100) < 25);
+        pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(RollRarity(), RollRankPlus(), Random.Range(0, 100) < 25);
 
         UpdatePackSreenUI();
     }
@@ -161,55 +161,89 @@ public class PackManager : MonoBehaviour
                 pack.transform.localPosition = new Vector3(600f, 350f - 500f * (i - 7), 0f);
             }
 
-            pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(Random.Range(0, 30), RollRankPlus(), (Random.Range(0, 100) < 25) || godpack);
+            pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(RollRarity(), RollRankPlus(), (Random.Range(0, 100) < 25) || godpack);
         }
 
         UpdatePackSreenUI();
     }
 
+    private int RollRarity()
+    {
+        // get the player level for overrides. Players should not get rare cards at low levels (before they understand the value).
+        var (_, level) = LevelManager.Instance.GetXPAndLevel();
+
+        int rand = Random.Range(0, 1000);
+        if (rand < 30 && level >= 10)           // legendary : 0 - 29 : 30 in 1000 : 3%
+        {
+            return PowerupCardData.GetRandomCardOfRarity(4);
+        }
+        else if (rand < 100 && level >= 5)      // epic : 30 - 99 : 70 in 1000 : 7%
+        {
+            return PowerupCardData.GetRandomCardOfRarity(3);
+        }
+        else if (rand < 250)                    // rare : 100 - 249 : 150 in 1000 : 15%
+        {
+            return PowerupCardData.GetRandomCardOfRarity(2);
+        }
+        else if (rand < 500)                    // uncommon : 250 - 499 : 250 in 1000 : 25%
+        {
+            return PowerupCardData.GetRandomCardOfRarity(1);
+        }
+        else                                    // common : 500 - 999 : 500 in 1000 : 50%
+        {
+            return PowerupCardData.GetRandomCardOfRarity(0);
+        }
+    }
+
     private int RollRankStandard()
     {
+        // get the player level for overrides. Players should not get rare ranks at low levels (before they understand the value).
+        var (_, level) = LevelManager.Instance.GetXPAndLevel();
+
         int rand = Random.Range(0, 1000);
-        if (rand < 1)           // 0 only : 0.1%
+        if (rand < 1 && level >= 25)         // Celestial : 0 only : 1 in 1000 : 0.1%
         {
-            return 4;           // Celestial
+            return 4;
         }
-        else if (rand < 11)     // 1 - 10 : 10 in 1000 : 1%
+        else if (rand < 11 && level >= 15)   // Diamond : 1 - 10 : 10 in 1000 : 1%
         {
-            return 3;           // Diamond
+            return 3;
         }
-        else if (rand < 31)     // 11 - 30 : 20 in 1000 : 2%
+        else if (rand < 31 && level >= 10)   // Gold : 11 - 30 : 20 in 1000 : 2%
         {
-            return 2;           // Gold
+            return 2;
         }
-        else if (rand < 71)     // 31 - 70 : 40 in 1000 : 4%
+        else if (rand < 71 && level >= 5)    // Bronze : 31 - 70 : 40 in 1000 : 4%
         {
-            return 1;           // Bronze
+            return 1;
         }
         else
         {
-            return 0;           // Standard
+            return 0;                        // Standard : 71 - 1000 : 929 in 1000 : 92.9%
         }
     }
 
     private int RollRankPlus()
     {
+        // get the player level for overrides. Players should not get rare ranks at low levels (before they understand the value).
+        var (_, level) = LevelManager.Instance.GetXPAndLevel();
+
         int rand = Random.Range(0, 1000);
-        if (rand < 10)           // 0 - 10 : 10 in 1000 : 1%
+        if (rand < 10 && level >= 25)       // Celestial: 0 - 10 : 10 in 1000 : 1%
         {
-            return 4;           // Celestial
+            return 4;
         }
-        else if (rand < 110)    // 10 - 110 : 100 in 1000 : 10%
+        else if (rand < 110)                // Diamond : 10 - 110 : 100 in 1000 : 10%
         {
-            return 3;           // Diamond
+            return 3;
         }
-        else if (rand < 360)    // 110 - 360 : 250 in 1000 : 25%
+        else if (rand < 360)                // Gold : 110 - 360 : 250 in 1000 : 25%
         {
-            return 2;           // Gold
+            return 2;
         }
-        else                    // 360 - 1000 : 650 in 1000 : 64%
+        else                                // Bronze : 360 - 1000 : 650 in 1000 : 64%
         {
-            return 1;           // Bronze
+            return 1;
         }
     }
 

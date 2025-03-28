@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class CardVariation
 {
@@ -198,9 +199,32 @@ public static class PowerupCardData
         PlayerPrefs.Save();
     }
 
-    private static int[] cardRarities = { 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 2, 0, 1, 2, 2, 2, 1, 2, 2, 3, 3, 3, 0, 0, 0, 0, 1, 4, -1 };
-    //private static int[] cardRarities = { 0, 0, 0, 2, 2, 1, 1, 1, 0, 1, 1, 1, 2, 0, 1, 2, 2, 2, 1, 2, 2, 3, 3, 3, 0, 0, 0, 0, 1, 4, -1 };
+    private static int[] cardRarities = { 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 2, 2, 2, 1, 2, 2, 3, 3, 3, 1, 0, 0, 0, 1, 4, -1 };
     public static int GetCardRarity(int index) { return cardRarities[index]; }
+    public static int GetRandomCardOfRarity(int rarity)
+    {
+        // Create a list to store indices that match the requested rarity
+        List<int> matchingIndices = new List<int>();
+
+        // Loop through the cardRarities array to find matching indices
+        for (int i = 0; i < cardRarities.Length; i++)
+        {
+            if (cardRarities[i] == rarity)
+            {
+                matchingIndices.Add(i);
+            }
+        }
+
+        // If no matching indices were found, return 0 (plus one)
+        if (matchingIndices.Count == 0)
+        {
+            return 0;
+        }
+
+        // Return a random index from the matching indices list
+        int rand = Random.Range(0, matchingIndices.Count);
+        return matchingIndices[rand];
+    }
 
     public static int EncodeCard(int cardIndex, int rank, bool holo, int quantity)
     {
