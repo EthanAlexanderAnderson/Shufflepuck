@@ -258,7 +258,8 @@ public class PowerupManager : NetworkBehaviour
         Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
         for (int i = 0; i < 3; i++)
         {
-            if (Array.Exists(cost2Discard, x => x == hand[i]))
+            var decodedCard = PowerupCardData.DecodeCard(hand[i]);
+            if (Array.Exists(cost2Discard, x => x == decodedCard.cardIndex))
             {
                 powerupButtons[i].gameObject.GetComponent<Button>().interactable = false;
             }
@@ -271,7 +272,8 @@ public class PowerupManager : NetworkBehaviour
         Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
         for (int i = 0; i < 3; i++)
         {
-            if (costPucks.ContainsKey(hand[i]) && LogicScript.Instance.activeCompetitor.puckCount <= costPucks[hand[i]])
+            var decodedCard = PowerupCardData.DecodeCard(hand[i]);
+            if (costPucks.ContainsKey(decodedCard.cardIndex) && LogicScript.Instance.activeCompetitor.puckCount <= costPucks[decodedCard.cardIndex])
             {
                 powerupButtons[i].gameObject.GetComponent<Button>().interactable = false;
             }
@@ -713,10 +715,12 @@ public class PowerupManager : NetworkBehaviour
             // add the last played card 3 times
             for (int i = 0; i < 3; i++)
             {
+                Debug.Log(lastPlayedCard);
                 deck.Add(lastPlayedCard);
             }
         }
-        if (activeCompetitor.isPlayer && !chaosEnsuing) { lastPlayedCard = index; }
+        // set insanity as last played card AFTER it's effect is complete
+        if (activeCompetitor.isPlayer && !chaosEnsuing) { lastPlayedCard = PowerupCardData.EncodeCard(index, 0 , false, 0); }
     }
 
     public void TriplePowerup(int encodedCard) // index 21 : shoots 3 pucks instead of 1. (two additional pucks per instance of triple).
@@ -881,7 +885,7 @@ public class PowerupManager : NetworkBehaviour
             // set this powerup as the last played card, with an exception for insanity because it does this at the end of its execution
             if (index != Array.IndexOf(methodArray, InsanityPowerup))
             {
-                lastPlayedCard = index;
+                lastPlayedCard = encodedCard;
             }
             // if the played card costs 2 discards, discard the whole hand
             if (Array.Exists(cost2Discard, x => x == index) && !activeCompetitor.isOmniscient)
@@ -922,7 +926,8 @@ public class PowerupManager : NetworkBehaviour
         Button[] powerupButtons = { powerupButton1, powerupButton2, powerupButton3 };
         for (int i = 0; i < 3; i++)
         {
-            if (lastPlayedCard >= 0 && hand[i] == Array.IndexOf(methodArray, InsanityPowerup)) { powerupButtons[i].gameObject.GetComponent<Button>().interactable = true; }
+            var decodedCard = PowerupCardData.DecodeCard(hand[i]);
+            if (lastPlayedCard >= 0 && decodedCard.cardIndex == Array.IndexOf(methodArray, InsanityPowerup)) { powerupButtons[i].gameObject.GetComponent<Button>().interactable = true; }
         }
         // add the powerup animation to the animation queue
         PowerupAnimationManager.Instance.AddPowerupPopupEffectAnimationToQueue(encodedCard);
