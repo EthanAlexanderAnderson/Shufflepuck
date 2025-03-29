@@ -19,8 +19,11 @@ public class DailyChallengeManagerScript : MonoBehaviour
     [SerializeField] private TMP_Text challenge1Text;
     [SerializeField] private TMP_Text challenge2Text;
 
-    [SerializeField] private TMP_Text reward1Text;
-    [SerializeField] private TMP_Text reward2Text;
+    [SerializeField] private TMP_Text challenge1Reward1Text;
+    [SerializeField] private TMP_Text challenge1Reward2Text;
+
+    [SerializeField] private TMP_Text challenge2Reward1Text;
+    [SerializeField] private TMP_Text challenge2Reward2Text;
 
     [SerializeField] private Button claim1;
     [SerializeField] private Button claim2;
@@ -74,11 +77,24 @@ public class DailyChallengeManagerScript : MonoBehaviour
             PlayerPrefs.SetInt("DailyChallenge2", 0);
         }
 
+        challenge1Reward2Text.text = "";
+        List<string> easyRewardStrings = easyDailyChallenges[Mathf.Abs(DC1)].GetRewardStrings();
+        TMP_Text[] easyRewardTexts = { challenge1Reward1Text, challenge1Reward2Text };
+        for (int i = 0; i < easyRewardStrings.Count; i++)
+        {
+            easyRewardTexts[i].text = easyRewardStrings[i];
+        }
         challenge1Text.text = easyDailyChallenges[Mathf.Abs(DC1)].challengeText;
+
+        challenge2Reward2Text.text = "";
+        List<string> hardRewardStrings = hardDailyChallenges[Mathf.Abs(DC2)].GetRewardStrings();
+        TMP_Text[] hardRewardTexts = { challenge2Reward1Text, challenge2Reward2Text };
+        for (int i = 0; i < hardRewardStrings.Count; i++)
+        {
+            hardRewardTexts[i].text = hardRewardStrings[i];
+        }
         challenge2Text.text = hardDailyChallenges[Mathf.Abs(DC2)].challengeText;
-        // TODO: make this dynamic to support non-XP rewards on daily challenges
-        reward1Text.text = easyDailyChallenges[Mathf.Abs(DC1)].GetXPReward().ToString() + " XP";
-        reward2Text.text = hardDailyChallenges[Mathf.Abs(DC2)].GetXPReward().ToString() + " XP";
+
         if (levelManager == null)
         {
             levelManager = LevelManager.Instance;
@@ -165,6 +181,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
                     failsafe++;
                     if (failsafe >= 1000)
                     {
+                        Debug.Log("failsafe triggered");
                         selectedChallenge = easyDailyChallenges[1];
                     }
                 }
@@ -190,6 +207,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
                     failsafe++;
                     if (failsafe >= 1000)
                     {
+                        Debug.Log("failsafe triggered");
                         selectedChallenge = hardDailyChallenges[1];
                     }
                 }
@@ -278,7 +296,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         // Check if the reward is complete (negative value)
         if (DC1 < 0)
         {
-            try { levelManager.AddXP(easyDailyChallenges[Mathf.Abs(DC1)].GetXPReward()); } // add the reward to the player's XP
+            try { easyDailyChallenges[Mathf.Abs(DC1)].ClaimRewards(); } // add the reward to the player's XP
             catch (IndexOutOfRangeException e) { levelManager.AddXP(50); Debug.LogError(e); }
             Debug.Log("Claimed reward 1!");
             PlayerPrefs.SetInt("DailyChallenge1", 0); // 0 means the reward is claimed
@@ -295,7 +313,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         // Check if the reward is complete (negative value)
         if (DC2 < 0)
         {
-            try { levelManager.AddXP(hardDailyChallenges[Mathf.Abs(DC2)].GetXPReward()); } // add the reward to the player's XP
+            try { hardDailyChallenges[Mathf.Abs(DC2)].ClaimRewards(); } // add the reward to the player's XP
             catch (IndexOutOfRangeException e) { levelManager.AddXP(100); Debug.LogError(e); }
             Debug.Log("Claimed reward 2!");
             PlayerPrefs.SetInt("DailyChallenge2", 0); // 0 means the reward is claimed

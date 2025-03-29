@@ -25,7 +25,7 @@ public class PlinkoDropButtonScript : MonoBehaviour
     {
         previousDropsValue = -1;
         SetDropButtonText();
-        playerXPonEnable = PlayerPrefs.GetInt("XP");
+        (playerXPonEnable, _) = LevelManager.Instance.GetXPAndLevel();
         PuckManager.Instance.ClearAllPucks();
     }
 

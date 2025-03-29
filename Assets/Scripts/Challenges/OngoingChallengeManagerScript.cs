@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -18,7 +17,6 @@ public class OngoingChallengeManagerScript : MonoBehaviour
     [SerializeField] private TMP_Text rewardText1;
     [SerializeField] private TMP_Text rewardText2;
     [SerializeField] private TMP_Text rewardText3;
-    [SerializeField] private TMP_Text rewardText4;
     [SerializeField] private TMP_Text progressText;
     [SerializeField] private Button claim;
     [SerializeField] private GameObject glow;
@@ -71,8 +69,13 @@ public class OngoingChallengeManagerScript : MonoBehaviour
 
         challengeText.text = ongoingChallenges[Mathf.Abs(OC)].challengeText;
         progressText.text = Mathf.Abs(OC) + "/" + (numberOfOngoingChallenges - 1).ToString();
-        // TODO: make this dynamic to support non-XP rewards on challenges
-        rewardText1.text = ongoingChallenges[Mathf.Abs(OC)].GetXPReward().ToString() + " XP";
+
+        List<string> rewardStrings = ongoingChallenges[Mathf.Abs(OC)].GetRewardStrings();
+        TMP_Text[] rewardTexts = { rewardText1, rewardText2, rewardText3};
+        for (int i = 0; i < rewardStrings.Count; i++)
+        {
+            rewardTexts[i].text = rewardStrings[i];
+        }
 
         LevelManager.Instance.SetText();
     }
@@ -81,9 +84,17 @@ public class OngoingChallengeManagerScript : MonoBehaviour
     {
         int OC = PlayerPrefs.GetInt("OngoingChallenge", 1);
 
-        PlayerPrefs.SetInt("OngoingChallenge", (Mathf.Abs(OC) + 1));
-
-        Debug.Log($"New Ongoing Challenge assigned. " + PlayerPrefs.GetInt("OngoingChallenge", 1));
+        // assign next challenge & check its completion
+        OC = Mathf.Abs(OC) + 1;
+        if (ongoingChallenges[OC].CheckCompletion())
+        {
+            PlayerPrefs.SetInt("OngoingChallenge", -OC);
+        }
+        else
+        {
+            PlayerPrefs.SetInt("OngoingChallenge", OC);
+            Debug.Log($"New Ongoing Challenge assigned. " + PlayerPrefs.GetInt("OngoingChallenge", 1));
+        }
 
         SetText();
     }
@@ -99,8 +110,11 @@ public class OngoingChallengeManagerScript : MonoBehaviour
             PlayerPrefs.SetInt("OngoingChallenge", OC);
         }
 
+        // don't need to evaluate already-completed ongoing challenges
+        if (OC < 0) return;
+
         // Evalute condition is met
-        if (ongoingChallenges[OC].CheckCompletion(scoreDifference, (isOnline ? -1 : difficulty)))
+        if (ongoingChallenges[OC].CheckCompletion())
         {
             PlayerPrefs.SetInt("OngoingChallenge", -OC);
         }
@@ -119,11 +133,10 @@ public class OngoingChallengeManagerScript : MonoBehaviour
         if (OC < 0)
         {
             // Add rewards
-            LevelManager.Instance.AddXP(ongoingChallenges[Mathf.Abs(OC)].GetXPReward());
+            ongoingChallenges[Mathf.Abs(OC)].ClaimRewards();
 
             Debug.Log("Claimed ongoing reward!");
             AdvanceOngoingChallenge();
-            // TODO: evalute if challenge is complete here (combined highscore, win a match on easy, etc.)
             SetText();
             sound.PlayWinSFX();
         }

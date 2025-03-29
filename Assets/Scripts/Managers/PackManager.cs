@@ -4,6 +4,9 @@ using UnityEngine.UI;
 
 public class PackManager : MonoBehaviour
 {
+    // self
+    public static PackManager Instance;
+
     [SerializeField] private GameObject cardOpenPrefab;
 
     [SerializeField] private GameObject packParent;
@@ -16,6 +19,13 @@ public class PackManager : MonoBehaviour
     [SerializeField] private Button openOnePlusButton;
     [SerializeField] private Button openTenPlusButton;
 
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(Instance);
+    }
 
     private void OnEnable()
     {
@@ -34,6 +44,13 @@ public class PackManager : MonoBehaviour
 
         standardPackCountText.text = standardPackCount.ToString();
         plusPackCountText.text = plusPackCount.ToString();
+    }
+
+    public void RewardPacks(bool isPlus, int count)
+    {
+        string key = isPlus ? "PlusPacks" : "StandardPacks";
+        PlayerPrefs.SetInt(key, PlayerPrefs.GetInt(key) + count);
+        UpdatePackSreenUI();
     }
 
     public void OpenStandardOne()
@@ -217,9 +234,9 @@ public class PackManager : MonoBehaviour
         {
             return 1;
         }
-        else
+        else                                // Standard : 71 - 1000 : 929 in 1000 : 92.9%
         {
-            return 0;                        // Standard : 71 - 1000 : 929 in 1000 : 92.9%
+            return 0;
         }
     }
 

@@ -245,6 +245,22 @@ public class PlinkoManager : MonoBehaviour
     public void SideReward( Transform self )
     {
         // give the reward to the player
+        PackManager.Instance.RewardPacks(false, 1);
+
+        // SFX for auditory feedback
+        SoundManagerScript.Instance.PlayWinSFX();
+
+        // floating text for visual feedback
+        var floatingText = Instantiate(floatingTextPrefab, self.position, Quaternion.identity, transform);
+        floatingText.GetComponent<FloatingTextScript>().Initialize("+1 PACK", 0.5f, 15);
+
+        // add a drop if we leveled up
+        plinkoDropButton.GetComponent<PlinkoDropButtonScript>().SetDropButtonText();
+    }
+
+    public void BonusReward(Transform self)
+    {
+        // give the reward to the player
         LevelManager.Instance.AddXP(100);
 
         // SFX for auditory feedback
