@@ -71,6 +71,7 @@ public class PlinkoDropButtonScript : MonoBehaviour
         {
             var floatingText = Instantiate(floatingTextPrefab, transform.position + new Vector3(floatingTextLocation, 0, 0), Quaternion.identity, transform);
             floatingText.GetComponent<FloatingTextScript>().Initialize("+" + (drops - previousDropsValue).ToString(), 0.25f, 25);
+            PlinkoManager.Instance.UpdateSideBucketText();
         }
         previousDropsValue = drops;
     }

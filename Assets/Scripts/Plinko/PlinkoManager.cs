@@ -15,7 +15,9 @@ public class PlinkoManager : MonoBehaviour
     [SerializeField] private TMP_Text rewardText;
     [SerializeField] private TMP_Text countdownText;
     [SerializeField] private GameObject bonusBucketLeft;
+    [SerializeField] private TMP_Text bonusBucketLeftText;
     [SerializeField] private GameObject bonusBucketRight;
+    [SerializeField] private TMP_Text bonusBucketRightText;
     [SerializeField] private GameObject plinkoDropButton;
 
     // floating text
@@ -61,6 +63,7 @@ public class PlinkoManager : MonoBehaviour
             rewardImageAnimation.SetActive(PlinkoReward == 40);
         }
         rewardImage.enabled = PlinkoReward < 100; // reward image should be disabled if the reward is XP
+        UpdateSideBucketText();
     }
 
     // Update is called once per frame
@@ -195,6 +198,16 @@ public class PlinkoManager : MonoBehaviour
         }
     }
 
+    public void UpdateSideBucketText()
+    {
+        // get level for pack reward quantity
+        var (_, level) = LevelManager.Instance.GetXPAndLevel();
+
+        string text = level > 1 ? $"+{level} PACKS" : $"+{level} PACK";
+        bonusBucketLeftText.text = text;
+        bonusBucketRightText.text = text;
+    }
+
     public void MainReward( Transform self )
     {
         int plinkoreward = PlayerPrefs.GetInt("PlinkoReward");
@@ -239,15 +252,18 @@ public class PlinkoManager : MonoBehaviour
 
     public void SideReward( Transform self )
     {
+        // get level for pack reward quantity
+        var (_, level) = LevelManager.Instance.GetXPAndLevel();
+
         // give the reward to the player
-        PackManager.Instance.RewardPacks(false, 1);
+        PackManager.Instance.RewardPacks(false, level);
 
         // SFX for auditory feedback
         SoundManagerScript.Instance.PlayWinSFX();
 
         // floating text for visual feedback
         var floatingText = Instantiate(floatingTextPrefab, self.position, Quaternion.identity, transform);
-        floatingText.GetComponent<FloatingTextScript>().Initialize("+1 PACK", 0.5f, 15);
+        floatingText.GetComponent<FloatingTextScript>().Initialize(level > 1 ? $"+{level} PACKS" : $"+{level} PACK", 0.5f, 15);
 
         // add a drop if we leveled up
         plinkoDropButton.GetComponent<PlinkoDropButtonScript>().SetDropButtonText();
