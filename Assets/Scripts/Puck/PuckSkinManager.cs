@@ -195,10 +195,7 @@ public class PuckSkinManager : MonoBehaviour
         if (!unlockedPuckIDs.Contains(id))
         {
             unlockedPuckIDs.Add(id);
-            if (logic.playedAGame)
-            {
-                PlayerPrefs.SetInt("ShowNewSkinAlert", 1);
-            }
+            PlayerPrefs.SetInt("ShowNewSkinAlert", 1);
         }
     }
 

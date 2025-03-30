@@ -42,7 +42,6 @@ public class UIManagerScript : MonoBehaviour
     [SerializeField] private GameObject readyButton;
     [SerializeField] private GameObject screenLog;
     [SerializeField] private GameObject titleScreenBackground;
-    [SerializeField] private GameObject FPS30Button;
     [SerializeField] private GameObject puckAlert;
     [SerializeField] private GameObject profileAlert;
 
@@ -145,12 +144,9 @@ public class UIManagerScript : MonoBehaviour
         sound = SoundManagerScript.Instance;
         dailyChallenge = DailyChallengeManagerScript.Instance;
 
-        // TODO: This is duplicate from TitleScreenScript, remove one of them
-        puckAlert.SetActive(PlayerPrefs.GetInt("ShowNewSkinAlert", 0) == 1);
-        profileAlert.SetActive(PlayerPrefs.GetInt("DailyChallenge1", 0) < 0 || PlayerPrefs.GetInt("DailyChallenge2", 0) < 0 || PlayerPrefs.GetInt("OngoingChallenge", 0) < 0);
-
         puckScreen.SetActive(true);
         UpdateLocks();
+        PlayerPrefs.SetInt("ShowNewSkinAlert", 0);
         puckScreen.SetActive(false);
         if (!PlayerPrefs.HasKey("DailyChallenge1")) { PlayerPrefs.SetInt("DailyChallenge1", 1); }
         if (!PlayerPrefs.HasKey("DailyChallenge2")) { PlayerPrefs.SetInt("DailyChallenge2", 1); }
@@ -540,7 +536,6 @@ public class UIManagerScript : MonoBehaviour
         newUI.SetActive(true);
         activeUI = newUI;
         SetErrorMessage("");
-        UpdateLocks();
         if (newUI == gameHud)
         {
             ResetHUD();

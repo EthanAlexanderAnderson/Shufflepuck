@@ -3,6 +3,7 @@ using UnityEngine;
 public class RewardsScreenScript : MonoBehaviour
 {
     public GameObject plinkoAlert;
+    public GameObject packAlert;
 
     private void OnEnable()
     {
@@ -17,5 +18,6 @@ public class RewardsScreenScript : MonoBehaviour
         string unlockedRewardKey = "puck" + plinkoReward.ToString() + "unlocked";
         bool unlockedReward = PlayerPrefs.GetInt(unlockedRewardKey, 0) == 1;
         plinkoAlert.SetActive(PlayerPrefs.GetInt("PlinkoPegsDropped", 0) < level && !unlockedReward);
+        packAlert.SetActive(PlayerPrefs.GetInt("StandardPacks", 0) > 0 || PlayerPrefs.GetInt("PlusPacks", 0) > 0);
     }
 }
