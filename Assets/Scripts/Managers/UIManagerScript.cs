@@ -148,6 +148,9 @@ public class UIManagerScript : MonoBehaviour
         UpdateLocks();
         PlayerPrefs.SetInt("ShowNewSkinAlert", 0);
         puckScreen.SetActive(false);
+        plinkoScreen.SetActive(true);
+        PlinkoManager.Instance.CheckForNewDailyPlinkoReward();
+        plinkoScreen.SetActive(false);
         if (!PlayerPrefs.HasKey("DailyChallenge1")) { PlayerPrefs.SetInt("DailyChallenge1", 1); }
         if (!PlayerPrefs.HasKey("DailyChallenge2")) { PlayerPrefs.SetInt("DailyChallenge2", 1); }
 

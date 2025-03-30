@@ -46,13 +46,6 @@ public class PlinkoManager : MonoBehaviour
             Destroy(Instance);
     }
 
-    private void Start()
-    {
-        CheckForNewDailyPlinkoReward();
-
-        TitleScreenScript.Instance.UpdateAlerts();
-    }
-
     private void OnEnable()
     {
         int PlinkoReward = PlayerPrefs.GetInt("PlinkoReward", 100);
@@ -97,7 +90,7 @@ public class PlinkoManager : MonoBehaviour
         }
     }
 
-    private void CheckForNewDailyPlinkoReward()
+    public void CheckForNewDailyPlinkoReward()
     {
         // Get the last saved date or use a default if it's the first time
         string lastSavedDate = PlayerPrefs.GetString("LastPlinkoRewardDate", string.Empty);
@@ -139,6 +132,8 @@ public class PlinkoManager : MonoBehaviour
             bonusBucketRight.SetActive(true);
             Debug.Log("Remaining Welcome Bonus Days: " + PlayerPrefs.GetInt("WelcomeBonus"));
         }
+
+        TitleScreenScript.Instance.UpdateAlerts();
     }
 
     private void AssignNewPlinkoReward()
