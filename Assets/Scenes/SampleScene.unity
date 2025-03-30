@@ -11948,6 +11948,7 @@ MonoBehaviour:
   openTenStandardButton: {fileID: 1878691392}
   openOnePlusButton: {fileID: 2146115831}
   openTenPlusButton: {fileID: 894742025}
+  bottomText: {fileID: 1893735861}
 --- !u!4 &188209707
 Transform:
   m_ObjectHideFlags: 0
@@ -138574,7 +138575,7 @@ GameObject:
   - component: {fileID: 1893735862}
   - component: {fileID: 1893735861}
   m_Layer: 5
-  m_Name: tap to open text
+  m_Name: Bottom text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

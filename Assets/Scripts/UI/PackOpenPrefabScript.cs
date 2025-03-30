@@ -59,15 +59,22 @@ public class PackOpenPrefabScript : MonoBehaviour
         PowerupPopupPrefabScript powerupPopupScript = powerupPopupObject.GetComponent<PowerupPopupPrefabScript>();
         powerupPopupScript.InitializePowerupPopup(cardIndex, rank, holo);
         powerupPopupScript.Animate();
+        PackManager.Instance.ShowBottomText();
     }
 
+    private int[] rarityBaseDupeCreditReward = new int[] { 1, 2, 5, 10, 25 };
+    private int[] rankMultDupeCreditReward = new int[] { 1, 25, 50, 100, 1000 };
     public void InitializePackOpen(int cardIndex, int rank, bool holo)
     {
         targetClicks = PowerupCardData.GetCardRarity(cardIndex);
         this.cardIndex = cardIndex;
         this.rank = rank;
         this.holo = holo;
-        PowerupCardData.AddCardToCollection(cardIndex, rank, holo);
+        if (PowerupCardData.AddCardToCollection(cardIndex, rank, holo))
+        {
+            int creditReward = rarityBaseDupeCreditReward[PowerupCardData.GetCardRarity(cardIndex)] * rankMultDupeCreditReward[rank] * (holo ? 10 : 1);
+            PackManager.Instance.RewardCraftingCredits(creditReward);
+        }
     }
 
     private Color GetRarityColor()

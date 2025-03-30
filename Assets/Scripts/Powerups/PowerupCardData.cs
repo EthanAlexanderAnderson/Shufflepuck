@@ -150,9 +150,12 @@ public static class PowerupCardData
     }
 
     // return success (if fail because over max count, reimburse with more credits)
-    public static void AddCardToCollection(int cardIndex, int rank = 0, bool holo = false, int count = 1)
+    public static bool AddCardToCollection(int cardIndex, int rank = 0, bool holo = false, int count = 1)
     {
-        if (cardIndex < 0) { return; }
+        if (cardIndex < 0) { return false; }
+
+        // return value : if the card is a duplicate, for rewarding crafting credits
+        bool duplicate = false;
 
         // Get the current collection string
         string collectionString = PlayerPrefs.GetString("CardCollection", "");
@@ -180,6 +183,8 @@ public static class PowerupCardData
                         cardEncoded[i] = EncodeCard(cardIndex, rank, holo, updatedQuantity).ToString();
                         cardFound = true;
                     }
+
+                    duplicate = true;
                     break;
                 }
             }
@@ -197,6 +202,8 @@ public static class PowerupCardData
 
         PlayerPrefs.SetString("CardCollection", updatedCollectionString);
         PlayerPrefs.Save();
+
+        return duplicate;
     }
 
     private static int[] cardRarities = { 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 2, 2, 2, 1, 2, 2, 3, 3, 3, 1, 0, 0, 0, 1, 4, -1 };

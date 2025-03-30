@@ -19,6 +19,8 @@ public class PackManager : MonoBehaviour
     [SerializeField] private Button openOnePlusButton;
     [SerializeField] private Button openTenPlusButton;
 
+    [SerializeField] private TMP_Text bottomText;
+
     private void Awake()
     {
         if (Instance == null)
@@ -44,6 +46,10 @@ public class PackManager : MonoBehaviour
 
         standardPackCountText.text = standardPackCount.ToString();
         plusPackCountText.text = plusPackCount.ToString();
+
+        bottomText.text = "tap to open!";
+        dupeCreditReward = 0;
+        opened = 0;
     }
 
     public void RewardPacks(bool isPlus, int count)
@@ -51,6 +57,24 @@ public class PackManager : MonoBehaviour
         string key = isPlus ? "PlusPacks" : "StandardPacks";
         PlayerPrefs.SetInt(key, PlayerPrefs.GetInt(key) + count);
         UpdatePackSreenUI();
+    }
+
+    private int dupeCreditReward;
+    public void RewardCraftingCredits(int credits)
+    {
+        PlayerPrefs.SetInt("CraftingCredits", PlayerPrefs.GetInt("CraftingCredits") + credits);
+        dupeCreditReward += credits;
+    }
+
+    private int opened;
+    private int targetOpened;
+    public void ShowBottomText()
+    {
+        opened++;
+        if (opened >= targetOpened)
+        {
+            bottomText.text = dupeCreditReward > 0 ? ("+" + dupeCreditReward.ToString() + " credits") : "";
+        }
     }
 
     public void OpenStandardOne()
@@ -65,13 +89,13 @@ public class PackManager : MonoBehaviour
 
         // consume pack
         PlayerPrefs.SetInt("StandardPacks", standardPackCount - 1);
+        UpdatePackSreenUI();
 
         // open the pack
         GameObject pack = Instantiate(cardOpenPrefab, packParent.transform);
         pack.transform.localScale = new Vector3(3f, 3f, 3f);
         pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(RollRarity(), RollRankStandard(), Random.Range(0, 100) < 5);
-
-        UpdatePackSreenUI();
+        targetOpened = 1;
     }
 
     public void OpenStandardTen()
@@ -86,6 +110,7 @@ public class PackManager : MonoBehaviour
 
         // consume pack
         PlayerPrefs.SetInt("StandardPacks", standardPackCount - 10);
+        UpdatePackSreenUI();
 
         // god pack chance
         bool godpack = false;
@@ -115,8 +140,7 @@ public class PackManager : MonoBehaviour
 
             pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(RollRarity(), RollRankStandard(), (Random.Range(0, 100) < 5) || godpack);
         }
-
-        UpdatePackSreenUI();
+        targetOpened = 10;
     }
 
     public void OpenPlusOne()
@@ -131,12 +155,12 @@ public class PackManager : MonoBehaviour
 
         // consume pack
         PlayerPrefs.SetInt("PlusPacks", plusPackCount - 1);
+        UpdatePackSreenUI();
 
         GameObject pack = Instantiate(cardOpenPrefab, packParent.transform);
         pack.transform.localScale = new Vector3(3f, 3f, 3f);
         pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(RollRarity(), RollRankPlus(), Random.Range(0, 100) < 25);
-
-        UpdatePackSreenUI();
+        targetOpened = 1;
     }
 
     public void OpenPlusTen()
@@ -151,6 +175,7 @@ public class PackManager : MonoBehaviour
 
         // consume pack
         PlayerPrefs.SetInt("PlusPacks", plusPackCount - 10);
+        UpdatePackSreenUI();
 
         // god pack chance
         bool godpack = false;
@@ -180,8 +205,7 @@ public class PackManager : MonoBehaviour
 
             pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(RollRarity(), RollRankPlus(), (Random.Range(0, 100) < 25) || godpack);
         }
-
-        UpdatePackSreenUI();
+        targetOpened = 10;
     }
 
     private int RollRarity()
@@ -271,4 +295,9 @@ public class PackManager : MonoBehaviour
             Destroy(child.gameObject);
         }
     }
+    /*
+    public void ResetBottomText()
+    {
+        bottomText.text = "tap to open!";
+    }*/
 }

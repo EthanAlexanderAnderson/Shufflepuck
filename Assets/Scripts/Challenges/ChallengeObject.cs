@@ -44,7 +44,7 @@ public class Challenge
             }
             else if (reward.type == RewardType.CraftingCredits)
             {
-                PlayerPrefs.SetInt("CraftingCredits", PlayerPrefs.GetInt("CraftingCredits") + reward.amount);
+                PackManager.Instance.RewardCraftingCredits(reward.amount);
             }
         }
     }
