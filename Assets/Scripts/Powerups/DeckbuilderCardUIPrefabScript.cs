@@ -19,9 +19,6 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
     private int[] inDeckCounts;  // how many of each variation do we have in deck currently, parallel to ownedCardVariationList
     private int maxCount;  // how many are we allowed to have in deck
 
-    private int[] rankToCraftCosts = new int[] { 10, 100, 200, 400, int.MaxValue };
-
-
     // --- HEADER
     [SerializeField] private GameObject header;
     [SerializeField] private GameObject minusButtonObject;
@@ -78,7 +75,11 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
     [SerializeField] private TMP_Text ownedCount2;
     [SerializeField] private Image craftArrow2;
     [SerializeField] private TMP_Text craftCount2;
-    [SerializeField] private Image craftCreditsImage2;
+    [SerializeField] private GameObject craftCreditsImage2;
+
+    private int[] rarityBaseCraftCosts = new int[] { 10, 20, 35, 75, 175 };
+    private int[] rankBaseCraftCosts = new int[] { 1, 25, 2, 2, 10 };
+    private string[] rankCraftNames = new string[] { "Standard", "Bronze", "Gold", "Diamond", "Celestial" };
 
     private int toCraftCount;
 
@@ -140,7 +141,7 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
         cardNameText.text = PowerupManager.Instance.powerupTexts[cardIndex];
         cardImageSprite = PowerupManager.Instance.powerupSprites[cardIndex];
 
-        // TODO: make crafting re-enable these
+        // TODO: make crafting a new card re-enable these (this is not possible right now but might be later)
         if (!anyOwned)
         {
             minusButtonObject.SetActive(false);
@@ -165,13 +166,13 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
             ownedCardVariationList = new();
             ownedCardVariationList.Add(new CardVariation(0, false, 0));
         }
-        // TODO: crafting should update totalOwned
         totalOwned = ownedCardVariationList.Sum(card => card.count);
         inDeckCounts = new int[ownedCardVariationList.Count];
 
         // load crafting data
         craftingCredits = PlayerPrefs.GetInt("CraftingCredits");
         ownedCount2.text = craftingCredits.ToString();
+        craftCreditsImage2.GetComponent<Image>().color = UIManagerScript.Instance.GetDarkMode() ? new Color(1f, 1f, 1f, 1f) : new Color(0f, 0f, 0f, 1f);
 
         // load indeck card data 
         if (anyOwned)
@@ -188,6 +189,7 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
             UpdateSelectedCardVariationIndex();
             UpdateRankUI();
             UpdateMinusAndPlusUIButtonInteractability();
+            UpdateCraftUI();
         }
     }
 
@@ -430,6 +432,7 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
 
         // reset crafting
         toCraftCount = 0;
+        UpdateCraftUI();
     }
 
     // CRAFTING
@@ -459,6 +462,9 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
             craftArrow2.enabled = false;
             craftCount1.text = "";
             craftCount2.text = "";
+            ownedText2.text = "";
+            ownedCount2.text = "";
+            craftCreditsImage2.SetActive(false);
 
             // buttons
             craftMinusButton.interactable = false;
@@ -466,20 +472,87 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
             craftPlusButton.interactable = false;
             return;
         }
+        int selectedCardRank = ownedCardVariationList[selectedCardVariationIndex].rank;
 
-        int craftCost = rankToCraftCosts[ownedCardVariationList[selectedCardVariationIndex].rank];
+        int craftCost = selectedCardRank > 0 ? rankBaseCraftCosts[selectedCardRank] : rarityBaseCraftCosts[PowerupCardData.GetCardRarity(cardIndex)];
+
+        int selectedCurrency = selectedCardRank > 0 ? PowerupCardData.GetCardOwnedCount(cardIndex, selectedCardRank - 1, false) : craftingCredits;
 
         // text
+        ownedCount1.text = ownedCardVariationList[selectedCardVariationIndex].count.ToString();
+        ownedCount2.text = selectedCurrency.ToString();
+        ownedText2.text = selectedCardRank > 0 ? rankCraftNames[selectedCardRank - 1] + ":" : "";
+        craftCreditsImage2.SetActive(selectedCardRank == 0);
         craftArrow1.enabled = (toCraftCount > 0);
         craftArrow2.enabled = (toCraftCount > 0);
         craftCount1.text = (toCraftCount > 0) ? (ownedCardVariationList[selectedCardVariationIndex].count + toCraftCount).ToString() : "";
-        int remainingCredits = (craftingCredits - craftCost * toCraftCount);
+        int remainingCredits = (selectedCurrency - craftCost * toCraftCount);
         craftCount2.text = (toCraftCount > 0) ? remainingCredits.ToString() : "";
 
         // buttons
         craftMinusButton.interactable = (toCraftCount > 0);
-        craftConfirmButton.interactable = (toCraftCount > 0 && remainingCredits > 0);
-        craftPlusButton.interactable = ((remainingCredits - craftCost) > 0 && craftCost > 0);
+        craftConfirmButton.interactable = (toCraftCount > 0 && remainingCredits >= 0);
+        craftPlusButton.interactable = ((remainingCredits - craftCost) >= 0 && craftCost > 0);
+    }
+
+    public void ConfirmCraft()
+    {
+        int selectedCardRank = ownedCardVariationList[selectedCardVariationIndex].rank;
+        int craftCost = selectedCardRank > 0 ? rankBaseCraftCosts[selectedCardRank] : rarityBaseCraftCosts[PowerupCardData.GetCardRarity(cardIndex)];
+
+        // crafting gold, diamond, celestial
+        if (selectedCardRank > 0)
+        {
+            int oldCurrencyRankCount = PowerupCardData.GetCardOwnedCount(cardIndex, selectedCardRank - 1, false);
+            int newCurrencyRankCount = (oldCurrencyRankCount - craftCost * toCraftCount);
+            if (newCurrencyRankCount >= 0)
+            {
+                if (newCurrencyRankCount < DeckManager.Instance.GetInDeckCount(cardIndex, selectedCardRank - 1, false))
+                {
+                    UIManagerScript.Instance.SetErrorMessage("Can't craft with card in deck. Remove them and try again.");
+                    return;
+                }
+                // remove (add negative) of currency rank (previous rank)
+                PowerupCardData.AddCardToCollection(cardIndex, selectedCardRank - 1, false, -(craftCost * toCraftCount));
+                // add crafted rank
+                PowerupCardData.AddCardToCollection(cardIndex, selectedCardRank, false, toCraftCount);
+                // update list
+                for (int i = 0; i < ownedCardVariationList.Count; i++)
+                {
+                    if (ownedCardVariationList[i].rank == selectedCardRank - 1 && !ownedCardVariationList[i].holo)
+                    {
+                        ownedCardVariationList[i].count = newCurrencyRankCount;
+                    }
+                    else if (ownedCardVariationList[i].rank == selectedCardRank && !ownedCardVariationList[i].holo)
+                    {
+                        ownedCardVariationList[i].count += toCraftCount;
+                    }
+                }
+            }
+        }
+        // crafting standard with credits
+        else if (selectedCardRank == 0)
+        {
+            int newCraftingCredits = (craftingCredits - craftCost * toCraftCount);
+            if (newCraftingCredits >= 0)
+            {
+                craftingCredits = newCraftingCredits;
+                PlayerPrefs.SetInt("CraftingCredits", craftingCredits);
+                PowerupCardData.AddCardToCollection(cardIndex, 0, false, toCraftCount);
+                // update list
+                for (int i = 0; i < ownedCardVariationList.Count; i++)
+                {
+                    if (ownedCardVariationList[i].rank == 0 && !ownedCardVariationList[i].holo)
+                    {
+                        ownedCardVariationList[i].count += toCraftCount;
+                    }
+                }
+            }
+        }
+
+        toCraftCount = 0;
+        totalOwned = ownedCardVariationList.Sum(card => card.count);
+        UpdateCraftUI();
     }
 
     private void UpdateSelectedCardVariationIndex()

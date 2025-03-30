@@ -539,6 +539,7 @@ public class UIManagerScript : MonoBehaviour
         newUI.SetActive(true);
         activeUI = newUI;
         SetErrorMessage("");
+        UpdateLocks(); // for non-puck locks (difficulty locks)
         if (newUI == gameHud)
         {
             ResetHUD();

@@ -21309,7 +21309,7 @@ MonoBehaviour:
   ownedCount2: {fileID: 2945390077475472030}
   craftArrow2: {fileID: 965854258122593551}
   craftCount2: {fileID: 7862627926823218222}
-  craftCreditsImage2: {fileID: 766776346941424507}
+  craftCreditsImage2: {fileID: 7994134915751882150}
   expandCollapseObject: {fileID: 6821323226540981879}
   expandSprite: {fileID: 21300000, guid: 3c276f22906da0b47921671c70efe073, type: 3}
   collapseSprite: {fileID: 21300000, guid: 410e97ff602502f4680ff6e4150788a2, type: 3}
@@ -43618,7 +43618,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1831766196962816343}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1236977793237508817}
+        m_TargetAssemblyTypeName: DeckbuilderCardUIPrefabScript, Assembly-CSharp
+        m_MethodName: ConfirmCraft
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &8986028626387790436
 GameObject:
   m_ObjectHideFlags: 0
