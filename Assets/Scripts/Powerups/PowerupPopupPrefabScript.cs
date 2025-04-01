@@ -15,6 +15,10 @@ public class PowerupPopupPrefabScript : MonoBehaviour
     [SerializeField] private GameObject holoParent;
 
     [SerializeField] private GameObject rankParticleSystemObject;
+    [SerializeField] private ParticleSystem rankParticleSystemOngoing;
+    [SerializeField] private ParticleSystem rankParticleSystemBurst;
+    private ParticleSystem.MainModule rankParticleSystemOngoingMain;
+    private ParticleSystem.MainModule rankParticleSystemBurstMain;
     [SerializeField] private GameObject shineIconObject;
     [SerializeField] private GameObject shineTextObject;
 
@@ -62,6 +66,8 @@ public class PowerupPopupPrefabScript : MonoBehaviour
         }
 
         // Rank & Holo
+        rankParticleSystemOngoingMain = rankParticleSystemOngoing.main;
+        rankParticleSystemBurstMain = rankParticleSystemBurst.main;
         SetRank(rank);
         holoParent.SetActive(holo);
         cardIconOutlineObject.SetActive(holo);
@@ -76,6 +82,7 @@ public class PowerupPopupPrefabScript : MonoBehaviour
         LeanTween.scale(cardRarityObject, new Vector3(1f, 1f, 1f), 0.5f).setEase(LeanTweenType.easeOutElastic).setDelay(0.4f);
     }
 
+    // TODO: get feedback on rank colors
     private void SetRank(int rank)
     {
         switch (rank)
@@ -83,20 +90,30 @@ public class PowerupPopupPrefabScript : MonoBehaviour
             case 1:
                 cardIcon.color = new Color(0.9f, 0.4f, 0f, 1f);
                 cardText.color = new Color(0.9f, 0.4f, 0f, 1f);
+                rankParticleSystemOngoingMain.startColor = new Color(1f, 0.35f, 0f, 1f);
+                rankParticleSystemBurstMain.startColor = new Color(1f, 0.35f, 0f, 1f);
                 break;
             case 2:
                 cardIcon.color = new Color(0.95f, 0.7f, 0f, 1f);
                 cardText.color = new Color(0.95f, 0.7f, 0f, 1f);
+                rankParticleSystemOngoingMain.startColor = new Color(0.9f, 0.7f, 0f, 1f);
+                rankParticleSystemBurstMain.startColor = new Color(0.9f, 0.7f, 0f, 1f);
                 break;
             case 3:
                 cardIcon.color = new Color(0f, 1f, 1f, 1f);
                 cardText.color = new Color(0f, 1f, 1f, 1f);
+                rankParticleSystemOngoingMain.startColor = new Color(0f, 1f, 1f, 1f);
+                rankParticleSystemBurstMain.startColor = new Color(0f, 1f, 1f, 1f);
                 break;
             case 4:
                 cardIcon.color = new Color(1f, 0f, 1f, 1f);
                 cardText.color = new Color(1f, 0f, 1f, 1f);
+                rankParticleSystemOngoingMain.startColor = new Color(1f, 0f, 1f, 1f);
+                rankParticleSystemBurstMain.startColor = new Color(1f, 0f, 1f, 1f);
                 break;
             default:
+                //cardIcon.color = new Color(1f, 1f, 1f, 1f);
+                //cardText.color = new Color(1f, 1f, 1f, 1f);
                 cardIcon.color = UIManagerScript.Instance.GetDarkMode() ? new Color(1f, 1f, 1f, 1f) : new Color(0f, 0f, 0f, 1f);
                 cardText.color = UIManagerScript.Instance.GetDarkMode() ? new Color(1f, 1f, 1f, 1f) : new Color(0f, 0f, 0f, 1f);
                 break;

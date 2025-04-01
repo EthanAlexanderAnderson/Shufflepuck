@@ -82,15 +82,16 @@ public class PackOpenPrefabScript : MonoBehaviour
         switch (clicks)
         {
             case 1:
-                return(new Color(0.4862745f, 0.7725491f, 0.4627451f));
+                return new Color(0.4862745f, 0.7725491f, 0.4627451f);
             case 2:
-                return (new Color(0.0000000f, 0.7490196f, 0.9529412f));
+                return new Color(0.0000000f, 0.7490196f, 0.9529412f);
             case 3:
-                return (new Color(0.5215687f, 0.3764706f, 0.6588235f));
+                return new Color(0.5215687f, 0.3764706f, 0.6588235f);
             case 4:
-                return (new Color(1.0000000f, 0.9607844f, 0.4078432f));
+                return new Color(1.0000000f, 0.9607844f, 0.4078432f);
             default:
-                return (new Color(1f, 1f, 1f, 1f));
+                //return new Color(1f, 1f, 1f, 1f);
+                return UIManagerScript.Instance.GetDarkMode() ? new Color(1f, 1f, 1f, 1f) : new Color(0f, 0f, 0f, 1f);
         }
     }
 
