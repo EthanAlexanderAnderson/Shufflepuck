@@ -25,13 +25,16 @@ public class DeckScreenScript : MonoBehaviour
             inDeck[decodedCard.cardIndex] = true;
         }
 
-        // load in deck
-        for (int i = 0; i < count; i++)
+        // load in deck, sorted by rarity ascending
+        for (int r = 0; r < 5; r++)
         {
-            if (PowerupCardData.GetCardName(i) == null) continue;
-            if (!inDeck[i]) continue;
-            GameObject cardUI = Instantiate(cardUIPrefab, deckMenuScrollView.transform);
-            cardUI.GetComponent<DeckbuilderCardUIPrefabScript>().InitializeDeckbuilderCardUI(i, deckMenuScrollView, true);
+            for (int i = 0; i < count; i++)
+            {
+                if (PowerupCardData.GetCardName(i) == null || PowerupCardData.GetCardRarity(i) != r) continue;
+                if (!inDeck[i]) continue;
+                GameObject cardUI = Instantiate(cardUIPrefab, deckMenuScrollView.transform);
+                cardUI.GetComponent<DeckbuilderCardUIPrefabScript>().InitializeDeckbuilderCardUI(i, deckMenuScrollView, true);
+            }
         }
 
         // collection divider
@@ -45,30 +48,36 @@ public class DeckScreenScript : MonoBehaviour
             owned[i] = sums[i] > 0;
         }
 
-        // load owned
-        for (int i = 0; i < count; i++)
+        // load owned, sorted by rarity ascending
+        for (int r = 0; r < 5; r++)
         {
-            if (PowerupCardData.GetCardName(i) == null) continue;
-            if (!owned[i] || inDeck[i]) continue;
-            GameObject cardUI = Instantiate(cardUIPrefab, deckMenuScrollView.transform);
-            cardUI.GetComponent<DeckbuilderCardUIPrefabScript>().InitializeDeckbuilderCardUI(i, deckMenuScrollView, true);
+            for (int i = 0; i < count; i++)
+            {
+                if (PowerupCardData.GetCardName(i) == null || PowerupCardData.GetCardRarity(i) != r) continue;
+                if (!owned[i] || inDeck[i]) continue;
+                GameObject cardUI = Instantiate(cardUIPrefab, deckMenuScrollView.transform);
+                cardUI.GetComponent<DeckbuilderCardUIPrefabScript>().InitializeDeckbuilderCardUI(i, deckMenuScrollView, true);
+            }
         }
 
         // undiscovered divider
         GameObject cardUIUndiscoveredDivider = Instantiate(cardUIPrefab, deckMenuScrollView.transform);
         cardUIUndiscoveredDivider.GetComponent<DeckbuilderCardUIPrefabScript>().InitializeDeckbuilderCardUI(-3, deckMenuScrollView);
 
-        // load not owned
-        for (int i = 0; i < count; i++)
+        // load not owned, sorted by rarity ascending
+        for (int r = 0; r < 5; r++)
         {
-            if (PowerupCardData.GetCardName(i) == null) continue;
-            if (owned[i]) continue;
-            GameObject cardUI = Instantiate(cardUIPrefab, deckMenuScrollView.transform);
-            cardUI.GetComponent<DeckbuilderCardUIPrefabScript>().InitializeDeckbuilderCardUI(i, deckMenuScrollView, false);
+            for (int i = 0; i < count; i++)
+            {
+                if (PowerupCardData.GetCardName(i) == null || PowerupCardData.GetCardRarity(i) != r) continue;
+                if (owned[i]) continue;
+                GameObject cardUI = Instantiate(cardUIPrefab, deckMenuScrollView.transform);
+                cardUI.GetComponent<DeckbuilderCardUIPrefabScript>().InitializeDeckbuilderCardUI(i, deckMenuScrollView, false);
+            }
         }
 
-        // no idea why the y pos here is that magic number, it works tho
-        deckMenuScrollView.transform.localPosition = new Vector3(0, -4100, 0);
+            // no idea why the y pos here is that magic number, it works tho
+            deckMenuScrollView.transform.localPosition = new Vector3(0, -4100, 0);
         DeckManager.Instance.UpdateTotalDeckCountUI();
         UIManagerScript.Instance.ApplyDarkMode();
     }

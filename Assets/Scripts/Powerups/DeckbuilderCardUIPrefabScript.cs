@@ -31,6 +31,10 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
 
     [SerializeField] private TMP_Text countText;
 
+    // --- RARITY
+    [SerializeField] private Image cardRarityIcon;
+    [SerializeField] private Sprite[] rarityIcons = new Sprite[5];
+
 
     // --- BODY
     [SerializeField] private GameObject body;
@@ -56,7 +60,6 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
 
     [SerializeField] private Button previousRankButton;
     [SerializeField] private Button nextRankButton;
-
 
     // --- CRAFTING
     [SerializeField] private GameObject craftingParent;
@@ -140,6 +143,10 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
         cardIcon.sprite = PowerupManager.Instance.powerupIcons[cardIndex];
         cardNameText.text = PowerupManager.Instance.powerupTexts[cardIndex];
         cardImageSprite = PowerupManager.Instance.powerupSprites[cardIndex];
+        int rarity = PowerupCardData.GetCardRarity(cardIndex);
+        cardRarityIcon.enabled = true;
+        cardRarityIcon.sprite = rarityIcons[rarity];
+        if (rarity == 0) { cardRarityIcon.color = UIManagerScript.Instance.GetDarkMode() ? new Color(1f, 1f, 1f, 1f) : new Color(0f, 0f, 0f, 1f); }
 
         // TODO: make crafting a new card re-enable these (this is not possible right now but might be later)
         if (!anyOwned)
