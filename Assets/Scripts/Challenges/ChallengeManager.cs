@@ -551,7 +551,7 @@ public class ChallengeManager : MonoBehaviour
         challengeData.ongoingChallenges.Add(new Challenge
         {
             challengeText = "No ongoing quests remaining",
-            condition = new BeatByCondition { winByTargetPoints = 99999999, difficultyLevel = 3 },
+            condition = new MatchesCondition { targetMacthes = int.MaxValue, matchResult = "Win", difficultyLevel = -1 },
             rewards = new List<Reward> { }
         });
 

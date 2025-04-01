@@ -17,9 +17,13 @@ public class OngoingChallengeManagerScript : MonoBehaviour
     [SerializeField] private TMP_Text rewardText1;
     [SerializeField] private TMP_Text rewardText2;
     [SerializeField] private TMP_Text rewardText3;
-    [SerializeField] private TMP_Text progressText;
+    [SerializeField] private TMP_Text allQuestsProgressText; // how many ongoing quests have been completed & how many are left
     [SerializeField] private Button claim;
     [SerializeField] private GameObject glow;
+    // our progress into completing the current quest
+    [SerializeField] private Slider progressBar;
+    [SerializeField] private TMP_Text progressText;
+
 
     List<Challenge> ongoingChallenges;
     int numberOfOngoingChallenges;
@@ -45,9 +49,20 @@ public class OngoingChallengeManagerScript : MonoBehaviour
 
         int OC = PlayerPrefs.GetInt("OngoingChallenge", 1);
 
+        // if uncompleted
+        if (OC > 0)
+        {
+            // retroactively complete the challenge
+            if (ongoingChallenges[OC].CheckCompletion())
+            {
+                PlayerPrefs.SetInt("OngoingChallenge", -OC);
+                OC *= -1;
+            }
+        }
+
         // if the challenge is completed, the value is negative
         claim.interactable = OC < 0;
-        glow.SetActive(claim.interactable);
+        glow.SetActive(OC < 0);
 
         // assert the challenge ID is within range, prevent index error
         if (OC >= numberOfOngoingChallenges || OC <= (numberOfOngoingChallenges * -1))
@@ -67,14 +82,29 @@ public class OngoingChallengeManagerScript : MonoBehaviour
             }
         }
 
+        // set description
         challengeText.text = ongoingChallenges[Mathf.Abs(OC)].challengeText;
-        progressText.text = Mathf.Abs(OC) + "/" + (numberOfOngoingChallenges - 1).ToString();
+        allQuestsProgressText.text = Mathf.Abs(OC) + "/" + (numberOfOngoingChallenges - 1).ToString();
 
+        // set rewards
         List<string> rewardStrings = ongoingChallenges[Mathf.Abs(OC)].GetRewardStrings();
         TMP_Text[] rewardTexts = { rewardText1, rewardText2, rewardText3};
         for (int i = 0; i < rewardStrings.Count; i++)
         {
             rewardTexts[i].text = rewardStrings[i];
+        }
+
+        // progress bar
+        var (num, dem) = ongoingChallenges[Mathf.Abs(OC)].GetVariables();
+        if (dem != int.MaxValue)
+        {
+            progressBar.value = ongoingChallenges[Mathf.Abs(OC)].GetProgress() * 100f;
+            progressText.text = $"{num}/{dem}";
+        }
+        else // this is just for the final "no challenges remaing" challenge
+        {
+            progressBar.value = 100;
+            progressText.text = "";
         }
 
         LevelManager.Instance.SetText();

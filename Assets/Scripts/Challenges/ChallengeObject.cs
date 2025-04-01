@@ -15,6 +15,16 @@ public class Challenge
     public ChallengeCondition condition; // The condition to complete the challenge
     public List<Reward> rewards; // List of rewards (XP, drops, packs, credits, etc.)
 
+    public (float, float) GetVariables(params object[] args)
+    {
+        return condition.GetConditionVariables();
+    }
+
+    public float GetProgress(params object[] args)
+    {
+        return condition.GetConditionProgress();
+    }
+
     public bool CheckCompletion(params object[] args)
     {
         return condition.IsConditionMet(args);
@@ -85,7 +95,16 @@ public class Challenge
 // Abstract Base Class for Conditions
 public abstract class ChallengeCondition
 {
-    public abstract bool IsConditionMet(params object[] args);
+    public abstract (float, float) GetConditionVariables();
+    public virtual float GetConditionProgress()
+    {
+        var (num, dem) = GetConditionVariables();
+        return num / dem;
+    }
+    public virtual bool IsConditionMet(params object[] args)
+    {
+        return GetConditionProgress() >= 1;
+    }
     public abstract bool IsAssignable();
 }
 
@@ -94,6 +113,12 @@ public class BeatByCondition : ChallengeCondition
 {
     public int winByTargetPoints = 1; // Example: win by 3+ points
     public int difficultyLevel = -2; // Example: Any Difficulty = -3, Online = -1, Easy = 0, Medium = 1, Hard = 2
+
+    // TODO: investigate if there is a better way to do this
+    public override (float, float) GetConditionVariables()
+    {
+        return (0, 0);
+    }
 
     public override bool IsConditionMet(params object[] args)
     {
@@ -120,15 +145,15 @@ public class BeatByCondition : ChallengeCondition
 public class MatchesCondition : ChallengeCondition
 {
     public int targetMacthes;
-    public string matchResult; // TODO: add "Any" as a match result for "Finish an online match"
+    public string matchResult;
     public int difficultyLevel; // Example: Any Difficulty = -3, Combined = -2, Online = -1, Easy = 0, Medium = 1, Hard = 2
 
-    public override bool IsConditionMet(params object[] args)
+    public override (float, float) GetConditionVariables()
     {
         if (matchResult != "Win" && matchResult != "Tie" && matchResult != "Loss")
         {
             Debug.LogError("ChallengeObjectError: MatchesCondition of invalid type.");
-            return false;
+            return (0, 0);
         }
 
         string[] difficultyStrings = { "easy", "medium", "hard" };
@@ -140,13 +165,18 @@ public class MatchesCondition : ChallengeCondition
         {
             currentValue = PlayerPrefs.GetInt(difficultyStrings[difficultyLevel] + matchResult);
         }
+        // Online
+        if (difficultyLevel == -1)
+        {
+            currentValue = PlayerPrefs.GetInt("online" + matchResult);
+        }
         // Combined
-        else if (difficultyLevel == -1)
+        else if (difficultyLevel == -2)
         {
             currentValue += PlayerPrefs.GetInt(matchResult.ToLower());
         }
         // Any Difficulty
-        else if (difficultyLevel == -2)
+        else if (difficultyLevel == -3)
         {
             int temp = 0;
             foreach (var dstring in difficultyStrings)
@@ -164,7 +194,7 @@ public class MatchesCondition : ChallengeCondition
             }
         }
 
-        return currentValue >= targetMacthes;
+        return ((float)currentValue, (float)targetMacthes);
     }
 
     public override bool IsAssignable() { return true; }
@@ -176,7 +206,7 @@ public class HighscoreCondition : ChallengeCondition
     public int targetHighscore;
     public int difficultyLevel; // Example: Any Difficulty = -2, Combined = -1, Easy = 0, Medium = 1, Hard = 2
 
-    public override bool IsConditionMet(params object[] args)
+    public override (float, float) GetConditionVariables()
     {
         int easyHighscore = PlayerPrefs.GetInt("easyHighscore");
         int mediumHighscore = PlayerPrefs.GetInt("mediumHighscore");
@@ -208,7 +238,7 @@ public class HighscoreCondition : ChallengeCondition
             }
         }
 
-        return currentValue >= targetHighscore;
+        return ((float)currentValue, (float)targetHighscore);
     }
 
     public override bool IsAssignable() { return true; }
@@ -221,12 +251,15 @@ public class CardCondition : ChallengeCondition
     public int cardID;
     public int targetNumberPlayed;
 
-    public override bool IsConditionMet(params object[] args)
+    public override (float, float) GetConditionVariables()
     {
-        int playedCardID = (int)args[0];
-        int timesPlayed = (int)args[1];
+        //int playedCardID = (int)args[0];
+        //int timesPlayed = (int)args[1];
 
-        return playedCardID == cardID && timesPlayed >= targetNumberPlayed;
+        //if (playedCardID != cardID) { return (0, 0); }
+
+        //return ((float)timesPlayed, (float)targetNumberPlayed);
+        return (0, 0);
     }
 
     // TODO: make sure player has the card
@@ -237,11 +270,11 @@ public class LevelCondition : ChallengeCondition
 {
     public int targetLevel;
 
-    public override bool IsConditionMet(params object[] args)
+    public override (float, float) GetConditionVariables()
     {
         var (_, level) = LevelManager.Instance.GetXPAndLevel();
 
-        return level >= targetLevel;
+        return ((float)level, (float)targetLevel);
     }
 
     public override bool IsAssignable() { return true; }
@@ -251,11 +284,11 @@ public class StreakCondition : ChallengeCondition
 {
     public int targetStreak;
 
-    public override bool IsConditionMet(params object[] args)
+    public override (float, float) GetConditionVariables()
     {
         int streak = PlayerPrefs.GetInt("Streak");
 
-        return streak >= targetStreak;
+        return ((float)streak, (float)targetStreak);
     }
 
     public override bool IsAssignable() { return true; }
