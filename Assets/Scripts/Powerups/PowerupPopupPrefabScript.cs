@@ -25,23 +25,40 @@ public class PowerupPopupPrefabScript : MonoBehaviour
     private string[] rarityTexts = { "common", "uncomon", "rare", "epic", "legendary" };
     [SerializeField] private Sprite[] rarityIcons = new Sprite[5];
 
+    [SerializeField] private Sprite questionMarkIconSprite;
+    private string[] boosterTexts = { "any holo", "any bronze", "any gold", "any diamond", "any celestial" };
+
     public void InitializePowerupPopup(int cardIndex, int rank, bool holo)
     {
-        cardIcon.sprite = PowerupManager.Instance.powerupIcons[cardIndex];
-        cardIconOutline.sprite = PowerupManager.Instance.powerupIcons[cardIndex];
-        cardText.text = PowerupManager.Instance.powerupTexts[cardIndex];
-
-        // Rarity
-        int rarity = PowerupCardData.GetCardRarity(cardIndex);
-        Color rarityColor = GetRarityColor(rarity);
-        cardRarityIcon.color = rarityColor;
-        cardRarityText.color = rarityColor;
-        cardRarityText.text = rarityTexts[rarity];
-        cardRarityIcon.sprite = rarityIcons[rarity];
-        if (rarity > 2)
+        // for normal cards
+        if (cardIndex >= 0)
         {
-            Transform icon = cardRarityIcon.gameObject.transform;
-            icon.localPosition = new Vector3(icon.localPosition.x + (rarity - 2) * 10, icon.localPosition.y);
+            cardIcon.sprite = PowerupManager.Instance.powerupIcons[cardIndex];
+            cardIconOutline.sprite = PowerupManager.Instance.powerupIcons[cardIndex];
+            cardText.text = PowerupManager.Instance.powerupTexts[cardIndex];
+
+            // Rarity
+            cardRarityObject.SetActive(true);
+            int rarity = PowerupCardData.GetCardRarity(cardIndex);
+            Color rarityColor = GetRarityColor(rarity);
+            cardRarityIcon.color = rarityColor;
+            cardRarityText.color = rarityColor;
+            cardRarityText.text = rarityTexts[rarity];
+            cardRarityIcon.sprite = rarityIcons[rarity];
+            if (rarity > 2)
+            {
+                Transform icon = cardRarityIcon.gameObject.transform;
+                icon.localPosition = new Vector3(icon.localPosition.x + (rarity - 2) * 10, icon.localPosition.y);
+            }
+        }
+        // for pack boosters
+        else if (cardIndex >= -5)
+        {
+            cardIndex *= -1;
+            cardIcon.sprite = questionMarkIconSprite;
+            cardIconOutline.sprite = questionMarkIconSprite;
+            cardText.text = boosterTexts[cardIndex - 1];
+            cardRarityObject.SetActive(false);
         }
 
         // Rank & Holo
@@ -84,12 +101,10 @@ public class PowerupPopupPrefabScript : MonoBehaviour
                 cardText.color = UIManagerScript.Instance.GetDarkMode() ? new Color(1f, 1f, 1f, 1f) : new Color(0f, 0f, 0f, 1f);
                 break;
         }
-        if (rank > 0)
-        {
-            rankParticleSystemObject.SetActive(true);
-            shineIconObject.SetActive(true);
-            shineTextObject.SetActive(true);
-        }
+
+        rankParticleSystemObject.SetActive(rank > 0);
+        shineIconObject.SetActive(rank > 0);
+        shineTextObject.SetActive(rank > 0);
     }
 
     private Color GetRarityColor(int rarity)

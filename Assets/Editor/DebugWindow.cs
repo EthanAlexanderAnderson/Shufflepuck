@@ -179,6 +179,7 @@ public class DebugWindow : EditorWindow
         PlayerPrefs.SetString("LastChallengeDate", "0001-01-01");
         PlayerPrefs.SetString("LastPlinkoRewardDate", "0001-01-01");
         PlayerPrefs.SetString("LastDailyWinDate", "0001-01-01");
+        PlayerPrefs.SetString("LastPackBoosterDate", "0001-01-01");
     }
 
     private void SetDateAsYesterday()
@@ -186,6 +187,7 @@ public class DebugWindow : EditorWindow
         PlayerPrefs.SetString("LastChallengeDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
         PlayerPrefs.SetString("LastPlinkoRewardDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
         PlayerPrefs.SetString("LastDailyWinDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
+        PlayerPrefs.SetString("LastPackBoosterDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
     }
 
     private void SetDateAsTomorrow()
@@ -195,6 +197,7 @@ public class DebugWindow : EditorWindow
         PlayerPrefs.SetString("LastChallengeDate", tomorrow.ToString("yyyy-MM-dd"));
         PlayerPrefs.SetString("LastPlinkoRewardDate", tomorrow.ToString("yyyy-MM-dd"));
         PlayerPrefs.SetString("LastDailyWinDate", tomorrow.ToString("yyyy-MM-dd"));
+        PlayerPrefs.SetString("LastPackBoosterDate", tomorrow.ToString("yyyy-MM-dd"));
     }
 
     private void SetDateAsNull()
@@ -202,5 +205,6 @@ public class DebugWindow : EditorWindow
         PlayerPrefs.DeleteKey("LastChallengeDate");
         PlayerPrefs.DeleteKey("LastPlinkoRewardDate");
         PlayerPrefs.DeleteKey("LastDailyWinDate");
+        PlayerPrefs.DeleteKey("LastPackBoosterDate");
     }
 }

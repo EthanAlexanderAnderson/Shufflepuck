@@ -32,7 +32,7 @@ public class LevelManager : MonoBehaviour
 
     public void LoadXP()
     {
-        XP = PlayerPrefs.GetInt("XP", 0);
+        XP = PlayerPrefs.GetInt("XP");
     }
 
     public void AddXP(int xp)
@@ -57,7 +57,7 @@ public class LevelManager : MonoBehaviour
     // gets current XP progress (not total XP) and current level
     public (int, int) GetXPAndLevel()
     {
-        int XPiterator = XP;
+        int XPiterator = PlayerPrefs.GetInt("XP");
         int leveliterator = -1;
         while (XPiterator >= 0)
         {

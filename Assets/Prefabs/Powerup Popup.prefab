@@ -15230,6 +15230,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 3473d2a475e9f4c40a4398e139d07174, type: 3}
   - {fileID: 21300000, guid: 2cf5046612e12ac47841a938359f8f4a, type: 3}
   - {fileID: 21300000, guid: d4b631fc2637e034dbe487c851c92256, type: 3}
+  questionMarkIconSprite: {fileID: 21300000, guid: e69fa90b3be26ad409991bc0efe54b0e, type: 3}
 --- !u!1 &5199676954512231133
 GameObject:
   m_ObjectHideFlags: 0
