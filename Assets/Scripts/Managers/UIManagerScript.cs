@@ -434,47 +434,6 @@ public class UIManagerScript : MonoBehaviour
     // unlock the unlockables based on player highscores
     public void UpdateLocks()
     {
-        string[] highscoresPlayerPrefsKeys = { "easyHighscore", "mediumHighscore", "hardHighscore" };
-        string[] difficultyLocksPlayerPrefsKeys = { "easyLock", "mediumLock", "hardLock" };
-        int[] IDs = { 9, 10, 11 };
-        int combinedHighscore = 0;
-
-        // for each different highscore, if it is greater than zero, unlock all objects of cooresponding type
-        for (int i = 0; i < highscoresPlayerPrefsKeys.Length; i++)
-        {
-            int iHighscore = PlayerPrefs.GetInt(highscoresPlayerPrefsKeys[i]);
-
-            if (iHighscore > 0)
-            {
-                foreach (GameObject go in GameObject.FindGameObjectsWithTag(difficultyLocksPlayerPrefsKeys[i]))
-                {
-                    go.SetActive(false);
-                }
-                PuckSkinManager.Instance.UnlockPuckID(IDs[i]);
-                PuckSkinManager.Instance.UnlockPuckID(IDs[i]*-1);
-            }
-            combinedHighscore += iHighscore;
-        }
-
-        // combined highscore locks
-        for (int i = 10; i <= combinedHighscore; i += 2)
-        {
-            try // this try catch is here for players who have TOO high of a highscore lol
-            {
-                foreach (GameObject go in GameObject.FindGameObjectsWithTag(i + "CombinedLock"))
-                {
-                    go.SetActive(false);
-                }
-                PuckSkinManager.Instance.UnlockPuckID(12 + ((i-10) / 2));
-                PuckSkinManager.Instance.UnlockPuckID((12 + ((i-10) / 2)) * -1);
-            }
-            catch (UnityException)
-            {
-                continue;
-            }
-        }
-
-        // custom locks
         foreach (GameObject go in GameObject.FindGameObjectsWithTag("customLock"))
         {
             var CUS = go.GetComponent<CustomUnlockScript>();
