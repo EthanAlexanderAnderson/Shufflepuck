@@ -359,7 +359,7 @@ public class MatchmakerClient : MonoBehaviour
         try
         {
             if (serverLogic == null) { serverLogic = ServerLogicScript.Instance; }
-            serverLogic.AddPlayerServerRpc(logic.player.puckSpriteID, logic.powerupsAreEnabled);
+            serverLogic.AddPlayerServerRpc(logic.player.puckSpriteID, true); // TODO: instead of true, pass in "true" if the deck is NOT empty
         }
         catch (Exception e)
         {

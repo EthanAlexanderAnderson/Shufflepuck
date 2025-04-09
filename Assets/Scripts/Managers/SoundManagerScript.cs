@@ -168,6 +168,14 @@ public class SoundManagerScript : MonoBehaviour
         winSFX.Play();
     }
 
+    [SerializeField] private AudioSource puckDestroySFX;
+    public void PlayDestroyPuckSFX(float SFXvolume)
+    {
+        if (puckDestroySFX == null) { return; }
+        puckDestroySFX.volume = SFXvolume;
+        puckDestroySFX.Play();
+    }
+
     private IEnumerator FadeInMusic()
     {
         float targetVolume = musicVolumeFromPref;

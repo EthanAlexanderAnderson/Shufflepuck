@@ -64,13 +64,18 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     // for powerups
     [SerializeField] private bool phasePowerup = false;
+    [SerializeField] private int growthPowerup = 0;
+    public int GetGrowthCount() { return growthPowerup; }
     [SerializeField] private int lockPowerup = 0;
     [SerializeField] private int explosionPowerup = 0;
     [SerializeField] private int hydraPowerup = 0;
     [SerializeField] private int shieldPowerup = 0;
     [SerializeField] private int resurrectPowerup = 0;
-    [SerializeField] private bool factoryPowerup = false;
+    [SerializeField] private int factoryPowerup = 0;
+    public int GetFactoryCount() { return factoryPowerup; }
     [SerializeField] private bool pushPowerup = false;
+    [SerializeField] private int exponentPowerup = 0;
+    public int GetExponentCount() { return exponentPowerup; }
 
     void OnEnable()
     {
@@ -346,12 +351,14 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public int ComputeValue() { return (puckBaseValue * zoneMultiplier) + (zoneMultiplier > 0 ? puckBonusValue : 0); }
     public int GetZoneMultiplier() { return zoneMultiplier; }
     public void SetZoneMultiplier(int ZM) { zoneMultiplier = ZM; }
+    public bool IsGrowth() { return growthPowerup > 0; }
     public bool IsLocked() { return lockPowerup > 0; }
     public bool IsExplosion() { return explosionPowerup > 0; }
     public bool IsHydra() { return hydraPowerup > 0; }
     public bool IsPhase() { return phasePowerup; }
     public bool IsResurrect() { return resurrectPowerup > 0; }
-    public bool IsFactory() { return factoryPowerup; }
+    public bool IsFactory() { return factoryPowerup > 0; }
+    public bool IsExponent() { return exponentPowerup > 0; }
 
     // when a puck enters a scoring zone, update its score and play a SFX
     public void EnterScoreZone(bool isZoneSafe, int enteredZoneMultiplier, bool isBoundry)
@@ -663,7 +670,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     private void DestroyPuckFX(int effectIndex = -1)
     {
-        logic.playDestroyPuckSFX(SFXvolume);
+        SoundManagerScript.Instance.PlayDestroyPuckSFX(SFXvolume);
         ScreenShake.Instance.Shake(0.25f);
         if (effectIndex > 0)
         {
@@ -750,6 +757,8 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     public void EnableGrowth()
     {
+        growthPowerup++;
+
         if (ClientLogicScript.Instance.isRunning) // growth online
         {
             if (playersPuck)
@@ -880,8 +889,9 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     public void EnableFactory()
     {
-        factoryPowerup = true;
+        factoryPowerup++;
         SetPuckBaseValue(0); // set to valueless
+
         if (ClientLogicScript.Instance.isRunning) // factory online
         {
             if (playersPuck)
@@ -973,6 +983,8 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     public void EnableExponent()
     {
+        exponentPowerup++;
+
         if (ClientLogicScript.Instance.isRunning) // exponent online
         {
             if (playersPuck)

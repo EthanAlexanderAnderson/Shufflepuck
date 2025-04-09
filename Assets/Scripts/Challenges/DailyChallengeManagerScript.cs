@@ -264,11 +264,11 @@ public class DailyChallengeManagerScript : MonoBehaviour
         }
 
         // Evalute condition is met
-        if (easyDailyChallenges[DC1].CheckCompletion(scoreDifference, difficulty))
+        if (DC1 > 0 && easyDailyChallenges[DC1].CheckCompletion(scoreDifference, difficulty))
         {
             PlayerPrefs.SetInt("DailyChallenge1", -DC1);
         }
-        if (hardDailyChallenges[DC2].CheckCompletion(scoreDifference, difficulty))
+        if (DC2 > 0 && hardDailyChallenges[DC2].CheckCompletion(scoreDifference, difficulty))
         {
             PlayerPrefs.SetInt("DailyChallenge2", -DC2);
         }

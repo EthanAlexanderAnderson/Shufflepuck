@@ -17,6 +17,23 @@ public class PuckManager : MonoBehaviour
             Destroy(Instance);
     }
 
+    public int GetPucksInPlayCount()
+    {
+        int count = 0;
+
+        var allPucks = GameObject.FindGameObjectsWithTag("puck");
+        foreach (var puck in allPucks)
+        {
+            pucki = puck.GetComponent<PuckScript>();
+            if (pucki.IsShot())
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
     public void CreatePuck(Competitor competitor)
     {
         float xpos = (competitor.isPlayer ? -3.6f : 3.6f);

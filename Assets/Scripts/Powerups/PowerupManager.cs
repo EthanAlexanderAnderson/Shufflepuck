@@ -182,7 +182,18 @@ public class PowerupManager : NetworkBehaviour
     // used by CPU during gameplay to check what the player has left in their deck
     public List<int> GetDeck()
     {
+        if (deck == null) { LoadDeck(); }
         return deck;
+    }
+    public bool DeckContains(int cardIndex)
+    {
+        if (deck == null) { LoadDeck(); }
+        for (int i = 0; i < deck.Count; i++)
+        {
+            var decodedCard = PowerupCardData.DecodeCard(deck[i]);
+            if (decodedCard.cardIndex == cardIndex) { return true; }
+        }
+        return false;
     }
 
     public void ShuffleDeck()
@@ -682,7 +693,7 @@ public class PowerupManager : NetworkBehaviour
         }
         else if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) // mill against CPU
         {
-            LogicScript.Instance.MillPowerupHelper();
+            CPUBehaviorScript.MillPowerupHelper();
         }
     }
 
@@ -715,7 +726,6 @@ public class PowerupManager : NetworkBehaviour
             // add the last played card 3 times
             for (int i = 0; i < 3; i++)
             {
-                Debug.Log(lastPlayedCard);
                 deck.Add(lastPlayedCard);
             }
         }
@@ -808,7 +818,7 @@ public class PowerupManager : NetworkBehaviour
         }
         else if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) // deny against CPU
         {
-            LogicScript.Instance.denyPowerup++;
+            CPUBehaviorScript.DenyPowerupHelper();
         }
     }
 
@@ -821,7 +831,9 @@ public class PowerupManager : NetworkBehaviour
 
         if (activeCompetitor.isPlayer)
         {
-            deck.Add(Array.IndexOf(methodArray, PlusThreePowerup));
+            var decodedCard = PowerupCardData.DecodeCard(encodedCard);
+
+            deck.Add(PowerupCardData.EncodeCard(Array.IndexOf(methodArray, PlusThreePowerup), decodedCard.rank, decodedCard.holo, 1));
         }
     }
 
@@ -930,7 +942,7 @@ public class PowerupManager : NetworkBehaviour
             if (lastPlayedCard >= 0 && decodedCard.cardIndex == Array.IndexOf(methodArray, InsanityPowerup)) { powerupButtons[i].gameObject.GetComponent<Button>().interactable = true; }
         }
         // add the powerup animation to the animation queue
-        PowerupAnimationManager.Instance.AddPowerupPopupEffectAnimationToQueue(encodedCard);
+        PowerupAnimationManager.Instance.AddPowerupPopupEffectAnimationToQueue(activeCompetitor.isPlayer, encodedCard);
     }
 
     private bool NeedsToBeSentToServer(int encodedCard)

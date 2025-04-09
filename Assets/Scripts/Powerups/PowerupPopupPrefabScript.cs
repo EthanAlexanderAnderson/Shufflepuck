@@ -44,15 +44,23 @@ public class PowerupPopupPrefabScript : MonoBehaviour
             // Rarity
             cardRarityObject.SetActive(true);
             int rarity = PowerupCardData.GetCardRarity(cardIndex);
-            Color rarityColor = GetRarityColor(rarity);
-            cardRarityIcon.color = rarityColor;
-            cardRarityText.color = rarityColor;
-            cardRarityText.text = rarityTexts[rarity];
-            cardRarityIcon.sprite = rarityIcons[rarity];
-            if (rarity > 2)
+            if (rarity >= 0 && rarity < rarityTexts.Length) // this is needed for Plus Three
             {
-                Transform icon = cardRarityIcon.gameObject.transform;
-                icon.localPosition = new Vector3(icon.localPosition.x + (rarity - 2) * 10, icon.localPosition.y);
+                Color rarityColor = GetRarityColor(rarity);
+                cardRarityIcon.color = rarityColor;
+                cardRarityText.color = rarityColor;
+                cardRarityText.text = rarityTexts[rarity];
+                cardRarityIcon.sprite = rarityIcons[rarity];
+                if (rarity > 2)
+                {
+                    Transform icon = cardRarityIcon.gameObject.transform;
+                    icon.localPosition = new Vector3(icon.localPosition.x + (rarity - 2) * 10, icon.localPosition.y);
+                }
+            }
+            else
+            {
+                cardRarityText.text = "";
+                cardRarityIcon.enabled = false;
             }
         }
         // for pack boosters

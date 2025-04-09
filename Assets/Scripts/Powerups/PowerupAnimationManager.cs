@@ -19,7 +19,7 @@ public class PowerupAnimationManager : MonoBehaviour
     private GameObject popupEffectTextObject;
     private GameObject popupEffectRarityObject;
 
-    Queue<int> PowerupPopupEffectAnimationQueue = new Queue<int>();
+    Queue<(bool, int)> PowerupPopupEffectAnimationQueue = new();
 
     private void Awake()
     {
@@ -30,9 +30,9 @@ public class PowerupAnimationManager : MonoBehaviour
     }
     public void ClearPowerupPopupEffectAnimationQueue() { PowerupPopupEffectAnimationQueue.Clear(); }
 
-    public void AddPowerupPopupEffectAnimationToQueue(int encodedCard)
+    public void AddPowerupPopupEffectAnimationToQueue(bool isPlayer, int encodedCard)
     {
-        PowerupPopupEffectAnimationQueue.Enqueue(encodedCard);
+        PowerupPopupEffectAnimationQueue.Enqueue((isPlayer, encodedCard));
         if (PowerupPopupEffectAnimationQueue.Count == 1)
         {
             PlayNextPowerupPopupEffectAnimationInQueue();
@@ -43,7 +43,7 @@ public class PowerupAnimationManager : MonoBehaviour
     {
         if (PowerupPopupEffectAnimationQueue.Count <= 0) { return; }
         float speedMultiplier = (PowerupPopupEffectAnimationQueue.Count - 1) / 3 + 1;
-        PlayPowerupPopupEffectAnimation(PowerupPopupEffectAnimationQueue.Peek(), speedMultiplier);
+        PlayPowerupPopupEffectAnimation(PowerupPopupEffectAnimationQueue.Peek().Item1, PowerupPopupEffectAnimationQueue.Peek().Item2, speedMultiplier);
     }
 
     public void FinishCurrentPowerupPopupEffectAnimationInQueue()
@@ -57,7 +57,7 @@ public class PowerupAnimationManager : MonoBehaviour
     }
 
     // this is the large icon and text effect than shows when a card is played
-    public void PlayPowerupPopupEffectAnimation(int encodedCard, float speedMultiplier)
+    public void PlayPowerupPopupEffectAnimation(bool isPlayer, int encodedCard, float speedMultiplier)
     {
         GameObject powerupPopupObject = Instantiate(powerupPopupPrefab, popupEffectParent.transform);
         PowerupPopupPrefabScript powerupPopupScript = powerupPopupObject.GetComponent<PowerupPopupPrefabScript>();
@@ -67,17 +67,20 @@ public class PowerupAnimationManager : MonoBehaviour
 
         LeanTween.cancel(popupEffectIconObject);
         LeanTween.cancel(popupEffectTextObject);
+        LeanTween.cancel(powerupPopupObject);
 
-        popupEffectIconObject.transform.localScale = new Vector3(0f, 0f, 0f);
-        popupEffectTextObject.transform.localScale = new Vector3(0f, 0f, 0f);
+        int side = isPlayer ? -1 : 1;
+        powerupPopupObject.transform.localPosition = new Vector3(300f * side, 0, 0);
 
-        float duration = 0.75f / speedMultiplier;
+        float duration = (decodedCard.rank > 0 || decodedCard.holo) ? 0.7f / speedMultiplier : 0.5f / speedMultiplier;
 
+        LeanTween.moveLocalX(powerupPopupObject, 0, duration * 1.5f).setEase(LeanTweenType.easeOutCubic).setDelay(0.01f);
         LeanTween.scale(popupEffectIconObject, new Vector3(1f, 1f, 1f), duration).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
         LeanTween.scale(popupEffectIconOutlineObject, new Vector3(1f, 1f, 1f), duration).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
         LeanTween.scale(popupEffectTextObject, new Vector3(1f, 1f, 1f), duration).setEase(LeanTweenType.easeOutElastic).setDelay(0.21f);
         LeanTween.scale(popupEffectRarityObject, new Vector3(1f, 1f, 1f), duration).setEase(LeanTweenType.easeOutElastic).setDelay(0.41f);
 
+        LeanTween.moveLocalX(powerupPopupObject, 300f * side, duration * 1.6f).setEase(LeanTweenType.easeInCubic).setDelay(duration * 3);
         LeanTween.scale(popupEffectIconObject, new Vector3(0f, 0f, 0f), duration).setEase(LeanTweenType.easeInElastic).setDelay(duration * 3 + 0.01f);
         LeanTween.scale(popupEffectIconOutlineObject, new Vector3(0f, 0f, 0f), duration).setEase(LeanTweenType.easeInElastic).setDelay(duration * 3 + 0.01f);
         LeanTween.scale(popupEffectTextObject, new Vector3(0f, 0f, 0f), duration).setEase(LeanTweenType.easeInElastic).setDelay(duration * 3 + 0.21f);

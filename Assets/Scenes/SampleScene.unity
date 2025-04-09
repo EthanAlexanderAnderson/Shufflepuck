@@ -632,7 +632,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 820, y: 230}
-  m_SizeDelta: {x: 200, y: 200}
+  m_SizeDelta: {x: 250, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &10092414
 MonoBehaviour:
@@ -684,9 +684,9 @@ MonoBehaviour:
   m_fontSize: 250
   m_fontSizeBase: 250
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 250
   m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -53728,18 +53728,13 @@ MonoBehaviour:
   arrow: {fileID: 505056772}
   activeBar: none
   wall: {fileID: 474300706}
-  powerupsAreEnabled: 0
   powerupsMenu: {fileID: 1793697537}
-  powerupsToggle: {fileID: 2129569473}
+  triplePowerup: 0
   CPUShotAngle: 0
   CPUShotPower: 0
   CPUShotSpin: 50
   playedAGame: 0
   tutorialActive: 0
-  triplePowerup: 0
-  denyPowerup: 0
-  deckScreen: {fileID: 125596096}
-  puckDestroySFX: {fileID: 817506630}
 --- !u!4 &817506626
 Transform:
   m_ObjectHideFlags: 0
@@ -64193,7 +64188,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 820, y: 228}
-  m_SizeDelta: {x: 200, y: 200}
+  m_SizeDelta: {x: 250, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1006224809
 MonoBehaviour:
@@ -64259,9 +64254,9 @@ MonoBehaviour:
   m_fontSize: 250
   m_fontSizeBase: 250
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 250
   m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -102852,6 +102847,7 @@ MonoBehaviour:
   clickSFX4: {fileID: 1416831217}
   clickSFXUp: {fileID: 1416831219}
   clickSFXDown: {fileID: 1416831218}
+  puckDestroySFX: {fileID: 0}
 --- !u!82 &1416831213
 AudioSource:
   m_ObjectHideFlags: 0
@@ -140176,7 +140172,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 820, y: 229.6}
-  m_SizeDelta: {x: 200, y: 200}
+  m_SizeDelta: {x: 250, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1910108062
 MonoBehaviour:
@@ -140242,9 +140238,9 @@ MonoBehaviour:
   m_fontSize: 250
   m_fontSizeBase: 250
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 250
   m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512

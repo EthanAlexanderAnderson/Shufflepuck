@@ -14,7 +14,6 @@ public class CPUPathScript : MonoBehaviour, CPUPathInterface
     [SerializeField] private float power;
     [SerializeField] private float spin;
     [SerializeField] private int value;
-    [SerializeField] private bool isContactShot;
     [SerializeField] private bool requiresPhasePowerup;
     private bool requiresExplosionPowerup;
 
@@ -24,9 +23,7 @@ public class CPUPathScript : MonoBehaviour, CPUPathInterface
 
     public bool DoesPathRequireExplosionPowerup() { return requiresExplosionPowerup; }
 
-    public bool IsPathAContactShot() { return isContactShot; }
-
-    public int CalculateValue()
+    public int CalculateValue(int modifiedDifficulty)
     {
         DisablePathVisualization();
         List<GameObject> pucksCurrentlyInPath = GetPucksInPath();
@@ -34,15 +31,16 @@ public class CPUPathScript : MonoBehaviour, CPUPathInterface
         requiresExplosionPowerup = false;
 
         // if not contact shot, only shoot if path is clear
-        if (!isContactShot)
+        if (numberOfPucksCurrentlyInPath == 0 && !requiresPhasePowerup)
         {
-            if (numberOfPucksCurrentlyInPath == 0)
+            return modifiedDifficulty < 2 ? 0 : value; // don't consider regular paths for easy/medium with no powerups
+        }
+        // explosion shot
+        else if (numberOfPucksCurrentlyInPath == 1 && pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsPlayersPuck() && !pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsHydra() && !pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsResurrect() && !requiresPhasePowerup)
+        {
+            requiresExplosionPowerup = true;
+            if (CPUBehaviorScript.HasExplosion())
             {
-                return value;
-            }
-            else if (numberOfPucksCurrentlyInPath == 1 && pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsPlayersPuck() && !pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsHydra() && !pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsResurrect() && !requiresPhasePowerup && !isContactShot) // explosion shot
-            {
-                requiresExplosionPowerup = true;
                 return pucksCurrentlyInPath[0].GetComponent<PuckScript>().ComputeValue() - 2; // minus 2 because we need to consider the opportunity cost of exploding the CPU puck
             }
             else
@@ -50,59 +48,15 @@ public class CPUPathScript : MonoBehaviour, CPUPathInterface
                 return 0;
             }
         }
-        // if contact shot, we only shoot if we can contact an opp puck to push it out
+        else if (requiresPhasePowerup && CPUBehaviorScript.HasPhase())
+        {
+            requiresPhasePowerup = true;
+            return value;
+        }
         else
         {
-            if (numberOfPucksCurrentlyInPath < 1) return 0;
-            // contact shot for a single puck if it's valuable enough
-            else if (numberOfPucksCurrentlyInPath == 1 && IsPlayersPuck(pucksCurrentlyInPath[0]) && IsNotLockedOrExposionOrPhase(pucksCurrentlyInPath[0]) && HasPostiveValue(pucksCurrentlyInPath[0]) && !WallIsActive())
-            {
-                return pucksCurrentlyInPath[0].GetComponent<PuckScript>().ComputeValue();
-            }
-            // contact shot for any two pucks with positive value
-            else if (numberOfPucksCurrentlyInPath > 1 & pucksCurrentlyInPath.TrueForAll(IsPlayersPuck) && pucksCurrentlyInPath.TrueForAll(IsNotLockedOrExposionOrPhase) && pucksCurrentlyInPath.TrueForAll(HasPostiveValue) && !WallIsActive())
-            {
-                return value;
-            }
-
             return 0;
         }
-    }
-
-    // helper only for CalculateValue() contact shots
-    private bool IsPlayersPuck(GameObject p)
-    {
-        if (p == null) return false;
-
-        if (p.GetComponent<PuckScript>() == null) return false;
-
-        return p.GetComponent<PuckScript>().IsPlayersPuck();
-    }
-
-    // helper only for CalculateValue() contact shots
-    private bool IsNotLockedOrExposionOrPhase(GameObject p)
-    {
-        if (p == null) return false;
-
-        if (p.GetComponent<PuckScript>() == null) return false;
-
-        return !(p.GetComponent<PuckScript>().IsLocked() || p.GetComponent<PuckScript>().IsExplosion() || p.GetComponent<PuckScript>().IsPhase());
-    }
-
-    // helper only for CalculateValue() contact shots
-    private bool HasPostiveValue(GameObject p)
-    {
-        if (p == null) return false;
-
-        if (p.GetComponent<PuckScript>() == null) return false;
-
-        return (p.GetComponent<PuckScript>().ComputeValue() > 0 || p.GetComponent<PuckScript>().IsFactory());
-    }
-
-    // helper only for CalculateValue() contact shots
-    private bool WallIsActive()
-    {
-        return LogicScript.Instance.WallIsActive();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -144,7 +98,7 @@ public class CPUPathScript : MonoBehaviour, CPUPathInterface
     public void EnablePathVisualization(int mode = 0)
     {
 #if (UNITY_EDITOR)
-        if (UIManagerScript.Instance.debugMode <= 0) { return;  }
+        if (UIManagerScript.Instance.debugMode <= 0 && mode > 0) { return;  }
         GetComponent<LineRenderer>().enabled = true;
         if (mode == 0)
         {

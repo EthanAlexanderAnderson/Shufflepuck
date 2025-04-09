@@ -20,18 +20,14 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
     private List<Vector3> gizRayOrigin = new();
     private List<Vector3> gizDirection = new();
 
-    bool powerupsEnabled;
-
     public (float, float, float) GetPath() => (((180f - bestAngle) - 60f) * 1.66666f, System.Math.Min(95f + powerModifier, 105), 50f); // convert angel to line-readable format
     public bool DoesPathRequirePhasePowerup() => false;
     public bool DoesPathRequireExplosionPowerup() => false;
-    public bool IsPathAContactShot() => powerModifier >= 5.0f; // use forcefield powerup if total shot power is 100 or above
 
-    public int CalculateValue()
+    public int CalculateValue(int modifiedDifficulty)
     {
         if (WallIsActive()) { return 0; }
-
-        powerupsEnabled = PlayerPrefs.GetInt("PowerupsEnabled", 0) == 1;
+        if (modifiedDifficulty < 0) { modifiedDifficulty = 0; }
 
         highestValue = 0;
         bestAngle = 0;
@@ -52,7 +48,16 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
             PuckScript puckScript = puck.GetComponent<PuckScript>();
             if (puckScript == null || !IsValidPuck(puckScript)) continue;
 
+            // get current puck value
             int puckValue = puckScript.ComputeValue();
+            // account for future puck value
+            if (puckScript.GetZoneMultiplier() > 0)
+            {
+                if (puckScript.IsGrowth()) puckValue += LogicScript.Instance.player.puckCount * puckScript.GetGrowthCount();
+                if (puckScript.IsFactory()) puckValue += LogicScript.Instance.player.puckCount * 2 * puckScript.GetFactoryCount();
+                if (puckScript.IsExponent()) puckValue += puckScript.ComputeValue() * (int)Mathf.Pow(2, LogicScript.Instance.player.puckCount - 1) * puckScript.GetExponentCount();
+            }
+
             Vector3 puckPosition = puck.transform.position;
 
             if (puckValue > 0)
@@ -82,14 +87,8 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
         if (highestValue <= 0 || (highestValue * 3 + valueModifier) <= 0) { return 0; } // this is just here so we don't Debug.Log for 0 value paths
         if (bestAngle < 60 || bestAngle > 120) { Debug.LogError("SMART SCAN ERROR: BAD ANGLE " + bestAngle); return 0; }
 
-        // temporary nerf for non-powerups mode. (don't shoot unless two or more opponent pucks are in path, 25% chance override)
-        float randomValue = Random.Range(0f, 1f);
-        // if powerups are disabled AND only 1 puck in path : 70% chance to nerf
-        // if above conditions AND the path value is less than 10 : 90% chance to nerf
-        if (!powerupsEnabled && powerModifier <= 0 && randomValue <= (0.70 + ((highestValue * 3 + valueModifier) < 10 ? 0.2 : 0)))
-        {
-            return 0;
-        }
+        // nerf based on modifiedDifficulty. (lower modifiedDifficulty = greater nerf).
+        valueModifier -= (5 - modifiedDifficulty) * 3;
 
         // return best puck
         Debug.Log($"Smart Scan Value: {highestValue * 3} + {valueModifier} at Angle: {bestAngle}");

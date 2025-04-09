@@ -384,14 +384,13 @@ public class UIManagerScript : MonoBehaviour
         {
             gameResultText.text = "You Win!";
             gameResultHighscoreMessageText.text = "You won by " + scoreDifference + " points.";
-            if (!logic.powerupsAreEnabled || difficulty < 2)
+
+            if (scoreDifference > PlayerPrefs.GetInt(highscoresPlayerPrefsKeys[difficulty]))
             {
-                if (scoreDifference > PlayerPrefs.GetInt(highscoresPlayerPrefsKeys[difficulty]))
-                {
-                    gameResultHighscoreMessageText.text += "\nNew Highscore!";
-                    OverwriteHighscore(scoreDifference, difficulty);
-                }
+                gameResultHighscoreMessageText.text += "\nNew Highscore!";
+                OverwriteHighscore(scoreDifference, difficulty);
             }
+
             IncrementPlayerPref(winPlayerPrefsKeys[difficulty]);
             gameResultHighscoreMessageText.text += dailyChallenge.EvaluateChallenge(difficulty, scoreDifference, 0);
         }

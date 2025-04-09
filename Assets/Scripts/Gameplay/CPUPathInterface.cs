@@ -1,14 +1,12 @@
 public interface CPUPathInterface {
 
-    (float, float, float) GetPath();
+    (float angle, float power, float spin) GetPath();
 
     bool DoesPathRequirePhasePowerup();
 
     bool DoesPathRequireExplosionPowerup();
 
-    bool IsPathAContactShot();
-
-    int CalculateValue();
+    int CalculateValue(int modifiedDifficulty);
 
     void EnablePathVisualization(int mode = 0);
 
