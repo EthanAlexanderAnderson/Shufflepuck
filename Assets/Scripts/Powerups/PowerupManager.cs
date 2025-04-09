@@ -835,6 +835,10 @@ public class PowerupManager : NetworkBehaviour
 
             deck.Add(PowerupCardData.EncodeCard(Array.IndexOf(methodArray, PlusThreePowerup), decodedCard.rank, decodedCard.holo, 1));
         }
+        else if (LogicScript.Instance.gameIsRunning && !activeCompetitor.isPlayer) // CPU using investment
+        {
+            CPUBehaviorScript.InvestmentPowerupHelper();
+        }
     }
 
     public void PlusThreePowerup(int encodedCard) // index 30 : give active puck +3 value, this card isn't directly add-able, it is a product of the investment card

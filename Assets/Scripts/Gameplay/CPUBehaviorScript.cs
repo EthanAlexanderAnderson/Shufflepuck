@@ -113,7 +113,7 @@ public static class CPUBehaviorScript
 
             previouslyGeneratedIndexes[i] = randomIndex;
             hand[i] = deck[randomIndex];
-            Debug.Log("CPU HAND CARD " + (i + 1) + " : " + PowerupCardData.GetCardName(hand[i]));
+            Debug.Log("CPU HAND CARD " + (i + 1) + " : " + PowerupManager.Instance.powerupTexts[hand[i]]);
         }
     }
 
@@ -245,6 +245,11 @@ public static class CPUBehaviorScript
         denyPowerup++;
     }
 
+    public static void InvestmentPowerupHelper()
+    {
+        deck.Add(30);
+    }
+
     public static bool EvaluatePowerupUsage(int cardIndex)
     {
         return cardIndex switch
@@ -281,7 +286,7 @@ public static class CPUBehaviorScript
             27 => !powerupsUsedThisTurn.Contains(cardIndex) && LogicScript.Instance.player.puckCount > 0,
             28 => (deck.Count) < (LogicScript.Instance.opponent.puckCount - 1) * 3,
             29 => false,
-            30 => true,
+            30 => DeckInExcess(),
             _ => false,
         };
     }

@@ -225,7 +225,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         string[] xpFeedback = { "\nEasy Win +10XP", "\nMedium Win +20XP", "\nHard Win +30XP", };
 
         // bonus XP for score
-        string pointBonus = "\nScore Bonus +" + scoreDifference + "XP";
+        string pointBonus = "\nScore Bonus +" + (difficulty + 1) * scoreDifference + "XP";
 
         // bonus XP for first win of the day
         string dailyWin = "";
@@ -276,7 +276,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         if (scoreDifference > 0 && isOnline == 0)
         {
             levelManager.AddXP((difficulty + 1) * 10);
-            levelManager.AddXP(scoreDifference);
+            levelManager.AddXP((difficulty + 1) * scoreDifference);
             return xpFeedback[difficulty] + pointBonus + dailyWin;
         }
         else if (scoreDifference > 0 && isOnline == 1)
