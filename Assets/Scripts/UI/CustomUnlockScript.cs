@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CustomUnlockScript : MonoBehaviour
 {
@@ -46,6 +47,7 @@ public class CustomUnlockScript : MonoBehaviour
             )
             {
                 gameObject.SetActive(false);
+                transform.parent.GetComponent<Button>().enabled = true;
                 return ID;
             }
         }
@@ -68,6 +70,7 @@ public class CustomUnlockScript : MonoBehaviour
             )
             {
                 gameObject.SetActive(false);
+                transform.parent.GetComponent<Button>().enabled = true;
                 return ID;
             }
         }
@@ -77,6 +80,7 @@ public class CustomUnlockScript : MonoBehaviour
             if (PlayerPrefs.GetInt("puck"+ID.ToString()+"unlocked") == 1 )
             {
                 gameObject.SetActive(false);
+                transform.parent.GetComponent<Button>().enabled = true;
                 return ID;
             }
         }
