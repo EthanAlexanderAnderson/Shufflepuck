@@ -170,7 +170,6 @@ MonoBehaviour:
   power: 50
   spin: 50
   value: 6
-  isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!61 &756733
 BoxCollider2D:
@@ -2923,7 +2922,6 @@ MonoBehaviour:
   power: 100
   spin: 50
   value: 7
-  isContactShot: 1
   requiresPhasePowerup: 0
 --- !u!61 &65559126
 BoxCollider2D:
@@ -3413,7 +3411,6 @@ MonoBehaviour:
   power: 88
   spin: 0
   value: 2
-  isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!60 &73639749
 PolygonCollider2D:
@@ -4609,7 +4606,6 @@ MonoBehaviour:
   power: 100
   spin: 50
   value: 7
-  isContactShot: 1
   requiresPhasePowerup: 0
 --- !u!61 &112330477
 BoxCollider2D:
@@ -5542,7 +5538,6 @@ MonoBehaviour:
   power: 90
   spin: 100
   value: 5
-  isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!60 &141762928
 PolygonCollider2D:
@@ -11496,7 +11491,6 @@ MonoBehaviour:
   power: 100
   spin: 50
   value: 7
-  isContactShot: 1
   requiresPhasePowerup: 0
 --- !u!60 &175755569
 PolygonCollider2D:
@@ -11892,7 +11886,6 @@ MonoBehaviour:
   power: 100
   spin: 50
   value: 7
-  isContactShot: 1
   requiresPhasePowerup: 0
 --- !u!61 &179528125
 BoxCollider2D:
@@ -12521,7 +12514,6 @@ MonoBehaviour:
   power: 70.4
   spin: 50
   value: 4
-  isContactShot: 0
   requiresPhasePowerup: 1
 --- !u!58 &203157389
 CircleCollider2D:
@@ -12610,7 +12602,6 @@ MonoBehaviour:
   power: 57
   spin: 50
   value: 6
-  isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!61 &207078887
 BoxCollider2D:
@@ -15194,7 +15185,6 @@ MonoBehaviour:
   power: 71
   spin: 50
   value: 9
-  isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!61 &266553088
 BoxCollider2D:
@@ -16367,7 +16357,6 @@ MonoBehaviour:
   power: 74
   spin: 0
   value: 8
-  isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!60 &299694977
 PolygonCollider2D:
@@ -23115,7 +23104,6 @@ MonoBehaviour:
   power: 80
   spin: 0
   value: 5
-  isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!60 &459286197
 PolygonCollider2D:
@@ -32354,7 +32342,6 @@ MonoBehaviour:
   power: 94.9
   spin: 70
   value: 2
-  isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!60 &541556641
 PolygonCollider2D:
@@ -39716,7 +39703,6 @@ MonoBehaviour:
   power: 31
   spin: 50
   value: 1
-  isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!61 &620282572
 BoxCollider2D:
@@ -42031,7 +42017,6 @@ MonoBehaviour:
   power: 35
   spin: 50
   value: 1
-  isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!61 &663298586
 BoxCollider2D:
@@ -42752,7 +42737,6 @@ MonoBehaviour:
   power: 77
   spin: 50
   value: 3
-  isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!61 &683211351
 BoxCollider2D:
@@ -46244,7 +46228,6 @@ MonoBehaviour:
   power: 77
   spin: 80
   value: 8
-  isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!60 &750069014
 PolygonCollider2D:
@@ -53704,6 +53687,7 @@ GameObject:
   - component: {fileID: 817506628}
   - component: {fileID: 817506629}
   - component: {fileID: 817506630}
+  - component: {fileID: 817506631}
   m_Layer: 0
   m_Name: Logic Manager
   m_TagString: logic
@@ -53730,11 +53714,9 @@ MonoBehaviour:
   wall: {fileID: 474300706}
   powerupsMenu: {fileID: 1793697537}
   triplePowerup: 0
-  CPUShotAngle: 0
-  CPUShotPower: 0
-  CPUShotSpin: 50
   playedAGame: 0
   tutorialActive: 0
+  powerupWaitTime: 0
 --- !u!4 &817506626
 Transform:
   m_ObjectHideFlags: 0
@@ -53900,6 +53882,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &817506631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 817506624}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96cd35263e44c73498b1a7c0361125c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &818546378
 GameObject:
   m_ObjectHideFlags: 0
@@ -54694,7 +54688,6 @@ MonoBehaviour:
   power: 102
   spin: 50
   value: 10
-  isContactShot: 1
   requiresPhasePowerup: 0
 --- !u!61 &826075816
 BoxCollider2D:
@@ -55321,7 +55314,6 @@ MonoBehaviour:
   power: 82
   spin: 100
   value: 8
-  isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!60 &835633550
 PolygonCollider2D:
@@ -58669,7 +58661,6 @@ MonoBehaviour:
   power: 100
   spin: 50
   value: 7
-  isContactShot: 1
   requiresPhasePowerup: 0
 --- !u!61 &898887451
 BoxCollider2D:
@@ -59399,7 +59390,6 @@ MonoBehaviour:
   power: 51
   spin: 50
   value: 6
-  isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!61 &917655134
 BoxCollider2D:
@@ -64946,7 +64936,6 @@ MonoBehaviour:
   power: 45
   spin: 50
   value: 1
-  isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!61 &1019210498
 BoxCollider2D:
@@ -82512,7 +82501,6 @@ MonoBehaviour:
   power: 71
   spin: 50
   value: 4
-  isContactShot: 0
   requiresPhasePowerup: 1
 --- !u!58 &1206316625
 CircleCollider2D:
@@ -83646,7 +83634,6 @@ MonoBehaviour:
   power: 71
   spin: 50
   value: 9
-  isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!61 &1237600845
 BoxCollider2D:
@@ -84544,7 +84531,6 @@ MonoBehaviour:
   power: 72
   spin: 20
   value: 8
-  isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!60 &1247150378
 PolygonCollider2D:
@@ -86920,7 +86906,6 @@ MonoBehaviour:
   power: 100
   spin: 50
   value: 7
-  isContactShot: 1
   requiresPhasePowerup: 0
 --- !u!61 &1280224750
 BoxCollider2D:
@@ -93259,7 +93244,6 @@ MonoBehaviour:
   power: 55
   spin: 80
   value: 6
-  isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!60 &1303936218
 PolygonCollider2D:
@@ -95477,7 +95461,6 @@ MonoBehaviour:
   power: 100
   spin: 50
   value: 7
-  isContactShot: 1
   requiresPhasePowerup: 0
 --- !u!61 &1351228538
 BoxCollider2D:
@@ -111057,7 +111040,6 @@ MonoBehaviour:
   power: 100
   spin: 50
   value: 7
-  isContactShot: 1
   requiresPhasePowerup: 0
 --- !u!60 &1488933047
 PolygonCollider2D:
@@ -121874,7 +121856,6 @@ MonoBehaviour:
   power: 89.5
   spin: 50
   value: 3
-  isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!61 &1618170138
 BoxCollider2D:
@@ -124390,7 +124371,6 @@ MonoBehaviour:
   power: 100
   spin: 50
   value: 7
-  isContactShot: 1
   requiresPhasePowerup: 0
 --- !u!61 &1675047166
 BoxCollider2D:
@@ -124908,7 +124888,6 @@ MonoBehaviour:
   power: 55
   spin: 50
   value: 6
-  isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!61 &1686513496
 BoxCollider2D:
@@ -133451,7 +133430,6 @@ MonoBehaviour:
   power: 77
   spin: 50
   value: 4
-  isContactShot: 0
   requiresPhasePowerup: 1
 --- !u!58 &1770598292
 CircleCollider2D:
@@ -138468,7 +138446,6 @@ MonoBehaviour:
   power: 71
   spin: 50
   value: 9
-  isContactShot: 0
   requiresPhasePowerup: 0
 --- !u!61 &1876184033
 BoxCollider2D:
@@ -150429,7 +150406,6 @@ MonoBehaviour:
   power: 69
   spin: 50
   value: 4
-  isContactShot: 0
   requiresPhasePowerup: 1
 --- !u!58 &2050891158
 CircleCollider2D:
