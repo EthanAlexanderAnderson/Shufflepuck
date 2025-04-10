@@ -27,6 +27,7 @@ public static class CPUBehaviorScript
         DrawHand();
         waitingTime = 1f;
         LogicScript.Instance.powerupWaitTime = 0;
+        usePhase = false;
     }
 
     public static void FullReset(int diff)
@@ -42,8 +43,6 @@ public static class CPUBehaviorScript
         }
     }
 
-    // TODO: fix phase + contact shots, and then remove phase from bannedCards
-    static int[] bannedCards = { 1, 5, 9, 15, 16, 17, 19, 20, 21, 23, 29 };
     // TODO: make sure this is called after PowerupManager.Instance.LoadDeck to accurately determine player deck power level
     private static void GenerateDeck()
     {
@@ -66,9 +65,9 @@ public static class CPUBehaviorScript
         int failSafe = 0;
         while (CPUDeckPowerLevel < playerDeckPowerLevel && failSafe < 1000)
         {
-            int rarity = Random.Range(0, difficulty + 1);
+            int rarity = Random.Range(0, (int)Math.Pow(difficulty, 2) + 1);
             int randomCard = PowerupCardData.GetRandomCardOfRarity(rarity);
-            if (deck.Count(n => n == randomCard) < 5 - rarity && !bannedCards.Contains(randomCard) && PowerupCardData.CheckIfCardIsOwned(randomCard))
+            if (deck.Count(n => n == randomCard) < (5 - rarity) && EvaluatePowerupEquipage(randomCard) && PowerupCardData.CheckIfCardIsOwned(randomCard))
             {
                 deck.Add(randomCard);
                 CPUDeckPowerLevel += (rarity + 1);
@@ -153,6 +152,21 @@ public static class CPUBehaviorScript
                 PowerupManager.Instance.CallMethodArray(PowerupCardData.EncodeCard(hand[i], 0, false, 1));
                 powerupsUsedThisTurn.Add(hand[i]);
                 deck.Remove(hand[i]);
+
+                // cost 2 discard
+                if (PowerupManager.Instance.GetCost2Discard().Contains(hand[i]))
+                {
+                    powerupsUsedThisTurn.Add(hand[i]);
+                    powerupsUsedThisTurn.Add(hand[i]);
+                    for (int j = 0; j < Math.Max(hand.Count(), 3); j++)
+                    {
+                        if (j != i)
+                        {
+                            deck.Remove(hand[j]);
+                        }
+                    }
+                }
+
                 hand[i] = -1;
                 return true;
             }
@@ -162,6 +176,7 @@ public static class CPUBehaviorScript
 
     // TODO: save selected path info somewhere so we can query it to see if we need to use explosion or phase in the second pass of card usage
     static CPUPathInterface pathi;
+    static bool usePhase = false;
     public static (float, float, float) FindPath()
     {
         // initialize CPU paths
@@ -196,6 +211,20 @@ public static class CPUBehaviorScript
         {
             Debug.Log("Found path with highest value " + highestValue);
             best.EnablePathVisualization();
+
+            // try to phase lol
+            usePhase = best.DoesPathRequirePhasePowerup();
+            if (best.DoesPathRequirePhasePowerup())
+            {
+                for (int i = 0; i < hand.Count(); i++)
+                {
+                    if (hand.Any(n => n != -1) && PowerupCountUsedThisTurn() < 3)
+                    {
+                        UseNextCard();
+                    }
+                }
+            }
+
             return best.GetPath();
         }
         // otherwise, Shoot random
@@ -250,6 +279,47 @@ public static class CPUBehaviorScript
         deck.Add(30);
     }
 
+    // if the CPU should add a card to its deck
+    public static bool EvaluatePowerupEquipage(int cardIndex)
+    {
+        return cardIndex switch
+        {
+            0 => true,
+            1 => PowerupManager.Instance.DeckContains(10),
+            2 => true,
+            3 => true,
+            4 => true,
+            5 => true,
+            6 => true,
+            7 => true,
+            8 => true,
+            9 => false, // TODO
+            10 => !PowerupManager.Instance.DeckContains(1),
+            11 => true,
+            12 => true,
+            13 => true,
+            14 => true,
+            15 => false, // TODO
+            16 => deck.Count() > 2,
+            17 => deck.Count() > 2 && deck.Contains(3) && deck.Contains(6),
+            18 => true,
+            19 => false, // TODO
+            20 => false, // TODO: equip insanity only if cpu deck contains investment
+            21 => false, // TODO
+            22 => deck.Contains(13) && !deck.Contains(3),
+            23 => false, // TODO
+            24 => true,
+            25 => true,
+            26 => true,
+            27 => true,
+            28 => !PowerupManager.Instance.DeckContains(18),
+            29 => false, // TODO: equip omniscience only if cpu deck contains over 2/3 cards with a cost
+            30 => false, // don't change this one from false, this is Plus Three
+            _ => false,
+        };
+    }
+
+    // if the CPU should play a card in a match
     public static bool EvaluatePowerupUsage(int cardIndex)
     {
         return cardIndex switch
@@ -259,7 +329,7 @@ public static class CPUBehaviorScript
             2 => LogicScript.Instance.player.puckCount > 0,
             3 => EvaluateBolt(),
             4 => !powerupsUsedThisTurn.Contains(cardIndex) && EvaluateForcefield(),
-            5 => !powerupsUsedThisTurn.Contains(cardIndex),
+            5 => !powerupsUsedThisTurn.Contains(cardIndex) && usePhase,
             6 => !powerupsUsedThisTurn.Contains(cardIndex) && EvaluateCull(),
             7 => LogicScript.Instance.opponent.puckCount > 1,
             8 => LogicScript.Instance.player.puckCount > 0,
@@ -272,12 +342,12 @@ public static class CPUBehaviorScript
             14 => LogicScript.Instance.player.score > LogicScript.Instance.opponent.score && PuckManager.Instance.GetPucksInPlayCount() >= 2,
             // TODO: 2discardcosts
             15 => false,
-            16 => false,
-            17 => false,
+            16 => true, // TODO: times two based on path value
+            17 => LogicScript.Instance.opponent.puckCount >= 3 && (deck.Contains(3) || deck.Contains(6)),
             18 => ((PowerupManager.Instance.GetDeck().Count / 2) < LogicScript.Instance.player.puckCount * 3 && PowerupManager.Instance.GetDeck().Count > 2) || PowerupManager.Instance.DeckContains(30),
             19 => false,
             20 => false,
-            21 => false,
+            21 => false, // TODO: use triple if CPU already used good stacking stuff
             22 => LogicScript.Instance.opponent.puckCount >= 5,
             23 => false,
             24 => DeckInExcess(),
@@ -366,6 +436,12 @@ public static class CPUBehaviorScript
             if (!puck.IsPlayersPuck())
             {
                 CPUPucksInForcefield++;
+
+                // auto-trigger forcefield if CPU has a single highvalue puck
+                if (puck.GetPuckBaseValue() > 1 || puck.GetPuckBonusValue() > 2)
+                {
+                    CPUPucksInForcefield++;
+                }
             }
         }
 
@@ -410,11 +486,11 @@ public static class CPUBehaviorScript
 
     public static bool HasExplosion()
     {
-        return hand.Contains(9);
+        return hand.Contains(9) && PowerupCountUsedThisTurn() < 3;
     }
 
     public static bool HasPhase()
     {
-        return hand.Contains(5);
+        return hand.Contains(5) && PowerupCountUsedThisTurn() < 3;
     }
 }
