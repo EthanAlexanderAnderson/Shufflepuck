@@ -528,10 +528,20 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         puckBaseValue = value;
     }
 
+    public int GetPuckBaseValue()
+    {
+        return puckBaseValue;
+    }
+
     // bonus value is added onto base value * score zone value
     public void SetPuckBonusValue(int value)
     {
         puckBonusValue = value;
+    }
+
+    public int GetPuckBonusValue()
+    {
+        return puckBonusValue;
     }
 
     public void IncrementPuckBonusValue(int value)

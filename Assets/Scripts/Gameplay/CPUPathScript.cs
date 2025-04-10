@@ -48,7 +48,7 @@ public class CPUPathScript : MonoBehaviour, CPUPathInterface
                 return 0;
             }
         }
-        else if (requiresPhasePowerup && CPUBehaviorScript.HasPhase())
+        else if (numberOfPucksCurrentlyInPath == 0 && requiresPhasePowerup && CPUBehaviorScript.HasPhase())
         {
             requiresPhasePowerup = true;
             return value;

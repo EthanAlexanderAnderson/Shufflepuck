@@ -20,7 +20,7 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
     private List<Vector3> gizRayOrigin = new();
     private List<Vector3> gizDirection = new();
 
-    public (float, float, float) GetPath() => (((180f - bestAngle) - 60f) * 1.66666f, System.Math.Min(95f + powerModifier, 105), 50f); // convert angel to line-readable format
+    public (float, float, float) GetPath() => (((180f - bestAngle) - 60f) * 1.66666f, System.Math.Min(95f + powerModifier, 102.5f), 50f); // convert angel to line-readable format
     public bool DoesPathRequirePhasePowerup() => false;
     public bool DoesPathRequireExplosionPowerup() => false;
 
