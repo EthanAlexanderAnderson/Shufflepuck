@@ -88,7 +88,10 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
         if (bestAngle < 60 || bestAngle > 120) { Debug.LogError("SMART SCAN ERROR: BAD ANGLE " + bestAngle); return 0; }
 
         // nerf based on modifiedDifficulty. (lower modifiedDifficulty = greater nerf).
-        valueModifier -= (5 - modifiedDifficulty) * 3;
+        if (LogicScript.Instance.opponent.puckCount > 1 || (LogicScript.Instance.opponent.puckCount <= 1 && LogicScript.Instance.opponent.score - LogicScript.Instance.player.score >= (10 - ((5 - modifiedDifficulty) * 2)))) // only nerf the last shot if the CPU is losing by a certain threshold
+        {
+            valueModifier -= (5 - modifiedDifficulty) * 3;
+        }
 
         // return best puck
         Debug.Log($"Smart Scan Value: {highestValue * 3} + {valueModifier} at Angle: {bestAngle}");
