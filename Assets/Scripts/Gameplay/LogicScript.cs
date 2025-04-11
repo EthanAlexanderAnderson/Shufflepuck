@@ -382,6 +382,7 @@ public class LogicScript : MonoBehaviour
 
     public void RestartGame(int diff)
     {
+        puckManager.ClearAllPucks();
         if (tutorialActive)
         {
             // check if tutorial should be active
@@ -468,6 +469,7 @@ public class LogicScript : MonoBehaviour
     public void ReturnToMenu()
     {
         gameIsRunning = false;
+        isLocal = false;
         player.puckCount = 0;
         opponent.puckCount = 0;
         UI.ChangeUI(UI.titleScreen);
@@ -478,6 +480,7 @@ public class LogicScript : MonoBehaviour
         FogScript.Instance.DisableFog();
         WallScript.Instance.WallEnabled(false);
         LaserScript.Instance.DisableLaser();
+        puckManager.ClearAllPucks();
     }
 
     public void IncrementPuckCount(bool playersPuck, int value = 1)

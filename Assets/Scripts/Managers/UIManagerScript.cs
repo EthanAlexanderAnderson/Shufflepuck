@@ -91,6 +91,9 @@ public class UIManagerScript : MonoBehaviour
 
     [SerializeField] private GameObject restartButton;
 
+    [SerializeField] private GameObject ExitConfirmation;
+    [SerializeField] private GameObject RestartConfirmation;
+
     // result
     [SerializeField] private Text gameResultText;
     [SerializeField] private Text gameResultHighscoreMessageText;
@@ -197,6 +200,30 @@ public class UIManagerScript : MonoBehaviour
             {
                 AdvanceTutorial();
             }
+        }
+    }
+
+    public void GameHUDExitButtonHandler()
+    {
+        if (!ClientLogicScript.Instance.isRunning && LogicScript.Instance.player.puckCount >= 5)
+        {
+            LogicScript.Instance.ReturnToMenu();
+        }
+        else
+        {
+            ExitConfirmation.SetActive(true);
+        }
+    }
+
+    public void GameHUDRestartButtonHandler()
+    {
+        if (!ClientLogicScript.Instance.isRunning && LogicScript.Instance.player.puckCount >= 5)
+        {
+            LogicScript.Instance.RestartGame(-1);
+        }
+        else
+        {
+            RestartConfirmation.SetActive(true);
         }
     }
 
@@ -558,6 +585,8 @@ public class UIManagerScript : MonoBehaviour
         opponentPuckCountText.text = 5.ToString();
         playerWinsObject.SetActive(playerWins > 0 || opponentWins > 0);
         opponentWinsObject.SetActive(playerWins > 0 || opponentWins > 0);
+        ExitConfirmation.SetActive(false);
+        RestartConfirmation.SetActive(false);
     }
 
     public void ResetWaitingScreen(string waitingTextInput)
