@@ -765,6 +765,11 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     {
         SetPuckBaseValue(0);
         SetPowerupText("valueless");
+        InitSpawnedPuck();
+    }
+
+    public void InitSpawnedPuck()
+    {
         shot = true;
         safe = true;
     }
@@ -899,6 +904,13 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public void EnableHydra()
     {
         hydraPowerup++;
+    }
+
+    [ClientRpc]
+    public void EnableHydraClientRpc()
+    {
+        hydraPowerup++;
+        SetPowerupText("hydra");
     }
 
     public void EnableFactory()

@@ -988,20 +988,23 @@ public class PowerupManager : NetworkBehaviour
         methodArray[decodedCard.cardIndex].Invoke(encodedCard);
     }
 
-    public void PuckSpawnHelper(bool isPlayers, float x, float y, int spwanCount)
+    public void PuckSpawnHelper(bool isPlayers, float x, float y, int spawnCount)
     {
+        // don't allow pucks below the safe line to spawn anything
+        if (y < 0) return;
+
         Competitor hydraCompetitor = isPlayers ? LogicScript.Instance.player : LogicScript.Instance.opponent;
         Vector3 pos = Vector3.zero;
 
         // do X times (X is count)
-        for (int i = 0; i < spwanCount; i++)
+        for (int i = 0; i < spawnCount; i++)
         {
             float randRange = 2.0f;
             // generate coordinates for potenial spawn, then see if it's too close to another puck
             bool tooClose = true;
             while (tooClose)
             {
-                pos = new Vector3(x + Random.Range(-randRange, randRange), y + Random.Range(-randRange, randRange), -1.0f);
+                pos = new Vector3(x + Random.Range(-randRange, randRange), Math.Max(0, y + Random.Range(-randRange, randRange)), -1.0f);
 
                 tooClose = false;
                 var pucks = GameObject.FindGameObjectsWithTag("puck");
@@ -1020,6 +1023,13 @@ public class PowerupManager : NetworkBehaviour
             GameObject puckObject = Instantiate(puckPrefab, pos, Quaternion.identity);
             PuckScript puckScript = puckObject.GetComponent<PuckScript>();
             puckScript.InitPuck(hydraCompetitor.isPlayer, hydraCompetitor.puckSpriteID);
+            puckScript.InitSpawnedPuck();
+
+            if (spawnCount == 2)
+            {
+                puckScript.EnableHydra();
+                puckScript.SetPowerupText("hydra");
+            }
         }
     }
 
