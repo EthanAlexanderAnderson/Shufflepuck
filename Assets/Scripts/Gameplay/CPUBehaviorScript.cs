@@ -85,11 +85,18 @@ public static class CPUBehaviorScript
     {
         int deckCount = deck.Count;
 
+        // initialize array with proper length
         int[] previouslyGeneratedIndexes = new int[modifiedDifficulty];
-
         for (int i = 0; i < modifiedDifficulty; i++)
         {
             previouslyGeneratedIndexes[i] = -1;
+        }
+
+        // deny powerup
+        for (int i = 0; i < denyPowerup; i++)
+        {
+            powerupsUsedThisTurn.Add(-1);
+            powerupsUsedThisTurn.Add(-1);
         }
 
         for (int i = 0; i < hand.Length; i++)
@@ -97,11 +104,7 @@ public static class CPUBehaviorScript
             if (deckCount <= 0) { continue; }
             deckCount--;
 
-            if (denyPowerup > 1 || denyPowerup == 1 && i < 2)
-            {
-                hand[i] = -1; 
-                continue;
-            }
+            denyPowerup = 0;
 
             int randomIndex = Random.Range(0, deck.Count);
             // while empty in deck, reroll
@@ -126,8 +129,8 @@ public static class CPUBehaviorScript
             {
                 if (UseNextCard())
                 {
-                    waitingTime += 1.5f;
-                    LogicScript.Instance.powerupWaitTime += 1f;
+                    waitingTime += 1.75f;
+                    LogicScript.Instance.powerupWaitTime += 1.25f;
                 }
             }
         }
@@ -297,7 +300,7 @@ public static class CPUBehaviorScript
             10 => !PowerupManager.Instance.DeckContains(1),
             11 => true,
             12 => true,
-            13 => true,
+            13 => deck.Contains(0) || deck.Contains(7) || deck.Contains(9) || deck.Contains(12) || deck.Contains(16) || deck.Contains(22) || deck.Contains(24) || deck.Contains(30),
             14 => true,
             15 => false, // TODO
             16 => deck.Count() > 2,
@@ -312,7 +315,7 @@ public static class CPUBehaviorScript
             25 => true,
             26 => true,
             27 => true,
-            28 => !PowerupManager.Instance.DeckContains(18),
+            28 => !PowerupManager.Instance.DeckContains(18), // TODO: add investment only based on the CPU deck size (or playerdeckpowerlevel) to make sure it will be usable at somepoint
             29 => false, // TODO: equip omniscience only if cpu deck contains over 2/3 cards with a cost
             30 => false, // don't change this one from false, this is Plus Three
             _ => false,
@@ -330,30 +333,29 @@ public static class CPUBehaviorScript
             3 => EvaluateBolt(),
             4 => !powerupsUsedThisTurn.Contains(cardIndex) && EvaluateForcefield(),
             5 => !powerupsUsedThisTurn.Contains(cardIndex) && usePhase,
-            6 => !powerupsUsedThisTurn.Contains(cardIndex) && EvaluateCull(),
-            7 => LogicScript.Instance.opponent.puckCount > 1,
+            6 => !powerupsUsedThisTurn.Contains(cardIndex) && EvaluateCull(), // TODO: somehow... CPU should wait to use cull until AFTER forcefield is used
+            7 => LogicScript.Instance.opponent.puckCount > 2,
             8 => LogicScript.Instance.player.puckCount > 0,
-            // TODO: explostion path
-            9 => false,
+            9 => false, // TODO: explostion path
             10 => !powerupsUsedThisTurn.Contains(cardIndex) && LogicScript.Instance.player.puckCount > 0,
             11 => !powerupsUsedThisTurn.Contains(13) && LogicScript.Instance.player.puckCount > 0,
             12 => LogicScript.Instance.opponent.puckCount > 2,
-            13 => !powerupsUsedThisTurn.Contains(11) && !powerupsUsedThisTurn.Contains(17) && LogicScript.Instance.player.puckCount > 0,
-            14 => LogicScript.Instance.player.score > LogicScript.Instance.opponent.score && PuckManager.Instance.GetPucksInPlayCount() >= 2,
+            13 => !powerupsUsedThisTurn.Contains(11) && !powerupsUsedThisTurn.Contains(17) && LogicScript.Instance.player.puckCount > 0 && (powerupsUsedThisTurn.Contains(0) || powerupsUsedThisTurn.Contains(7) || powerupsUsedThisTurn.Contains(9) || powerupsUsedThisTurn.Contains(12) || powerupsUsedThisTurn.Contains(16) || powerupsUsedThisTurn.Contains(22) || powerupsUsedThisTurn.Contains(24) || powerupsUsedThisTurn.Contains(30)),
+            14 => LogicScript.Instance.player.score > LogicScript.Instance.opponent.score && PuckManager.Instance.GetPucksInPlayCount() >= 2 && PuckManager.Instance.GetPucksInPlayCount(false, -1) >= 1 && PuckManager.Instance.GetPucksInPlayCount(false, 1) >= 1,
             // TODO: 2discardcosts
-            15 => false,
-            16 => true, // TODO: times two based on path value
-            17 => LogicScript.Instance.opponent.puckCount >= 3 && (deck.Contains(3) || deck.Contains(6)),
+            15 => PowerupCountUsedThisTurn() == 0 && false,
+            16 => PowerupCountUsedThisTurn() == 0 && LogicScript.Instance.opponent.puckCount <= 3, // TODO: times two based on path value
+            17 => PowerupCountUsedThisTurn() == 0 && LogicScript.Instance.opponent.puckCount >= 3 && (deck.Contains(3) || deck.Contains(6)),
             18 => ((PowerupManager.Instance.GetDeck().Count / 2) < LogicScript.Instance.player.puckCount * 3 && PowerupManager.Instance.GetDeck().Count > 2) || PowerupManager.Instance.DeckContains(30),
             19 => false,
             20 => false,
             21 => false, // TODO: use triple if CPU already used good stacking stuff
             22 => LogicScript.Instance.opponent.puckCount >= 5,
             23 => false,
-            24 => DeckInExcess(),
-            25 => LogicScript.Instance.player.score > LogicScript.Instance.opponent.score,
+            24 => !powerupsUsedThisTurn.Contains(25) && DeckInExcess() && (PuckManager.Instance.GetPucksInPlayCount(true, -1) >= 3 || LogicScript.Instance.opponent.puckCount >= 3),
+            25 => !powerupsUsedThisTurn.Contains(24) && LogicScript.Instance.player.score > LogicScript.Instance.opponent.score && PuckManager.Instance.GetPucksInPlayCount(true) >= 3, // TODO: push based on path proximity to player pucks (this will be a nightmare to code) AT LEAST make sure angle is middle-ish so it's likely to do SOMETHING
             26 => !powerupsUsedThisTurn.Contains(cardIndex) && LogicScript.Instance.player.puckCount > 0,
-            27 => !powerupsUsedThisTurn.Contains(cardIndex) && LogicScript.Instance.player.puckCount > 0,
+            27 => !powerupsUsedThisTurn.Contains(cardIndex) && LogicScript.Instance.player.puckCount > 0 && PowerupManager.Instance.GetDeck().Count > 0,
             28 => (deck.Count) < (LogicScript.Instance.opponent.puckCount - 1) * 3,
             29 => false,
             30 => DeckInExcess(),
@@ -380,18 +382,18 @@ public static class CPUBehaviorScript
             if (puckScript.IsPlayersPuck() && puckScript.ComputeValue() > 0)
             {
                 playerPucks++;
-                // extra weight for high value pucks
-                if (puckScript.ComputeValue() > 10)
+                // small positive weight for player high value or exponent pucks
+                if ((puckScript.ComputeValue() > 10 || puckScript.IsExponent()) && !puckScript.IsShield())
                 {
                     playerPucks++;
                 }
-                // small negative weight for hydra
-                if (puckScript.IsHydra())
+                // small negative weight for player hydra
+                if (puckScript.IsHydra() && !puckScript.IsShield())
                 {
                     opponentPucks += 2;
                 }
-                // large negative weight for resurrect
-                if (puckScript.IsResurrect())
+                // large negative weight for player resurrect
+                if (puckScript.IsResurrect() && !puckScript.IsShield())
                 {
                     opponentPucks += 5;
                 }
@@ -399,18 +401,18 @@ public static class CPUBehaviorScript
             else if (!puckScript.IsPlayersPuck() && puckScript.ComputeValue() > 0)
             {
                 opponentPucks++;
-                // extra weight for high value pucks
-                if (puckScript.ComputeValue() > 10)
+                // small negative weight for CPU high value or exponent pucks
+                if ((puckScript.ComputeValue() > 10 || puckScript.IsExponent()) && !puckScript.IsShield())
                 {
                     opponentPucks++;
                 }
-                // small negative weight for hydra
-                if (puckScript.IsHydra())
+                // small postive weight for CPU hydra
+                if (puckScript.IsHydra() && !puckScript.IsShield())
                 {
                     playerPucks += 2;
                 }
-                // large negative weight for resurrect
-                if (puckScript.IsResurrect())
+                // large postive weight for CPU resurrect
+                if (puckScript.IsResurrect() && !puckScript.IsShield())
                 {
                     playerPucks += 5;
                 }
@@ -445,7 +447,6 @@ public static class CPUBehaviorScript
             }
         }
 
-        Debug.Log("CPUPucksInForcefield: " + CPUPucksInForcefield);
         return CPUPucksInForcefield >= 2;
     }
 
@@ -477,7 +478,7 @@ public static class CPUBehaviorScript
             }
 
             if (puckScript.IsPlayersPuck()) { validPucks++; }
-            if (puckScript.IsPlayersPuck() && puckScript.IsFactory()) { validPucks++; } // a single player factory will trigger cull
+            if (puckScript.IsPlayersPuck() && puckScript.IsFactory() && LogicScript.Instance.player.puckCount > 0) { validPucks++; } // a single player factory will trigger cull
             if (!puckScript.IsPlayersPuck() && puckScript.IsResurrect()) { validPucks++; } // a single CPU resurrect will trigger cull
         }
 

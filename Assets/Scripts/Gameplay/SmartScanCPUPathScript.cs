@@ -90,7 +90,7 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
         // nerf based on modifiedDifficulty. (lower modifiedDifficulty = greater nerf).
         if (LogicScript.Instance.opponent.puckCount > 1 || (LogicScript.Instance.opponent.puckCount <= 1 && LogicScript.Instance.opponent.score - LogicScript.Instance.player.score >= (10 - ((5 - modifiedDifficulty) * 2)))) // only nerf the last shot if the CPU is losing by a certain threshold
         {
-            valueModifier -= (5 - modifiedDifficulty) * 3;
+            valueModifier -= Mathf.Max(0, (5 - modifiedDifficulty) * 3);
         }
 
         // return best puck

@@ -35,14 +35,15 @@ public class PowerupAnimationManager : MonoBehaviour
         PowerupPopupEffectAnimationQueue.Enqueue((isPlayer, encodedCard));
         if (PowerupPopupEffectAnimationQueue.Count == 1)
         {
-            PlayNextPowerupPopupEffectAnimationInQueue();
+            Invoke("PlayNextPowerupPopupEffectAnimationInQueue", 0.1f);
         }
     }
 
     public void PlayNextPowerupPopupEffectAnimationInQueue()
     {
         if (PowerupPopupEffectAnimationQueue.Count <= 0) { return; }
-        float speedMultiplier = (PowerupPopupEffectAnimationQueue.Count - 1) / 3 + 1;
+        float speedMultiplier = Mathf.Min(((PowerupPopupEffectAnimationQueue.Count - 1f) / 4f) + 1f, 3);
+
         PlayPowerupPopupEffectAnimation(PowerupPopupEffectAnimationQueue.Peek().Item1, PowerupPopupEffectAnimationQueue.Peek().Item2, speedMultiplier);
     }
 
@@ -72,7 +73,7 @@ public class PowerupAnimationManager : MonoBehaviour
         int side = isPlayer ? -1 : 1;
         powerupPopupObject.transform.localPosition = new Vector3(300f * side, 0, 0);
 
-        float duration = (decodedCard.rank > 0 || decodedCard.holo) ? 0.7f / speedMultiplier : 0.5f / speedMultiplier;
+        float duration = (decodedCard.rank > 0 || decodedCard.holo) ? 0.65f / speedMultiplier : 0.45f / speedMultiplier;
 
         LeanTween.moveLocalX(powerupPopupObject, 0, duration * 1.5f).setEase(LeanTweenType.easeOutCubic).setDelay(0.01f);
         LeanTween.scale(popupEffectIconObject, new Vector3(1f, 1f, 1f), duration).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);

@@ -75,6 +75,8 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public int GetFactoryCount() { return factoryPowerup; }
     [SerializeField] private bool pushPowerup = false;
     [SerializeField] private int exponentPowerup = 0;
+    [SerializeField] private int erraticPowerup = 0;
+
     public int GetExponentCount() { return exponentPowerup; }
 
     void OnEnable()
@@ -355,10 +357,12 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public bool IsLocked() { return lockPowerup > 0; }
     public bool IsExplosion() { return explosionPowerup > 0; }
     public bool IsHydra() { return hydraPowerup > 0; }
+    public bool IsShield() { return shieldPowerup > 0; }
     public bool IsPhase() { return phasePowerup; }
     public bool IsResurrect() { return resurrectPowerup > 0; }
     public bool IsFactory() { return factoryPowerup > 0; }
     public bool IsExponent() { return exponentPowerup > 0; }
+    public bool IsErratic() { return erraticPowerup > 0; }
 
     // when a puck enters a scoring zone, update its score and play a SFX
     public void EnterScoreZone(bool isZoneSafe, int enteredZoneMultiplier, bool isBoundry)
@@ -1048,6 +1052,8 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     public void EnableErratic()
     {
+        erraticPowerup++;
+
         if (ClientLogicScript.Instance.isRunning) // Erratic online
         {
             if (playersPuck)

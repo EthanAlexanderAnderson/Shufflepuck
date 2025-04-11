@@ -17,7 +17,7 @@ public class PuckManager : MonoBehaviour
             Destroy(Instance);
     }
 
-    public int GetPucksInPlayCount()
+    public int GetPucksInPlayCount(bool getOnlyPucksWithValue = false, int owner = 0) // owner 1 = player & owner -1 = CPU & owner 0 = anyone
     {
         int count = 0;
 
@@ -27,6 +27,11 @@ public class PuckManager : MonoBehaviour
             pucki = puck.GetComponent<PuckScript>();
             if (pucki.IsShot())
             {
+                // skip based on parameters
+                if (getOnlyPucksWithValue && pucki.ComputeValue() <= 0) continue;
+                if (owner == -1 && pucki.IsPlayersPuck()) continue;
+                if (owner == 1 && !pucki.IsPlayersPuck()) continue;
+
                 count++;
             }
         }
