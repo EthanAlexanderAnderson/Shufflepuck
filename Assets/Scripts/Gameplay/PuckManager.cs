@@ -146,4 +146,138 @@ public class PuckManager : MonoBehaviour
         }
         return true;
     }
+
+    // using this for ending the game, thank you chatgpt for doing the math stuff :)))
+    public bool AllPucksAreNotNearingScoreZoneEdge()
+    {
+        GameObject[] pucks = GameObject.FindGameObjectsWithTag("puck");
+        GameObject[] scoreZones = GameObject.FindGameObjectsWithTag("scoreZone");
+
+        foreach (GameObject puckObj in pucks)
+        {
+            CircleCollider2D puckCenterCollider = puckObj.transform.GetChild(0).GetComponent<CircleCollider2D>();
+            Rigidbody2D rb = puckObj.GetComponent<Rigidbody2D>();
+            if (puckCenterCollider == null || rb == null)
+                continue;
+
+            Vector2 center = puckCenterCollider.transform.TransformPoint(puckCenterCollider.offset);
+            float radius = puckCenterCollider.radius * puckCenterCollider.transform.lossyScale.x;
+            float velocity = rb.velocity.magnitude;
+
+            float minDistance = float.MaxValue;
+
+            foreach (GameObject zoneObj in scoreZones)
+            {
+                Vector2 closestPoint = center;
+                float distance = float.MaxValue;
+
+                if (zoneObj.TryGetComponent(out PolygonCollider2D poly))
+                {
+                    distance = ClosestDistanceToPolygon(center, poly, out closestPoint);
+                }
+                else if (zoneObj.TryGetComponent(out BoxCollider2D box))
+                {
+                    distance = ClosestDistanceToBox(center, box, out closestPoint);
+                }
+                else if (zoneObj.TryGetComponent(out CircleCollider2D zoneCircle))
+                {
+                    if (zoneObj.transform.parent.gameObject == puckObj) continue; // don't consider pucks own Aura collider (nearby collider)
+                    distance = ClosestDistanceToCircle(center, zoneCircle, out closestPoint);
+                }
+
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                }
+            }
+
+            float distanceToExit = minDistance - radius;
+            if (distanceToExit < (velocity * 2))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private float ClosestDistanceToPolygon(Vector2 point, PolygonCollider2D poly, out Vector2 closest)
+    {
+        Vector2[] points = poly.points;
+        Transform t = poly.transform;
+
+        float minDist = float.MaxValue;
+        closest = point;
+
+        for (int i = 0; i < points.Length; i++)
+        {
+            Vector2 a = t.TransformPoint(points[i]);
+            Vector2 b = t.TransformPoint(points[(i + 1) % points.Length]);
+
+            Vector2 c = ClosestPointOnSegment(point, a, b);
+            float dist = Vector2.Distance(point, c);
+            if (dist < minDist)
+            {
+                minDist = dist;
+                closest = c;
+            }
+        }
+
+        return minDist;
+    }
+
+    private float ClosestDistanceToBox(Vector2 point, BoxCollider2D box, out Vector2 closest)
+    {
+        // Get world-space corners
+        Transform t = box.transform;
+        Vector2 size = Vector2.Scale(box.size, t.lossyScale);
+        Vector2 center = t.TransformPoint(box.offset);
+
+        Vector2[] corners = new Vector2[4];
+        Vector2 right = 0.5f * size.x * t.right;
+        Vector2 up = 0.5f * size.y * t.up;
+        corners[0] = center + right + up;
+        corners[1] = center - right + up;
+        corners[2] = center - right - up;
+        corners[3] = center + right - up;
+
+        float minDist = float.MaxValue;
+        closest = point;
+
+        for (int i = 0; i < 4; i++)
+        {
+            Vector2 a = corners[i];
+            Vector2 b = corners[(i + 1) % 4];
+
+            Vector2 c = ClosestPointOnSegment(point, a, b);
+            float dist = Vector2.Distance(point, c);
+            if (dist < minDist)
+            {
+                minDist = dist;
+                closest = c;
+            }
+        }
+
+        return minDist;
+    }
+
+    private float ClosestDistanceToCircle(Vector2 point, CircleCollider2D circle, out Vector2 closest)
+    {
+        Transform t = circle.transform;
+        Vector2 center = t.TransformPoint(circle.offset);
+        float radius = circle.radius * t.lossyScale.x;
+
+        Vector2 dir = (point - center).normalized;
+        closest = center + dir * radius;
+
+        return Vector2.Distance(point, closest);
+    }
+
+    private Vector2 ClosestPointOnSegment(Vector2 point, Vector2 a, Vector2 b)
+    {
+        Vector2 ab = b - a;
+        Vector2 ap = point - a;
+        float t = Mathf.Clamp01(Vector2.Dot(ap, ab) / ab.sqrMagnitude);
+        return a + t * ab;
+    }
 }

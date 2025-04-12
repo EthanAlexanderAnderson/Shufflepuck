@@ -14338,7 +14338,7 @@ GameObject:
   - component: {fileID: 252435394}
   m_Layer: 2
   m_Name: Score Zone Red L 3
-  m_TagString: Untagged
+  m_TagString: scoreZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -18834,7 +18834,7 @@ GameObject:
   - component: {fileID: 383451801}
   m_Layer: 2
   m_Name: Score Zone Yellow L 1
-  m_TagString: Untagged
+  m_TagString: scoreZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -41722,7 +41722,7 @@ GameObject:
   - component: {fileID: 651277313}
   m_Layer: 2
   m_Name: Score Zone Red R 3
-  m_TagString: Untagged
+  m_TagString: scoreZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -43561,7 +43561,7 @@ GameObject:
   - component: {fileID: 690633037}
   m_Layer: 2
   m_Name: Score Zone Orange L 2
-  m_TagString: Untagged
+  m_TagString: scoreZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -44200,7 +44200,7 @@ GameObject:
   - component: {fileID: 707031246}
   m_Layer: 2
   m_Name: Score Zone Black
-  m_TagString: Untagged
+  m_TagString: scoreZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -45538,7 +45538,7 @@ GameObject:
   - component: {fileID: 734195365}
   m_Layer: 2
   m_Name: Score Zone Orange C 3
-  m_TagString: Untagged
+  m_TagString: scoreZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -52244,7 +52244,7 @@ GameObject:
   - component: {fileID: 765016194}
   m_Layer: 2
   m_Name: Score Zone Yellow
-  m_TagString: Untagged
+  m_TagString: scoreZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -67034,7 +67034,7 @@ GameObject:
   - component: {fileID: 1036752858}
   m_Layer: 2
   m_Name: Score Zone Red C 4
-  m_TagString: Untagged
+  m_TagString: scoreZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -72122,7 +72122,7 @@ GameObject:
   - component: {fileID: 1043637384}
   m_Layer: 2
   m_Name: Score Zone Mini Left 2
-  m_TagString: Untagged
+  m_TagString: scoreZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -93364,7 +93364,7 @@ GameObject:
   - component: {fileID: 1293446492}
   m_Layer: 2
   m_Name: Score Zone Yellow R 1
-  m_TagString: Untagged
+  m_TagString: scoreZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -97537,7 +97537,7 @@ GameObject:
   - component: {fileID: 1383375517}
   m_Layer: 2
   m_Name: Score Zone Zero
-  m_TagString: Untagged
+  m_TagString: scoreZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -104989,7 +104989,7 @@ GameObject:
   - component: {fileID: 1426578336}
   m_Layer: 2
   m_Name: Score Zone Red
-  m_TagString: Untagged
+  m_TagString: scoreZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -136685,7 +136685,7 @@ GameObject:
   - component: {fileID: 1805845575}
   m_Layer: 2
   m_Name: Score Zone Mini Right 2
-  m_TagString: Untagged
+  m_TagString: scoreZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -138045,7 +138045,7 @@ GameObject:
   - component: {fileID: 1825203437}
   m_Layer: 2
   m_Name: Score Zone Orange
-  m_TagString: Untagged
+  m_TagString: scoreZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -143270,7 +143270,7 @@ GameObject:
   - component: {fileID: 1933260200}
   m_Layer: 2
   m_Name: Score Zone Orange R 2
-  m_TagString: Untagged
+  m_TagString: scoreZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -150478,7 +150478,7 @@ GameObject:
   - component: {fileID: 1993915131}
   m_Layer: 2
   m_Name: Score Zone Yellow C 2
-  m_TagString: Untagged
+  m_TagString: scoreZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

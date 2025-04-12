@@ -179,7 +179,7 @@ public class LogicScript : MonoBehaviour
             timer += Time.deltaTime;
         }
         // ran out of pucks (game over)
-        else if (gameIsRunning && puckManager.AllPucksAreStopped())
+        else if (gameIsRunning && puckManager.AllPucksAreStopped() && puckManager.AllPucksAreNotNearingScoreZoneEdge())
         {
             gameIsRunning = false;
             UpdateScores();

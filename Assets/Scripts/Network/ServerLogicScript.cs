@@ -88,8 +88,9 @@ public class ServerLogicScript : NetworkBehaviour
         }
 
         // If both players have 0 pucks (aka game is over)
-        if (competitorList.Count > 1 && competitorList.All(n => n.puckCount <= 0) && !sentGameResult)
+        if (competitorList.Count > 1 && competitorList.All(n => n.puckCount <= 0) && !sentGameResult && PuckManager.Instance.AllPucksAreStopped() && PuckManager.Instance.AllPucksAreNotNearingScoreZoneEdge())
         {
+            /*
             var allPucks = GameObject.FindGameObjectsWithTag("puck");
             foreach (var puck in allPucks)
             {
@@ -99,6 +100,7 @@ public class ServerLogicScript : NetworkBehaviour
                     return;
                 }
             }
+            */
             gameIsRunning = false;
             StartCoroutine(TryToEndGame());
             // this is here so this block doesn't get called repeatedly
@@ -301,6 +303,7 @@ public class ServerLogicScript : NetworkBehaviour
     // Shoot the puck. isNonActiveCompetitorBit is just for triple right now
     public void Shoot(float angleParameter, float powerParameter, float spinParameter, int isNonActiveCompetitorBit = 0)
     {
+
         try
         {
             competitorList[activeCompetitorIndex ^ isNonActiveCompetitorBit].activePuckScript.Shoot(angleParameter, powerParameter, spinParameter);

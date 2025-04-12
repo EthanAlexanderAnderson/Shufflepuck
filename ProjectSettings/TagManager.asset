@@ -20,6 +20,7 @@ TagManager:
   - floatingText
   - mainMenu
   - blackText
+  - scoreZone
   layers:
   - Default
   - TransparentFX
