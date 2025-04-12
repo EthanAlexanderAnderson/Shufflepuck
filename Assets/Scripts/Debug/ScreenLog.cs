@@ -1,4 +1,4 @@
-// This is only for development builds on android, basically shows the unity console on screen
+// Enabled with debug mode, shows the logs on screen
 
 using UnityEngine;
 using System.Collections;
@@ -6,11 +6,25 @@ using System.Linq;
 
 public class ScreenLog : MonoBehaviour
 {
+    public static ScreenLog Instance;
+
     uint qsize = 20;  // number of messages to keep
     int maxTotalCharCount = 1000;  // maximum total character count of all logs
     int maxLogLength = 500;  // maximum length of an individual log
 
-    Queue myLogQueue = new Queue(); 
+    Queue myLogQueue = new Queue();
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject); // Destroy duplicate
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
 
     void OnEnable()
     {
@@ -24,6 +38,8 @@ public class ScreenLog : MonoBehaviour
 
     void HandleLog(string logString, string stackTrace, LogType type)
     {
+        if (logString.Contains("Google.Logger") || logString.Contains("manifest") || logString.Contains("Manifest") || logString.Contains("External")) return;
+
         // Ensure the log entry is not longer than the maxLogLength
         string logEntry = "[" + type + "] : " + TrimLog(logString);
 

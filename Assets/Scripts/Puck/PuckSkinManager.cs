@@ -121,6 +121,11 @@ public class PuckSkinManager : MonoBehaviour
         UI = UIManagerScript.Instance;
     }
 
+    private void Start()
+    {
+        SelectPlayerPuckSprite(PlayerPrefs.GetInt("puck") == 0 && PlayerPrefs.GetInt("hardHighscore") <= 5 ? 1 : PlayerPrefs.GetInt("puck"));
+    }
+
     public Sprite ColorIDtoPuckSprite(int id)
     {
         Sprite[] puckSprites = { puckFlower, puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain, puckNuke, puckWreath, puckSky, puckDragon, puckNinja, puckEgg, puckMonster, puckEye, puckCamo, puckYingYang, puckCow, puckCraft, puckPlanet, puckLove, puckAura, puckCheese, puckScotia, puckPoker, puckPumpkin, puckWeb, puckCoin, puckMagic, puckStar, puckSnake, puckHexagon, puckShuriken, puckLifesaver, puckAtom, puckMatrix, puckLucky, puckSkull, puckButterfly };

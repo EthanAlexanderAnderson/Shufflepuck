@@ -32,10 +32,20 @@ public class DebugWindow : EditorWindow
 
     public void CreateGUI()
     {
-        logic = GameObject.FindGameObjectWithTag("logic").GetComponent<LogicScript>();
-        serverLogic = GameObject.FindGameObjectWithTag("logic").GetComponent<ServerLogicScript>();
-        haloScript = GameObject.FindGameObjectWithTag("halo").GetComponent<HaloScript>();
-        puck = logic.puckPrefab;
+        try
+        {
+            logic = LogicScript.Instance;
+            serverLogic = ServerLogicScript.Instance;
+            haloScript = HaloScript.Instance;
+
+            puck = logic.puckPrefab;
+        }
+        catch (NullReferenceException)
+        {
+            Debug.LogError("Failed to create unity debug window");
+            return;
+        }
+
         FloatField angleFloatField = new FloatField();
         angleFloatField.label = "Angle";
         angleFloatField.value = 50f;

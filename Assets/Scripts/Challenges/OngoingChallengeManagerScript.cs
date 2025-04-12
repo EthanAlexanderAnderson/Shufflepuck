@@ -7,9 +7,6 @@ public class OngoingChallengeManagerScript : MonoBehaviour
 {
     // self
     public static OngoingChallengeManagerScript Instance;
-    // dependencies
-    private LevelManager levelManager;
-    private SoundManagerScript sound;
 
     [SerializeField] private GameObject titleScreen;
 
@@ -24,10 +21,6 @@ public class OngoingChallengeManagerScript : MonoBehaviour
     [SerializeField] private Slider progressBar;
     [SerializeField] private TMP_Text progressText;
 
-
-    List<Challenge> ongoingChallenges;
-    int numberOfOngoingChallenges;
-
     private void Awake()
     {
         if (Instance == null)
@@ -36,18 +29,13 @@ public class OngoingChallengeManagerScript : MonoBehaviour
             Destroy(Instance);
     }
 
-    void Start()
-    {
-        levelManager = LevelManager.Instance;
-        sound = SoundManagerScript.Instance;
-    }
-
+    // Called at start after the challenges are instantiated by ChallengeManager
     public void SetText()
     {
-        ongoingChallenges = ChallengeManager.Instance.challengeData.ongoingChallenges;
-        numberOfOngoingChallenges = ongoingChallenges.Count;
-
         int OC = PlayerPrefs.GetInt("OngoingChallenge", 1);
+
+        List<Challenge> ongoingChallenges = ChallengeManager.Instance.challengeData.ongoingChallenges;
+        int numberOfOngoingChallenges = ongoingChallenges.Count;
 
         // if uncompleted
         if (OC > 0)
@@ -113,6 +101,7 @@ public class OngoingChallengeManagerScript : MonoBehaviour
     private void AdvanceOngoingChallenge()
     {
         int OC = PlayerPrefs.GetInt("OngoingChallenge", 1);
+        List<Challenge> ongoingChallenges = ChallengeManager.Instance.challengeData.ongoingChallenges;
 
         // assign next challenge & check its completion
         OC = Mathf.Abs(OC) + 1;
@@ -132,6 +121,9 @@ public class OngoingChallengeManagerScript : MonoBehaviour
     public void EvaluateChallenge(int difficulty, int scoreDifference, bool isOnline)
     {
         int OC = PlayerPrefs.GetInt("OngoingChallenge", 1);
+
+        List<Challenge> ongoingChallenges = ChallengeManager.Instance.challengeData.ongoingChallenges;
+        int numberOfOngoingChallenges = ongoingChallenges.Count;
 
         // assert the challenges IDs are within range, prevent index error
         if (OC >= numberOfOngoingChallenges || OC <= (numberOfOngoingChallenges * -1))
@@ -162,13 +154,14 @@ public class OngoingChallengeManagerScript : MonoBehaviour
         // Check if the reward is complete (negative value)
         if (OC < 0)
         {
+            List<Challenge> ongoingChallenges = ChallengeManager.Instance.challengeData.ongoingChallenges;
             // Add rewards
             ongoingChallenges[Mathf.Abs(OC)].ClaimRewards();
 
             Debug.Log("Claimed ongoing reward!");
             AdvanceOngoingChallenge();
             SetText();
-            sound.PlayWinSFX();
+            SoundManagerScript.Instance.PlayWinSFX();
         }
         titleScreen.GetComponent<TitleScreenScript>().UpdateAlerts();
     }

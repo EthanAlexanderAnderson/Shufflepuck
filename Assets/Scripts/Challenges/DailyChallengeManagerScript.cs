@@ -30,11 +30,6 @@ public class DailyChallengeManagerScript : MonoBehaviour
     [SerializeField] private GameObject glow1;
     [SerializeField] private GameObject glow2;
 
-    List<Challenge> easyDailyChallenges;
-    List<Challenge> hardDailyChallenges;
-    int numberOfEasyDailyChallenges;
-    int numberOfHardDailyChallenges;
-
     private void Awake()
     {
         if (Instance == null)
@@ -43,12 +38,13 @@ public class DailyChallengeManagerScript : MonoBehaviour
             Destroy(Instance);
     }
 
-    void Start()
+    void OnEnable()
     {
         levelManager = LevelManager.Instance;
         sound = SoundManagerScript.Instance;
     }
 
+    // Called at start after the challenges are instantiated by ChallengeManager
     public void SetText()
     {
         CheckForNewDailyChallenge();
@@ -60,10 +56,10 @@ public class DailyChallengeManagerScript : MonoBehaviour
         glow1.SetActive(claim1.interactable);
         glow2.SetActive(claim2.interactable);
 
-        easyDailyChallenges = ChallengeManager.Instance.challengeData.easyDailyChallenges;
-        hardDailyChallenges = ChallengeManager.Instance.challengeData.hardDailyChallenges;
-        numberOfEasyDailyChallenges = easyDailyChallenges.Count;
-        numberOfHardDailyChallenges = hardDailyChallenges.Count;
+        List<Challenge> easyDailyChallenges = ChallengeManager.Instance.challengeData.easyDailyChallenges;
+        List<Challenge> hardDailyChallenges = ChallengeManager.Instance.challengeData.hardDailyChallenges;
+        int numberOfEasyDailyChallenges = easyDailyChallenges.Count;
+        int numberOfHardDailyChallenges = hardDailyChallenges.Count;
 
         // assert the challenge ID is within range, prevent index error
         if (DC1 >= numberOfEasyDailyChallenges || DC1 <= (numberOfEasyDailyChallenges * -1) || DC1 <= (numberOfEasyDailyChallenges * -1) || DC1 <= (numberOfEasyDailyChallenges * -1))
@@ -143,7 +139,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
             }
             else
             {
-                Debug.Log("Today's challenge is already assigned. " + PlayerPrefs.GetInt("DailyChallenge1", 0) + " " + PlayerPrefs.GetInt("DailyChallenge2", 0));
+                Debug.Log("Today's daily challenges are already assigned. easy: " + PlayerPrefs.GetInt("DailyChallenge1", 0) + "   hard: " + PlayerPrefs.GetInt("DailyChallenge2", 0));
             }
         }
         else // no date ever written
@@ -154,10 +150,10 @@ public class DailyChallengeManagerScript : MonoBehaviour
 
     private void AssignNewChallenge()
     {
-        easyDailyChallenges = ChallengeManager.Instance.challengeData.easyDailyChallenges;
-        hardDailyChallenges = ChallengeManager.Instance.challengeData.hardDailyChallenges;
-        numberOfEasyDailyChallenges = easyDailyChallenges.Count;
-        numberOfHardDailyChallenges = hardDailyChallenges.Count;
+        List<Challenge> easyDailyChallenges = ChallengeManager.Instance.challengeData.easyDailyChallenges;
+        List<Challenge> hardDailyChallenges = ChallengeManager.Instance.challengeData.hardDailyChallenges;
+        int numberOfEasyDailyChallenges = easyDailyChallenges.Count;
+        int numberOfHardDailyChallenges = hardDailyChallenges.Count;
 
         PlayerPrefs.SetString("LastChallengeDate", DateTime.Today.ToString("yyyy-MM-dd"));
 
@@ -252,6 +248,10 @@ public class DailyChallengeManagerScript : MonoBehaviour
         // assert the daily challenges IDs are within range, prevent index error
         int DC1 = PlayerPrefs.GetInt("DailyChallenge1", 0);
         int DC2 = PlayerPrefs.GetInt("DailyChallenge2", 0);
+        List<Challenge> easyDailyChallenges = ChallengeManager.Instance.challengeData.easyDailyChallenges;
+        List<Challenge> hardDailyChallenges = ChallengeManager.Instance.challengeData.hardDailyChallenges;
+        int numberOfEasyDailyChallenges = easyDailyChallenges.Count;
+        int numberOfHardDailyChallenges = hardDailyChallenges.Count;
         if (DC1 >= numberOfEasyDailyChallenges || DC1 <= (numberOfEasyDailyChallenges * -1))
         {
             DC1 = 0;
@@ -296,6 +296,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         // Check if the reward is complete (negative value)
         if (DC1 < 0)
         {
+            List<Challenge> easyDailyChallenges = ChallengeManager.Instance.challengeData.easyDailyChallenges;
             try { easyDailyChallenges[Mathf.Abs(DC1)].ClaimRewards(); } // add the reward to the player's XP
             catch (IndexOutOfRangeException e) { levelManager.AddXP(50); Debug.LogError(e); }
             Debug.Log("Claimed reward 1!");
@@ -313,6 +314,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         // Check if the reward is complete (negative value)
         if (DC2 < 0)
         {
+            List<Challenge> hardDailyChallenges = ChallengeManager.Instance.challengeData.hardDailyChallenges;
             try { hardDailyChallenges[Mathf.Abs(DC2)].ClaimRewards(); } // add the reward to the player's XP
             catch (IndexOutOfRangeException e) { levelManager.AddXP(100); Debug.LogError(e); }
             Debug.Log("Claimed reward 2!");

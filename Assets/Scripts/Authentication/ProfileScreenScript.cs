@@ -26,18 +26,23 @@ public class ProfileScreenScript : MonoBehaviour
         if (PlayerAuthentication.Instance != null)
         {
             (username, id, imgURL) = PlayerAuthentication.Instance.GetProfile();
-            usernameText.text = username;
-            string profilepictureURL = imgURL;
-            StartCoroutine(LoadProfilePicture(profilepictureURL));
-
-            if (username != "")
+            if (!string.IsNullOrEmpty(username))
             {
+                usernameText.text = username;
                 authenticationButtonsParent.SetActive(false);
                 saveButtonsParent.SetActive(true);
             }
             else
             {
                 authenticationButtonsParent.SetActive(true);
+            }
+
+            // TODO: put ID somewhere
+
+            if (!string.IsNullOrEmpty(imgURL))
+            {
+                string profilepictureURL = imgURL;
+                StartCoroutine(LoadProfilePicture(profilepictureURL));
             }
         }
         else

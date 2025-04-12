@@ -6,6 +6,10 @@ public class ChallengeObject
     public List<Challenge> easyDailyChallenges = new List<Challenge>();
     public List<Challenge> hardDailyChallenges = new List<Challenge>();
     public List<Challenge> ongoingChallenges = new List<Challenge>();
+
+    public int GetNumberOfEasyDailyChallenges() { return easyDailyChallenges.Count; }
+    public int GetNumberOfHardDailyChallenges() { return hardDailyChallenges.Count; }
+    public int GetNumberOfOngoingChallenges() { return ongoingChallenges.Count; }
 }
 
 // TODO: add weights for dailt challenges maybe

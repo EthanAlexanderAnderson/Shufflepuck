@@ -40,7 +40,6 @@ public class UIManagerScript : MonoBehaviour
     [SerializeField] private TMP_Text errorMessage;
     [SerializeField] private TMP_Text profilePopupText;
     [SerializeField] private GameObject readyButton;
-    [SerializeField] private GameObject screenLog;
     [SerializeField] private GameObject titleScreenBackground;
     [SerializeField] private GameObject puckAlert;
     [SerializeField] private GameObject profileAlert;
@@ -538,6 +537,7 @@ public class UIManagerScript : MonoBehaviour
             playerWins = 0;
             opponentWins = 0;
         }
+        // This is needed to update text of completed challegnes. TODO: investigate if we can move this to EvaluateChallenge method (may not work because gameobjects are inactive).
         else if (newUI == questsScreen)
         {
             DailyChallengeManagerScript.Instance.SetText();
@@ -712,7 +712,7 @@ public class UIManagerScript : MonoBehaviour
     {
         debugMode++;
         if (debugMode == 10) {
-            screenLog.SetActive(true);
+            ScreenLog.Instance.gameObject.SetActive(true);
             if (PlayerPrefs.GetInt("tutorialCompleted") == 0)
             {
                 PlayerPrefs.SetInt("tutorialCompleted", 1);

@@ -4,10 +4,13 @@ using Unity.Services.Core;
 using GooglePlayGames;
 using GooglePlayGames.BasicApi;
 using System.Threading.Tasks;
+using UnityEngine.SceneManagement;
+#if UNITY_IOS
+using System.Runtime.InteropServices;
+#endif
 
 public class PlayerAuthentication : MonoBehaviour
 {
-    // self
     public static PlayerAuthentication Instance;
 
     private string username;
@@ -18,28 +21,15 @@ public class PlayerAuthentication : MonoBehaviour
     {
         return (username, id, imgURL);
     }
+
 #if UNITY_IOS
-    // Import native functions from iOS plugin
-    [DllImport("__Internal")]
-    private static extern void AuthenticateGameCenterPlayer();
-
-    [DllImport("__Internal")]
-    private static extern string GetGameCenterPlayerID();
-
-    [DllImport("__Internal")]
-    private static extern string GetGameCenterTeamID();
-
-    [DllImport("__Internal")]
-    private static extern string GetGameCenterPublicKeyURL();
-
-    [DllImport("__Internal")]
-    private static extern string GetGameCenterSalt();
-
-    [DllImport("__Internal")]
-    private static extern ulong GetGameCenterTimestamp();
-
-    [DllImport("__Internal")]
-    private static extern string GetGameCenterSignature();
+    [DllImport("__Internal")] private static extern void AuthenticateGameCenterPlayer();
+    [DllImport("__Internal")] private static extern string GetGameCenterPlayerID();
+    [DllImport("__Internal")] private static extern string GetGameCenterTeamID();
+    [DllImport("__Internal")] private static extern string GetGameCenterPublicKeyURL();
+    [DllImport("__Internal")] private static extern string GetGameCenterSalt();
+    [DllImport("__Internal")] private static extern ulong GetGameCenterTimestamp();
+    [DllImport("__Internal")] private static extern string GetGameCenterSignature();
 #endif
 
     private async void Awake()
@@ -47,11 +37,14 @@ public class PlayerAuthentication : MonoBehaviour
         if (Instance == null)
             Instance = this;
         else
-            Destroy(Instance);
+        {
+            Destroy(gameObject);
+            return;
+        }
 
-        // Initialize Play Games with the config
+        DontDestroyOnLoad(gameObject);
+
         PlayGamesPlatform.Activate();
-
         await UnityServices.InitializeAsync();
 
         if (AuthenticationService.Instance.IsSignedIn)
@@ -61,9 +54,9 @@ public class PlayerAuthentication : MonoBehaviour
         }
 
 #if UNITY_ANDROID
-        SignInWithGooglePlayGames();
+        AuthenticateWithGooglePlayGames();
 #elif UNITY_IOS
-        SignInWithAppleGameCenter();
+        SignInWithAppleGameCenterAsync();
 #else
         SignInAnonymously();
 #endif
@@ -71,7 +64,7 @@ public class PlayerAuthentication : MonoBehaviour
 
     // ---------- SIGN-IN FLOW ----------
 
-    private void SignInWithGooglePlayGames()
+    private void AuthenticateWithGooglePlayGames()
     {
         try
         {
@@ -79,15 +72,14 @@ public class PlayerAuthentication : MonoBehaviour
             {
                 if (success == SignInStatus.Success)
                 {
-                    // Request Server Auth Code
                     PlayGamesPlatform.Instance.RequestServerSideAccess(true, code =>
                     {
-                        SignInWithGooglePlay(code);
+                        CompleteGooglePlaySignInAsync(code);
                     });
                 }
                 else
                 {
-                    Debug.LogWarning($"Google Play sign-in failed.");
+                    Debug.LogWarning("Google Play sign-in failed.");
                     SignInAnonymously();
                 }
             });
@@ -99,33 +91,19 @@ public class PlayerAuthentication : MonoBehaviour
         }
     }
 
-    private async void SignInWithGooglePlay(string authCode)
+    private async void CompleteGooglePlaySignInAsync(string authCode)
     {
         try
         {
             await AuthenticationService.Instance.SignInWithGooglePlayGamesAsync(authCode);
             Debug.Log("Signed in with Google Play Games!");
 
+            // These are checked for null values in ProfileScreenScript before they are used.
             username = PlayGamesPlatform.Instance.GetUserDisplayName();
             id = PlayGamesPlatform.Instance.GetUserId();
             imgURL = PlayGamesPlatform.Instance.GetUserImageUrl();
 
-            try
-            {
-                if (AuthenticationService.Instance.IsSignedIn)
-                {
-                    // Write new save data, if no cloud data exists already. If it does, load data (same function)
-                    await PlayerDataManager.Instance.CheckIfSaveAllIsNecessary();
-                }
-                else
-                {
-                    Debug.LogError("SaveAll/LoadAll Error: Not Signed In.");
-                }
-            }
-            catch (AuthenticationException e)
-            {
-                Debug.LogError($"SaveAll/LoadAll Error: {e}");
-            }
+            await HandlePostSignInAsync();
         }
         catch (AuthenticationException e)
         {
@@ -137,11 +115,11 @@ public class PlayerAuthentication : MonoBehaviour
     }
 
 #if UNITY_IOS
-    private async void SignInWithAppleGameCenter()
+    private async void SignInWithAppleGameCenterAsync()
     {
         try
         {
-            AuthenticateGameCenterPlayer(); // Triggers Game Center login
+            AuthenticateGameCenterPlayer();
 
             string playerId = GetGameCenterPlayerID();
             string teamId = GetGameCenterTeamID();
@@ -158,27 +136,11 @@ public class PlayerAuthentication : MonoBehaviour
             }
 
             await AuthenticationService.Instance.SignInWithAppleGameCenterAsync(
-                signature, teamId, publicKeyUrl, salt, timestamp, new SignInOptions { CreateAccount = true }
-            );
+                signature, teamId, publicKeyUrl, salt, timestamp, new SignInOptions { CreateAccount = true });
 
             Debug.Log("Successfully signed in with Apple Game Center!");
 
-            try
-            {
-                if (AuthenticationService.Instance.IsSignedIn)
-                {
-                    // Write new save data, if no cloud data exists already. If it does, load data (same function)
-                    await PlayerDataManager.Instance.CheckIfSaveAllIsNecessary();
-                }
-                else
-                {
-                    Debug.LogError("SaveAll/LoadAll Error: Not Signed In.");
-                }
-            }
-            catch (AuthenticationException e)
-            {
-                Debug.LogError($"SaveAll/LoadAll Error: {e}");
-            }
+            await HandlePostSignInAsync();
         }
         catch (AuthenticationException e)
         {
@@ -199,6 +161,7 @@ public class PlayerAuthentication : MonoBehaviour
         {
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
             Debug.Log($"Signed In Anon as {AuthenticationService.Instance.PlayerId}");
+            SceneManager.LoadScene("SampleScene");
         }
         catch (AuthenticationException e)
         {
@@ -214,10 +177,8 @@ public class PlayerAuthentication : MonoBehaviour
         {
             if (success == SignInStatus.Success)
             {
-                // Request Server Auth Code
                 PlayGamesPlatform.Instance.RequestServerSideAccess(true, code =>
                 {
-                    Debug.Log("Server Auth Code: " + code);
                     LinkWithGooglePlay(code);
                 });
             }
@@ -243,7 +204,7 @@ public class PlayerAuthentication : MonoBehaviour
     {
         try
         {
-            AuthenticateGameCenterPlayer(); // Make sure player is authenticated
+            AuthenticateGameCenterPlayer();
 
             string playerId = GetGameCenterPlayerID();
             string teamId = GetGameCenterTeamID();
@@ -259,8 +220,7 @@ public class PlayerAuthentication : MonoBehaviour
             }
 
             await AuthenticationService.Instance.LinkWithAppleGameCenterAsync(
-                signature, teamId, publicKeyUrl, salt, timestamp, new LinkOptions { ForceLink = true }
-            );
+                signature, teamId, publicKeyUrl, salt, timestamp, new LinkOptions { ForceLink = true });
 
             Debug.Log("Successfully linked Apple Game Center to guest account!");
             await PlayerDataManager.Instance.SaveAllData();
@@ -271,4 +231,16 @@ public class PlayerAuthentication : MonoBehaviour
         }
     }
 #endif
+
+    private async Task HandlePostSignInAsync()
+    {
+        if (AuthenticationService.Instance.IsSignedIn)
+        {
+            await PlayerDataManager.Instance.SyncWithCloudIfNeeded();
+        }
+        else
+        {
+            Debug.LogError("SaveAll/LoadAll Error: Not Signed In.");
+        }
+    }
 }

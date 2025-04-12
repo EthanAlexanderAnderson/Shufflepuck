@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Unity.Services.CloudSave;
 using Unity.Services.Authentication;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerDataManager : MonoBehaviour
 {
@@ -29,7 +30,7 @@ public class PlayerDataManager : MonoBehaviour
         if (Instance == null)
             Instance = this;
         else
-            Destroy(Instance);
+            Destroy(gameObject);
     }
 
     public void TestSaveButtonHelper() { TestSave(); }
@@ -51,8 +52,8 @@ public class PlayerDataManager : MonoBehaviour
         }
     }
 
-    public void CheckIfSaveAllIsNecessaryButtonHelper() { CheckIfSaveAllIsNecessary(); }
-    public async Task CheckIfSaveAllIsNecessary()
+    public void SyncWithCloudIfNeededButtonHelper() { SyncWithCloudIfNeeded(); }
+    public async Task SyncWithCloudIfNeeded()
     {
         if (!AuthenticationService.Instance.IsSignedIn) return;
 
@@ -66,14 +67,14 @@ public class PlayerDataManager : MonoBehaviour
                 int easyWin = value.Value.GetAs<int>(); // Convert JSON object to int
                 if (easyWin > 0 && PlayerPrefs.GetInt("easyWin") == 0)
                 {
-                    Debug.Log("Prior backup found, attempting to load data...");
+                    Debug.Log("Prior backup found, attempting to load data from cloud...");
                     await LoadAllData();
                 }
                 else
                 {
                     if (PlayerPrefs.GetInt("easyWin") > 0)
                     {
-                        Debug.Log("No prior backup, attempting to save all...");
+                        Debug.Log("Attempting to save all data to cloud...");
                         await SaveAllData();
                     }
                 }
@@ -87,10 +88,12 @@ public class PlayerDataManager : MonoBehaviour
         {
             if (PlayerPrefs.GetInt("easyWin") > 0)
             {
-                Debug.Log("No prior backup, attempting to save all...");
+                Debug.Log("No prior backup, attempting to save all data to cloud...");
                 await SaveAllData();
             }
         }
+
+        SceneManager.LoadScene("SampleScene");
     }
 
     public void SaveAllDataButtonHelper() { SaveAllData(); }
@@ -146,8 +149,6 @@ public class PlayerDataManager : MonoBehaviour
         {
             await LoadDataString(key);
         }
-
-        ProcessLoadedData();
     }
 
     // generic load for ints
@@ -240,19 +241,5 @@ public class PlayerDataManager : MonoBehaviour
         {
             Debug.LogError($"Failed to save {key} : {e.Message}");
         }
-    }
-
-    // this is for doing any extra work to apply loaded data to the game state
-    private void ProcessLoadedData()
-    {
-        // set puck skin
-        PuckSkinManager.Instance.SelectPlayerPuckSprite(PlayerPrefs.GetInt("puck") == 0 && PlayerPrefs.GetInt("hardHighscore") <= 5 ? 1 : PlayerPrefs.GetInt("puck"));
-
-        // load challenges
-        DailyChallengeManagerScript.Instance.SetText();
-        OngoingChallengeManagerScript.Instance.SetText();
-
-        // XP
-        LevelManager.Instance.LoadXP();
     }
 }
