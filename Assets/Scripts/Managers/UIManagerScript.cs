@@ -75,8 +75,8 @@ public class UIManagerScript : MonoBehaviour
     [SerializeField] private Text playerScoreBonusText;
     [SerializeField] private Text opponentScoreBonusText;
 
-    private int playerWins; // TODO: this should not be stored here
-    private int opponentWins; // TODO: this should not be stored here
+    private int playerWins;
+    private int opponentWins;
     [SerializeField] private GameObject playerWinsObject;
     [SerializeField] private GameObject opponentWinsObject;
     [SerializeField] private Text playerWinsText;
@@ -536,12 +536,6 @@ public class UIManagerScript : MonoBehaviour
             puckScreen.SetActive(false);
             playerWins = 0;
             opponentWins = 0;
-        }
-        // This is needed to update text of completed challegnes. TODO: investigate if we can move this to EvaluateChallenge method (may not work because gameobjects are inactive).
-        else if (newUI == questsScreen)
-        {
-            DailyChallengeManagerScript.Instance.SetText();
-            OngoingChallengeManagerScript.Instance.SetText();
         }
         else if (newUI == rewardsScreen)
         {

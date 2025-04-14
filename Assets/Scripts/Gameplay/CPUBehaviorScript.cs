@@ -43,7 +43,6 @@ public static class CPUBehaviorScript
         }
     }
 
-    // TODO: make sure this is called after PowerupManager.Instance.LoadDeck to accurately determine player deck power level
     private static void GenerateDeck()
     {
         deck = new();
@@ -339,18 +338,18 @@ public static class CPUBehaviorScript
             9 => false, // TODO: explostion path
             10 => !powerupsUsedThisTurn.Contains(cardIndex) && LogicScript.Instance.player.puckCount > 0,
             11 => !powerupsUsedThisTurn.Contains(13) && LogicScript.Instance.player.puckCount > 0,
-            12 => LogicScript.Instance.opponent.puckCount > 2,
+            12 => LogicScript.Instance.opponent.puckCount > 2 && !powerupsUsedThisTurn.Contains(22) && !powerupsUsedThisTurn.Contains(16),
             13 => !powerupsUsedThisTurn.Contains(11) && !powerupsUsedThisTurn.Contains(17) && LogicScript.Instance.player.puckCount > 0 && (powerupsUsedThisTurn.Contains(0) || powerupsUsedThisTurn.Contains(7) || powerupsUsedThisTurn.Contains(9) || powerupsUsedThisTurn.Contains(12) || powerupsUsedThisTurn.Contains(16) || powerupsUsedThisTurn.Contains(22) || powerupsUsedThisTurn.Contains(24) || powerupsUsedThisTurn.Contains(30)),
             14 => LogicScript.Instance.player.score > LogicScript.Instance.opponent.score && PuckManager.Instance.GetPucksInPlayCount() >= 2 && PuckManager.Instance.GetPucksInPlayCount(false, -1) >= 1 && PuckManager.Instance.GetPucksInPlayCount(false, 1) >= 1,
             // TODO: 2discardcosts
-            15 => PowerupCountUsedThisTurn() == 0 && false,
-            16 => PowerupCountUsedThisTurn() == 0 && LogicScript.Instance.opponent.puckCount <= 3, // TODO: times two based on path value
-            17 => PowerupCountUsedThisTurn() == 0 && LogicScript.Instance.opponent.puckCount >= 3 && (deck.Contains(3) || deck.Contains(6)),
+            15 => PowerupCountUsedThisTurn() == 0 && !hand.Contains(30) && false,
+            16 => PowerupCountUsedThisTurn() == 0 && !hand.Contains(30) && LogicScript.Instance.opponent.puckCount <= 3 && !powerupsUsedThisTurn.Contains(12), // TODO: times two based on path value
+            17 => PowerupCountUsedThisTurn() == 0 && !hand.Contains(30) && LogicScript.Instance.opponent.puckCount >= 3 && (deck.Contains(3) || deck.Contains(6)),
             18 => ((PowerupManager.Instance.GetDeck().Count / 2) < LogicScript.Instance.player.puckCount * 3 && PowerupManager.Instance.GetDeck().Count > 2) || PowerupManager.Instance.DeckContains(30),
             19 => false,
             20 => false,
             21 => false, // TODO: use triple if CPU already used good stacking stuff
-            22 => LogicScript.Instance.opponent.puckCount >= 5,
+            22 => LogicScript.Instance.opponent.puckCount >= 5 && !powerupsUsedThisTurn.Contains(12),
             23 => false,
             24 => !powerupsUsedThisTurn.Contains(25) && DeckInExcess() && (PuckManager.Instance.GetPucksInPlayCount(true, -1) >= 3 || LogicScript.Instance.opponent.puckCount >= 3),
             25 => !powerupsUsedThisTurn.Contains(24) && LogicScript.Instance.player.score > LogicScript.Instance.opponent.score && PuckManager.Instance.GetPucksInPlayCount(true) >= 3, // TODO: push based on path proximity to player pucks (this will be a nightmare to code) AT LEAST make sure angle is middle-ish so it's likely to do SOMETHING
@@ -477,7 +476,7 @@ public static class CPUBehaviorScript
                 break;
             }
 
-            if (puckScript.IsPlayersPuck()) { validPucks++; }
+            if (puckScript.IsPlayersPuck() && !puckScript.IsHydra()) { validPucks++; }
             if (puckScript.IsPlayersPuck() && puckScript.IsFactory() && LogicScript.Instance.player.puckCount > 0) { validPucks++; } // a single player factory will trigger cull
             if (!puckScript.IsPlayersPuck() && puckScript.IsResurrect()) { validPucks++; } // a single CPU resurrect will trigger cull
         }

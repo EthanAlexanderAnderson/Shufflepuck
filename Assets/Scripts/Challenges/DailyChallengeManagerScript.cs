@@ -10,7 +10,6 @@ public class DailyChallengeManagerScript : MonoBehaviour
     public static DailyChallengeManagerScript Instance;
     // dependencies
     private LevelManager levelManager;
-    private SoundManagerScript sound;
 
     [SerializeField] private GameObject titleScreen;
 
@@ -38,13 +37,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
             Destroy(Instance);
     }
 
-    void OnEnable()
-    {
-        levelManager = LevelManager.Instance;
-        sound = SoundManagerScript.Instance;
-    }
-
-    // Called at start after the challenges are instantiated by ChallengeManager
+    // Called at start after the challenges are instantiated by ChallengeManager. also called when a challenge is assigned/completed or a reward is claimed.
     public void SetText()
     {
         CheckForNewDailyChallenge();
@@ -91,11 +84,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         }
         challenge2Text.text = hardDailyChallenges[Mathf.Abs(DC2)].challengeText;
 
-        if (levelManager == null)
-        {
-            levelManager = LevelManager.Instance;
-        }
-        levelManager.SetText();
+        LevelManager.Instance.SetText();
     }
 
     void Update()
@@ -211,6 +200,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
             }
         }
 
+        SetText();
         Debug.Log($"New daily challenges assigned. " + PlayerPrefs.GetInt("DailyChallenge1", 0) + " " + PlayerPrefs.GetInt("DailyChallenge2", 0));
     }
 
@@ -272,6 +262,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         {
             PlayerPrefs.SetInt("DailyChallenge2", -DC2);
         }
+        SetText();
 
         if (scoreDifference > 0 && isOnline == 0)
         {
@@ -302,7 +293,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
             Debug.Log("Claimed reward 1!");
             PlayerPrefs.SetInt("DailyChallenge1", 0); // 0 means the reward is claimed
             SetText();
-            sound.PlayWinSFX();
+            SoundManagerScript.Instance.PlayWinSFX();
         }
         titleScreen.GetComponent<TitleScreenScript>().UpdateAlerts();
     }
@@ -320,7 +311,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
             Debug.Log("Claimed reward 2!");
             PlayerPrefs.SetInt("DailyChallenge2", 0); // 0 means the reward is claimed
             SetText();
-            sound.PlayWinSFX();
+            SoundManagerScript.Instance.PlayWinSFX();
         }
         titleScreen.GetComponent<TitleScreenScript>().UpdateAlerts();
     }
