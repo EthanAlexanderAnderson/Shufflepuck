@@ -9,7 +9,7 @@ public class PlinkoManager : MonoBehaviour
     // self
     public static PlinkoManager Instance;
 
-    // imports
+    // objects in scene
     [SerializeField] private Image rewardImage;
     [SerializeField] private GameObject rewardImageAnimation;
     [SerializeField] private TMP_Text rewardText;
@@ -19,6 +19,9 @@ public class PlinkoManager : MonoBehaviour
     [SerializeField] private GameObject bonusBucketRight;
     [SerializeField] private TMP_Text bonusBucketRightText;
     [SerializeField] private GameObject plinkoDropButton;
+
+    // asset imports
+    [SerializeField] private Sprite plusPack;
 
     // floating text
     [SerializeField] private GameObject floatingTextPrefab;
@@ -56,11 +59,17 @@ public class PlinkoManager : MonoBehaviour
             rewardText.text = "+" + PlinkoReward.ToString() + "XP";
             rewardImageAnimation.SetActive(false);
         }
-        else // skin reward
+        else if (PlinkoReward > 0) // skin reward
         {
             rewardText.text = "UNLOCK";
             rewardImage.sprite = PuckSkinManager.Instance.ColorIDtoPuckSprite(PlinkoReward);
             rewardImageAnimation.SetActive(PlinkoReward == 40);
+        }
+        else
+        {
+            var (_, level) = LevelManager.Instance.GetXPAndLevel();
+            rewardText.text = (int)(level / 10f) > 1 ? $"+{(int)(level / 10f)} +PACKS" : $"+{(int)(level / 10f)} +PACK";
+            rewardImage.sprite = plusPack;
         }
         rewardImage.enabled = PlinkoReward < 100; // reward image should be disabled if the reward is XP
         UpdateSideBucketText();
@@ -165,14 +174,16 @@ public class PlinkoManager : MonoBehaviour
         }
 
         // if we have no pucks remaining
-        if (totalWeight == 0 && currentReward < 100)
+        if (totalWeight == 0 && currentReward > 0 && currentReward < 100)
         {
             // no pucks are left to unlock
             if (PlayerPrefs.GetInt("puck" + currentReward + "unlocked") == 1)
             {
                 Debug.Log("No puck skin rewards remain.");
-                PlayerPrefs.SetInt("PlinkoReward", 999);
-                rewardImage.enabled = false;
+                PlayerPrefs.SetInt("PlinkoReward", 0);
+                var (_, level) = LevelManager.Instance.GetXPAndLevel();
+                rewardText.text = (int)(level / 10f) > 1 ? $"+{(int)(level / 10f)} +PACKS" : $"+{(int)(level / 10f)} +PACK";
+                rewardImage.sprite = plusPack;
                 return;
             }
             // only one puck left to unlock
@@ -213,19 +224,40 @@ public class PlinkoManager : MonoBehaviour
         int plinkoreward = PlayerPrefs.GetInt("PlinkoReward");
 
         // input checking
-        if (self == null || plinkoreward == 0)
+        if (self == null || plinkoreward < 0)
         {
             Debug.LogError("PlinkoManager.MainReward() : Error : Plinko Reward not given.");
             UIManagerScript.Instance.SetErrorMessage("Error: Plinko Reward not given.");
             return;
         }
 
+        // SFX for auditory feedback
+        SoundManagerScript.Instance.PlayWinSFX();
+
+        GameObject floatingText = Instantiate(floatingTextPrefab, self.position, Quaternion.identity, transform);
+
         // give the reward to the player
-        if (plinkoreward >= 100) // XP reward
+        // XP reward
+        if (plinkoreward >= 100)
         {
             LevelManager.Instance.AddXP(plinkoreward);
+            // floating text for visual feedback
+            floatingText.GetComponent<FloatingTextScript>().Initialize("+" + plinkoreward + "XP", 0.5f, 15);
         }
-        else // skin reward
+        // plus packs
+        else if (plinkoreward == 0)
+        {
+            // get level for pack reward quantity
+            var (_, level) = LevelManager.Instance.GetXPAndLevel();
+
+            // give the reward to the player
+            PackManager.Instance.RewardPacks(true, (int)(level / 10f));
+
+            // floating text for visual feedback
+            floatingText.GetComponent<FloatingTextScript>().Initialize((int)(level / 10f) > 1 ? $"+{(int)(level / 10f)} +PACKS" : $"+{(int)(level / 10f)} +PACK", 0.5f, 15);
+        }
+        // skin reward
+        else if (plinkoreward > 0 && plinkoreward < 100)
         {
             // if the puck has not been unlocked already, unlock it. otherwise it is a duplicate and we should grant XP
             if (PlayerPrefs.GetInt("puck" + plinkoreward.ToString() + "unlocked", 0) == 0)
@@ -240,14 +272,9 @@ public class PlinkoManager : MonoBehaviour
                 LevelManager.Instance.AddXP(plinkoreward);
                 UIManagerScript.Instance.SetErrorMessage("Duplicate reward. Adding +100XP instead.");
             }
+            // floating text for visual feedback
+            floatingText.GetComponent<FloatingTextScript>().Initialize((plinkoreward >= 100) ? "+" + plinkoreward + "XP" : "UNLOCKED!", 0.5f, 15);
         }
-
-        // SFX for auditory feedback
-        SoundManagerScript.Instance.PlayWinSFX();
-
-        // floating text for visual feedback
-        var floatingText = Instantiate(floatingTextPrefab, self.position, Quaternion.identity, transform);
-        floatingText.GetComponent<FloatingTextScript>().Initialize((plinkoreward >= 100) ? "+" + plinkoreward + "XP" : "UNLOCKED!", 0.5f, 15);
     }
 
     public void SideReward( Transform self )
@@ -264,9 +291,6 @@ public class PlinkoManager : MonoBehaviour
         // floating text for visual feedback
         var floatingText = Instantiate(floatingTextPrefab, self.position, Quaternion.identity, transform);
         floatingText.GetComponent<FloatingTextScript>().Initialize(level > 1 ? $"+{level} PACKS" : $"+{level} PACK", 0.5f, 15);
-
-        // add a drop if we leveled up
-        plinkoDropButton.GetComponent<PlinkoDropButtonScript>().SetDropButtonText();
     }
 
     public void BonusReward(Transform self)

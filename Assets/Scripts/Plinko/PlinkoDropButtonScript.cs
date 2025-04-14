@@ -62,7 +62,7 @@ public class PlinkoDropButtonScript : MonoBehaviour
 
     public void SetDropButtonText()
     {
-        (int XP, int level) = LevelManager.Instance.GetXPAndLevel();
+        (_, int level) = LevelManager.Instance.GetXPAndLevel();
         dropped = PlayerPrefs.GetInt("PlinkoPegsDropped", 0);
         drops = level - dropped;
         count.text = drops.ToString();
