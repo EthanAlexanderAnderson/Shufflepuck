@@ -144,11 +144,12 @@ public static class CPUBehaviorScript
         return (-1f, -1f, -1f);
     }
 
-    private static bool UseNextCard()
+    private static bool UseNextCard(int cardIndex = -1)
     {
         for (int i = 0; i < hand.Length; i++)
         {
-            if (hand[i] == -1) continue;
+            if (hand[i] == -1 || (cardIndex >= 0 && hand[i] != cardIndex)) continue; // if card in hand is null, or is not the desired card, skip
+
             if (EvaluatePowerupUsage(hand[i]))
             {
                 PowerupManager.Instance.CallMethodArray(PowerupCardData.EncodeCard(hand[i], 0, false, 1));
@@ -216,15 +217,9 @@ public static class CPUBehaviorScript
 
             // try to phase lol
             usePhase = best.DoesPathRequirePhasePowerup();
-            if (best.DoesPathRequirePhasePowerup())
+            if (best.DoesPathRequirePhasePowerup() && hand.Any(n => n != -1) && PowerupCountUsedThisTurn() < 3)
             {
-                for (int i = 0; i < hand.Count(); i++)
-                {
-                    if (hand.Any(n => n != -1) && PowerupCountUsedThisTurn() < 3)
-                    {
-                        UseNextCard();
-                    }
-                }
+                UseNextCard(5);
             }
 
             return best.GetPath();
@@ -234,7 +229,7 @@ public static class CPUBehaviorScript
         {
             Debug.Log("No path :(");
             float variance = Random.Range(0f, (5 - modifiedDifficulty) * 3);
-            return (Random.Range(20.0f - variance, 60.0f + variance), Random.Range(65.0f - variance, 80.0f + variance), Random.Range(45.0f - variance, 55.0f + variance));
+            return (Random.Range(20.0f - variance, 60.0f + variance), Random.Range(65.0f - variance, 85.0f + variance - (LogicScript.Instance.opponent.puckCount * 3)), Random.Range(45.0f - variance, 55.0f + variance));
         }
     }
 
