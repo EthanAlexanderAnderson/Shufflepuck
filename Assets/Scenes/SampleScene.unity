@@ -169,7 +169,7 @@ MonoBehaviour:
   angle: 32.3
   power: 50
   spin: 50
-  value: 6
+  value: 3.1
   requiresPhasePowerup: 0
 --- !u!61 &756733
 BoxCollider2D:
@@ -3411,7 +3411,7 @@ MonoBehaviour:
   angle: 84
   power: 88
   spin: 0
-  value: 2
+  value: 2.1
   requiresPhasePowerup: 0
 --- !u!60 &73639749
 PolygonCollider2D:
@@ -5675,7 +5675,7 @@ MonoBehaviour:
   angle: 12
   power: 90
   spin: 100
-  value: 5
+  value: 3
   requiresPhasePowerup: 0
 --- !u!60 &141762928
 PolygonCollider2D:
@@ -12737,7 +12737,7 @@ MonoBehaviour:
   angle: 20
   power: 57
   spin: 50
-  value: 6
+  value: 3.1
   requiresPhasePowerup: 0
 --- !u!61 &207078887
 BoxCollider2D:
@@ -15272,7 +15272,7 @@ MonoBehaviour:
   angle: 30
   power: 71
   spin: 50
-  value: 9
+  value: 4.1
   requiresPhasePowerup: 0
 --- !u!61 &266553088
 BoxCollider2D:
@@ -16580,7 +16580,7 @@ MonoBehaviour:
   angle: 57
   power: 74
   spin: 0
-  value: 8
+  value: 4
   requiresPhasePowerup: 0
 --- !u!60 &299694977
 PolygonCollider2D:
@@ -23483,7 +23483,7 @@ MonoBehaviour:
   angle: 62
   power: 80
   spin: 0
-  value: 5
+  value: 3
   requiresPhasePowerup: 0
 --- !u!60 &459286197
 PolygonCollider2D:
@@ -32897,7 +32897,7 @@ MonoBehaviour:
   angle: 0
   power: 94.9
   spin: 70
-  value: 2
+  value: 2.1
   requiresPhasePowerup: 0
 --- !u!60 &541556641
 PolygonCollider2D:
@@ -40266,7 +40266,7 @@ MonoBehaviour:
   angle: 28
   power: 31
   spin: 50
-  value: 1
+  value: 2.2
   requiresPhasePowerup: 0
 --- !u!61 &620282572
 BoxCollider2D:
@@ -42583,7 +42583,7 @@ MonoBehaviour:
   angle: 58
   power: 35
   spin: 50
-  value: 1
+  value: 2.2
   requiresPhasePowerup: 0
 --- !u!61 &663298586
 BoxCollider2D:
@@ -43304,7 +43304,7 @@ MonoBehaviour:
   angle: 70.2
   power: 77
   spin: 50
-  value: 3
+  value: 2.1
   requiresPhasePowerup: 0
 --- !u!61 &683211351
 BoxCollider2D:
@@ -46834,7 +46834,7 @@ MonoBehaviour:
   angle: 22
   power: 77
   spin: 80
-  value: 8
+  value: 4
   requiresPhasePowerup: 0
 --- !u!60 &750069014
 PolygonCollider2D:
@@ -56261,7 +56261,7 @@ MonoBehaviour:
   angle: 15
   power: 82
   spin: 100
-  value: 8
+  value: 4
   requiresPhasePowerup: 0
 --- !u!60 &835633550
 PolygonCollider2D:
@@ -60358,7 +60358,7 @@ MonoBehaviour:
   angle: 46
   power: 51
   spin: 50
-  value: 6
+  value: 3.1
   requiresPhasePowerup: 0
 --- !u!61 &917655134
 BoxCollider2D:
@@ -65905,7 +65905,7 @@ MonoBehaviour:
   angle: 7.5
   power: 45
   spin: 50
-  value: 1
+  value: 2.2
   requiresPhasePowerup: 0
 --- !u!61 &1019210498
 BoxCollider2D:
@@ -84779,7 +84779,7 @@ MonoBehaviour:
   angle: 35.5
   power: 71
   spin: 50
-  value: 9
+  value: 4.1
   requiresPhasePowerup: 0
 --- !u!61 &1237600845
 BoxCollider2D:
@@ -85676,7 +85676,7 @@ MonoBehaviour:
   angle: 49
   power: 72
   spin: 20
-  value: 8
+  value: 4
   requiresPhasePowerup: 0
 --- !u!60 &1247150378
 PolygonCollider2D:
@@ -94390,7 +94390,7 @@ MonoBehaviour:
   angle: 22
   power: 55
   spin: 80
-  value: 6
+  value: 3.1
   requiresPhasePowerup: 0
 --- !u!60 &1303936218
 PolygonCollider2D:
@@ -111646,7 +111646,7 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 0
     m_MaxSize: 300
-    m_Alignment: 4
+    m_Alignment: 1
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
@@ -111677,8 +111677,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -1100}
-  m_SizeDelta: {x: 1200, y: 600}
+  m_AnchoredPosition: {x: 0, y: -1025}
+  m_SizeDelta: {x: 1200, y: 700}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1468171727
 GameObject:
@@ -120383,8 +120383,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -700}
-  m_SizeDelta: {x: 1250, y: 400}
+  m_AnchoredPosition: {x: 0, y: -500}
+  m_SizeDelta: {x: 1250, y: 350}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1541591845
 MonoBehaviour:
@@ -123459,7 +123459,7 @@ MonoBehaviour:
   angle: 4.8
   power: 89.5
   spin: 50
-  value: 3
+  value: 2.1
   requiresPhasePowerup: 0
 --- !u!61 &1618170138
 BoxCollider2D:
@@ -125839,7 +125839,7 @@ GameObject:
   - component: {fileID: 1672071359}
   m_Layer: 5
   m_Name: (multiplier scales with your level) Text (TMP)
-  m_TagString: blackText
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -125893,7 +125893,7 @@ MonoBehaviour:
   m_fontColor32:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+  m_fontColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -126647,7 +126647,7 @@ MonoBehaviour:
   angle: 22.23
   power: 55
   spin: 50
-  value: 6
+  value: 3.1
   requiresPhasePowerup: 0
 --- !u!61 &1686513496
 BoxCollider2D:
@@ -140465,7 +140465,7 @@ MonoBehaviour:
   angle: 40
   power: 71
   spin: 50
-  value: 9
+  value: 4.1
   requiresPhasePowerup: 0
 --- !u!61 &1876184033
 BoxCollider2D:

@@ -13,7 +13,7 @@ public class CPUPathScript : MonoBehaviour, CPUPathInterface
     [SerializeField] private float angle;
     [SerializeField] private float power;
     [SerializeField] private float spin;
-    [SerializeField] private int value;
+    [SerializeField] private float value;
     [SerializeField] private bool requiresPhasePowerup;
     private bool requiresExplosionPowerup;
 
@@ -23,7 +23,7 @@ public class CPUPathScript : MonoBehaviour, CPUPathInterface
 
     public bool DoesPathRequireExplosionPowerup() { return requiresExplosionPowerup; }
 
-    public int CalculateValue(int modifiedDifficulty)
+    public float CalculateValue(int modifiedDifficulty)
     {
         DisablePathVisualization();
         List<GameObject> pucksCurrentlyInPath = GetPucksInPath();
@@ -41,7 +41,7 @@ public class CPUPathScript : MonoBehaviour, CPUPathInterface
             requiresExplosionPowerup = true;
             if (CPUBehaviorScript.HasExplosion())
             {
-                return pucksCurrentlyInPath[0].GetComponent<PuckScript>().ComputeValue() - 2; // minus 2 because we need to consider the opportunity cost of exploding the CPU puck
+                return pucksCurrentlyInPath[0].GetComponent<PuckScript>().ComputeTotalFutureValue() - 2; // minus 2 because we need to consider the opportunity cost of exploding the CPU puck
             }
             else
             {

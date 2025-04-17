@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -55,7 +54,11 @@ public static class CPUBehaviorScript
             playerDeckPowerLevel += (int)Math.Pow(PowerupCardData.GetCardRarity(PowerupCardData.DecodeCard(playerDeck[i]).cardIndex) + 1, 2);
         }
 
-        // modify the power level based on CPU difficulty
+        // any cards in deck -> increases modified difficulty by 1
+        // every additional 15 deck power -> increases modified difficulty by 1
+        modifiedDifficulty = difficulty + (playerDeckPowerLevel + 14) / 15;
+
+        // modify the deck power level based on CPU difficulty, for the purpose of CPU deckbuilding
         playerDeckPowerLevel -= (2 - difficulty) * 5;
 
         Debug.Log("modified playerDeckPowerLevel: " + playerDeckPowerLevel);
@@ -74,9 +77,6 @@ public static class CPUBehaviorScript
             failSafe++;
         }
 
-        // any cards in deck -> increases modified difficulty by 1
-        // every additional 15 deck power -> increases modified difficulty by 1
-        modifiedDifficulty = difficulty + (playerDeckPowerLevel + 14) / 15;
         Debug.Log("CPU modifiedDifficulty set to: " + modifiedDifficulty);
     }
 
@@ -182,14 +182,16 @@ public static class CPUBehaviorScript
     static bool usePhase = false;
     public static (float, float, float) FindPath()
     {
-        // initialize CPU paths
-        CPUPaths = GameObject.FindGameObjectsWithTag("cpu_path");
-
         // if Fog is active and foresight isn't, shoot random
         if ((FogScript.Instance.FogEnabled() && !HaloScript.Instance.HaloEnabled())) { return (Random.Range(20.0f, 60.0f), Random.Range(60.0f, 80.0f), Random.Range(45.0f, 55.0f)); }
 
+        // initialize CPU paths
+        CPUPaths = GameObject.FindGameObjectsWithTag("cpu_path");
+
+        // random path is worth 2
         CPUPathInterface best = null;
-        int highestValue = 0;
+        float highestValue = 2;
+
         // check all paths to see which are unblocked
         foreach (var path in CPUPaths)
         {
@@ -202,6 +204,7 @@ public static class CPUBehaviorScript
 
             if (pathi.GetPath().spin != 50 && difficulty < 2) { continue; } // skip path if it needs spin and we're not playing against hard CPU
 
+            // pick the highest path. if the paths have the same value, there is a 25% chance of swapping.
             float randomValue = Random.Range(0f, 1f);
             if (pathiShotValue > highestValue || (pathiShotValue == highestValue && randomValue < 0.25))
             {
@@ -210,7 +213,7 @@ public static class CPUBehaviorScript
             }
         }
         // chose the highest-value unblocked path
-        if (highestValue > 0)
+        if (highestValue > 2 && best != null)
         {
             Debug.Log("Found path with highest value " + highestValue);
             best.EnablePathVisualization();
@@ -377,7 +380,7 @@ public static class CPUBehaviorScript
             {
                 playerPucks++;
                 // small positive weight for player high value or exponent pucks
-                if ((puckScript.ComputeValue() > 10 || puckScript.IsExponent()) && !puckScript.IsShield())
+                if (puckScript.ComputeTotalFutureValue() > 10 && !puckScript.IsShield())
                 {
                     playerPucks++;
                 }
@@ -396,7 +399,7 @@ public static class CPUBehaviorScript
             {
                 opponentPucks++;
                 // small negative weight for CPU high value or exponent pucks
-                if ((puckScript.ComputeValue() > 10 || puckScript.IsExponent()) && !puckScript.IsShield())
+                if (puckScript.ComputeTotalFutureValue() > 10 && !puckScript.IsShield())
                 {
                     opponentPucks++;
                 }

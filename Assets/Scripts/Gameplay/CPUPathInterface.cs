@@ -6,7 +6,7 @@ public interface CPUPathInterface {
 
     bool DoesPathRequireExplosionPowerup();
 
-    int CalculateValue(int modifiedDifficulty);
+    float CalculateValue(int modifiedDifficulty);
 
     void EnablePathVisualization(int mode = 0);
 

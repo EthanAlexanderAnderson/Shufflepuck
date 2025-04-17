@@ -351,6 +351,15 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public bool IsPastSafeLine() { return pastSafeLine; }
     public bool IsPlayersPuck() { return playersPuck; }
     public int ComputeValue() { return (puckBaseValue * zoneMultiplier) + (zoneMultiplier > 0 ? puckBonusValue : 0); }
+    public int ComputeTotalFutureValue()
+    {
+        if (zoneMultiplier < 0) return 0;
+        int puckValue = ComputeValue();
+        if (IsGrowth()) puckValue += LogicScript.Instance.player.puckCount * GetGrowthCount();
+        if (IsFactory()) puckValue += LogicScript.Instance.player.puckCount * 2 * GetFactoryCount();
+        if (IsExponent()) puckValue += (puckBaseValue * zoneMultiplier) * (int)Mathf.Pow(2, LogicScript.Instance.player.puckCount - 1) * GetExponentCount() - (puckBaseValue * zoneMultiplier);
+        return puckValue;
+    }
     public int GetZoneMultiplier() { return zoneMultiplier; }
     public void SetZoneMultiplier(int ZM) { zoneMultiplier = ZM; }
     public bool IsGrowth() { return growthPowerup > 0; }
