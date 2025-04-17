@@ -42,7 +42,7 @@ public class DebugWindow : EditorWindow
         }
         catch (NullReferenceException)
         {
-            Debug.LogError("Failed to create unity debug window");
+            Debug.Log("Failed to create unity debug window");
             return;
         }
 
