@@ -460,8 +460,10 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
         SoundManagerScript.Instance.PlayClickSFX(4);
     }
 
-    private void UpdateCraftUI()
+    public void UpdateCraftUI()
     {
+        if (cardIndex < 0) return;
+
         // holos are uncraftable
         if (ownedCardVariationList[selectedCardVariationIndex].holo)
         {
@@ -483,6 +485,7 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
 
         int craftCost = selectedCardRank > 0 ? rankBaseCraftCosts[selectedCardRank] : rarityBaseCraftCosts[PowerupCardData.GetCardRarity(cardIndex)];
 
+        craftingCredits = PlayerPrefs.GetInt("CraftingCredits");
         int selectedCurrency = selectedCardRank > 0 ? PowerupCardData.GetCardOwnedCount(cardIndex, selectedCardRank - 1, false) : craftingCredits;
 
         // text
@@ -559,7 +562,7 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
 
         toCraftCount = 0;
         totalOwned = ownedCardVariationList.Sum(card => card.count);
-        UpdateCraftUI();
+        GetComponentInParent<DeckScreenScript>().UpdateAllCardCraftUI();
     }
 
     private void UpdateSelectedCardVariationIndex()

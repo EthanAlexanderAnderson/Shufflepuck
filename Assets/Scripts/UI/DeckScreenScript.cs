@@ -89,4 +89,14 @@ public class DeckScreenScript : MonoBehaviour
             Destroy(child.gameObject);
         }
     }
+
+    public void UpdateAllCardCraftUI()
+    {
+        DeckbuilderCardUIPrefabScript[] deckbuilderCardUIArray = GetComponentsInChildren<DeckbuilderCardUIPrefabScript>();
+
+        foreach (var deckbuilderCardUI in deckbuilderCardUIArray)
+        {
+            deckbuilderCardUI.UpdateCraftUI();
+        }
+    }
 }
