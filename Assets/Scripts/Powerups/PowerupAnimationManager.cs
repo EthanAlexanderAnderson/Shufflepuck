@@ -66,6 +66,8 @@ public class PowerupAnimationManager : MonoBehaviour
         powerupPopupScript.InitializePowerupPopup(decodedCard.cardIndex, decodedCard.rank, decodedCard.holo);
         (popupEffectIconObject, popupEffectIconOutlineObject, popupEffectTextObject, popupEffectRarityObject) = powerupPopupScript.GetObjects();
 
+        PlayPowerupPopupEffectSoundeffects(isPlayer, decodedCard.holo, decodedCard.rank > 0);
+
         LeanTween.cancel(popupEffectIconObject);
         LeanTween.cancel(popupEffectTextObject);
         LeanTween.cancel(powerupPopupObject);
@@ -90,6 +92,12 @@ public class PowerupAnimationManager : MonoBehaviour
         Destroy(powerupPopupObject, 3.5f);
     }
 
+    private void PlayPowerupPopupEffectSoundeffects(bool isPlayer, bool holo, bool rank)
+    {
+        SoundManagerScript.Instance.PlayPowerupPopup(isPlayer);
+        if (holo) SoundManagerScript.Instance.PlayPowerupPopup(isPlayer, 1);
+        if (rank) SoundManagerScript.Instance.PlayPowerupPopup(isPlayer, 2);
+    }
 
     // this is the small icon effect than shows at a pucks location when an effect in activated
     public void PlayPowerupActivationAnimation(int index, Vector3 position)

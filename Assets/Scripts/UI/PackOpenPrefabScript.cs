@@ -31,6 +31,7 @@ public class PackOpenPrefabScript : MonoBehaviour
             puckImageObject.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
             LeanTween.scale(puckImageObject, Vector3.one, 0.5f).setEaseOutElastic();
             rarityParticleSystem.Play();
+            SoundManagerScript.Instance.PlayClickSFX(3, clicks/10f);
             clicks++;
         }
         else if (Input.GetMouseButtonDown(0) && puckImageObject.transform.localScale == Vector3.one && clicks == targetClicks)
@@ -49,6 +50,7 @@ public class PackOpenPrefabScript : MonoBehaviour
 
             LeanTween.scale(puckImageObject, Vector3.zero, 0.5f).setEaseInOutQuint().setDelay(0.45f).setOnComplete(CreatePowerupPopupPrefab);
 
+            SoundManagerScript.Instance.PlayClickSFX(3, clicks/10f);
             clicks++;
         }
     }
@@ -59,6 +61,9 @@ public class PackOpenPrefabScript : MonoBehaviour
         PowerupPopupPrefabScript powerupPopupScript = powerupPopupObject.GetComponent<PowerupPopupPrefabScript>();
         powerupPopupScript.InitializePowerupPopup(cardIndex, rank, holo);
         powerupPopupScript.Animate();
+        SoundManagerScript.Instance.PlayPowerupPopup(true);
+        if (holo) SoundManagerScript.Instance.PlayPowerupPopup(true, 1);
+        if (rank > 0) SoundManagerScript.Instance.PlayPowerupPopup(true, 2);
         PackManager.Instance.ShowBottomText();
     }
 

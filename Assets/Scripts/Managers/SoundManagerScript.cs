@@ -44,10 +44,17 @@ public class SoundManagerScript : MonoBehaviour
     [SerializeField] private AudioSource clickSFXUp;
     [SerializeField] private AudioSource clickSFXDown;
 
+    // powerup popups
+    private AudioSource[] powerupPopups;
+    [SerializeField] private AudioSource powerupPopup;
+    [SerializeField] private AudioSource powerupPopupShineHolo;
+    [SerializeField] private AudioSource powerupPopupShineRank;
+
     void Awake()
     {
         tracks = new AudioClip[] { music_Shufflepuck, game_1_Quirkii, game_2_Mana_Trail, menu_1_Play_It_Cool };
         clicks = new AudioSource[] { clickSFX1, clickSFX2, clickSFX3, clickSFX4, clickSFXUp, clickSFXDown };
+        powerupPopups = new AudioSource[] { powerupPopup, powerupPopupShineHolo, powerupPopupShineRank };
 
         if (Instance == null)
             Instance = this;
@@ -136,13 +143,13 @@ public class SoundManagerScript : MonoBehaviour
         musicComponent.Play();
     }
 
-    public void PlayClickSFX(int i = 0)
+    public void PlayClickSFX(int i = 0, float pitchBoost = 0f)
     {
         // very important this doesn't throw an error and stop the rest of whatever the button is trying to do
         try
         {
             clicks[i].mute = false;
-            clicks[i].pitch = 1f;
+            clicks[i].pitch = 1f + pitchBoost;
             clicks[i].volume = SFXVolumeFromPref;
             clicks[i].Play();
         }
@@ -174,6 +181,18 @@ public class SoundManagerScript : MonoBehaviour
         if (puckDestroySFX == null) { return; }
         puckDestroySFX.volume = SFXvolume;
         puckDestroySFX.Play();
+    }
+
+    public void PlayPowerupPopup(bool isPlayers, int i = 0)
+    {
+        try
+        {
+            powerupPopups[i].mute = false;
+            powerupPopups[i].pitch = isPlayers ? 1.1f : 0.9f;
+            powerupPopups[i].volume = SFXVolumeFromPref;
+            powerupPopups[i].Play();
+        }
+        catch (System.Exception e) { Debug.LogError(e); }
     }
 
     private IEnumerator FadeInMusic()
