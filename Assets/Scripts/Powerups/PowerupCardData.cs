@@ -163,7 +163,7 @@ public static class PowerupCardData
         // Split the collection string into individual encoded card values
         string[] cardEncoded = string.IsNullOrEmpty(collectionString) ? new string[0] : collectionString.Split(',');
 
-        // Encode the card information for the given index
+        // flag for if the card already exsits in the collection (increment vs add new)
         bool cardFound = false;
 
         // Search for the card in the collection and update its quantity
@@ -298,4 +298,57 @@ public static class PowerupCardData
             }
         }
     }
+
+#if UNITY_EDITOR
+    public static void LogRarityStats()
+    {
+        int commonTotalCards = 0;
+        int uncommonTotalCards = 0;
+        int rareTotalCards = 0;
+        int epicTotalCards = 0;
+        int legendaryTotalCards = 0;
+
+        // Get the current collection string
+        string collectionString = PlayerPrefs.GetString("CardCollection", "");
+
+        // Split the collection string into individual encoded card values
+        string[] cardEncoded = string.IsNullOrEmpty(collectionString) ? new string[0] : collectionString.Split(',');
+
+        // Search for the card in the collection and update its quantity
+        for (int i = 0; i < cardEncoded.Length; i++)
+        {
+            if (int.TryParse(cardEncoded[i], out int encodedCard))
+            {
+                var decodedCard = DecodeCard(encodedCard);
+                switch (PowerupCardData.GetCardRarity(decodedCard.cardIndex))
+                {
+                    case 0:
+                        commonTotalCards += decodedCard.quantity;
+                        break;
+                    case 1:
+                        uncommonTotalCards += decodedCard.quantity;
+                        break;
+                    case 2:
+                        rareTotalCards += decodedCard.quantity;
+                        break;
+                    case 3:
+                        epicTotalCards += decodedCard.quantity;
+                        break;
+                    case 4:
+                        legendaryTotalCards += decodedCard.quantity;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        Debug.Log($"average count per rarity:\n" +
+                  $"common: {commonTotalCards/12f}\n" +
+                  $"uncommon: {uncommonTotalCards / 9f}\n" +
+                  $"rare: {rareTotalCards / 5f}\n" +
+                  $"epic: {epicTotalCards / 3f}\n" +
+                  $"legendary: {legendaryTotalCards / 1f}");
+    }
+#endif
 }

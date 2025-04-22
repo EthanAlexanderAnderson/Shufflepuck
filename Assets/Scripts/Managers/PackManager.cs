@@ -373,23 +373,23 @@ public class PackManager : MonoBehaviour
         while (boosterPoints >= 0 && returnValue != packBooster)
         {
             int rand = Random.Range(0, 1000);
-            if (rand < 30 && level >= 10)           // legendary : 0 - 29 : 30 in 1000 : 3%
+            if (rand < 10 && level >= 10)           // legendary : 0 - 9 : 10 in 1000 : 1%
             {
                 returnValue = PowerupCardData.GetRandomCardOfRarity(4);
             }
-            else if (rand < 100 && level >= 5)      // epic : 30 - 99 : 70 in 1000 : 7%
+            else if (rand < 60 && level >= 5)      // epic : 10 - 59 : 50 in 1000 : 5%
             {
                 returnValue = PowerupCardData.GetRandomCardOfRarity(3);
             }
-            else if (rand < 250)                    // rare : 100 - 249 : 150 in 1000 : 15%
+            else if (rand < 180)                    // rare : 60 - 179 : 120 in 1000 : 12%
             {
                 returnValue = PowerupCardData.GetRandomCardOfRarity(2);
             }
-            else if (rand < 500)                    // uncommon : 250 - 499 : 250 in 1000 : 25%
+            else if (rand < 460)                    // uncommon : 180 - 459 : 280 in 1000 : 28%
             {
                 returnValue = PowerupCardData.GetRandomCardOfRarity(1);
             }
-            else                                    // common : 500 - 999 : 500 in 1000 : 50%
+            else                                    // common : 460 - 999 : 550 in 1000 : 54%
             {
                 returnValue = PowerupCardData.GetRandomCardOfRarity(0);
             }
