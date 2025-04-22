@@ -322,6 +322,7 @@ public class LogicScript : MonoBehaviour
         if (tempTime == 0)
         {
             tempTime = timer;
+            powerupWaitTime = 0;
         }
 
         if (CPUShotAngle < 0) (CPUShotAngle, CPUShotPower, CPUShotSpin) = CPUBehaviorScript.Think(timer - tempTime);
@@ -400,6 +401,7 @@ public class LogicScript : MonoBehaviour
         }
         player.ResetProperties();
         opponent.ResetProperties();
+        tempTime = 0;
         UI.PostShotUpdate(player.puckCount, opponent.puckCount);
         UpdateScores();
         PowerupAnimationManager.Instance.ClearPowerupPopupEffectAnimationQueue();

@@ -353,7 +353,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public int ComputeValue() { return (puckBaseValue * zoneMultiplier) + (zoneMultiplier > 0 ? puckBonusValue : 0); }
     public int ComputeTotalFutureValue()
     {
-        if (zoneMultiplier < 0) return 0;
+        if (zoneMultiplier <= 0) return 0;
         int puckValue = ComputeValue();
         if (IsGrowth()) puckValue += LogicScript.Instance.player.puckCount * GetGrowthCount();
         if (IsFactory()) puckValue += LogicScript.Instance.player.puckCount * 2 * GetFactoryCount();

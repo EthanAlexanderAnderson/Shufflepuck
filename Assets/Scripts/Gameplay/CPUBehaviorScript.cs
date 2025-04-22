@@ -35,6 +35,7 @@ public static class CPUBehaviorScript
         GenerateDeck();
 
         hand = new int[modifiedDifficulty];
+        powerupsUsedThisTurn = new();
 
         for (int i = 0; i < modifiedDifficulty; i++)
         {
@@ -75,6 +76,24 @@ public static class CPUBehaviorScript
                 CPUDeckPowerLevel += (rarity + 1);
             }
             failSafe++;
+        }
+
+        // temporary force add bolt/cull if the player has exponent, because exponent erratic is too strong
+        // TODO remove this or change it or something
+        if (PowerupManager.Instance.DeckContains(22))
+        {
+            while (deck.Count(n => n == 3) < 5)
+            {
+                deck.Add(3);
+            }
+
+            if (difficulty > 0)
+            {
+                while (deck.Count(n => n == 6) < 4)
+                {
+                    deck.Add(6);
+                }
+            }
         }
 
         Debug.Log("CPU modifiedDifficulty set to: " + modifiedDifficulty);
@@ -168,6 +187,13 @@ public static class CPUBehaviorScript
                             deck.Remove(hand[j]);
                         }
                     }
+                }
+
+                // wait longer to use the next card if we just used forcefield or shuffle, to allow for pucks to move
+                if (hand[i] == 4 || hand[i] == 14)
+                {
+                    waitingTime += 1.0f;
+                    LogicScript.Instance.powerupWaitTime += 0.5f;
                 }
 
                 hand[i] = -1;
@@ -297,7 +323,7 @@ public static class CPUBehaviorScript
             10 => !PowerupManager.Instance.DeckContains(1),
             11 => true,
             12 => true,
-            13 => deck.Contains(0) || deck.Contains(7) || deck.Contains(9) || deck.Contains(12) || deck.Contains(16) || deck.Contains(22) || deck.Contains(24) || deck.Contains(30),
+            13 => deck.Contains(0) || deck.Contains(7) || deck.Contains(9) || deck.Contains(12) || deck.Contains(16) || deck.Contains(22) || deck.Contains(24),
             14 => true,
             15 => false, // TODO
             16 => deck.Count() > 2,
@@ -343,7 +369,7 @@ public static class CPUBehaviorScript
             15 => PowerupCountUsedThisTurn() == 0 && !hand.Contains(30) && false,
             16 => PowerupCountUsedThisTurn() == 0 && !hand.Contains(30) && LogicScript.Instance.opponent.puckCount <= 3 && !powerupsUsedThisTurn.Contains(12), // TODO: times two based on path value
             17 => PowerupCountUsedThisTurn() == 0 && !hand.Contains(30) && LogicScript.Instance.opponent.puckCount >= 3 && (deck.Contains(3) || deck.Contains(6)),
-            18 => ((PowerupManager.Instance.GetDeck().Count / 2) < LogicScript.Instance.player.puckCount * 3 && PowerupManager.Instance.GetDeck().Count > 2) || PowerupManager.Instance.DeckContains(30),
+            18 => ((PowerupManager.Instance.GetDeck().Count / 2) < LogicScript.Instance.player.puckCount * 3 && PowerupManager.Instance.GetDeck().Count > 2) || (LogicScript.Instance.player.puckCount > 0 && PowerupManager.Instance.DeckContains(30)),
             19 => false,
             20 => false,
             21 => false, // TODO: use triple if CPU already used good stacking stuff
@@ -375,15 +401,12 @@ public static class CPUBehaviorScript
         {
             var puckScript = puck.GetComponent<PuckScript>();
 
-            // check normal pucks
+            // players pucks
             if (puckScript.IsPlayersPuck() && puckScript.ComputeValue() > 0)
             {
                 playerPucks++;
-                // small positive weight for player high value or exponent pucks
-                if (puckScript.ComputeTotalFutureValue() > 10 && !puckScript.IsShield())
-                {
-                    playerPucks++;
-                }
+                // small postive weight relative to player puck total future value, and ignore shield to avoid exponent+shield being OP
+                playerPucks += puckScript.ComputeTotalFutureValue() / 10;
                 // small negative weight for player hydra
                 if (puckScript.IsHydra() && !puckScript.IsShield())
                 {
@@ -395,14 +418,12 @@ public static class CPUBehaviorScript
                     opponentPucks += 5;
                 }
             }
+            // CPUs pucks
             else if (!puckScript.IsPlayersPuck() && puckScript.ComputeValue() > 0)
             {
                 opponentPucks++;
-                // small negative weight for CPU high value or exponent pucks
-                if (puckScript.ComputeTotalFutureValue() > 10 && !puckScript.IsShield())
-                {
-                    opponentPucks++;
-                }
+                // small negative weight relative to CPU puck total future value if it has no shield
+                opponentPucks += !puckScript.IsShield() ? puckScript.ComputeTotalFutureValue() / 10 : 0;
                 // small postive weight for CPU hydra
                 if (puckScript.IsHydra() && !puckScript.IsShield())
                 {
@@ -467,8 +488,8 @@ public static class CPUBehaviorScript
                 useCull = false;
                 break;
             }
-            // don't use cull if CPU has factory that would be destroyed
-            if (!puckScript.IsPlayersPuck() && puckScript.IsFactory())
+            // don't use cull if CPU has factory in a scoring zone that would be destroyed
+            if (!puckScript.IsPlayersPuck() && puckScript.IsFactory() && puckScript.GetZoneMultiplier() > 0)
             {
                 useCull = false;
                 break;
@@ -477,6 +498,7 @@ public static class CPUBehaviorScript
             if (puckScript.IsPlayersPuck() && !puckScript.IsHydra()) { validPucks++; }
             if (puckScript.IsPlayersPuck() && puckScript.IsFactory() && LogicScript.Instance.player.puckCount > 0) { validPucks++; } // a single player factory will trigger cull
             if (!puckScript.IsPlayersPuck() && puckScript.IsResurrect()) { validPucks++; } // a single CPU resurrect will trigger cull
+            if (puckScript.IsPlayersPuck() && puckScript.IsExponent() && (puckScript.IsErratic() || PowerupManager.Instance.GetDeck().Contains(4))) { validPucks++; } // a single exponent+erratic or exponent+forcefield will trigger cull
         }
 
         return useCull && validPucks > 1;
