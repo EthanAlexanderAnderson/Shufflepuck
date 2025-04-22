@@ -78,21 +78,7 @@ public class PlayerDataManager : MonoBehaviour
             Debug.Log($"loginData save failed {e}");
         }
 
-        // change data storage of plinko skin unlocks if needed
-        if (!PlayerPrefs.HasKey("PlinkoSkinsUnlocked"))
-        {
-            List<int> unlocked = new();
-            for (int i = 33; i < 45; i++)
-            {
-                if (PlayerPrefs.GetInt("puck" + i.ToString() + "unlocked") == 1)
-                {
-                    unlocked.Add(i);
-                }
-            }
-            string plinkoSkinsUnlockedString = string.Join(",", unlocked);
-            PlayerPrefs.SetString("PlinkoSkinsUnlocked", plinkoSkinsUnlockedString);
-            PlayerPrefs.Save();
-        }
+        PlinkoDataSwap();
 
         // because easyWin should be the first player pref written, we know we have to save data to cloud if it exists locally but not in cloud
         var results = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { "easyWin" });
@@ -277,6 +263,26 @@ public class PlayerDataManager : MonoBehaviour
         catch (CloudSaveException e)
         {
             Debug.LogError($"Failed to save {key} : {e.Message}");
+        }
+    }
+
+    // plinko data storage swap function
+    public void PlinkoDataSwap()
+    {
+        // change data storage of plinko skin unlocks if needed
+        if (!PlayerPrefs.HasKey("PlinkoSkinsUnlocked"))
+        {
+            List<int> unlocked = new();
+            for (int i = 33; i < 45; i++)
+            {
+                if (PlayerPrefs.GetInt("puck" + i.ToString() + "unlocked") == 1)
+                {
+                    unlocked.Add(i);
+                }
+            }
+            string plinkoSkinsUnlockedString = string.Join(",", unlocked);
+            PlayerPrefs.SetString("PlinkoSkinsUnlocked", plinkoSkinsUnlockedString);
+            PlayerPrefs.Save();
         }
     }
 }

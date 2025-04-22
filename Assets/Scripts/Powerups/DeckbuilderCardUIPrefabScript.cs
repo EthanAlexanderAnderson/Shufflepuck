@@ -562,6 +562,7 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
 
         toCraftCount = 0;
         totalOwned = ownedCardVariationList.Sum(card => card.count);
+        UpdateMinusAndPlusUIButtonInteractability();
         GetComponentInParent<DeckScreenScript>().UpdateAllCardCraftUI();
     }
 

@@ -182,6 +182,8 @@ public class DebugWindow : EditorWindow
         log += "PlinkoReward: " + PlayerPrefs.GetInt("PlinkoReward") + "\n";
 
         Debug.Log(log);
+
+        PowerupCardData.LogRarityStats();
     }
 
     private void SetDateAs0001()

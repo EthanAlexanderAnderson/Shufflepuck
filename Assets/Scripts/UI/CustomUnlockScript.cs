@@ -13,17 +13,6 @@ public class CustomUnlockScript : MonoBehaviour
     [SerializeField] private bool medium;
     [SerializeField] private bool hard;
 
-    // Start is called before the first frame update
-
-    private void Start()
-    {
-        Unlock();
-    }
-    private void OnEnable()
-    {
-        Unlock();
-    }
-
     public int Unlock()
     {
         // wins
