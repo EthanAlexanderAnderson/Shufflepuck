@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -159,11 +160,14 @@ public class PlinkoManager : MonoBehaviour
         // Shallow copy so we don't override real weights
         int[,] plinkoUnlockableIDsCopy = (int[,])plinkoUnlockableIDs.Clone();
 
+        // get currently unlocked plinko skins
+        List<int> alreadyUnlocked = PuckSkinManager.Instance.GetAllUnlockedPlinkoSkins();
+
         for (int i = 0; i < plinkoUnlockableIDsCopy.GetLength(0); i++)
         {
             int puckID = plinkoUnlockableIDsCopy[i, 0];
             // if a puck has been unlocked already or was the previous reward, set it's weight (probability of being the next reward) to be zero
-            if (PlayerPrefs.GetInt("puck" + puckID + "unlocked") == 1 || puckID == currentReward)
+            if (!alreadyUnlocked.Contains(puckID) || puckID == currentReward)
             {
                 plinkoUnlockableIDsCopy[i, 1] = 0;
             }
@@ -177,7 +181,7 @@ public class PlinkoManager : MonoBehaviour
         if (totalWeight == 0 && currentReward > 0 && currentReward < 100)
         {
             // no pucks are left to unlock
-            if (PlayerPrefs.GetInt("puck" + currentReward + "unlocked") == 1)
+            if (PuckSkinManager.Instance.IsPlinkoSkinUnlocked(currentReward))
             {
                 Debug.Log("No puck skin rewards remain.");
                 PlayerPrefs.SetInt("PlinkoReward", 0);
@@ -260,10 +264,10 @@ public class PlinkoManager : MonoBehaviour
         else if (plinkoreward > 0 && plinkoreward < 100)
         {
             // if the puck has not been unlocked already, unlock it. otherwise it is a duplicate and we should grant XP
-            if (PlayerPrefs.GetInt("puck" + plinkoreward.ToString() + "unlocked", 0) == 0)
+            if (PuckSkinManager.Instance.IsPlinkoSkinUnlocked(plinkoreward))
             {
                 PuckSkinManager.Instance.UnlockPuckID(plinkoreward);
-                PlayerPrefs.SetInt("puck" + plinkoreward.ToString() + "unlocked", 1);
+                PuckSkinManager.Instance.UnlockPlinkoSkin(plinkoreward);
                 UIManagerScript.Instance.SetErrorMessage("New puck unlocked!");
             }
             else

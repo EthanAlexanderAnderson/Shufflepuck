@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
 #if UNITY_IOS
 using System.Runtime.InteropServices;
+// note for me later: it might be possible to use apple gamekit plugin here as long it's building on unity cloud build servers?
 #endif
 
 public class PlayerAuthentication : MonoBehaviour
@@ -17,7 +18,7 @@ public class PlayerAuthentication : MonoBehaviour
     private string id;
     private string imgURL;
 
-    public (string, string, string) GetProfile()
+    public (string username, string id, string imgURL) GetProfile()
     {
         return (username, id, imgURL);
     }
@@ -30,6 +31,8 @@ public class PlayerAuthentication : MonoBehaviour
     [DllImport("__Internal")] private static extern string GetGameCenterSalt();
     [DllImport("__Internal")] private static extern ulong GetGameCenterTimestamp();
     [DllImport("__Internal")] private static extern string GetGameCenterSignature();
+    [DllImport("__Internal")] private static extern string GetGameCenterDisplayName();
+
 #endif
 
     private async void Awake()
@@ -43,8 +46,9 @@ public class PlayerAuthentication : MonoBehaviour
         }
 
         DontDestroyOnLoad(gameObject);
-
+#if UNITY_ANDROID
         PlayGamesPlatform.Activate();
+#endif
         await UnityServices.InitializeAsync();
 
         if (AuthenticationService.Instance.IsSignedIn)
@@ -64,6 +68,7 @@ public class PlayerAuthentication : MonoBehaviour
 
     // ---------- SIGN-IN FLOW ----------
 
+#if UNITY_ANDROID
     private void AuthenticateWithGooglePlayGames()
     {
         try
@@ -108,11 +113,9 @@ public class PlayerAuthentication : MonoBehaviour
         catch (AuthenticationException e)
         {
             Debug.LogWarning($"Google Play sign-in failed: {e.Message}");
-#if UNITY_IOS
-            SignInWithAppleGameCenter();
-#endif
         }
     }
+#endif
 
 #if UNITY_IOS
     private async void SignInWithAppleGameCenterAsync()
@@ -122,6 +125,7 @@ public class PlayerAuthentication : MonoBehaviour
             AuthenticateGameCenterPlayer();
 
             string playerId = GetGameCenterPlayerID();
+            id = playerId;
             string teamId = GetGameCenterTeamID();
             string publicKeyUrl = GetGameCenterPublicKeyURL();
             string salt = GetGameCenterSalt();
@@ -137,6 +141,15 @@ public class PlayerAuthentication : MonoBehaviour
 
             await AuthenticationService.Instance.SignInWithAppleGameCenterAsync(
                 signature, teamId, publicKeyUrl, salt, timestamp, new SignInOptions { CreateAccount = true });
+
+            try
+            {
+                username = GetGameCenterDisplayName();
+            }
+            catch (System.Exception)
+            {
+                Debug.Log("Couldn't get display name.");
+            }
 
             Debug.Log("Successfully signed in with Apple Game Center!");
 
@@ -155,7 +168,7 @@ public class PlayerAuthentication : MonoBehaviour
     }
 #endif
 
-    private async void SignInAnonymously()
+            private async void SignInAnonymously()
     {
         try
         {
@@ -171,6 +184,7 @@ public class PlayerAuthentication : MonoBehaviour
 
     // ---------- ACCOUNT LINKING UI METHODS ----------
 
+#if UNITY_ANDROID
     public void LinkGooglePlayGames()
     {
         PlayGamesPlatform.Instance.Authenticate(success =>
@@ -184,6 +198,7 @@ public class PlayerAuthentication : MonoBehaviour
             }
         });
     }
+#endif
 
     private async void LinkWithGooglePlay(string authCode)
     {

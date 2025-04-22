@@ -20,10 +20,15 @@ public class PlayerDataManager : MonoBehaviour
         "hardWin", "hardLoss", "hardTie",
         "DailyChallenge1", "DailyChallenge2", "OngoingChallenge",
         "PlinkoReward", "PlinkoPegsDropped", "WelcomeBonus", "Streak", "XP",
-        "puck33unlocked", "puck34unlocked", "puck35unlocked", "puck36unlocked", "puck37unlocked", "puck38unlocked", "puck39unlocked", "puck40unlocked", "puck41unlocked", "puck42unlocked", "puck43unlocked", "puck44unlocked"
+        "CraftingCredits", "PackBooster", "StandardPacks", "PlusPacks"
     };
 
-    string[] stringKeys = { "LastChallengeDate", "LastPlinkoRewardDate" };
+    string[] stringKeys = {
+        "LastChallengeDate", "LastPlinkoRewardDate", "LastDailyWinDate", "LastPackBoosterDate",
+        "PlinkoSkinsUnlocked",
+        "Deck1", "Deck2", "Deck3", "Deck4", "Deck5", "CardCollection",
+        "WonUsing"
+    };
 
     private void Awake()
     {
@@ -56,6 +61,38 @@ public class PlayerDataManager : MonoBehaviour
     public async Task SyncWithCloudIfNeeded()
     {
         if (!AuthenticationService.Instance.IsSignedIn) return;
+
+        // set username and id in cloud
+        try
+        {
+            var loginData = new Dictionary<string, object>
+            {
+                { "username", PlayerAuthentication.Instance.GetProfile().username },
+                { "platformID", PlayerAuthentication.Instance.GetProfile().id }
+            };
+            await CloudSaveService.Instance.Data.Player.SaveAsync(loginData);
+            Debug.Log("Player data successfully saved to Cloud Save.");
+        }
+        catch (System.Exception e)
+        {
+            Debug.Log($"loginData save failed {e}");
+        }
+
+        // change data storage of plinko skin unlocks if needed
+        if (!PlayerPrefs.HasKey("PlinkoSkinsUnlocked"))
+        {
+            List<int> unlocked = new();
+            for (int i = 33; i < 45; i++)
+            {
+                if (PlayerPrefs.GetInt("puck" + i.ToString() + "unlocked") == 1)
+                {
+                    unlocked.Add(i);
+                }
+            }
+            string plinkoSkinsUnlockedString = string.Join(",", unlocked);
+            PlayerPrefs.SetString("PlinkoSkinsUnlocked", plinkoSkinsUnlockedString);
+            PlayerPrefs.Save();
+        }
 
         // because easyWin should be the first player pref written, we know we have to save data to cloud if it exists locally but not in cloud
         var results = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { "easyWin" });

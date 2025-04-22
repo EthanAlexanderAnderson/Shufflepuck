@@ -77,7 +77,7 @@ public class CustomUnlockScript : MonoBehaviour
         // simple ID based
         else if (type == 2)
         {
-            if (PlayerPrefs.GetInt("puck"+ID.ToString()+"unlocked") == 1 )
+            if (PuckSkinManager.Instance.IsPlinkoSkinUnlocked(ID))
             {
                 gameObject.SetActive(false);
                 transform.parent.GetComponent<Button>().enabled = true;

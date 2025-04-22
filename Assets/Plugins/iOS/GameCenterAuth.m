@@ -39,4 +39,13 @@ extern "C" {
     const char* GetGameCenterSignature() {
         return [[[GKLocalPlayer localPlayer] signature] UTF8String];
     }
+
+    const char* GetGameCenterDisplayName() {
+        if ([GKLocalPlayer localPlayer].isAuthenticated) {
+            NSString* name = [GKLocalPlayer localPlayer].displayName;
+            return strdup([name UTF8String]);
+        } else {
+            return strdup("Unknown Player");
+        }
+    }
 }
