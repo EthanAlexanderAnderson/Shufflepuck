@@ -483,7 +483,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     {
         // FX
         if (ClientLogicScript.Instance.isRunning) { CollisionFXClientRpc(col.GetContact(0).point); }
-        else if (LogicScript.Instance.gameIsRunning) { CollisionFX(col.GetContact(0).point); }
+        else { CollisionFX(col.GetContact(0).point); }
         angularVelocityModifier = 0;
 
         // explosion powerup
@@ -531,7 +531,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
             collisionParticleEffect.Play();
             Destroy(collisionParticleEffect.gameObject, 5f);
-            ScreenShake.Instance.Shake(velocity / 20);
+            ScreenShake.Instance.Shake(velocity / (LogicScript.Instance.gameIsRunning ? 20 : 100));
         }
     }
 
