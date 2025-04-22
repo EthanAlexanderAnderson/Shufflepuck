@@ -376,7 +376,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 21.599998
+  orthographic size: 21.6
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -978,8 +978,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1600, y: 900}
+  m_AnchoredPosition: {x: 0, y: 200}
+  m_SizeDelta: {x: 1600, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2015773533
 MonoBehaviour:
@@ -1001,7 +1001,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Attempting to load player data from cloud...
+  m_text: syncing with cloud...
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 49d790e490aded44a8ad8765ea27cce6, type: 2}
   m_sharedMaterial: {fileID: -579455787902537155, guid: 49d790e490aded44a8ad8765ea27cce6, type: 2}

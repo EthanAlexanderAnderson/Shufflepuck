@@ -143,7 +143,20 @@ public class SoundManagerScript : MonoBehaviour
         musicComponent.Play();
     }
 
-    public void PlayClickSFX(int i = 0, float pitchBoost = 0f)
+    public void PlayClickSFX(int i = 0)
+    {
+        // very important this doesn't throw an error and stop the rest of whatever the button is trying to do
+        try
+        {
+            clicks[i].mute = false;
+            clicks[i].pitch = 1f;
+            clicks[i].volume = SFXVolumeFromPref;
+            clicks[i].Play();
+        }
+        catch (System.Exception e){ Debug.LogError(e); }
+    }
+
+    public void PlayClickSFXPitch(int i = 0, float pitchBoost = 0f)
     {
         // very important this doesn't throw an error and stop the rest of whatever the button is trying to do
         try
@@ -153,7 +166,7 @@ public class SoundManagerScript : MonoBehaviour
             clicks[i].volume = SFXVolumeFromPref;
             clicks[i].Play();
         }
-        catch (System.Exception e){ Debug.LogError(e); }
+        catch (System.Exception e) { Debug.LogError(e); }
     }
 
     public void PlayClickSFXAlterPitch(int i = 0, float pitch = 1f)
@@ -190,7 +203,7 @@ public class SoundManagerScript : MonoBehaviour
             powerupPopups[i].mute = false;
             powerupPopups[i].pitch = isPlayers ? 1.1f : 0.9f;
             powerupPopups[i].volume = SFXVolumeFromPref;
-            powerupPopups[i].Play();
+            powerupPopups[i].PlayOneShot(powerupPopups[i].clip);
         }
         catch (System.Exception e) { Debug.LogError(e); }
     }
