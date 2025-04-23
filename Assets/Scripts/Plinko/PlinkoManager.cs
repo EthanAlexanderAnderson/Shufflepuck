@@ -167,7 +167,7 @@ public class PlinkoManager : MonoBehaviour
         {
             int puckID = plinkoUnlockableIDsCopy[i, 0];
             // if a puck has been unlocked already or was the previous reward, set it's weight (probability of being the next reward) to be zero
-            if (!alreadyUnlocked.Contains(puckID) || puckID == currentReward)
+            if (alreadyUnlocked.Contains(puckID) || puckID == currentReward)
             {
                 plinkoUnlockableIDsCopy[i, 1] = 0;
             }
@@ -207,6 +207,9 @@ public class PlinkoManager : MonoBehaviour
             if (rand < threshold)
             {
                 PlayerPrefs.SetInt("PlinkoReward", plinkoUnlockableIDsCopy[i, 0]);
+                rewardText.text = "UNLOCK";
+                rewardImage.sprite = PuckSkinManager.Instance.ColorIDtoPuckSprite(plinkoUnlockableIDsCopy[i, 0]);
+                rewardImageAnimation.SetActive(plinkoUnlockableIDsCopy[i, 0] == 40);
                 Debug.Log("New Plinko Reward: " + PlayerPrefs.GetInt("PlinkoReward"));
                 return;
             }
@@ -264,7 +267,7 @@ public class PlinkoManager : MonoBehaviour
         else if (plinkoreward > 0 && plinkoreward < 100)
         {
             // if the puck has not been unlocked already, unlock it. otherwise it is a duplicate and we should grant XP
-            if (PuckSkinManager.Instance.IsPlinkoSkinUnlocked(plinkoreward))
+            if (!PuckSkinManager.Instance.IsPlinkoSkinUnlocked(plinkoreward))
             {
                 PuckSkinManager.Instance.UnlockPuckID(plinkoreward);
                 PuckSkinManager.Instance.UnlockPlinkoSkin(plinkoreward);

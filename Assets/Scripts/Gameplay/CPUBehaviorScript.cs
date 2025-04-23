@@ -376,7 +376,7 @@ public static class CPUBehaviorScript
             22 => LogicScript.Instance.opponent.puckCount >= 5 && !powerupsUsedThisTurn.Contains(12),
             23 => false,
             24 => !powerupsUsedThisTurn.Contains(25) && DeckInExcess() && (PuckManager.Instance.GetPucksInPlayCount(true, -1) >= 3 || LogicScript.Instance.opponent.puckCount >= 3),
-            25 => !powerupsUsedThisTurn.Contains(24) && LogicScript.Instance.player.score > LogicScript.Instance.opponent.score && PuckManager.Instance.GetPucksInPlayCount(true) >= 3, // TODO: push based on path proximity to player pucks (this will be a nightmare to code) AT LEAST make sure angle is middle-ish so it's likely to do SOMETHING
+            25 => !powerupsUsedThisTurn.Contains(cardIndex) && !powerupsUsedThisTurn.Contains(24) && LogicScript.Instance.player.score > LogicScript.Instance.opponent.score && PuckManager.Instance.GetPucksInPlayCount(true) >= 3, // TODO: push based on path proximity to player pucks (this will be a nightmare to code) AT LEAST make sure angle is middle-ish so it's likely to do SOMETHING
             26 => !powerupsUsedThisTurn.Contains(cardIndex) && LogicScript.Instance.player.puckCount > 0,
             27 => !powerupsUsedThisTurn.Contains(cardIndex) && LogicScript.Instance.player.puckCount > 0 && PowerupManager.Instance.GetDeck().Count > 0,
             28 => (deck.Count) < (LogicScript.Instance.opponent.puckCount - 1) * 3,

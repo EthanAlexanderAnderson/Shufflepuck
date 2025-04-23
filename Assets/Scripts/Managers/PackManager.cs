@@ -571,7 +571,7 @@ public class PackManager : MonoBehaviour
             }
         }
 
-        return returnValue;
+        return returnValue && level >= 5;
     }
 
     public void ClearPackUIs()
