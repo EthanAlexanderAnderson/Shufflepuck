@@ -124,7 +124,7 @@ public class PlinkoManager : MonoBehaviour
             }
             else
             {
-                Debug.Log("Today's Plinko Reward is already assigned. " + PlayerPrefs.GetInt("PlinkoReward"));
+                Debug.Log("Daily Plinko Reward already assigned: " + PlayerPrefs.GetInt("PlinkoReward"));
             }
             // if the lastChallengeDate is 7 or more days ago, set welcome bonus
             if (DateTime.Today.Subtract(lastChallengeDate).Days >= 7)

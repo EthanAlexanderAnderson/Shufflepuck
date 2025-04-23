@@ -63,7 +63,7 @@ public class StreakManager : MonoBehaviour
             PlayerPrefs.SetInt("Streak", 1);
         }
 
-        Debug.Log("Streak: " + streak);
+        Debug.Log("Daily Login Streak: " + streak);
         SetText();
     }
 

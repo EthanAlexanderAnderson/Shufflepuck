@@ -71,7 +71,7 @@ public class PlayerDataManager : MonoBehaviour
                 { "platformID", PlayerAuthentication.Instance.GetProfile().id }
             };
             await CloudSaveService.Instance.Data.Player.SaveAsync(loginData);
-            Debug.Log("Player data successfully saved to Cloud Save.");
+            Debug.Log("Login data successfully saved to Cloud.");
         }
         catch (System.Exception e)
         {
@@ -147,7 +147,7 @@ public class PlayerDataManager : MonoBehaviour
         if (playerData.Count > 0) // Save only if there's data to save
         {
             await CloudSaveService.Instance.Data.Player.SaveAsync(playerData);
-            Debug.Log("Player data successfully saved to Cloud Save.");
+            Debug.Log("Player data successfully saved to Cloud.");
         }
         else
         {
@@ -238,7 +238,7 @@ public class PlayerDataManager : MonoBehaviour
         try
         {
             await CloudSaveService.Instance.Data.Player.SaveAsync(playerData);
-            Debug.Log("Player data successfully saved to Cloud Save.");
+            Debug.Log("Player data successfully saved to Cloud.");
         }
         catch (CloudSaveException e)
         {
@@ -258,7 +258,7 @@ public class PlayerDataManager : MonoBehaviour
         try
         {
             await CloudSaveService.Instance.Data.Player.SaveAsync(playerData);
-            Debug.Log("Player data successfully saved to Cloud Save.");
+            Debug.Log("Player data successfully saved to Cloud.");
         }
         catch (CloudSaveException e)
         {
