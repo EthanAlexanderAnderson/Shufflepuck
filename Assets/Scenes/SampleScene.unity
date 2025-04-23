@@ -54447,7 +54447,7 @@ MonoBehaviour:
   powerupsMenu: {fileID: 1793697537}
   triplePowerup: 0
   playedAGame: 0
-  tutorialActive: 0
+  tutorialActive: 1
   powerupWaitTime: 0
 --- !u!4 &817506626
 Transform:

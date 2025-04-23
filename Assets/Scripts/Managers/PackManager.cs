@@ -95,9 +95,11 @@ public class PackManager : MonoBehaviour
                 AssignNewPackBooster();
             }
         }
-        else // no date ever written
+        else // no date ever written, default plus one
         {
-            AssignNewPackBooster();
+            PlayerPrefs.SetString("LastPackBoosterDate", DateTime.Today.ToString("yyyy-MM-dd"));
+            PlayerPrefs.SetInt("PackBooster", 0);
+            Debug.Log("New Pack Booster: 0");
         }
     }
 

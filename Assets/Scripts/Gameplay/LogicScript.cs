@@ -69,8 +69,8 @@ public class LogicScript : MonoBehaviour
     public Competitor opponent;
     public Competitor activeCompetitor;
     public Competitor nonActiveCompetitor;
-    public bool playedAGame = false;
-    public bool tutorialActive = true;
+    public bool playedAGame;
+    public bool tutorialActive;
 
     private void Awake()
     {
