@@ -217,7 +217,7 @@ public class PuckSkinManager : MonoBehaviour
             logic.player.puckSprite = ColorIDtoPuckSprite(unlockedPuckIDs[rng]);
         } while (prev == logic.player.puckSprite);
         UI.SetPlayerPuckIcon(logic.player.puckSprite, Math.Abs(logic.player.puckSpriteID) == 40);
-        PlayerPrefs.SetInt("puck", rng);
+        PlayerPrefs.SetInt("puck", unlockedPuckIDs[rng]);
         RandomizeCPUPuckSprite();
     }
 

@@ -30,7 +30,7 @@ public class ProfileScreenScript : MonoBehaviour
             {
                 usernameText.text = username;
                 authenticationButtonsParent.SetActive(false);
-                saveButtonsParent.SetActive(true);
+                //saveButtonsParent.SetActive(true);
             }
             else
             {
