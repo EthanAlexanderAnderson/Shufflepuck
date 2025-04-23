@@ -275,9 +275,9 @@ public class PlinkoManager : MonoBehaviour
             }
             else
             {
-                plinkoreward = 100;
-                LevelManager.Instance.AddXP(plinkoreward);
-                UIManagerScript.Instance.SetErrorMessage("Duplicate reward. Adding +100XP instead.");
+                PlayerPrefs.SetInt("PlinkoPegsDropped", PlayerPrefs.GetInt("PlinkoPegsDropped") - 1);
+                plinkoDropButton.GetComponent<PlinkoDropButtonScript>().SetDropButtonText();
+                UIManagerScript.Instance.SetErrorMessage("Duplicate reward. Adding +1 drop instead.");
             }
             // floating text for visual feedback
             floatingText.GetComponent<FloatingTextScript>().Initialize((plinkoreward >= 100) ? "+" + plinkoreward + "XP" : "UNLOCKED!", 0.5f, 15);
