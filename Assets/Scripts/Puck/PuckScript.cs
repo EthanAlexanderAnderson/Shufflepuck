@@ -995,7 +995,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         breakSFX.volume *= SFXvolume;
         breakSFX.Play();
         shieldFromRPC = false;
-        //PowerupAnimationManager.Instance.PlayPowerupActivationAnimation(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.ShieldPowerup), transform.position);
+        PowerupAnimationManager.Instance.PlayPowerupActivationAnimation(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.ShieldPowerup), transform.position);
     }
 
     [ServerRpc(RequireOwnership = false)]
