@@ -88,12 +88,7 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
         return highestValue + valueModifier - diffNerf;
     }
 
-    private bool IsValidPuck(PuckScript puck)
-    {
-        return puck.IsPlayersPuck() && !puck.IsLocked() && !puck.IsExplosion();
-    }
-
-    private (bool, float, int) CheckPuckVisibility(GameObject puck)
+    private (bool isVisible, float tempPowerModifier, int tempValueModifier) CheckPuckVisibility(GameObject puck)
     {
         PuckScript targetPuckScript = puck.GetComponent<PuckScript>();
         // CPU puck should end up vaguely where the hitout puck was (unless the target puck will explode the shot puck), so start the shot value with that
