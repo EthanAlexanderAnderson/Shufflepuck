@@ -29,28 +29,13 @@ public class OngoingChallengeManagerScript : MonoBehaviour
             Destroy(Instance);
     }
 
-    // Called at start after the challenges are instantiated by ChallengeManager
-    public void SetText()
+    // Called at start after the challenges are instantiated by ChallengeManager, whenever a match is won, and when the ongoing challenge is advanced
+    public void EvaluateChallengeAndSetText()
     {
         int OC = PlayerPrefs.GetInt("OngoingChallenge", 1);
 
         List<Challenge> ongoingChallenges = ChallengeManager.Instance.challengeData.ongoingChallenges;
         int numberOfOngoingChallenges = ongoingChallenges.Count;
-
-        // if uncompleted
-        if (OC > 0)
-        {
-            // retroactively complete the challenge
-            if (ongoingChallenges[OC].CheckCompletion())
-            {
-                PlayerPrefs.SetInt("OngoingChallenge", -OC);
-                OC *= -1;
-            }
-        }
-
-        // if the challenge is completed, the value is negative
-        claim.interactable = OC < 0;
-        glow.SetActive(OC < 0);
 
         // assert the challenge ID is within range, prevent index error
         if (OC >= numberOfOngoingChallenges || OC <= (numberOfOngoingChallenges * -1))
@@ -70,14 +55,31 @@ public class OngoingChallengeManagerScript : MonoBehaviour
             }
         }
 
+        // if uncompleted,
+        if (OC > 0)
+        {
+            // retroactively complete the challenge
+            if (ongoingChallenges[OC].CheckCompletion())
+            {
+                PlayerPrefs.SetInt("OngoingChallenge", -OC);
+                OC *= -1;
+            }
+        }
+
         // set description
         challengeText.text = ongoingChallenges[Mathf.Abs(OC)].challengeText;
         allQuestsProgressText.text = Mathf.Abs(OC) + "/" + (numberOfOngoingChallenges - 1).ToString();
 
-        // set rewards
+        // clear rewards text boxes
+        TMP_Text[] rewardTexts = { rewardText1, rewardText2, rewardText3 };
+        for (int i = 0; i < rewardTexts.Length; i++)
+        {
+            rewardTexts[i].text = "";
+        }
+
+        // set rewards text boxes
         List<string> rewardStrings = ongoingChallenges[Mathf.Abs(OC)].GetRewardStrings();
-        TMP_Text[] rewardTexts = { rewardText1, rewardText2, rewardText3};
-        for (int i = 0; i < rewardStrings.Count; i++)
+        for (int i = 0; (i < rewardStrings.Count && i < rewardTexts.Length); i++)
         {
             rewardTexts[i].text = rewardStrings[i];
         }
@@ -89,61 +91,24 @@ public class OngoingChallengeManagerScript : MonoBehaviour
             progressBar.value = ongoingChallenges[Mathf.Abs(OC)].GetProgress() * 100f;
             progressText.text = $"{num}/{dem}";
         }
-        else // this is just for the final "no challenges remaing" challenge
+        else // this is just for the final "no challenges remaining" challenge
         {
             progressBar.value = 100;
             progressText.text = "";
         }
 
-        LevelManager.Instance.SetText();
+        // if the challenge is completed (the value is negative), enable the claim button
+        claim.interactable = OC < 0;
+        glow.SetActive(OC < 0);
     }
 
     private void AdvanceOngoingChallenge()
     {
         int OC = PlayerPrefs.GetInt("OngoingChallenge", 1);
-        List<Challenge> ongoingChallenges = ChallengeManager.Instance.challengeData.ongoingChallenges;
 
         // assign next challenge & check its completion
-        OC = Mathf.Abs(OC) + 1;
-        if (ongoingChallenges[OC].CheckCompletion())
-        {
-            PlayerPrefs.SetInt("OngoingChallenge", -OC);
-        }
-        else
-        {
-            PlayerPrefs.SetInt("OngoingChallenge", OC);
-            Debug.Log($"New Ongoing Challenge assigned. " + PlayerPrefs.GetInt("OngoingChallenge", 1));
-        }
-
-        SetText();
-    }
-
-    public void EvaluateChallenge(int difficulty, int scoreDifference, bool isOnline)
-    {
-        int OC = PlayerPrefs.GetInt("OngoingChallenge", 1);
-
-        List<Challenge> ongoingChallenges = ChallengeManager.Instance.challengeData.ongoingChallenges;
-        int numberOfOngoingChallenges = ongoingChallenges.Count;
-
-        // assert the challenges IDs are within range, prevent index error
-        if (OC >= numberOfOngoingChallenges || OC <= (numberOfOngoingChallenges * -1))
-        {
-            OC = numberOfOngoingChallenges - 1; // all challenges complete
-            PlayerPrefs.SetInt("OngoingChallenge", OC);
-        }
-
-        // don't need to evaluate already-completed ongoing challenges
-        if (OC < 0) return;
-
-        // Evalute condition is met
-        if (ongoingChallenges[OC].CheckCompletion())
-        {
-            PlayerPrefs.SetInt("OngoingChallenge", -OC);
-        }
-        else
-        {
-            Debug.Log($"Challenge not complete. {OC} {scoreDifference} {(isOnline ? -1 : difficulty)}");
-        }
+        PlayerPrefs.SetInt("OngoingChallenge", Mathf.Abs(OC) + 1);
+        EvaluateChallengeAndSetText();
     }
 
     // called by claim button
@@ -160,7 +125,6 @@ public class OngoingChallengeManagerScript : MonoBehaviour
 
             Debug.Log("Claimed ongoing reward!");
             AdvanceOngoingChallenge();
-            SetText();
             SoundManagerScript.Instance.PlayWinSFX();
         }
         titleScreen.GetComponent<TitleScreenScript>().UpdateAlerts();

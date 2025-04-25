@@ -5,9 +5,6 @@ using UnityEngine.UIElements;
 
 public class DebugWindow : EditorWindow
 {
-    private LogicScript logic;
-    private ServerLogicScript serverLogic;
-    private HaloScript haloScript;
     public GameObject puck;
 
     public float angle;
@@ -32,20 +29,6 @@ public class DebugWindow : EditorWindow
 
     public void CreateGUI()
     {
-        try
-        {
-            logic = LogicScript.Instance;
-            serverLogic = ServerLogicScript.Instance;
-            haloScript = HaloScript.Instance;
-
-            puck = logic.puckPrefab;
-        }
-        catch (NullReferenceException)
-        {
-            Debug.Log("Failed to create unity debug window");
-            return;
-        }
-
         FloatField angleFloatField = new FloatField();
         angleFloatField.label = "Angle";
         angleFloatField.value = 50f;
@@ -79,7 +62,7 @@ public class DebugWindow : EditorWindow
         rootVisualElement.Add(shootall);
 
         Button sethalo = new() { text = "SET HALO" };
-        sethalo.clicked += () => haloScript.SetHaloPostion(angleFloatField.value, powerFloatField.value, spinFloatField.value, left.value);
+        sethalo.clicked += () => HaloScript.Instance.SetHaloPostion(angleFloatField.value, powerFloatField.value, spinFloatField.value, left.value);
         rootVisualElement.Add(sethalo);
 
         // destroy all pucks button
@@ -88,7 +71,7 @@ public class DebugWindow : EditorWindow
         rootVisualElement.Add(destroy);
 
         Button addPlayer = new() { text = "addPlayer" };
-        addPlayer.clicked += () => serverLogic.AddPlayerServerRpc(0, true);
+        addPlayer.clicked += () => ServerLogicScript.Instance.AddPlayerServerRpc(0, true);
         rootVisualElement.Add(addPlayer);
 
         Button printPlayerPrefs = new() { text = "printPlayerPrefs" };
@@ -110,10 +93,30 @@ public class DebugWindow : EditorWindow
         Button setDateAsNull = new() { text = "setDateAsNull" };
         setDateAsNull.clicked += () => SetDateAsNull();
         rootVisualElement.Add(setDateAsNull);
+
+        Button resetAllProgress = new() { text = "resetAllProgress" };
+        resetAllProgress.clicked += () => ResetAllProgress();
+        rootVisualElement.Add(resetAllProgress);
+
+        // simulate game win
+        IntegerField diff = new IntegerField();
+        diff.label = "Difficulty";
+        diff.value = 0;
+        rootVisualElement.Add(diff);
+
+        IntegerField winBy = new IntegerField();
+        winBy.label = "Win By";
+        winBy.value = 1;
+        rootVisualElement.Add(winBy);
+
+        Button simulateGameWin = new() { text = "simulate game win" };
+        simulateGameWin.clicked += () => SimulateGameWin(diff.value, winBy.value);
+        rootVisualElement.Add(simulateGameWin);
     }
 
     public void DebugShootNew(float angleParameter, float powerParameter, float spinParameter)
     {
+        puck = LogicScript.Instance.puckPrefab;
         puckObject = Instantiate(puck, new Vector3((left.value ? -3.6f : 3.6f), -10.0f, 0.0f), Quaternion.identity);
         puckScript = puckObject.GetComponent<PuckScript>();
         puckScript.InitPuck(true, 1);
@@ -127,6 +130,7 @@ public class DebugWindow : EditorWindow
             obj.GetComponent<PuckScript>().Shoot(angleParameter, powerParameter, spinParameter);
         }
 
+        puck = LogicScript.Instance.puckPrefab;
         puckObject = Instantiate(puck, new Vector3((left.value ? -3.6f : 3.6f), -10.0f, 0.0f), Quaternion.identity);
         puckScript = puckObject.GetComponent<PuckScript>();
         puckScript.InitPuck(true, 1);
@@ -200,6 +204,7 @@ public class DebugWindow : EditorWindow
         PlayerPrefs.SetString("LastPlinkoRewardDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
         PlayerPrefs.SetString("LastDailyWinDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
         PlayerPrefs.SetString("LastPackBoosterDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
+        StreakManager.Instance.IncrementStreak();
     }
 
     private void SetDateAsTomorrow()
@@ -218,5 +223,55 @@ public class DebugWindow : EditorWindow
         PlayerPrefs.DeleteKey("LastPlinkoRewardDate");
         PlayerPrefs.DeleteKey("LastDailyWinDate");
         PlayerPrefs.DeleteKey("LastPackBoosterDate");
+    }
+
+    private void ResetAllProgress()
+    {
+        PlayerPrefs.DeleteKey("easyHighscore");
+        PlayerPrefs.DeleteKey("mediumHighscore");
+        PlayerPrefs.DeleteKey("hardHighscore");
+        PlayerPrefs.DeleteKey("win");
+        PlayerPrefs.DeleteKey("loss");
+        PlayerPrefs.DeleteKey("tie");
+        PlayerPrefs.DeleteKey("onlineWin");
+        PlayerPrefs.DeleteKey("onlineLoss");
+        PlayerPrefs.DeleteKey("onlineTie");
+        PlayerPrefs.DeleteKey("easyWin");
+        PlayerPrefs.DeleteKey("easyLoss");
+        PlayerPrefs.DeleteKey("easyTie");
+        PlayerPrefs.DeleteKey("mediumWin");
+        PlayerPrefs.DeleteKey("mediumLoss");
+        PlayerPrefs.DeleteKey("mediumTie");
+        PlayerPrefs.DeleteKey("hardWin");
+        PlayerPrefs.DeleteKey("hardTie");
+        PlayerPrefs.DeleteKey("DailyChallenge1");
+        PlayerPrefs.DeleteKey("DailyChallenge2");
+        PlayerPrefs.DeleteKey("OngoingChallenge");
+        PlayerPrefs.DeleteKey("Streak");
+        PlayerPrefs.DeleteKey("PackBooster");
+        PlayerPrefs.DeleteKey("StandardPacks");
+        PlayerPrefs.DeleteKey("PlusPacks");
+        PlayerPrefs.DeleteKey("WelcomeBonus");
+        PlayerPrefs.DeleteKey("XP");
+        PlayerPrefs.DeleteKey("CraftingCredits");
+        PlayerPrefs.DeleteKey("PlinkoPegsDropped");
+        PlayerPrefs.DeleteKey("PlinkoSkinsUnlocked");
+        PlayerPrefs.DeleteKey("puck");
+        PlayerPrefs.DeleteKey("ShowNewSkinAlert");
+        PlayerPrefs.DeleteKey("PlinkoReward");
+        PlayerPrefs.DeleteKey("Deck1");
+
+        SetDateAsNull();
+    }
+
+    private void SimulateGameWin(int diff, int winBy)
+    {
+        int playerScore = 0;
+        int opponentScore = 0;
+        bool isOnline = (diff < 0);
+        if (winBy > 0) { playerScore = winBy; }
+        else if (winBy < 0) { opponentScore = winBy; }
+
+        UIManagerScript.Instance.UpdateGameResult(playerScore, opponentScore, diff, false, isOnline);
     }
 }

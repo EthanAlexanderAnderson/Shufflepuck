@@ -140,6 +140,11 @@ public class BeatByCondition : ChallengeCondition
         {
             return false;
         }
+        // don't assign "win online" challenge if the player hasn't beat the hard CPU 5 times
+        else if (difficultyLevel == -1 && PlayerPrefs.GetInt("hardWin") < 5)
+        {
+            return false;
+        }
 
         return true;
     }
@@ -198,7 +203,7 @@ public class MatchesCondition : ChallengeCondition
             }
         }
 
-        return ((float)currentValue, (float)targetMacthes);
+        return (currentValue, targetMacthes);
     }
 
     public override bool IsAssignable() { return true; }
@@ -242,28 +247,62 @@ public class HighscoreCondition : ChallengeCondition
             }
         }
 
-        return ((float)currentValue, (float)targetHighscore);
+        return (currentValue, targetHighscore);
     }
 
     public override bool IsAssignable() { return true; }
 }
 
-// Card Condition (Example: Play a specific card X times)
-// TODO: this is just a template for now, eventually i'll make this a proper challange
-public class CardCondition : ChallengeCondition
+// Card Condition, example: "Win a match using 'plus one'", "Win a match using any holo card", "Win matches using 'growth' 3 times", "Win a match using any common card"
+public class WinUsingCondition : ChallengeCondition
 {
-    public int cardID;
-    public int targetNumberPlayed;
+    public int ID; // -5 = celestial, -4 = diamond, -3 = gold, -2 = bronze, -1 = holo, 0 - 4 rarity, 5+ index - 5
+    public int targetNumberUsed;
 
     public override (float, float) GetConditionVariables()
     {
-        //int playedCardID = (int)args[0];
-        //int timesPlayed = (int)args[1];
+        int currentNumberUsed = 0;
 
-        //if (playedCardID != cardID) { return (0, 0); }
+        // Get the current WonUsing string
+        string wonUsingString = PlayerPrefs.GetString("WonUsing", "");
 
-        //return ((float)timesPlayed, (float)targetNumberPlayed);
-        return (0, 0);
+        // Convert the wonUsingString string into a list of encoded card strings
+        List<string> wonUsingCardsEncoded = string.IsNullOrEmpty(wonUsingString)
+            ? new List<string>()
+            : new List<string>(wonUsingString.Split(','));
+
+
+        // Search for the card in the list
+        for (int i = 0; i < wonUsingCardsEncoded.Count; i++)
+        {
+            if (int.TryParse(wonUsingCardsEncoded[i], out int encodedCard))
+            {
+                var decodedCard = PowerupCardData.DecodeCard(encodedCard);
+
+                // card index
+                if (ID >= 5 && decodedCard.cardIndex == (ID - 5))
+                {
+                    currentNumberUsed += decodedCard.quantity;
+                }
+                // card rarity
+                else if (ID >= 0 && PowerupCardData.GetCardRarity(decodedCard.cardIndex) == ID)
+                {
+                    currentNumberUsed += decodedCard.quantity;
+                }
+                // holo
+                else if (ID == -1 && decodedCard.holo)
+                {
+                    currentNumberUsed += decodedCard.quantity;
+                }
+                // rank
+                else if (ID >= -5 && decodedCard.rank == (ID * -1) - 1)
+                {
+                    currentNumberUsed += decodedCard.quantity;
+                }
+            }
+        }
+
+        return (currentNumberUsed, targetNumberUsed);
     }
 
     // TODO: make sure player has the card
@@ -278,7 +317,7 @@ public class LevelCondition : ChallengeCondition
     {
         var (_, level) = LevelManager.Instance.GetXPAndLevel();
 
-        return ((float)level, (float)targetLevel);
+        return (level, targetLevel);
     }
 
     public override bool IsAssignable() { return true; }
@@ -292,7 +331,7 @@ public class StreakCondition : ChallengeCondition
     {
         int streak = PlayerPrefs.GetInt("Streak");
 
-        return ((float)streak, (float)targetStreak);
+        return (streak, targetStreak);
     }
 
     public override bool IsAssignable() { return true; }

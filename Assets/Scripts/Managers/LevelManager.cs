@@ -28,6 +28,7 @@ public class LevelManager : MonoBehaviour
     void OnEnable()
     {
         LoadXP();
+        SetText();
     }
 
     public void LoadXP()
@@ -41,6 +42,7 @@ public class LevelManager : MonoBehaviour
         XP += xp;
         PlayerPrefs.SetInt("XP", XP);
         SetText();
+        OngoingChallengeManagerScript.Instance.EvaluateChallengeAndSetText();
     }
 
     public void SetText()

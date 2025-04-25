@@ -8,6 +8,7 @@ public class RewardsScreenScript : MonoBehaviour
     private void OnEnable()
     {
         UpdateAlerts();
+        PlinkoManager.Instance.CheckForNewDailyPlinkoReward();
     }
 
     public void UpdateAlerts()

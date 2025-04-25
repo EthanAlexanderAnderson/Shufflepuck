@@ -78,12 +78,14 @@ public class PlinkoDropButtonScript : MonoBehaviour
 
     public void Drop()
     {
+#if !UNITY_EDITOR
         // 1 second cooldown on clicking the button
         if (Time.time - cooldown < 2 || drops <= 0)
         {
             return;
         }
         cooldown = Time.time;
+# endif
 
         xAxisRandomRange = (playerXPonEnable >= 100 && playerXPonEnable < 460) ? 3f : 8f; // Greater than level 1 (gets first drop) and less than level 4. Thus boosted odds for first 3 drops.
 

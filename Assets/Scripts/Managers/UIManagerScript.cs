@@ -151,6 +151,7 @@ public class UIManagerScript : MonoBehaviour
         PlayerPrefs.SetInt("ShowNewSkinAlert", 0);
         puckScreen.SetActive(false);
         plinkoScreen.SetActive(true);
+        PlayerDataManager.Instance.PlinkoDataSwap();
         PlinkoManager.Instance.CheckForNewDailyPlinkoReward();
         plinkoScreen.SetActive(false);
         if (!PlayerPrefs.HasKey("DailyChallenge1")) { PlayerPrefs.SetInt("DailyChallenge1", 1); }
@@ -189,8 +190,6 @@ public class UIManagerScript : MonoBehaviour
             // Handle the back button press
             HandleBackButton();
         }
-
-        if (logic.tutorialActive) { tutorialMenu.SetActive(true);  }
 
         if (Input.GetMouseButtonDown(0) && tutorialMenu.activeInHierarchy && iPage != 6)
         {
@@ -319,6 +318,7 @@ public class UIManagerScript : MonoBehaviour
         if (playerScore > opponentScore)
         {
             IncrementPlayerPref("win");
+            if (!isLocal) { PowerupManager.Instance.UpdateWonUsingPlayerPref(); }
             sound.PlayWinSFX();
         } 
         else if (playerScore < opponentScore)
@@ -329,8 +329,6 @@ public class UIManagerScript : MonoBehaviour
         {
             IncrementPlayerPref("tie");
         }
-
-        OngoingChallengeManagerScript.Instance.EvaluateChallenge(difficulty, scoreDifference, isOnline);
 
         if (isOnline)
         {
@@ -376,6 +374,7 @@ public class UIManagerScript : MonoBehaviour
 
                 }
             }
+            OngoingChallengeManagerScript.Instance.EvaluateChallengeAndSetText();
             return;
         }
 
@@ -398,6 +397,7 @@ public class UIManagerScript : MonoBehaviour
                 return;
             }
             gameResultHighscoreMessageText.text = "They won by " + System.Math.Abs(scoreDifference) + " points.";
+            OngoingChallengeManagerScript.Instance.EvaluateChallengeAndSetText();
             return;
         }
 
@@ -432,6 +432,7 @@ public class UIManagerScript : MonoBehaviour
             gameResultHighscoreMessageText.text = "";
             IncrementPlayerPref(tiePlayerPrefsKeys[difficulty]);
         }
+        OngoingChallengeManagerScript.Instance.EvaluateChallengeAndSetText();
     }
 
     // write highscore to file and profile
@@ -541,6 +542,12 @@ public class UIManagerScript : MonoBehaviour
         {
             StreakManager.Instance.SetText();
         }
+        // sadly, this has to be here I think
+        else if (newUI == questsScreen)
+        {
+            DailyChallengeManagerScript.Instance.SetText();
+            OngoingChallengeManagerScript.Instance.EvaluateChallengeAndSetText();
+        }
         titleScreenBackground.SetActive(newUI != gameHud && newUI != gameResultScreen);
         table.SetActive(newUI == gameHud || newUI == gameResultScreen);
         slider.SetActive(newUI == gameHud || newUI == gameResultScreen || newUI == titleScreen);
@@ -572,6 +579,7 @@ public class UIManagerScript : MonoBehaviour
     // reset in-game HUD
     public void ResetHUD()
     {
+        if (logic.gameIsRunning) { tutorialMenu.SetActive(logic.tutorialActive); };
         gameResultText.text = "";
         playerScoreText.text = 0.ToString();
         opponentScoreText.text = 0.ToString();
@@ -719,7 +727,21 @@ public class UIManagerScript : MonoBehaviour
             {
                 PlayerPrefs.SetInt("easyHighscore", 1);
             }
+            if (PlayerPrefs.GetInt("mediumWin") == 0)
+            {
+                PlayerPrefs.SetInt("mediumWin", 1);
+            }
+            if (PlayerPrefs.GetInt("mediumHighscore") == 0)
+            {
+                PlayerPrefs.SetInt("mediumHighscore", 1);
+            }
+            PlayerPrefs.SetInt("debug", 1);
             Debug.Log("Started up logging.");
+        }
+        else if (debugMode == 5 || debugMode == 15)
+        {
+            ScreenLog.Instance.gameObject.SetActive(false);
+            PlayerPrefs.SetInt("debug", 0);
         }
     }
 

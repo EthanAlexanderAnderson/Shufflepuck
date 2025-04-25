@@ -100,6 +100,7 @@ public class PowerupManager : NetworkBehaviour
     public int[] GetCost2Discard() { return cost2Discard; }
     private List<int> deck;
     int[] hand = { -1, -1, -1 };
+    private List<int> playerUsed;
 
     private Competitor activeCompetitor;
     public Action<int>[] methodArray;
@@ -177,6 +178,7 @@ public class PowerupManager : NetworkBehaviour
         LogicScript.Instance.player.isOmniscient = false;
         LogicScript.Instance.opponent.isOmniscient = false;
         denyPowerup = 0;
+        playerUsed = new();
     }
 
     // used by CPU during gameplay to check what the player has left in their deck
@@ -913,6 +915,9 @@ public class PowerupManager : NetworkBehaviour
             {
                 deck.Remove(encodedCard);
             }
+
+            // keep track of what cards the player used during the match
+            playerUsed.Add(encodedCard);
         }
         // if the played card costs 2 points, pay the cost
         if (costPoints.ContainsKey(index) && !chaosEnsuing && !activeCompetitor.isOmniscient)
@@ -1040,5 +1045,64 @@ public class PowerupManager : NetworkBehaviour
             ServerLogicScript.Instance.ShotTimerBoostServerRpc();
             ClientLogicScript.Instance.ShotTimerBoost();
         }
+    }
+
+    // this is called when the player wins any match to track which cards they've won using
+    public void UpdateWonUsingPlayerPref()
+    {
+        if (playerUsed == null || playerUsed.Count == 0) return;
+
+        // Get the current WonUsing string
+        string wonUsingString = PlayerPrefs.GetString("WonUsing", "");
+
+        // Convert the wonUsingString string into a list of encoded card strings
+        List<string> wonUsingCardsEncoded = string.IsNullOrEmpty(wonUsingString)
+            ? new List<string>()
+            : new List<string>(wonUsingString.Split(','));
+
+        // for each card the player used
+        for (int i = 0; i < playerUsed.Count; i++)
+        {
+            bool cardFound = false;
+            var usedDecodedCard = PowerupCardData.DecodeCard(playerUsed[i]);
+
+            // Search for the card in the WonUsing pref and update its quantity
+            for (int j = 0; j < wonUsingCardsEncoded.Count; j++)
+            {
+                if (int.TryParse(wonUsingCardsEncoded[j], out int encodedCard))
+                {
+                    var prefDecodedCard = PowerupCardData.DecodeCard(encodedCard);
+                    if (prefDecodedCard.cardIndex == usedDecodedCard.cardIndex && prefDecodedCard.rank == usedDecodedCard.rank && prefDecodedCard.holo == usedDecodedCard.holo)
+                    {
+                        // Add the count to the current quantity (right now, usedDecodedCard.quantity is always 1)
+                        var updatedQuantity = prefDecodedCard.quantity + usedDecodedCard.quantity;
+
+                        // If the quantity is valid, re-encode and update the card
+                        if (updatedQuantity >= 0)
+                        {
+                            wonUsingCardsEncoded[j] = PowerupCardData.EncodeCard(prefDecodedCard.cardIndex, prefDecodedCard.rank, prefDecodedCard.holo, updatedQuantity).ToString();
+                            cardFound = true;
+                            Debug.Log($"Won using {PowerupCardData.GetCardName(prefDecodedCard.cardIndex)} {prefDecodedCard.rank} {prefDecodedCard.holo} {updatedQuantity}");
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            // If the card wasn't found, add it as a new card with the given quantity
+            if (!cardFound)
+            {
+                int encodedNewCard = PowerupCardData.EncodeCard(usedDecodedCard.cardIndex, usedDecodedCard.rank, usedDecodedCard.holo, usedDecodedCard.quantity);
+                wonUsingCardsEncoded.Add(encodedNewCard.ToString());
+                Debug.Log($"Won using {PowerupCardData.GetCardName(usedDecodedCard.cardIndex)} {usedDecodedCard.rank} {usedDecodedCard.holo} {usedDecodedCard.quantity}");
+            }
+        }
+
+        // Join the updated WonUsing string and save it back to PlayerPrefs
+        string updatedWonUsingString = string.Join(",", wonUsingCardsEncoded);
+        PlayerPrefs.SetString("WonUsing", updatedWonUsingString);
+        PlayerPrefs.Save();
+        OngoingChallengeManagerScript.Instance.EvaluateChallengeAndSetText();
     }
 }

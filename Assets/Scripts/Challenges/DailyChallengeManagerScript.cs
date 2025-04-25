@@ -8,8 +8,6 @@ public class DailyChallengeManagerScript : MonoBehaviour
 {
     // self
     public static DailyChallengeManagerScript Instance;
-    // dependencies
-    private LevelManager levelManager;
 
     [SerializeField] private GameObject titleScreen;
 
@@ -66,6 +64,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
             PlayerPrefs.SetInt("DailyChallenge2", 0);
         }
 
+        challenge1Reward1Text.text = "";
         challenge1Reward2Text.text = "";
         List<string> easyRewardStrings = easyDailyChallenges[Mathf.Abs(DC1)].GetRewardStrings();
         TMP_Text[] easyRewardTexts = { challenge1Reward1Text, challenge1Reward2Text };
@@ -75,6 +74,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         }
         challenge1Text.text = easyDailyChallenges[Mathf.Abs(DC1)].challengeText;
 
+        challenge2Reward1Text.text = "";
         challenge2Reward2Text.text = "";
         List<string> hardRewardStrings = hardDailyChallenges[Mathf.Abs(DC2)].GetRewardStrings();
         TMP_Text[] hardRewardTexts = { challenge2Reward1Text, challenge2Reward2Text };
@@ -83,8 +83,6 @@ public class DailyChallengeManagerScript : MonoBehaviour
             hardRewardTexts[i].text = hardRewardStrings[i];
         }
         challenge2Text.text = hardDailyChallenges[Mathf.Abs(DC2)].challengeText;
-
-        LevelManager.Instance.SetText();
     }
 
     void Update()
@@ -224,14 +222,14 @@ public class DailyChallengeManagerScript : MonoBehaviour
             if (DateTime.Today.Subtract(lastChallengeDate).Days >= 1)
             {
                 dailyWin += "\nDaily Win +50XP";
-                levelManager.AddXP(50);
+                LevelManager.Instance.AddXP(50);
                 PlayerPrefs.SetString("LastDailyWinDate", DateTime.Today.ToString("yyyy-MM-dd"));
             }
         } 
         else // no date ever written
         {
             dailyWin += "\nDaily Win +50XP";
-            levelManager.AddXP(50);
+            LevelManager.Instance.AddXP(50);
             PlayerPrefs.SetString("LastDailyWinDate", DateTime.Today.ToString("yyyy-MM-dd"));
         }
 
@@ -253,6 +251,8 @@ public class DailyChallengeManagerScript : MonoBehaviour
             PlayerPrefs.SetInt("DailyChallenge2", 0);
         }
 
+        if (isOnline == 1) { difficulty = -1; }
+
         // Evalute condition is met
         if (DC1 > 0 && easyDailyChallenges[DC1].CheckCompletion(scoreDifference, difficulty))
         {
@@ -266,8 +266,8 @@ public class DailyChallengeManagerScript : MonoBehaviour
 
         if (scoreDifference > 0 && isOnline == 0)
         {
-            levelManager.AddXP((difficulty + 1) * 10);
-            levelManager.AddXP((difficulty + 1) * scoreDifference);
+            LevelManager.Instance.AddXP((difficulty + 1) * 10);
+            LevelManager.Instance.AddXP((difficulty + 1) * scoreDifference);
             return xpFeedback[difficulty] + pointBonus + dailyWin;
         }
         else if (scoreDifference > 0 && isOnline == 1)
@@ -289,7 +289,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         {
             List<Challenge> easyDailyChallenges = ChallengeManager.Instance.challengeData.easyDailyChallenges;
             try { easyDailyChallenges[Mathf.Abs(DC1)].ClaimRewards(); } // add the reward to the player's XP
-            catch (IndexOutOfRangeException e) { levelManager.AddXP(50); Debug.LogError(e); }
+            catch (IndexOutOfRangeException e) { LevelManager.Instance.AddXP(50); Debug.LogError(e); }
             Debug.Log("Claimed reward 1!");
             PlayerPrefs.SetInt("DailyChallenge1", 0); // 0 means the reward is claimed
             SetText();
@@ -307,7 +307,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         {
             List<Challenge> hardDailyChallenges = ChallengeManager.Instance.challengeData.hardDailyChallenges;
             try { hardDailyChallenges[Mathf.Abs(DC2)].ClaimRewards(); } // add the reward to the player's XP
-            catch (IndexOutOfRangeException e) { levelManager.AddXP(100); Debug.LogError(e); }
+            catch (IndexOutOfRangeException e) { LevelManager.Instance.AddXP(100); Debug.LogError(e); }
             Debug.Log("Claimed reward 2!");
             PlayerPrefs.SetInt("DailyChallenge2", 0); // 0 means the reward is claimed
             SetText();

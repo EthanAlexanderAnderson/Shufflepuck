@@ -116,7 +116,7 @@ public class PlinkoManager : MonoBehaviour
             {
                 AssignNewPlinkoReward();
                 // subtract welcome bonus
-                var welcomeBonus = PlayerPrefs.GetInt("WelcomeBonus");
+                int welcomeBonus = PlayerPrefs.GetInt("WelcomeBonus");
                 if (welcomeBonus > 0)
                 {
                     PlayerPrefs.SetInt("WelcomeBonus", welcomeBonus - 1);
@@ -139,12 +139,10 @@ public class PlinkoManager : MonoBehaviour
         }
 
         // enable welcome bonus buckets
-        if (PlayerPrefs.GetInt("WelcomeBonus") > 0)
-        {
-            bonusBucketLeft.SetActive(true);
-            bonusBucketRight.SetActive(true);
-            Debug.Log("Remaining Welcome Bonus Days: " + PlayerPrefs.GetInt("WelcomeBonus"));
-        }
+        int newWelcomeBonus = PlayerPrefs.GetInt("WelcomeBonus");
+        bonusBucketLeft.SetActive(newWelcomeBonus > 0);
+        bonusBucketRight.SetActive(newWelcomeBonus > 0);
+        if (newWelcomeBonus > 0) { Debug.Log("Remaining Welcome Bonus Days: " + PlayerPrefs.GetInt("WelcomeBonus")); }
 
         TitleScreenScript.Instance.UpdateAlerts();
     }
