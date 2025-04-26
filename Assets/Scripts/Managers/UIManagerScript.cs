@@ -63,6 +63,7 @@ public class UIManagerScript : MonoBehaviour
     public GameObject page6;
     public GameObject page7;
     public GameObject page8;
+    public GameObject page9;
 
     // HUD
     [SerializeField] private Text turnText;
@@ -137,7 +138,7 @@ public class UIManagerScript : MonoBehaviour
         else
             Destroy(Instance);
 
-        tutorialPages = new GameObject[] { page0, page1, page2, page3, page4, page5, page6, page7, page8 };
+        tutorialPages = new GameObject[] { page0, page1, page2, page3, page4, page5, page6, page7, page8, page9 };
     }
 
     private void Start()
