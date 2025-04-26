@@ -25,25 +25,53 @@ static const char* SafeStrdupURL(NSURL *url, const char *fallback) {
     return strdup(fallback);
 }
 
+// Helper function to get the current window.
+static UIWindow* GetCurrentWindow() {
+     if (@available(iOS 13.0, *)) {
+        for (UIScene *scene in [UIApplication sharedApplication].connectedScenes) {
+            if (scene.activationState == UISceneActivationStateForegroundActive) {
+                return ((UIWindowScene *)scene).windows.firstObject;
+            }
+        }
+    } else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        return [UIApplication sharedApplication].keyWindow;
+#pragma clang diagnostic pop
+    }
+    return nil;
+}
+
 void GameCenterAuthenticatePlayer(void (^completion)(bool, const char*, const char*)) {
     GKLocalPlayer *localPlayer = [GKLocalPlayer localPlayer];
+    // Use __weak to avoid a retain cycle.
+    __weak typeof(localPlayer) weakPlayer = localPlayer;
 
     [localPlayer setAuthenticateHandler:^(UIViewController *viewController, NSError *error) {
         if (viewController) {
-            // Present the Game Center login UI
-            UIViewController *rootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
-            if (rootVC) {
-                [rootVC presentViewController:viewController animated:YES completion:nil];
+            // Present the Game Center login UI.
+            UIWindow *currentWindow = GetCurrentWindow();
+            if (currentWindow) {
+                UIViewController *rootVC = currentWindow.rootViewController;
+                 if (rootVC) {
+                     [rootVC presentViewController:viewController animated:YES completion:nil];
+                 }
+                 else{
+                     NSLog(@"GameCenterAuthenticatePlayer: Error: Could not get root view controller.");
+                     if (completion) {
+                         completion(false, "CouldNotGetViewController", "");
+                     }
+                 }
             } else {
-                NSLog(@"GameCenterAuthenticatePlayer: Error: Could not get root view controller.");
+                NSLog(@"GameCenterAuthenticatePlayer: Error: Could not get current window.");
                 if (completion) {
-                    completion(false, "CouldNotGetViewController", "");
+                    completion(false, "CouldNotGetWindow", "");
                 }
             }
-        } else if (localPlayer.isAuthenticated) {
-            NSLog(@"Game Center authenticated: %@", localPlayer.playerID);
+        } else if (weakPlayer.isAuthenticated) { // Use weakPlayer
+            NSLog(@"Game Center authenticated: %@", weakPlayer.gamePlayerID); // Use gamePlayerID
             if (completion) {
-                completion(true, "Success", SafeStrdup(localPlayer.playerID, "UnknownPlayerID"));
+                completion(true, "Success", SafeStrdup(weakPlayer.gamePlayerID, "UnknownPlayerID")); // Use gamePlayerID
             }
         } else {
             NSLog(@"Game Center authentication failed: %@", error.localizedDescription);
@@ -57,7 +85,7 @@ void GameCenterAuthenticatePlayer(void (^completion)(bool, const char*, const ch
 void GetGameCenterPlayerID(void (^completion)(const char*)) {
     if (completion) {
         if ([GKLocalPlayer localPlayer].isAuthenticated) {
-            completion(SafeStrdup([GKLocalPlayer localPlayer].playerID, "UnknownPlayerID"));
+            completion(SafeStrdup([GKLocalPlayer localPlayer].gamePlayerID, "UnknownPlayerID")); // Use gamePlayerID
         } else {
             completion(strdup("UnknownPlayerID"));
         }
