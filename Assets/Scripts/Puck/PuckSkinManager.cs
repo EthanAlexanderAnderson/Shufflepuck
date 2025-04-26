@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -121,6 +122,11 @@ public class PuckSkinManager : MonoBehaviour
         UI = UIManagerScript.Instance;
     }
 
+    private void Start()
+    {
+        SelectPlayerPuckSprite(PlayerPrefs.GetInt("puck") == 0 && PlayerPrefs.GetInt("hardHighscore") <= 5 ? 1 : PlayerPrefs.GetInt("puck"));
+    }
+
     public Sprite ColorIDtoPuckSprite(int id)
     {
         Sprite[] puckSprites = { puckFlower, puckBlue, puckGreen, puckGrey, puckOrange, puckPink, puckPurple, puckRed, puckYellow, puckRainbow, puckCanada, puckDonut, puckCaptain, puckNuke, puckWreath, puckSky, puckDragon, puckNinja, puckEgg, puckMonster, puckEye, puckCamo, puckYingYang, puckCow, puckCraft, puckPlanet, puckLove, puckAura, puckCheese, puckScotia, puckPoker, puckPumpkin, puckWeb, puckCoin, puckMagic, puckStar, puckSnake, puckHexagon, puckShuriken, puckLifesaver, puckAtom, puckMatrix, puckLucky, puckSkull, puckButterfly };
@@ -195,10 +201,7 @@ public class PuckSkinManager : MonoBehaviour
         if (!unlockedPuckIDs.Contains(id))
         {
             unlockedPuckIDs.Add(id);
-            if (logic.playedAGame)
-            {
-                PlayerPrefs.SetInt("ShowNewSkinAlert", 1);
-            }
+            PlayerPrefs.SetInt("ShowNewSkinAlert", 1);
         }
     }
 
@@ -214,7 +217,7 @@ public class PuckSkinManager : MonoBehaviour
             logic.player.puckSprite = ColorIDtoPuckSprite(unlockedPuckIDs[rng]);
         } while (prev == logic.player.puckSprite);
         UI.SetPlayerPuckIcon(logic.player.puckSprite, Math.Abs(logic.player.puckSpriteID) == 40);
-        PlayerPrefs.SetInt("puck", rng);
+        PlayerPrefs.SetInt("puck", unlockedPuckIDs[rng]);
         RandomizeCPUPuckSprite();
     }
 
@@ -247,6 +250,38 @@ public class PuckSkinManager : MonoBehaviour
     int easterEggCounter = 0;
     [SerializeField] private Transform easterEggBox;
     [SerializeField] private Transform antiEasterEggBox;
+
+    public bool IsPlinkoSkinUnlocked(int index)
+    {
+        List<int> unlocked = GetAllUnlockedPlinkoSkins();
+        return unlocked.Contains(index);
+    }
+
+    public void UnlockPlinkoSkin(int index)
+    {
+        List<int> unlocked = GetAllUnlockedPlinkoSkins();
+        if (!unlocked.Contains(index))
+        {
+            unlocked.Add(index);
+            string newValue = string.Join(",", unlocked);
+            PlayerPrefs.SetString("PlinkoSkinsUnlocked", newValue);
+            PlayerPrefs.Save();
+        }
+    }
+
+    public List<int> GetAllUnlockedPlinkoSkins()
+    {
+        string raw = PlayerPrefs.GetString("PlinkoSkinsUnlocked", "");
+        if (string.IsNullOrEmpty(raw))
+            return new List<int>();
+
+        return raw.Split(',')
+                  .Where(s => !string.IsNullOrWhiteSpace(s))
+                  .Select(s => int.TryParse(s, out int val) ? val : (int?)null)
+                  .Where(val => val.HasValue)
+                  .Select(val => val.Value)
+                  .ToList();
+    }
 
     // called by easter egg object
     public void EasterEgg()

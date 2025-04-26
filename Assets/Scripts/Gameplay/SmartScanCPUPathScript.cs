@@ -9,10 +9,10 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
     [SerializeField] private float scanDistance = 30f; // Max raycast distance
     [SerializeField] private LayerMask puckLayer;     // Which layer to raycast on
 
-    private float bestAngle = 0f;
-    private int highestValue = 0;
-    float powerModifier = 0;
+    int highestValue = 0;
     int valueModifier = 0;
+    float bestAngle = 0f;
+    float powerModifier = 0;
 
     // for gizmos
     private bool drawGizmos = true;
@@ -20,23 +20,19 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
     private List<Vector3> gizRayOrigin = new();
     private List<Vector3> gizDirection = new();
 
-    bool powerupsEnabled;
-
-    public (float, float, float) GetPath() => (((180f - bestAngle) - 60f) * 1.66666f, System.Math.Min(95f + powerModifier, 105), 50f); // convert angel to line-readable format
+    public (float, float, float) GetPath() => (((180f - bestAngle) - 60f) * 1.66666f, System.Math.Min(95f + powerModifier, 102.5f), 50f); // convert angel to line-readable format
     public bool DoesPathRequirePhasePowerup() => false;
-    public bool DoesPathRequireExplosionPowerup() => false;
-    public bool IsPathAContactShot() => powerModifier >= 5.0f; // use forcefield powerup if total shot power is 100 or above
+    public bool DoesPathRequireExplosionPowerup() => false; // TODO: requires explosion IF theres no pucks in front and there are 3+ pucks behind
 
-    public int CalculateValue()
+    public float CalculateValue(int modifiedDifficulty)
     {
         if (WallIsActive()) { return 0; }
-
-        powerupsEnabled = PlayerPrefs.GetInt("PowerupsEnabled", 0) == 1;
+        if (modifiedDifficulty < 0) { modifiedDifficulty = 0; }
 
         highestValue = 0;
+        valueModifier = 0;
         bestAngle = 0;
         powerModifier = 0;
-        valueModifier = 0;
 
         // these 3 lists are just for gizmos
         gizRayOrigin.Clear();
@@ -47,12 +43,14 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
 
         foreach (GameObject puck in allPucks)
         {
-            if (puck.transform.position.y < 0) continue;  // Ignore pucks below y = 0
+            if (puck.transform.position.y < 0) continue;  // Ignore pucks below y = 0 because they should be destroyed by the cleanup
 
             PuckScript puckScript = puck.GetComponent<PuckScript>();
-            if (puckScript == null || !IsValidPuck(puckScript)) continue;
+            if (puckScript == null) continue;
+            if (!puckScript.IsPlayersPuck() || puckScript.IsLocked()) continue;
 
-            int puckValue = puckScript.ComputeValue();
+            int puckValue = puckScript.ComputeTotalFutureValue();
+
             Vector3 puckPosition = puck.transform.position;
 
             if (puckValue > 0)
@@ -63,7 +61,7 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
                 (isVisible, tempPowerModifier, tempValueModifier) = CheckPuckVisibility(puck);
                 if (isVisible)
                 {
-                    float angle = GetAngleToAnchor(puckPosition);
+                    float angle = GetAngleToAnchor(puckPosition);puck.GetComponent<PuckScript>();
                     if ((puckValue + tempValueModifier) > (highestValue + valueModifier))
                     {
                         highestValue = puckValue;
@@ -79,32 +77,24 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
         bestAngle = (bestAngle + 180f) % 360f;
 
         // make sure we have good values
-        if (highestValue <= 0 || (highestValue * 3 + valueModifier) <= 0) { return 0; } // this is just here so we don't Debug.Log for 0 value paths
+        if (highestValue <= 0 || (highestValue + valueModifier) <= 0) { return 0; } // this is just here so we don't Debug.Log for 0 value paths
         if (bestAngle < 60 || bestAngle > 120) { Debug.LogError("SMART SCAN ERROR: BAD ANGLE " + bestAngle); return 0; }
 
-        // temporary nerf for non-powerups mode. (don't shoot unless two or more opponent pucks are in path, 25% chance override)
-        float randomValue = Random.Range(0f, 1f);
-        // if powerups are disabled AND only 1 puck in path : 70% chance to nerf
-        // if above conditions AND the path value is less than 10 : 90% chance to nerf
-        if (!powerupsEnabled && powerModifier <= 0 && randomValue <= (0.70 + ((highestValue * 3 + valueModifier) < 10 ? 0.2 : 0)))
-        {
-            return 0;
-        }
+        // nerf based on modifiedDifficulty. (lower modifiedDifficulty = greater nerf). also additional nerf for earlier shots.
+        int diffNerf = Mathf.Max(0, (int)Mathf.Pow(2f, 4 - modifiedDifficulty) + (LogicScript.Instance.opponent.puckCount - 3));
 
-        // return best puck
-        Debug.Log($"Smart Scan Value: {highestValue * 3} + {valueModifier} at Angle: {bestAngle}");
-        return highestValue * 3 + valueModifier;
+        // return best puck, highest value times two because hitting out the opponent's puck + CPU ending up there is net value of double
+        Debug.Log($"Smart Scan Value: {highestValue + valueModifier - diffNerf}: ({highestValue} + {valueModifier} - {diffNerf}) at Angle: {bestAngle}");
+        return highestValue + valueModifier - diffNerf;
     }
 
-    private bool IsValidPuck(PuckScript puck)
+    private (bool isVisible, float tempPowerModifier, int tempValueModifier) CheckPuckVisibility(GameObject puck)
     {
-        return puck.IsPlayersPuck() && !puck.IsLocked() && !puck.IsExplosion();
-    }
-
-    private (bool, float, int) CheckPuckVisibility(GameObject puck)
-    {
+        PuckScript targetPuckScript = puck.GetComponent<PuckScript>();
+        // CPU puck should end up vaguely where the hitout puck was (unless the target puck will explode the shot puck), so start the shot value with that
+        int tempValueModifier = !targetPuckScript.IsExplosion() ? targetPuckScript.GetZoneMultiplier() : 0;
         float tempPowerModifier = 0;
-        int tempValueModifier = 0;
+
         Vector3[] offsets = { new(-1f, 0, 0), new(1f, 0, 0) }; // 1 for puck width
         List<Vector3> directions = new();
         List<Vector3> rayOrigins = new();
@@ -134,19 +124,38 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
         {
             foreach (var hit in Physics2D.RaycastAll(rayOrigins[i], directions[i], scanDistance, puckLayer))
             {
-                // Ignore non-puck collisions, self-hit, and opponent's active puck
+                // Ignore non-puck collisions, self-hit, and CPU's active puck
                 if (!hit.collider.CompareTag("puck") || hit.collider.gameObject == puck ||
                     hit.collider.gameObject == LogicScript.Instance.opponent.activePuckObject)
                     continue;
+
+                hitPoints.Add(hit.point);
 
                 // for forward facing raycasts (in front of target puck)
                 if (i % 2 == 0)
                 {
                     var puckScript = hit.collider.GetComponent<PuckScript>();
-                    if (IsValidPuck(puckScript)) { tempPowerModifier += 2.5f; tempValueModifier += puckScript.ComputeValue(); continue; }
+                    // if there is a lock or explosion in front, the path is blocked
+                    if (puckScript.IsLocked() || puckScript.IsExplosion())
+                    {
+                        return (false, 0, 0); // Puck is blocking
+                    }
+                    // if there is a players puck in front, add more power to the shot
+                    else if (puckScript.IsPlayersPuck())
+                    {
+                        tempPowerModifier += 2.5f;
+                        tempValueModifier += puckScript.ComputeTotalFutureValue() - 1; // minus 1 here, so we slightly favor aiming towards the front puck
+                    }
+                    // if there is a CPU puck in front, make the path slightly less valuable
+                    else
+                    {
+                        tempValueModifier -= puckScript.ComputeTotalFutureValue() / 2;
+                    }
+                    continue;
                 }
 
                 // for backwards facing raycasts (behind target puck)
+                // TODO: ignore pucks behind if the target puck has explosion
                 if (i % 2 == 1)
                 {
                     var puckScript = hit.collider.GetComponent<PuckScript>();
@@ -155,21 +164,20 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
                     {
                         if (puckScript.IsPlayersPuck())
                         {
-                            tempValueModifier += puckScript.ComputeValue();
+                            tempPowerModifier += 2.5f;
+                            tempValueModifier += puckScript.ComputeTotalFutureValue();
                         }
                         else // it's okay to have CPU pucks behind, it just makes the path less valuable
                         {
-                            tempValueModifier -= (puckScript.ComputeValue() * 4);
+                            tempValueModifier -= (puckScript.ComputeTotalFutureValue());
                         }
                         tempPowerModifier += 2.5f;
                         continue;
                     }
                 }
-
-                hitPoints.Add(hit.point);
-                return (false, 0, 0); // Puck is blocking
             }
         }
+
         return (true, tempPowerModifier, tempValueModifier); // No pucks are blocking
     }
 

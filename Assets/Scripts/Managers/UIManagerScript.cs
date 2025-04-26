@@ -20,10 +20,15 @@ public class UIManagerScript : MonoBehaviour
     public GameObject titleScreen;
     public GameObject gameHud;
     public GameObject gameResultScreen;
-    public GameObject customizeScreen;
+    public GameObject puckScreen;
+    public GameObject deckScreen;
+    public GameObject rewardsScreen;
+    public GameObject questsScreen;
     public GameObject profileScreen;
+    public GameObject shopScreen;
     public GameObject plinkoScreen;
     public GameObject waitingScreen;
+    public GameObject packOpenScreen;
 
     // title
     [SerializeField] private GameObject playerPuckIcon;
@@ -35,12 +40,9 @@ public class UIManagerScript : MonoBehaviour
     [SerializeField] private TMP_Text errorMessage;
     [SerializeField] private TMP_Text profilePopupText;
     [SerializeField] private GameObject readyButton;
-    [SerializeField] private GameObject screenLog;
     [SerializeField] private GameObject titleScreenBackground;
-    [SerializeField] private GameObject FPS30Button;
     [SerializeField] private GameObject puckAlert;
     [SerializeField] private GameObject profileAlert;
-
 
     // Lobby
     public TMP_Text lobbyCodeText;
@@ -61,6 +63,7 @@ public class UIManagerScript : MonoBehaviour
     public GameObject page6;
     public GameObject page7;
     public GameObject page8;
+    public GameObject page9;
 
     // HUD
     [SerializeField] private Text turnText;
@@ -73,8 +76,8 @@ public class UIManagerScript : MonoBehaviour
     [SerializeField] private Text playerScoreBonusText;
     [SerializeField] private Text opponentScoreBonusText;
 
-    private int playerWins; // TODO: this should not be stored here
-    private int opponentWins; // TODO: this should not be stored here
+    private int playerWins;
+    private int opponentWins;
     [SerializeField] private GameObject playerWinsObject;
     [SerializeField] private GameObject opponentWinsObject;
     [SerializeField] private Text playerWinsText;
@@ -88,6 +91,9 @@ public class UIManagerScript : MonoBehaviour
 
     [SerializeField] private GameObject restartButton;
 
+    [SerializeField] private GameObject ExitConfirmation;
+    [SerializeField] private GameObject RestartConfirmation;
+
     // result
     [SerializeField] private Text gameResultText;
     [SerializeField] private Text gameResultHighscoreMessageText;
@@ -100,18 +106,20 @@ public class UIManagerScript : MonoBehaviour
     private GameObject previousActiveUI;
 
     [SerializeField] private TMP_Text wallText;
-    [SerializeField] private GameObject fade;
+    [SerializeField] private GameObject table;
+    [SerializeField] private GameObject slider;
 
     // dark / light mode assets
     private bool darkMode = false;
+    public bool GetDarkMode() { return darkMode; }
     [SerializeField] private GameObject darkModeToggle;
     [SerializeField] private Sprite titleScreenLight;
     [SerializeField] private Sprite titleScreenDark;
     [SerializeField] private Sprite titleScreenBackgroundLight;
     [SerializeField] private Sprite titleScreenBackgroundDark;
-    [SerializeField] private GameObject table;
     [SerializeField] private Sprite tableLight;
     [SerializeField] private Sprite tableDark;
+
     public string TurnText
     {
         get => turnText.text;
@@ -130,7 +138,7 @@ public class UIManagerScript : MonoBehaviour
         else
             Destroy(Instance);
 
-        tutorialPages = new GameObject[] { page0, page1, page2, page3, page4, page5, page6, page7, page8 };
+        tutorialPages = new GameObject[] { page0, page1, page2, page3, page4, page5, page6, page7, page8, page9 };
     }
 
     private void Start()
@@ -138,12 +146,15 @@ public class UIManagerScript : MonoBehaviour
         logic = LogicScript.Instance;
         sound = SoundManagerScript.Instance;
         dailyChallenge = DailyChallengeManagerScript.Instance;
-        puckAlert.SetActive(PlayerPrefs.GetInt("ShowNewSkinAlert", 0) == 1);
-        profileAlert.SetActive(PlayerPrefs.GetInt("DailyChallenge1", 0) < 0 || PlayerPrefs.GetInt("DailyChallenge2", 0) < 0);
 
-        customizeScreen.SetActive(true);
+        puckScreen.SetActive(true);
         UpdateLocks();
-        customizeScreen.SetActive(false);
+        PlayerPrefs.SetInt("ShowNewSkinAlert", 0);
+        puckScreen.SetActive(false);
+        plinkoScreen.SetActive(true);
+        PlayerDataManager.Instance.PlinkoDataSwap();
+        PlinkoManager.Instance.CheckForNewDailyPlinkoReward();
+        plinkoScreen.SetActive(false);
         if (!PlayerPrefs.HasKey("DailyChallenge1")) { PlayerPrefs.SetInt("DailyChallenge1", 1); }
         if (!PlayerPrefs.HasKey("DailyChallenge2")) { PlayerPrefs.SetInt("DailyChallenge2", 1); }
 
@@ -181,8 +192,6 @@ public class UIManagerScript : MonoBehaviour
             HandleBackButton();
         }
 
-        if (logic.tutorialActive) { tutorialMenu.SetActive(true);  }
-
         if (Input.GetMouseButtonDown(0) && tutorialMenu.activeInHierarchy && iPage != 6)
         {
             // make sure click is not on a puck
@@ -190,6 +199,30 @@ public class UIManagerScript : MonoBehaviour
             {
                 AdvanceTutorial();
             }
+        }
+    }
+
+    public void GameHUDExitButtonHandler()
+    {
+        if (!ClientLogicScript.Instance.isRunning && LogicScript.Instance.player.puckCount >= 5)
+        {
+            LogicScript.Instance.ReturnToMenu();
+        }
+        else
+        {
+            ExitConfirmation.SetActive(true);
+        }
+    }
+
+    public void GameHUDRestartButtonHandler()
+    {
+        if (!ClientLogicScript.Instance.isRunning && LogicScript.Instance.player.puckCount >= 5)
+        {
+            LogicScript.Instance.RestartGame(-1);
+        }
+        else
+        {
+            RestartConfirmation.SetActive(true);
         }
     }
 
@@ -236,6 +269,8 @@ public class UIManagerScript : MonoBehaviour
         var newOpponentScore = Mathf.Max(0, opponentScore);
         GameHUDManager.Instance.ChangeScoreText(false, newOpponentScore.ToString(), newOpponentScore != prevOpponentScore);
         prevOpponentScore = newOpponentScore;
+
+        GameHUDManager.Instance.UpdateParticleEffects(playerScore, opponentScore);
     }
 
     public void UpdateScoreBonuses(int playerScoreBonus, int opponentScoreBonus)
@@ -284,6 +319,7 @@ public class UIManagerScript : MonoBehaviour
         if (playerScore > opponentScore)
         {
             IncrementPlayerPref("win");
+            if (!isLocal) { PowerupManager.Instance.UpdateWonUsingPlayerPref(); }
             sound.PlayWinSFX();
         } 
         else if (playerScore < opponentScore)
@@ -339,6 +375,7 @@ public class UIManagerScript : MonoBehaviour
 
                 }
             }
+            OngoingChallengeManagerScript.Instance.EvaluateChallengeAndSetText();
             return;
         }
 
@@ -361,6 +398,7 @@ public class UIManagerScript : MonoBehaviour
                 return;
             }
             gameResultHighscoreMessageText.text = "They won by " + System.Math.Abs(scoreDifference) + " points.";
+            OngoingChallengeManagerScript.Instance.EvaluateChallengeAndSetText();
             return;
         }
 
@@ -373,14 +411,13 @@ public class UIManagerScript : MonoBehaviour
         {
             gameResultText.text = "You Win!";
             gameResultHighscoreMessageText.text = "You won by " + scoreDifference + " points.";
-            if (!logic.powerupsAreEnabled || difficulty < 2)
+
+            if (scoreDifference > PlayerPrefs.GetInt(highscoresPlayerPrefsKeys[difficulty]))
             {
-                if (scoreDifference > PlayerPrefs.GetInt(highscoresPlayerPrefsKeys[difficulty]))
-                {
-                    gameResultHighscoreMessageText.text += "\nNew Highscore!";
-                    OverwriteHighscore(scoreDifference, difficulty);
-                }
+                gameResultHighscoreMessageText.text += "\nNew Highscore!";
+                OverwriteHighscore(scoreDifference, difficulty);
             }
+
             IncrementPlayerPref(winPlayerPrefsKeys[difficulty]);
             gameResultHighscoreMessageText.text += dailyChallenge.EvaluateChallenge(difficulty, scoreDifference, 0);
         }
@@ -396,6 +433,7 @@ public class UIManagerScript : MonoBehaviour
             gameResultHighscoreMessageText.text = "";
             IncrementPlayerPref(tiePlayerPrefsKeys[difficulty]);
         }
+        OngoingChallengeManagerScript.Instance.EvaluateChallengeAndSetText();
     }
 
     // write highscore to file and profile
@@ -424,47 +462,6 @@ public class UIManagerScript : MonoBehaviour
     // unlock the unlockables based on player highscores
     public void UpdateLocks()
     {
-        string[] highscoresPlayerPrefsKeys = { "easyHighscore", "mediumHighscore", "hardHighscore" };
-        string[] difficultyLocksPlayerPrefsKeys = { "easyLock", "mediumLock", "hardLock" };
-        int[] IDs = { 9, 10, 11 };
-        int combinedHighscore = 0;
-
-        // for each different highscore, if it is greater than zero, unlock all objects of cooresponding type
-        for (int i = 0; i < highscoresPlayerPrefsKeys.Length; i++)
-        {
-            int iHighscore = PlayerPrefs.GetInt(highscoresPlayerPrefsKeys[i]);
-
-            if (iHighscore > 0)
-            {
-                foreach (GameObject go in GameObject.FindGameObjectsWithTag(difficultyLocksPlayerPrefsKeys[i]))
-                {
-                    go.SetActive(false);
-                }
-                PuckSkinManager.Instance.UnlockPuckID(IDs[i]);
-                PuckSkinManager.Instance.UnlockPuckID(IDs[i]*-1);
-            }
-            combinedHighscore += iHighscore;
-        }
-
-        // combined highscore locks
-        for (int i = 10; i <= combinedHighscore; i += 2)
-        {
-            try // this try catch is here for players who have TOO high of a highscore lol
-            {
-                foreach (GameObject go in GameObject.FindGameObjectsWithTag(i + "CombinedLock"))
-                {
-                    go.SetActive(false);
-                }
-                PuckSkinManager.Instance.UnlockPuckID(12 + ((i-10) / 2));
-                PuckSkinManager.Instance.UnlockPuckID((12 + ((i-10) / 2)) * -1);
-            }
-            catch (UnityException)
-            {
-                continue;
-            }
-        }
-
-        // custom locks
         foreach (GameObject go in GameObject.FindGameObjectsWithTag("customLock"))
         {
             var CUS = go.GetComponent<CustomUnlockScript>();
@@ -528,7 +525,7 @@ public class UIManagerScript : MonoBehaviour
         newUI.SetActive(true);
         activeUI = newUI;
         SetErrorMessage("");
-        UpdateLocks();
+        UpdateLocks(); // for non-puck locks (difficulty locks)
         if (newUI == gameHud)
         {
             ResetHUD();
@@ -536,19 +533,32 @@ public class UIManagerScript : MonoBehaviour
         else if (newUI == titleScreen)
         {
             // blink puck screen for unlocks
-            customizeScreen.SetActive(true);
+            puckScreen.SetActive(true);
             UpdateLocks();
-            customizeScreen.SetActive(false);
+            puckScreen.SetActive(false);
             playerWins = 0;
             opponentWins = 0;
         }
-        else if (newUI == profileScreen)
+        else if (newUI == rewardsScreen)
         {
-            dailyChallenge.SetText();
+            StreakManager.Instance.SetText();
+        }
+        // sadly, this has to be here I think
+        else if (newUI == questsScreen)
+        {
+            DailyChallengeManagerScript.Instance.SetText();
+            OngoingChallengeManagerScript.Instance.EvaluateChallengeAndSetText();
         }
         titleScreenBackground.SetActive(newUI != gameHud && newUI != gameResultScreen);
-        fade.SetActive(newUI == gameHud || newUI == gameResultScreen);
+        table.SetActive(newUI == gameHud || newUI == gameResultScreen);
+        slider.SetActive(newUI == gameHud || newUI == gameResultScreen || newUI == titleScreen);
         ApplyDarkMode();
+        if (newUI != gameHud)
+        {
+            newUI.transform.localScale = new Vector3(0.95f, 0.95f, 0.95f);
+            LeanTween.cancel(newUI);
+            LeanTween.scale(newUI, new Vector3(1f, 1f, 1f), 0.1f).setEase(LeanTweenType.easeOutBack).setDelay(0.01f);
+        }
     }
 
     // handle android back button / esc key
@@ -570,6 +580,7 @@ public class UIManagerScript : MonoBehaviour
     // reset in-game HUD
     public void ResetHUD()
     {
+        if (logic.gameIsRunning) { tutorialMenu.SetActive(logic.tutorialActive); };
         gameResultText.text = "";
         playerScoreText.text = 0.ToString();
         opponentScoreText.text = 0.ToString();
@@ -577,6 +588,8 @@ public class UIManagerScript : MonoBehaviour
         opponentPuckCountText.text = 5.ToString();
         playerWinsObject.SetActive(playerWins > 0 || opponentWins > 0);
         opponentWinsObject.SetActive(playerWins > 0 || opponentWins > 0);
+        ExitConfirmation.SetActive(false);
+        RestartConfirmation.SetActive(false);
     }
 
     public void ResetWaitingScreen(string waitingTextInput)
@@ -640,8 +653,11 @@ public class UIManagerScript : MonoBehaviour
         PlayerPrefs.SetInt("darkMode", darkMode ? 1 : 0);
     }
 
-    private void ApplyDarkMode()
+    public void ApplyDarkMode(GameObject parentObject = null)
     {
+        // hacky way of enabling darkmode for disabled objects (run this with parameter onenable)
+        if (parentObject == null) { parentObject = activeUI; }
+
         if (activeUI == gameHud)
         {
             table.GetComponent<SpriteRenderer>().sprite = darkMode ? tableDark : tableLight;
@@ -651,8 +667,14 @@ public class UIManagerScript : MonoBehaviour
             titleScreenBackground.GetComponent<Image>().sprite = darkMode ? titleScreenBackgroundDark : titleScreenBackgroundLight;
             activeUI.GetComponent<Image>().sprite = darkMode ? titleScreenDark : titleScreenLight;
         }
+        // force dark mode for pack open because it looks better with particle effects (lame i know)
+        else if (activeUI == packOpenScreen)
+        {
+            titleScreenBackground.GetComponent<Image>().sprite = titleScreenBackgroundDark;
+            activeUI.GetComponent<Image>().sprite = titleScreenDark;
+        }
         // swap text color to white for all children TMP objects with the blackText tag
-        foreach (TMP_Text text in activeUI.GetComponentsInChildren<TMP_Text>())
+        foreach (TMP_Text text in parentObject.GetComponentsInChildren<TMP_Text>())
         {
             if (text.tag == "blackText")
             {
@@ -662,7 +684,7 @@ public class UIManagerScript : MonoBehaviour
             }
         }
         // swap text color to white for all children Text objects with the blackText tag
-        foreach (Text text in activeUI.GetComponentsInChildren<Text>())
+        foreach (Text text in parentObject.GetComponentsInChildren<Text>())
         {
             if (text.tag == "blackText")
             {
@@ -670,7 +692,7 @@ public class UIManagerScript : MonoBehaviour
             }
         }
         // swap color to white for all children sprite renderer objects with the blackText tag
-        foreach (SpriteRenderer sr in activeUI.GetComponentsInChildren<SpriteRenderer>())
+        foreach (SpriteRenderer sr in parentObject.GetComponentsInChildren<SpriteRenderer>())
         {
             if (sr.tag == "blackText")
             {
@@ -678,7 +700,7 @@ public class UIManagerScript : MonoBehaviour
             }
         }
         // swap color to white for all children image objects with the blackText tag
-        foreach (Image img in activeUI.GetComponentsInChildren<Image>())
+        foreach (Image img in parentObject.GetComponentsInChildren<Image>())
         {
             if (img.tag == "blackText")
             {
@@ -693,8 +715,34 @@ public class UIManagerScript : MonoBehaviour
     {
         debugMode++;
         if (debugMode == 10) {
-            screenLog.SetActive(true);
+            ScreenLog.Instance.gameObject.SetActive(true);
+            if (PlayerPrefs.GetInt("tutorialCompleted") == 0)
+            {
+                PlayerPrefs.SetInt("tutorialCompleted", 1);
+            }
+            if (PlayerPrefs.GetInt("easyWin") == 0)
+            {
+                PlayerPrefs.SetInt("easyWin", 1);
+            }
+            if (PlayerPrefs.GetInt("easyHighscore") == 0)
+            {
+                PlayerPrefs.SetInt("easyHighscore", 1);
+            }
+            if (PlayerPrefs.GetInt("mediumWin") == 0)
+            {
+                PlayerPrefs.SetInt("mediumWin", 1);
+            }
+            if (PlayerPrefs.GetInt("mediumHighscore") == 0)
+            {
+                PlayerPrefs.SetInt("mediumHighscore", 1);
+            }
+            PlayerPrefs.SetInt("debug", 1);
             Debug.Log("Started up logging.");
+        }
+        else if (debugMode == 5 || debugMode == 15)
+        {
+            ScreenLog.Instance.gameObject.SetActive(false);
+            PlayerPrefs.SetInt("debug", 0);
         }
     }
 

@@ -64,13 +64,20 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     // for powerups
     [SerializeField] private bool phasePowerup = false;
+    [SerializeField] private int growthPowerup = 0;
+    public int GetGrowthCount() { return growthPowerup; }
     [SerializeField] private int lockPowerup = 0;
     [SerializeField] private int explosionPowerup = 0;
     [SerializeField] private int hydraPowerup = 0;
     [SerializeField] private int shieldPowerup = 0;
     [SerializeField] private int resurrectPowerup = 0;
-    [SerializeField] private bool factoryPowerup = false;
+    [SerializeField] private int factoryPowerup = 0;
+    public int GetFactoryCount() { return factoryPowerup; }
     [SerializeField] private bool pushPowerup = false;
+    [SerializeField] private int exponentPowerup = 0;
+    [SerializeField] private int erraticPowerup = 0;
+
+    public int GetExponentCount() { return exponentPowerup; }
 
     void OnEnable()
     {
@@ -152,6 +159,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 GetComponentInChildren<NearbyPuckScript>().TriggerPush();
                 pushPowerup = false;
                 RemovePowerupText("push");
+                //PowerupAnimationManager.Instance.PlayPowerupActivationAnimation(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.PushPowerup), transform.position);
             }
         }
 
@@ -171,7 +179,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                         phaseHasOverlap = true;
                         if (explosionPowerup > 0) // phase & explosion combo
                         {
-                            puck.GetComponent<PuckScript>().DestroyPuck();
+                            puck.GetComponent<PuckScript>().DestroyPuck(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.ExplosionPowerup));
                         }
                     }
                 }
@@ -343,14 +351,27 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public bool IsPastSafeLine() { return pastSafeLine; }
     public bool IsPlayersPuck() { return playersPuck; }
     public int ComputeValue() { return (puckBaseValue * zoneMultiplier) + (zoneMultiplier > 0 ? puckBonusValue : 0); }
+    public int ComputeTotalFutureValue()
+    {
+        if (zoneMultiplier <= 0) return 0;
+        int puckValue = ComputeValue();
+        if (IsGrowth()) puckValue += LogicScript.Instance.player.puckCount * GetGrowthCount();
+        if (IsFactory()) puckValue += LogicScript.Instance.player.puckCount * 2 * GetFactoryCount();
+        if (IsExponent()) puckValue += Math.Max(0, puckBaseValue * zoneMultiplier * (int)Math.Pow((int)Mathf.Pow(2, GetExponentCount()), LogicScript.Instance.player.puckCount) - (puckBaseValue * zoneMultiplier));
+        return puckValue;
+    }
     public int GetZoneMultiplier() { return zoneMultiplier; }
     public void SetZoneMultiplier(int ZM) { zoneMultiplier = ZM; }
+    public bool IsGrowth() { return growthPowerup > 0; }
     public bool IsLocked() { return lockPowerup > 0; }
     public bool IsExplosion() { return explosionPowerup > 0; }
     public bool IsHydra() { return hydraPowerup > 0; }
+    public bool IsShield() { return shieldPowerup > 0; }
     public bool IsPhase() { return phasePowerup; }
     public bool IsResurrect() { return resurrectPowerup > 0; }
-    public bool IsFactory() { return factoryPowerup; }
+    public bool IsFactory() { return factoryPowerup > 0; }
+    public bool IsExponent() { return exponentPowerup > 0; }
+    public bool IsErratic() { return erraticPowerup > 0; }
 
     // when a puck enters a scoring zone, update its score and play a SFX
     public void EnterScoreZone(bool isZoneSafe, int enteredZoneMultiplier, bool isBoundry)
@@ -462,7 +483,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     {
         // FX
         if (ClientLogicScript.Instance.isRunning) { CollisionFXClientRpc(col.GetContact(0).point); }
-        else if (LogicScript.Instance.gameIsRunning) { CollisionFX(col.GetContact(0).point); }
+        else { CollisionFX(col.GetContact(0).point); }
         angularVelocityModifier = 0;
 
         // explosion powerup
@@ -472,7 +493,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             // Destroy the collided object
             if (Vector2.Distance(col.gameObject.transform.position, transform.position) < 2.2f) // make sure it's nearby (trying to fix a weird bug)
             {
-                col.gameObject.GetComponent<PuckScript>().DestroyPuck();
+                col.gameObject.GetComponent<PuckScript>().DestroyPuck(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.ExplosionPowerup));
                 Explode();
             }
         }
@@ -510,7 +531,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
             collisionParticleEffect.Play();
             Destroy(collisionParticleEffect.gameObject, 5f);
-            ScreenShake.Instance.Shake(velocity / 20);
+            ScreenShake.Instance.Shake(velocity / (LogicScript.Instance.gameIsRunning ? 20 : 100));
         }
     }
 
@@ -520,10 +541,20 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         puckBaseValue = value;
     }
 
+    public int GetPuckBaseValue()
+    {
+        return puckBaseValue;
+    }
+
     // bonus value is added onto base value * score zone value
     public void SetPuckBonusValue(int value)
     {
         puckBonusValue = value;
+    }
+
+    public int GetPuckBonusValue()
+    {
+        return puckBonusValue;
     }
 
     public void IncrementPuckBonusValue(int value)
@@ -596,7 +627,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
     }
 
-    public void DestroyPuck() // Destroys the puck with a particle and sound effect, used by powerups that say destroy
+    public void DestroyPuck(int effectIndex = -1) // Destroys the puck with a particle and sound effect, used by powerups that say destroy
     {
         if (ClientLogicScript.Instance.isRunning && !IsOwner) { return; } // only owner can destroy
 
@@ -617,12 +648,14 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 ServerLogicScript.Instance.PuckSpawnHelperServerRpc(playersPuck, transform.position.x, transform.position.y, 2);
                 hydraPowerup--;
                 RemovePowerupText("hydra");
+                //PowerupAnimationManager.Instance.PlayPowerupActivationAnimation(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.HydraPowerup), transform.position);
             }
             else
             {
                 PowerupManager.Instance.PuckSpawnHelper(playersPuck, transform.position.x, transform.position.y, 2);
                 hydraPowerup--;
                 RemovePowerupText("hydra");
+                //PowerupAnimationManager.Instance.PlayPowerupActivationAnimation(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.HydraPowerup), transform.position);
             }
         }
         // resurrect powerup
@@ -633,39 +666,45 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 ServerLogicScript.Instance.AdjustPuckCountServerRpc(playersPuck, 1); // requires ownership
                 resurrectPowerup--;
                 RemovePowerupText("resurrect");
+                //PowerupAnimationManager.Instance.PlayPowerupActivationAnimation(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.ResurrectPowerup), transform.position);
             }
             else
             {
                 LogicScript.Instance.IncrementPuckCount(playersPuck);
                 resurrectPowerup--;
                 RemovePowerupText("resurrect");
+                //PowerupAnimationManager.Instance.PlayPowerupActivationAnimation(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.ResurrectPowerup), transform.position);
             }
         }
 
         // SFX & screen shake
         if (ClientLogicScript.Instance.isRunning)
         {
-            DestroyPuckFXClientRpc(); // todo put for phase
+            DestroyPuckFXClientRpc(effectIndex); // todo put for phase
         }
         else
         {
-            DestroyPuckFX();
+            DestroyPuckFX(effectIndex);
         }
 
         // actually destroy the gameobject
         Destroy(gameObject);
     }
 
-    private void DestroyPuckFX()
+    private void DestroyPuckFX(int effectIndex = -1)
     {
-        logic.playDestroyPuckSFX(SFXvolume);
+        SoundManagerScript.Instance.PlayDestroyPuckSFX(SFXvolume);
         ScreenShake.Instance.Shake(0.25f);
+        if (effectIndex > 0)
+        {
+            PowerupAnimationManager.Instance.PlayPowerupActivationAnimation(effectIndex, transform.position);
+        }
     }
 
     [ClientRpc]
-    public void DestroyPuckFXClientRpc()
+    public void DestroyPuckFXClientRpc(int effectIndex = -1)
     {
-        DestroyPuckFX();
+        DestroyPuckFX(effectIndex);
     }
 
     override public void OnDestroy()
@@ -713,10 +752,10 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void DestroyPuckServerRpc()
+    public void DestroyPuckServerRpc(int effectIndex = -1)
     {
         if (!IsServer) return;
-        DestroyPuck();
+        DestroyPuck(effectIndex);
     }
 
     public void SetPhase(bool isPhase)
@@ -735,12 +774,19 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     {
         SetPuckBaseValue(0);
         SetPowerupText("valueless");
+        InitSpawnedPuck();
+    }
+
+    public void InitSpawnedPuck()
+    {
         shot = true;
         safe = true;
     }
 
     public void EnableGrowth()
     {
+        growthPowerup++;
+
         if (ClientLogicScript.Instance.isRunning) // growth online
         {
             if (playersPuck)
@@ -784,6 +830,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             pointCPUSFX.Play();
         }
         CreateScoreFloatingText();
+        //PowerupAnimationManager.Instance.PlayPowerupActivationAnimation(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.GrowthPowerup), transform.position);
     }
 
     public void EnableLock()
@@ -846,7 +893,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
         explosionPowerup--;
         RemovePowerupText("explosion");
-        DestroyPuck();
+        DestroyPuck(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.ExplosionPowerup));
         explodeFromRPC = false;
     }
 
@@ -868,10 +915,18 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         hydraPowerup++;
     }
 
+    [ClientRpc]
+    public void EnableHydraClientRpc()
+    {
+        hydraPowerup++;
+        SetPowerupText("hydra");
+    }
+
     public void EnableFactory()
     {
-        factoryPowerup = true;
+        factoryPowerup++;
         SetPuckBaseValue(0); // set to valueless
+
         if (ClientLogicScript.Instance.isRunning) // factory online
         {
             if (playersPuck)
@@ -907,6 +962,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         {
             PowerupManager.Instance.PuckSpawnHelper(playersPuck, transform.position.x, transform.position.y, 1);
         }
+        //PowerupAnimationManager.Instance.PlayPowerupActivationAnimation(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.FactoryPowerup), transform.position);
     }
 
     public void EnableShield()
@@ -939,6 +995,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         breakSFX.volume *= SFXvolume;
         breakSFX.Play();
         shieldFromRPC = false;
+        PowerupAnimationManager.Instance.PlayPowerupActivationAnimation(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.ShieldPowerup), transform.position);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -961,6 +1018,8 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     public void EnableExponent()
     {
+        exponentPowerup++;
+
         if (ClientLogicScript.Instance.isRunning) // exponent online
         {
             if (playersPuck)
@@ -1004,6 +1063,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             pointCPUSFX.Play();
         }
         CreateScoreFloatingText();
+        //PowerupAnimationManager.Instance.PlayPowerupActivationAnimation(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.ExponentPowerup), transform.position);
     }
 
     public void EnablePush()
@@ -1013,6 +1073,8 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     public void EnableErratic()
     {
+        erraticPowerup++;
+
         if (ClientLogicScript.Instance.isRunning) // Erratic online
         {
             if (playersPuck)

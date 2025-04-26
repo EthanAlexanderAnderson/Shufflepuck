@@ -39,11 +39,12 @@ public class MatchmakerClient : MonoBehaviour
         return AuthenticationService.Instance.PlayerId;
     }
 
-    // SIGN IN --- This happens instantly upon opening the game
+    /*/ SIGN IN --- This happens instantly upon opening the game
     private void OnEnable()
     {
         ServerStartUp.ClientInstance += SignIn;
     }
+    */
 
     private void Start()
     {
@@ -53,6 +54,7 @@ public class MatchmakerClient : MonoBehaviour
         clientLogic = ClientLogicScript.Instance;
     }
 
+    /*
     private void OnDisable()
     {
         ServerStartUp.ClientInstance -= SignIn;
@@ -70,6 +72,7 @@ public class MatchmakerClient : MonoBehaviour
         await UnityServices.InitializeAsync();
         Debug.Log($"Signed In Anon as {serviceProfileName}({PlayerID()})");
     }
+    */
 
     // START ONLINE PLAY (This is NOT the same as starting a network client, that happens after matching)
     // StartClient() is called by Online -> Public button
@@ -356,7 +359,7 @@ public class MatchmakerClient : MonoBehaviour
         try
         {
             if (serverLogic == null) { serverLogic = ServerLogicScript.Instance; }
-            serverLogic.AddPlayerServerRpc(logic.player.puckSpriteID, logic.powerupsAreEnabled);
+            serverLogic.AddPlayerServerRpc(logic.player.puckSpriteID, true); // TODO: instead of true, pass in "true" if the deck is NOT empty
         }
         catch (Exception e)
         {

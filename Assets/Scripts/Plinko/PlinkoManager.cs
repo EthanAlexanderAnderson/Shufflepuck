@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,20 +10,19 @@ public class PlinkoManager : MonoBehaviour
     // self
     public static PlinkoManager Instance;
 
-    //dependacies
-    private PuckSkinManager puckSkinManager;
-    private LevelManager levelManager;
-    private SoundManagerScript sound;
-    private UIManagerScript UI;
-
-    // imports
+    // objects in scene
     [SerializeField] private Image rewardImage;
     [SerializeField] private GameObject rewardImageAnimation;
     [SerializeField] private TMP_Text rewardText;
     [SerializeField] private TMP_Text countdownText;
     [SerializeField] private GameObject bonusBucketLeft;
+    [SerializeField] private TMP_Text bonusBucketLeftText;
     [SerializeField] private GameObject bonusBucketRight;
+    [SerializeField] private TMP_Text bonusBucketRightText;
     [SerializeField] private GameObject plinkoDropButton;
+
+    // asset imports
+    [SerializeField] private Sprite plusPack;
 
     // floating text
     [SerializeField] private GameObject floatingTextPrefab;
@@ -54,25 +54,26 @@ public class PlinkoManager : MonoBehaviour
 
     private void OnEnable()
     {
-        puckSkinManager = PuckSkinManager.Instance;
-        levelManager = LevelManager.Instance;
-        sound = SoundManagerScript.Instance;
-        UI = UIManagerScript.Instance;
-
-        CheckForNewDailyPlinkoReward();
         int PlinkoReward = PlayerPrefs.GetInt("PlinkoReward", 100);
         if (PlinkoReward >= 100) // 100+ = XP REWARD
         {
             rewardText.text = "+" + PlinkoReward.ToString() + "XP";
             rewardImageAnimation.SetActive(false);
         }
-        else // skin reward
+        else if (PlinkoReward > 0) // skin reward
         {
-            rewardText.text = "UNLOCK";
-            rewardImage.sprite = puckSkinManager.ColorIDtoPuckSprite(PlinkoReward);
+            rewardText.text = PuckSkinManager.Instance.IsPlinkoSkinUnlocked(PlinkoReward) ? "" : "UNLOCK";
+            rewardImage.sprite = PuckSkinManager.Instance.ColorIDtoPuckSprite(PlinkoReward);
             rewardImageAnimation.SetActive(PlinkoReward == 40);
         }
+        else
+        {
+            var (_, level) = LevelManager.Instance.GetXPAndLevel();
+            rewardText.text = (int)(level / 10f) > 1 ? $"+{(int)(level / 10f)} +PACKS" : $"+{(int)(level / 10f)} +PACK";
+            rewardImage.sprite = plusPack;
+        }
         rewardImage.enabled = PlinkoReward < 100; // reward image should be disabled if the reward is XP
+        UpdateSideBucketText();
     }
 
     // Update is called once per frame
@@ -102,7 +103,7 @@ public class PlinkoManager : MonoBehaviour
         }
     }
 
-    private void CheckForNewDailyPlinkoReward()
+    public void CheckForNewDailyPlinkoReward()
     {
         // Get the last saved date or use a default if it's the first time
         string lastSavedDate = PlayerPrefs.GetString("LastPlinkoRewardDate", string.Empty);
@@ -115,19 +116,18 @@ public class PlinkoManager : MonoBehaviour
             {
                 AssignNewPlinkoReward();
                 // subtract welcome bonus
-                var welcomeBonus = PlayerPrefs.GetInt("WelcomeBonus");
+                int welcomeBonus = PlayerPrefs.GetInt("WelcomeBonus");
                 if (welcomeBonus > 0)
                 {
                     PlayerPrefs.SetInt("WelcomeBonus", welcomeBonus - 1);
                 }
-
             }
             else
             {
-                Debug.Log("Today's Plinko Reward is already assigned. " + PlayerPrefs.GetInt("PlinkoReward"));
+                Debug.Log("Daily Plinko Reward already assigned: " + PlayerPrefs.GetInt("PlinkoReward"));
             }
-            // if the lastChallengeDate is 7 or more days ago or XP is under 200, set welcome bonus
-            if (DateTime.Today.Subtract(lastChallengeDate).Days >= 7 || PlayerPrefs.GetInt("XP") < 200)
+            // if the lastChallengeDate is 7 or more days ago, set welcome bonus
+            if (DateTime.Today.Subtract(lastChallengeDate).Days >= 7)
             {
                 PlayerPrefs.SetInt("WelcomeBonus", (int)DateTime.Today.Subtract(lastChallengeDate).Days / 7);
             }
@@ -139,12 +139,12 @@ public class PlinkoManager : MonoBehaviour
         }
 
         // enable welcome bonus buckets
-        if (PlayerPrefs.GetInt("WelcomeBonus") > 0)
-        {
-            bonusBucketLeft.SetActive(true);
-            bonusBucketRight.SetActive(true);
-            Debug.Log("Remaining Welcome Bonus Days: " + PlayerPrefs.GetInt("WelcomeBonus"));
-        }
+        int newWelcomeBonus = PlayerPrefs.GetInt("WelcomeBonus");
+        bonusBucketLeft.SetActive(newWelcomeBonus > 0);
+        bonusBucketRight.SetActive(newWelcomeBonus > 0);
+        if (newWelcomeBonus > 0) { Debug.Log("Remaining Welcome Bonus Days: " + PlayerPrefs.GetInt("WelcomeBonus")); }
+
+        TitleScreenScript.Instance.UpdateAlerts();
     }
 
     private void AssignNewPlinkoReward()
@@ -158,11 +158,14 @@ public class PlinkoManager : MonoBehaviour
         // Shallow copy so we don't override real weights
         int[,] plinkoUnlockableIDsCopy = (int[,])plinkoUnlockableIDs.Clone();
 
+        // get currently unlocked plinko skins
+        List<int> alreadyUnlocked = PuckSkinManager.Instance.GetAllUnlockedPlinkoSkins();
+
         for (int i = 0; i < plinkoUnlockableIDsCopy.GetLength(0); i++)
         {
             int puckID = plinkoUnlockableIDsCopy[i, 0];
             // if a puck has been unlocked already or was the previous reward, set it's weight (probability of being the next reward) to be zero
-            if (PlayerPrefs.GetInt("puck" + puckID + "unlocked") == 1 || puckID == currentReward)
+            if (alreadyUnlocked.Contains(puckID) || puckID == currentReward)
             {
                 plinkoUnlockableIDsCopy[i, 1] = 0;
             }
@@ -173,14 +176,16 @@ public class PlinkoManager : MonoBehaviour
         }
 
         // if we have no pucks remaining
-        if (totalWeight == 0 && currentReward < 100)
+        if (totalWeight == 0 && currentReward > 0 && currentReward < 100)
         {
             // no pucks are left to unlock
-            if (PlayerPrefs.GetInt("puck" + currentReward + "unlocked") == 1)
+            if (PuckSkinManager.Instance.IsPlinkoSkinUnlocked(currentReward))
             {
                 Debug.Log("No puck skin rewards remain.");
-                PlayerPrefs.SetInt("PlinkoReward", 999);
-                rewardImage.enabled = false;
+                PlayerPrefs.SetInt("PlinkoReward", 0);
+                var (_, level) = LevelManager.Instance.GetXPAndLevel();
+                rewardText.text = (int)(level / 10f) > 1 ? $"+{(int)(level / 10f)} +PACKS" : $"+{(int)(level / 10f)} +PACK";
+                rewardImage.sprite = plusPack;
                 return;
             }
             // only one puck left to unlock
@@ -199,11 +204,25 @@ public class PlinkoManager : MonoBehaviour
 
             if (rand < threshold)
             {
-                PlayerPrefs.SetInt("PlinkoReward", plinkoUnlockableIDsCopy[i, 0]);
+                int plinkoReward = plinkoUnlockableIDsCopy[i, 0];
+                PlayerPrefs.SetInt("PlinkoReward", plinkoReward);
+                rewardText.text = PuckSkinManager.Instance.IsPlinkoSkinUnlocked(plinkoReward) ? "" : "UNLOCK";
+                rewardImage.sprite = PuckSkinManager.Instance.ColorIDtoPuckSprite(plinkoReward);
+                rewardImageAnimation.SetActive(plinkoReward == 40);
                 Debug.Log("New Plinko Reward: " + PlayerPrefs.GetInt("PlinkoReward"));
                 return;
             }
         }
+    }
+
+    public void UpdateSideBucketText()
+    {
+        // get level for pack reward quantity
+        var (_, level) = LevelManager.Instance.GetXPAndLevel();
+
+        string text = level > 1 ? $"+{level} PACKS" : $"+{level} PACK";
+        bonusBucketLeftText.text = text;
+        bonusBucketRightText.text = text;
     }
 
     public void MainReward( Transform self )
@@ -211,50 +230,83 @@ public class PlinkoManager : MonoBehaviour
         int plinkoreward = PlayerPrefs.GetInt("PlinkoReward");
 
         // input checking
-        if (self == null || plinkoreward == 0)
+        if (self == null || plinkoreward < 0)
         {
             Debug.LogError("PlinkoManager.MainReward() : Error : Plinko Reward not given.");
-            UI.SetErrorMessage("Error: Plinko Reward not given.");
+            UIManagerScript.Instance.SetErrorMessage("Error: Plinko Reward not given.");
             return;
         }
 
+        // SFX for auditory feedback
+        SoundManagerScript.Instance.PlayWinSFX();
+
+        GameObject floatingText = Instantiate(floatingTextPrefab, self.position, Quaternion.identity, transform);
+
         // give the reward to the player
-        if (plinkoreward >= 100) // XP reward
+        // XP reward
+        if (plinkoreward >= 100)
         {
-            levelManager.AddXP(plinkoreward);
+            LevelManager.Instance.AddXP(plinkoreward);
+            // floating text for visual feedback
+            floatingText.GetComponent<FloatingTextScript>().Initialize("+" + plinkoreward + "XP", 0.5f, 15);
         }
-        else // skin reward
+        // plus packs
+        else if (plinkoreward == 0)
+        {
+            // get level for pack reward quantity
+            var (_, level) = LevelManager.Instance.GetXPAndLevel();
+
+            // give the reward to the player
+            PackManager.Instance.RewardPacks(true, (int)(level / 10f));
+
+            // floating text for visual feedback
+            floatingText.GetComponent<FloatingTextScript>().Initialize((int)(level / 10f) > 1 ? $"+{(int)(level / 10f)} +PACKS" : $"+{(int)(level / 10f)} +PACK", 0.5f, 15);
+        }
+        // skin reward
+        else if (plinkoreward > 0 && plinkoreward < 100)
         {
             // if the puck has not been unlocked already, unlock it. otherwise it is a duplicate and we should grant XP
-            if (PlayerPrefs.GetInt("puck" + plinkoreward.ToString() + "unlocked", 0) == 0)
+            if (!PuckSkinManager.Instance.IsPlinkoSkinUnlocked(plinkoreward))
             {
-                puckSkinManager.UnlockPuckID(plinkoreward);
-                PlayerPrefs.SetInt("puck" + plinkoreward.ToString() + "unlocked", 1);
-                UI.SetErrorMessage("New puck unlocked!");
+                PuckSkinManager.Instance.UnlockPuckID(plinkoreward);
+                PuckSkinManager.Instance.UnlockPlinkoSkin(plinkoreward);
+                UIManagerScript.Instance.SetErrorMessage("New puck unlocked!");
+                rewardText.text = "";
             }
             else
             {
-                plinkoreward = 100;
-                levelManager.AddXP(plinkoreward);
-                UI.SetErrorMessage("Duplicate reward. Adding +100XP instead.");
+                PlayerPrefs.SetInt("PlinkoPegsDropped", PlayerPrefs.GetInt("PlinkoPegsDropped") - 1);
+                plinkoDropButton.GetComponent<PlinkoDropButtonScript>().SetDropButtonText();
+                UIManagerScript.Instance.SetErrorMessage("Duplicate reward. Adding +1 drop instead.");
             }
+            // floating text for visual feedback
+            floatingText.GetComponent<FloatingTextScript>().Initialize((plinkoreward >= 100) ? "+" + plinkoreward + "XP" : "UNLOCKED!", 0.5f, 15);
         }
-
-        // SFX for auditory feedback
-        sound.PlayWinSFX();
-
-        // floating text for visual feedback
-        var floatingText = Instantiate(floatingTextPrefab, self.position, Quaternion.identity, transform);
-        floatingText.GetComponent<FloatingTextScript>().Initialize((plinkoreward >= 100) ? "+" + plinkoreward + "XP" : "UNLOCKED!", 0.5f, 15);
     }
 
     public void SideReward( Transform self )
     {
+        // get level for pack reward quantity
+        var (_, level) = LevelManager.Instance.GetXPAndLevel();
+
         // give the reward to the player
-        levelManager.AddXP(100);
+        PackManager.Instance.RewardPacks(false, level);
 
         // SFX for auditory feedback
-        sound.PlayWinSFX();
+        SoundManagerScript.Instance.PlayWinSFX();
+
+        // floating text for visual feedback
+        var floatingText = Instantiate(floatingTextPrefab, self.position, Quaternion.identity, transform);
+        floatingText.GetComponent<FloatingTextScript>().Initialize(level > 1 ? $"+{level} PACKS" : $"+{level} PACK", 0.5f, 15);
+    }
+
+    public void BonusReward(Transform self)
+    {
+        // give the reward to the player
+        LevelManager.Instance.AddXP(100);
+
+        // SFX for auditory feedback
+        SoundManagerScript.Instance.PlayWinSFX();
 
         // floating text for visual feedback
         var floatingText = Instantiate(floatingTextPrefab, self.position, Quaternion.identity, transform);

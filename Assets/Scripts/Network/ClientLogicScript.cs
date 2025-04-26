@@ -233,6 +233,8 @@ public class ClientLogicScript : NetworkBehaviour
     {
         if (!IsClient) return;
 
+        UI.ChangeUI(UI.gameHud);
+
         UI.SetReButtons(false);
         if (powerupsAreEnabled) { powerupManager.LoadDeck(); }
 
@@ -248,7 +250,7 @@ public class ClientLogicScript : NetworkBehaviour
         logic.opponent.scoreBonus = 0;
         logic.player.clientID = NetworkManager.Singleton.LocalClientId;
         logic.activeCompetitor = logic.opponent;
-        powerupManager.ClearPowerupPopupEffectAnimationQueue();
+        PowerupAnimationManager.Instance.ClearPowerupPopupEffectAnimationQueue();
 
         Debug.Log("Client: Restarting game");
         Debug.Log($"player : {logic.player.puckSpriteID}     0 : {puckSpriteID_0}   1 : {puckSpriteID_1}");
@@ -270,7 +272,6 @@ public class ClientLogicScript : NetworkBehaviour
         puckHalo.SetActive(false);
         bar.ToggleDim(false);
         UI.onlineRematchButton.SetActive(false);
-        UI.ChangeUI(UI.gameHud);
         GameHUDManager.Instance.ChangeTurnText("Opponent's Turn");
         line.GetComponent<LineScript>().FullSpeed();
     }

@@ -5,7 +5,7 @@ public class PlinkoBucketScript : MonoBehaviour
     //dependacies
     private PlinkoManager plinkoManager;
 
-    public bool isMainReward;
+    public int mainSideBonus;
 
     private void OnEnable()
     {
@@ -24,13 +24,17 @@ public class PlinkoBucketScript : MonoBehaviour
             plinkoManager = PlinkoManager.Instance;
         }
 
-        if (isMainReward)
+        if (mainSideBonus <= 0)
         {
             plinkoManager.MainReward(transform);
         }
-        else
+        else if (mainSideBonus == 1)
         {
             plinkoManager.SideReward(transform);
+        }
+        else
+        {
+            plinkoManager.BonusReward(transform);
         }
     }
 }

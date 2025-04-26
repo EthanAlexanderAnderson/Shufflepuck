@@ -1,12 +1,24 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ForcefieldScript : MonoBehaviour
 {
+    // self
+    public static ForcefieldScript Instance;
+
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private Collider2D boxCollider;
     [SerializeField] private ParticleSystem particles;
     [SerializeField] private bool forcefieldIsEnabled;
     [SerializeField] private bool playersPuck;
+
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(Instance);
+    }
 
     void FixedUpdate()
     {
@@ -52,5 +64,24 @@ public class ForcefieldScript : MonoBehaviour
     public bool IsPlayers()
     {
         return playersPuck;
+    }
+
+    public List<PuckScript> GetPucksInForcefield()
+    {
+        List<PuckScript> pucksInForcefield = new();
+
+        boxCollider.enabled = true;
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(boxCollider.bounds.center, boxCollider.bounds.size, 0);
+        foreach (Collider2D collider in colliders)
+        {
+            // if the collider is a puck
+            if (collider.CompareTag("puck"))
+            {
+                pucksInForcefield.Add(collider.GetComponent<PuckScript>());
+            }
+        }
+
+        boxCollider.enabled = forcefieldIsEnabled;
+        return pucksInForcefield;
     }
 }

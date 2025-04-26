@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6914501702572560244}
   m_Layer: 2
   m_Name: NearbyCollider
-  m_TagString: Untagged
+  m_TagString: scoreZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -364,6 +364,7 @@ MonoBehaviour:
   counterForce: 0.3
   floatingTextPrefab: {fileID: 4579905589776270658, guid: a4af9b0b007a49c4ca9fa4d76af0f273, type: 3}
   phasePowerup: 0
+  growthPowerup: 0
   lockPowerup: 0
   explosionPowerup: 0
   hydraPowerup: 0
@@ -371,6 +372,8 @@ MonoBehaviour:
   resurrectPowerup: 0
   factoryPowerup: 0
   pushPowerup: 0
+  exponentPowerup: 0
+  erraticPowerup: 0
   collisionParticleEffectPrefab: {fileID: 4929346313033784861, guid: 9f76c534760375c468d38282f074644f, type: 3}
 --- !u!96 &6188019625278550676
 TrailRenderer:
@@ -536,7 +539,7 @@ SpriteMask:
   m_BackSortingLayerID: 0
   m_FrontSortingLayer: 0
   m_BackSortingLayer: 0
-  m_FrontSortingOrder: 3
+  m_FrontSortingOrder: 2
   m_BackSortingOrder: 0
   m_IsCustomRangeActive: 1
   m_SpriteSortPoint: 0
@@ -1457,7 +1460,7 @@ ParticleSystemRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_RenderMode: 0
   m_MeshDistribution: 0
   m_SortMode: 0

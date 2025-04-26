@@ -2,8 +2,8 @@
  * it controls most things happening in game and directs other scripts.
  */
 
+using System;
 using UnityEngine;
-using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class LogicScript : MonoBehaviour
@@ -36,14 +36,9 @@ public class LogicScript : MonoBehaviour
     [SerializeField] private GameObject wall; // set in editor
     public bool WallIsActive() { return wallCount > 0; }
 
-    // Hard CPU shot paths
-    GameObject[] CPUPaths;
-
     // powerups
-    public bool powerupsAreEnabled = false;
     [SerializeField] private GameObject powerupsMenu; // set in editor
-    private int powerupsUsedThisTurn = 0;
-    [SerializeField] private GameObject powerupsToggle;
+    public int triplePowerup;
 
     // game state
     public bool gameIsRunning { get; private set; }
@@ -67,19 +62,15 @@ public class LogicScript : MonoBehaviour
 
     // temp variables
     private float tempTime = 0;
-    public float CPUShotAngle = 0;
-    public float CPUShotPower = 0;
-    public float CPUShotSpin = 50;
+    private float CPUShotAngle = -1;
+    private float CPUShotPower = -1;
+    private float CPUShotSpin = -1;
     public Competitor player;
     public Competitor opponent;
     public Competitor activeCompetitor;
     public Competitor nonActiveCompetitor;
-    public bool playedAGame = false;
+    public bool playedAGame;
     public bool tutorialActive;
-
-    // powerups TODO: move to powerups manager probably
-    public int triplePowerup;
-    public int denyPowerup;
 
     private void Awake()
     {
@@ -92,11 +83,17 @@ public class LogicScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        PowerupCardData.EncodeDecodeTest();
+
 #if (UNITY_EDITOR)
         PlayerPrefs.SetInt("easyWin", 0);
         PlayerPrefs.SetInt("easyHighscore", 14);
         PlayerPrefs.SetInt("mediumHighscore", 12);
         PlayerPrefs.SetInt("hardHighscore", 10);
+        // TODO: REMOVE
+        PlayerPrefs.SetInt("CraftingCredits", 999);
+        PlayerPrefs.SetInt("StandardPacks", 999);
+        PlayerPrefs.SetInt("PlusPacks", 999);
 #endif
 
         // connect scripts
@@ -119,23 +116,13 @@ public class LogicScript : MonoBehaviour
         PuckSkinManager.Instance.SelectPlayerPuckSprite(PlayerPrefs.GetInt("puck") == 0 && PlayerPrefs.GetInt("hardHighscore") <= 5 ? 1 : PlayerPrefs.GetInt("puck"));
         activeCompetitor = opponent;
         nonActiveCompetitor = player;
-        // check if tutorial should be active
-        tutorialActive = PlayerPrefs.GetInt("tutorialCompleted") == 0 && PlayerPrefs.GetInt("easyWin") == 0 && PlayerPrefs.GetInt("easyHighscore") == 0;
-        // load if powerups should be active
-        powerupsAreEnabled = PlayerPrefs.GetInt("PowerupsEnabled", 0) == 1;
-        powerupsToggle.GetComponent<Toggle>().isOn = powerupsAreEnabled;
-        // initialize CPU paths
-        CPUPaths = GameObject.FindGameObjectsWithTag("cpu_path");
         // make sure we're on title screen
         UI.ChangeUI(UI.titleScreen);
-        // load daily challenges
-        DailyChallengeManagerScript.Instance.SetText();
     }
 
     // Update is called once per frame
     void Update()
     {
-
         if (tutorialActive && UI.iPage < 6)
         {
             return;
@@ -192,7 +179,7 @@ public class LogicScript : MonoBehaviour
             timer += Time.deltaTime;
         }
         // ran out of pucks (game over)
-        else if (gameIsRunning && puckManager.AllPucksAreStopped())
+        else if (gameIsRunning && puckManager.AllPucksAreStopped() && puckManager.AllPucksAreNotNearingScoreZoneEdge())
         {
             gameIsRunning = false;
             UpdateScores();
@@ -242,11 +229,10 @@ public class LogicScript : MonoBehaviour
             if (wallCount > 0) { UI.UpdateWallText(wallCount); }
         }
 
-        if (difficulty >= 2 && !isLocal)
+        if (!isLocal)
         {
-            if (powerupsAreEnabled) { powerupManager.ShuffleDeck(); }
-            powerupsMenu.SetActive(powerupsAreEnabled);
-            powerupsUsedThisTurn = 0;
+            powerupManager.ShuffleDeck();
+            powerupsMenu.SetActive(true);
         }
     }
 
@@ -296,7 +282,6 @@ public class LogicScript : MonoBehaviour
         activeCompetitor = opponent;
         nonActiveCompetitor = player;
 
-        powerupsUsedThisTurn = 0;
         activeBar = bar.ChangeBar("angle", activeCompetitor.isPlayer);
         if (!isLocal)
         {
@@ -319,50 +304,36 @@ public class LogicScript : MonoBehaviour
             wallCount--;
             if (wallCount > 0) { UI.UpdateWallText(wallCount); }
         }
-        // first turn on med-hard diff, CPU Shoots perfect
-        if (difficulty == 1 && opponent.puckCount == 5)
-        {
-            CPUShotAngle = Random.Range(33.0f, 38.0f);
-            CPUShotPower = Random.Range(65.0f, 78.0f);
-        }
-        // easy-med regular shots only
-        else if (difficulty < 2)
-        {
-            CPUShotAngle = Random.Range(11.0f + (difficulty * 5.0f), 63.0f - (difficulty * 5.0f));
-            CPUShotPower = Random.Range(30.0f + (difficulty * 5.0f), 90.0f - (difficulty * 5.0f));
-        }
-        // hard uses paths, and random if no path is found
-        else
-        {
-            if (difficulty >= 2 && !isLocal && powerupsAreEnabled && powerupsUsedThisTurn < 3) { CPUPreShotPowerups(); }
-            ReadyToFindPath = true;
-        }
+
+        CPUShotAngle = -1f;
+        CPUShotPower = -1f;
+        CPUShotAngle = -1f;
+
+        CPUBehaviorScript.TurnReset();
+
+        readyToStartOpponentTurn = true;
     }
 
-    bool ReadyToFindPath = false;
+    bool readyToStartOpponentTurn = false;
+    public float powerupWaitTime = 0;
     private void OpponentShootingHelper()
     {
         // timestamp the beginning of CPU's turn for delays
         if (tempTime == 0)
         {
             tempTime = timer;
+            powerupWaitTime = 0;
         }
 
-        // after 1 seconds elapsed, CPU selects shot path and uses post shot powerups
-        if (0 < (timer - (tempTime + 1)) && ReadyToFindPath)
-        {
-            FindOpenPath();
-            if (difficulty >= 2 && !isLocal && powerupsAreEnabled && powerupsUsedThisTurn < 3) { CPUPostShotPowerups(); }
-            ReadyToFindPath = false;
-        }
+        if (CPUShotAngle < 0) (CPUShotAngle, CPUShotPower, CPUShotSpin) = CPUBehaviorScript.Think(timer - tempTime);
 
         // after 1.5 seconds elapsed, CPU selects angle
-        if (Mathf.Abs(line.GetValue() - CPUShotAngle) < (timer - (tempTime + 1.5)) && activeBar == "angle")
+        if (CPUShotAngle >= 0 && Mathf.Abs(line.GetValue() - CPUShotAngle) < (timer - (tempTime + 1.5 + powerupWaitTime))/2 && activeBar == "angle")
         {
             activeBar = bar.ChangeBar("power", activeCompetitor.isPlayer);
         }
         // after 3 seconds elapsed, CPU selects power
-        if (Mathf.Abs(line.GetValue() - CPUShotPower) < (timer - (tempTime + 3)) && activeBar == "power")
+        if (CPUShotPower >= 0 && Mathf.Abs(line.GetValue() - CPUShotPower) < (timer - (tempTime + 3 + powerupWaitTime))/2 && activeBar == "power")
         {
             if (difficulty < 2)
             {
@@ -375,10 +346,9 @@ public class LogicScript : MonoBehaviour
             }
         }
         // after 4.5 seconds elapsed, CPU selects spin (for hard mode only)
-        if (Mathf.Abs(line.GetValue() - CPUShotSpin) < (timer - (tempTime + 4.5)) && activeBar == "spin")
+        if (CPUShotSpin >= 0 && Mathf.Abs(line.GetValue() - CPUShotSpin) < (timer - (tempTime + 4.5 + powerupWaitTime))/2 && activeBar == "spin")
         {
             Shoot(CPUShotAngle, CPUShotPower, CPUShotSpin);
-            denyPowerup = 0;
             tempTime = 0;
         }
     }
@@ -413,6 +383,12 @@ public class LogicScript : MonoBehaviour
 
     public void RestartGame(int diff)
     {
+        puckManager.ClearAllPucks();
+        if (tutorialActive)
+        {
+            // check if tutorial should be active
+            tutorialActive = PlayerPrefs.GetInt("tutorialCompleted") == 0 && PlayerPrefs.GetInt("easyWin") == 0 && PlayerPrefs.GetInt("easyHighscore") == 0;
+        }
         playedAGame = true;
         // organize scene
         puckManager.ClearAllPucks();
@@ -425,11 +401,16 @@ public class LogicScript : MonoBehaviour
         }
         player.ResetProperties();
         opponent.ResetProperties();
+        tempTime = 0;
         UI.PostShotUpdate(player.puckCount, opponent.puckCount);
         UpdateScores();
-        powerupManager.ClearPowerupPopupEffectAnimationQueue();
+        PowerupAnimationManager.Instance.ClearPowerupPopupEffectAnimationQueue();
         triplePowerup = 0;
         LaserScript.Instance.DisableLaser();
+
+        // load player & CPU decks
+        powerupManager.LoadDeck();
+        CPUBehaviorScript.FullReset(difficulty);
 
         if (difficulty < 2) // for easy & medium
         {
@@ -442,7 +423,6 @@ public class LogicScript : MonoBehaviour
         }
         else // for hard
         {
-            if (powerupsAreEnabled) { powerupManager.LoadDeck(); }
             player.isTurn = true;
             opponent.isTurn = false;
             activeCompetitor = player;
@@ -462,7 +442,6 @@ public class LogicScript : MonoBehaviour
         }
         UI.UpdateWallText(wallCount);
 
-        mill = 0;
         UI.SetReButtons(true);
         gameIsRunning = true;
         puckHalo.SetActive(difficulty == 0);
@@ -472,7 +451,7 @@ public class LogicScript : MonoBehaviour
         UI.ChangeUI(UI.gameHud);
         powerupManager.DisableForceFieldIfNecessary();
         FogScript.Instance.DisableFog();
-        Debug.Log("Starting match with difficulty: " + difficulty);
+        powerupsMenu.SetActive(false);
     }
 
     public bool LeftsTurn()
@@ -492,9 +471,9 @@ public class LogicScript : MonoBehaviour
     public void ReturnToMenu()
     {
         gameIsRunning = false;
+        isLocal = false;
         player.puckCount = 0;
         opponent.puckCount = 0;
-        mill = 0;
         UI.ChangeUI(UI.titleScreen);
         line.isActive = false;
         bar.ChangeBar("none");
@@ -503,226 +482,7 @@ public class LogicScript : MonoBehaviour
         FogScript.Instance.DisableFog();
         WallScript.Instance.WallEnabled(false);
         LaserScript.Instance.DisableLaser();
-#if (UNITY_EDITOR)
-        foreach (var path in CPUPaths)
-        {
-            pathi = path.GetComponent<CPUPathScript>();
-            if (pathi == null) { pathi = path.GetComponent<SmartScanCPUPathScript>(); }
-            if (pathi == null) { return; }
-            pathi.DisablePathVisualization();
-        }
-#endif
-    }
-
-    // this is the CPU AI for hard mode
-    CPUPathInterface pathi;
-    public void FindOpenPath()
-    {
-        // if Fog is active and foresight isn't, shoot random
-        if (FogScript.Instance.FogEnabled() && !HaloScript.Instance.HaloEnabled()) { (CPUShotAngle, CPUShotPower, CPUShotSpin) = (Random.Range(35.0f, 65.0f), Random.Range(40.0f, 70.0f), Random.Range(45.0f, 55.0f)); return; }
-
-        CPUPathInterface best = null;
-        int highestValue = 0;
-        // check all paths to see which are unblocked
-        foreach (var path in CPUPaths)
-        {
-            pathi = path.GetComponent<CPUPathScript>();
-            if (pathi == null) { pathi = path.GetComponent<SmartScanCPUPathScript>(); }
-
-            pathi.DisablePathVisualization();
-            var pathiShotValue = pathi.CalculateValue();
-            float randomValue = Random.Range(0f, 1f);
-            if (pathiShotValue > highestValue || (pathiShotValue == highestValue && randomValue < 0.25))
-            {
-                // handle phase powerup shots
-                if (!powerupsAreEnabled && pathi.DoesPathRequirePhasePowerup())
-                {
-                    continue;
-                }
-                // handle phase powerup shots
-                if (!powerupsAreEnabled && pathi.DoesPathRequireExplosionPowerup())
-                {
-                    continue;
-                }
-
-                best = pathi;
-                highestValue = pathiShotValue;
-            }
-        }
-        // chose the highest-value unblocked path
-        if (highestValue > 0)
-        {
-            Debug.Log("Found path with highest value " + highestValue);
-            best.EnablePathVisualization();
-
-            // handle powerup shots
-            if (best.DoesPathRequirePhasePowerup() && powerupsAreEnabled && powerupsUsedThisTurn < 3)
-            {
-                powerupManager.PhasePowerup();
-                powerupsUsedThisTurn++;
-            }
-            else if (best.DoesPathRequireExplosionPowerup() && powerupsAreEnabled && powerupsUsedThisTurn < 3)
-            {
-                powerupManager.ExplosionPowerup();
-                powerupsUsedThisTurn++;
-            }
-            else if (best.IsPathAContactShot() && powerupsAreEnabled && powerupsUsedThisTurn < 3)
-            {
-                powerupManager.ForceFieldPowerup();
-                powerupsUsedThisTurn++;
-            }
-
-            (CPUShotAngle, CPUShotPower, CPUShotSpin) = best.GetPath();
-        }
-        // otherwise, Shoot random
-        else
-        {
-            Debug.Log("No path :(");
-            (CPUShotAngle, CPUShotPower, CPUShotSpin) = (Random.Range(35.0f, 65.0f), Random.Range(40.0f, 70.0f), Random.Range(45.0f, 55.0f));
-        }
-    }
-
-    private void CPUPreShotPowerups()
-    {
-        if (denyPowerup > 0) { return; }
-        float millSubtractor = (mill * 0.25f);
-        float scoreSubtractor = ((opponent.score - player.score) * 0.02f);
-        float totalSubtractor = millSubtractor + scoreSubtractor;
-        float randomValue = Random.Range(0f, 1f);
-        // first two shots use block
-        if (opponent.puckCount > 3 && randomValue < (0.75 - totalSubtractor))
-        {
-            powerupManager.BlockPowerup();
-            powerupsUsedThisTurn++;
-        }
-        // shot three and four check if bolt is needed, if it isn't use foresight
-        else if (opponent.puckCount > 1 && randomValue < (0.75 - totalSubtractor))
-        {
-            // if the ratio of player pucks to opponent pucks is greater than 2, use bolt
-            var allPucks = GameObject.FindGameObjectsWithTag("puck");
-            float playerPucks = 0;
-            float opponentPucks = 0.001f; // so we don't divide by zero
-            foreach (var puck in allPucks)
-            {
-                var puckScript = puck.GetComponent<PuckScript>();
-                if (puckScript.IsPlayersPuck() && puckScript.ComputeValue() > 0 && !puckScript.IsHydra())
-                {
-                    playerPucks++;
-                }
-                else if (!puckScript.IsPlayersPuck() && puckScript.ComputeValue() > 0)
-                {
-                    opponentPucks++;
-                }
-            }
-            if (playerPucks / opponentPucks > 2)
-            {
-                powerupManager.BoltPowerup();
-                powerupsUsedThisTurn++;
-            }
-            else if (FogScript.Instance.FogEnabled())
-            {
-                powerupManager.ForesightPowerup();
-                powerupsUsedThisTurn++;
-            }
-        }
-        // last shot, cull
-        else if (opponent.puckCount == 1 && randomValue < (0.75 - totalSubtractor))
-        {
-            var allPucks = GameObject.FindGameObjectsWithTag("puck");
-            // don't use cull if player has resurrect that would trigger
-            var useCull = true;
-            foreach (var puck in allPucks)
-            {
-                if (!useCull) { continue; }
-                var puckScript = puck.GetComponent<PuckScript>();
-                if (puckScript.IsPlayersPuck() && puckScript.IsResurrect() && puckScript.ComputeValue() == 0 )
-                {
-                    useCull = false;
-                }
-                if (!puckScript.IsPlayersPuck() && puckScript.IsFactory())
-                {
-                    useCull = false;
-                }
-            }
-            if (useCull)
-            {
-                powerupManager.CullPowerup();
-                powerupsUsedThisTurn++;
-            }
-        }
-    }
-
-    private void CPUPostShotPowerups()
-    {
-        float millSubtractor = (mill * 0.25f);
-        float scoreSubtractor = ((opponent.score - player.score) * 0.02f);
-        float totalSubtractor = millSubtractor + scoreSubtractor;
-        float randomValue = Random.Range(0f, 1f);
-        // plus one, growth, hydra
-        if (opponent.puckCount > 3 && randomValue < (0.75 - totalSubtractor))
-        {
-            powerupManager.GrowthPowerup();
-        }
-        else if (opponent.puckCount == 3 && randomValue < (0.75 - totalSubtractor))
-        {
-            powerupManager.HydraPowerup();
-        }
-        else if (opponent.puckCount == 2 && randomValue < (0.75 - totalSubtractor))
-        {
-            powerupManager.AuraPowerup();
-        }
-        else if (opponent.puckCount <= 1 && randomValue < (0.75 - totalSubtractor))
-        {
-            if (powerupsUsedThisTurn == 0)
-            {
-                powerupManager.TimesTwoPowerup();
-                return;
-            }
-            powerupManager.PlusOnePowerup();
-        }
-
-        powerupsUsedThisTurn++;
-        if (powerupsUsedThisTurn >= 3 - denyPowerup * 2) { return; }
-
-        // lock, fog
-        randomValue = Random.Range(0f, 1f);
-        if (opponent.puckCount > 3 && randomValue < (0.55 - totalSubtractor))
-        {
-            powerupManager.LockPowerup();
-        }
-        else if ((opponent.puckCount == 3 || opponent.puckCount == 2) && player.puckCount > 0 && randomValue < (0.55 - totalSubtractor))
-        {
-            powerupManager.FogPowerup();
-        }
-        powerupsUsedThisTurn++;
-        if (powerupsUsedThisTurn >= 3 - denyPowerup * 2) { return; }
-
-        // shield
-        randomValue = Random.Range(0f, 1f);
-        if ((opponent.puckCount == 2) && randomValue < (0.55 - totalSubtractor))
-        {
-            powerupManager.ShieldPowerup();
-        }
-        powerupsUsedThisTurn++;
-        if (powerupsUsedThisTurn >= 3 - denyPowerup * 2) { return; }
-
-        // factory
-        randomValue = Random.Range(0f, 1f);
-        if ((opponent.puckCount == 5 || opponent.puckCount == 4) && randomValue < (0.55 - totalSubtractor))
-        {
-            powerupManager.FactoryPowerup();
-        }
-        powerupsUsedThisTurn++;
-        if (powerupsUsedThisTurn >= 3 - denyPowerup * 2) { return; }
-
-        // resurrect
-        randomValue = Random.Range(0f, 1f);
-        if (powerupsUsedThisTurn == 0 && (opponent.puckCount == 5 || opponent.puckCount == 4) && randomValue < (0.75 - totalSubtractor))
-        {
-            powerupManager.ResurrectPowerup();
-        }
-        powerupsUsedThisTurn++;
-        if (powerupsUsedThisTurn >= 3 - denyPowerup * 2) { return; }
+        puckManager.ClearAllPucks();
     }
 
     public void IncrementPuckCount(bool playersPuck, int value = 1)
@@ -738,13 +498,6 @@ public class LogicScript : MonoBehaviour
         UI.PostShotUpdate(player.puckCount, opponent.puckCount);
     }
 
-    private int mill = 0;
-    public void MillPowerupHelper()
-    {
-        mill++;
-    }
-
-
     public void ModifyScoreBonus(bool isplayer, int value)
     {
         if (isplayer)
@@ -757,30 +510,6 @@ public class LogicScript : MonoBehaviour
         }
         UI.UpdateScores(player.GetScore(), opponent.GetScore());
         UI.UpdateScoreBonuses(player.scoreBonus, opponent.scoreBonus);
-    }
-
-    public void QuitGame()
-    {
-        Application.Quit();
-    }
-
-    [SerializeField] GameObject deckScreen;
-    public void SetPowerups(bool value)
-    {
-        powerupsAreEnabled = value;
-        PlayerPrefs.SetInt("PowerupsEnabled", value ? 1 : 0);
-        if (value)
-        {
-            UI.ChangeUI(deckScreen); // TODO: make this not dumb
-        }
-    }
-
-    [SerializeField] private AudioSource puckDestroySFX;
-    public void playDestroyPuckSFX(float SFXvolume)
-    {
-        if (puckDestroySFX == null) { return; }
-        puckDestroySFX.volume = SFXvolume;
-        puckDestroySFX.Play();
     }
 
     // O(n) + O(m) where n is gameobjects in the scene and m is pucks
@@ -805,4 +534,8 @@ public class LogicScript : MonoBehaviour
         return true; // Click is not near any puck
     }
 
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
 }

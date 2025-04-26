@@ -11,11 +11,12 @@ public class GameHUDManager : MonoBehaviour
     private GameObject[] playerHUDElements;
     private GameObject[] playerHUDTexts;
     private GameObject[] playerHUDIcons;
-    private GameObject[] playerHUDBackgrounds;
     [SerializeField] private GameObject playerScore;
     [SerializeField] private GameObject playerScoreText;
     [SerializeField] private GameObject playerScoreIcon;
     [SerializeField] private GameObject playerScoreBackground;
+    [SerializeField] private GameObject playerScoreParticleEffect;
+    private ParticleSystem.MainModule playerScoreParticleSystemMainModule;
     [SerializeField] private GameObject playerPuckCount;
     [SerializeField] private GameObject playerPuckCountText;
     [SerializeField] private GameObject playerPuckCountIcon;
@@ -30,11 +31,12 @@ public class GameHUDManager : MonoBehaviour
     private GameObject[] opponentHUDElements;
     private GameObject[] opponentHUDTexts;
     private GameObject[] opponentHUDIcons;
-    private GameObject[] opponentHUDBackgrounds;
     [SerializeField] private GameObject opponentScore;
     [SerializeField] private GameObject opponentScoreText;
     [SerializeField] private GameObject opponentScoreIcon;
     [SerializeField] private GameObject opponentScoreBackground;
+    [SerializeField] private GameObject opponentScoreParticleEffect;
+    private ParticleSystem.MainModule opponentScoreParticleSystemMainModule;
     [SerializeField] private GameObject opponentPuckCount;
     [SerializeField] private GameObject opponentPuckCountText;
     [SerializeField] private GameObject opponentPuckCountIcon;
@@ -64,12 +66,10 @@ public class GameHUDManager : MonoBehaviour
         playerHUDElements = new GameObject[] { playerScore, playerPuckCount, playerWins };
         playerHUDTexts = new GameObject[] { playerScoreText, playerPuckCountText, playerWinsText };
         playerHUDIcons = new GameObject[] { playerScoreIcon, playerPuckCountIcon, playerWinsIcon };
-        playerHUDBackgrounds = new GameObject[] { playerScoreBackground, playerPuckCountBackground, playerWinsBackground };
 
         opponentHUDElements = new GameObject[] { opponentScore, opponentPuckCount, opponentWins };
         opponentHUDTexts = new GameObject[] { opponentScoreText, opponentPuckCountText, opponentWinsText };
         opponentHUDIcons = new GameObject[] { opponentScoreIcon, opponentPuckCountIcon, opponentWinsIcon };
-        opponentHUDBackgrounds = new GameObject[] { opponentScoreBackground, opponentPuckCountBackground, opponentWinsBackground };
         Reset();
     }
 
@@ -123,6 +123,15 @@ public class GameHUDManager : MonoBehaviour
         LeanTween.scale(restartButton, new Vector3(1f, 1f, 1f), 1f).setEase(LeanTweenType.easeOutBack).setDelay(0.4f); 
         LeanTween.cancel(turnText);
         LeanTween.scale(turnText, new Vector3(1f, 1f, 1f), 1f).setEase(LeanTweenType.easeOutQuint).setDelay(0.6f);
+
+        // setup score particles
+        playerScoreParticleSystemMainModule = playerScoreParticleEffect.GetComponent<ParticleSystem>().main;
+        playerScoreParticleSystemMainModule.startColor = UIManagerScript.Instance.GetDarkMode() ? Color.white : Color.black;
+        playerScoreParticleSystemMainModule.startSpeed = 0;
+
+        opponentScoreParticleSystemMainModule = opponentScoreParticleEffect.GetComponent<ParticleSystem>().main;
+        opponentScoreParticleSystemMainModule.startColor = UIManagerScript.Instance.GetDarkMode() ? Color.white : Color.black;
+        opponentScoreParticleSystemMainModule.startSpeed = 0;
     }
 
     public void Reset()
@@ -258,9 +267,22 @@ public class GameHUDManager : MonoBehaviour
         }
     }
 
-    private Action ChangeTurnTextHelper(string turnTextString)
+    public void UpdateParticleEffects(int playerScore, int opponentScore)
     {
-        turnText.GetComponent<Text>().text = turnTextString;
-        return null;
+        if (playerScore == opponentScore) // tie, disable both
+        {
+            playerScoreParticleSystemMainModule.startSpeed = 0;
+            opponentScoreParticleSystemMainModule.startSpeed = 0;
+        }
+        else if (playerScore > opponentScore)
+        {
+            playerScoreParticleSystemMainModule.startSpeed = Math.Min(0.5f + ((float)playerScore - (float)opponentScore) / 2, 10);
+            opponentScoreParticleSystemMainModule.startSpeed = 0;
+        }
+        else
+        {
+            playerScoreParticleSystemMainModule.startSpeed = 0;
+            opponentScoreParticleSystemMainModule.startSpeed = Math.Min(0.5f + ((float)opponentScore - (float)playerScore) / 2, 10);
+        }
     }
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CustomUnlockScript : MonoBehaviour
 {
@@ -12,12 +13,6 @@ public class CustomUnlockScript : MonoBehaviour
     [SerializeField] private bool medium;
     [SerializeField] private bool hard;
 
-    // Start is called before the first frame update
-
-    private void Start()
-    {
-        Unlock();
-    }
     public int Unlock()
     {
         // wins
@@ -41,6 +36,7 @@ public class CustomUnlockScript : MonoBehaviour
             )
             {
                 gameObject.SetActive(false);
+                transform.parent.GetComponent<Button>().enabled = true;
                 return ID;
             }
         }
@@ -63,18 +59,20 @@ public class CustomUnlockScript : MonoBehaviour
             )
             {
                 gameObject.SetActive(false);
+                transform.parent.GetComponent<Button>().enabled = true;
                 return ID;
             }
         }
         // simple ID based
         else if (type == 2)
         {
-            if (PlayerPrefs.GetInt("puck"+ID.ToString()+"unlocked") == 1 )
+            if (PuckSkinManager.Instance.IsPlinkoSkinUnlocked(ID))
             {
                 gameObject.SetActive(false);
+                transform.parent.GetComponent<Button>().enabled = true;
                 return ID;
             }
         }
-            return 0;
+        return 0;
     }
 }

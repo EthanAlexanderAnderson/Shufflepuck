@@ -88,8 +88,9 @@ public class ServerLogicScript : NetworkBehaviour
         }
 
         // If both players have 0 pucks (aka game is over)
-        if (competitorList.Count > 1 && competitorList.All(n => n.puckCount <= 0) && !sentGameResult)
+        if (competitorList.Count > 1 && competitorList.All(n => n.puckCount <= 0) && !sentGameResult && PuckManager.Instance.AllPucksAreStopped() && PuckManager.Instance.AllPucksAreNotNearingScoreZoneEdge())
         {
+            /*
             var allPucks = GameObject.FindGameObjectsWithTag("puck");
             foreach (var puck in allPucks)
             {
@@ -99,6 +100,7 @@ public class ServerLogicScript : NetworkBehaviour
                     return;
                 }
             }
+            */
             gameIsRunning = false;
             StartCoroutine(TryToEndGame());
             // this is here so this block doesn't get called repeatedly
@@ -301,6 +303,7 @@ public class ServerLogicScript : NetworkBehaviour
     // Shoot the puck. isNonActiveCompetitorBit is just for triple right now
     public void Shoot(float angleParameter, float powerParameter, float spinParameter, int isNonActiveCompetitorBit = 0)
     {
+
         try
         {
             competitorList[activeCompetitorIndex ^ isNonActiveCompetitorBit].activePuckScript.Shoot(angleParameter, powerParameter, spinParameter);
@@ -454,9 +457,13 @@ public class ServerLogicScript : NetworkBehaviour
 
     // Hydra Powerup
     [ServerRpc(RequireOwnership = true)] // this is true so it only fires once
-    public void PuckSpawnHelperServerRpc(bool playersPuck, float x, float y, int spwanCount, ServerRpcParams rpcParams = default)
+    public void PuckSpawnHelperServerRpc(bool playersPuck, float x, float y, int spawnCount, ServerRpcParams rpcParams = default)
     {
         if (!IsServer) return;
+
+        // don't allow pucks below the safe line to spawn anything
+        if (y < 0) return;
+
         // Get the ClientId of the client that sent this ServerRPC
         ulong clientId = rpcParams.Receive.SenderClientId;
         int competitorIndex = clients.IndexOf(clientId);
@@ -471,14 +478,14 @@ public class ServerLogicScript : NetworkBehaviour
             int puckSpriteID = competitor.puckSpriteID;
 
             // do X times (X is spwanCount)
-            for (int i = 0; i < spwanCount; i++)
+            for (int i = 0; i < spawnCount; i++)
             {
                 float randRange = 2.0f;
                 // generate coordinates for potenial spawn, then see if it's too close to another puck
                 bool tooClose = true;
                 while (tooClose)
                 {
-                    pos = new Vector3(x + Random.Range(-randRange, randRange), y + Random.Range(-randRange, randRange), 0);
+                    pos = new Vector3(x + Random.Range(-randRange, randRange), System.Math.Max(0, y + Random.Range(-randRange, randRange)), 0);
 
                     tooClose = false;
                     var pucks = GameObject.FindGameObjectsWithTag("puck");
@@ -502,6 +509,11 @@ public class ServerLogicScript : NetworkBehaviour
                 for (int j = 0; j < competitorList.Count; j++)
                 {
                     puckScript.InitPuckClientRpc(j == competitorIndex, puckSpriteID, clientRpcParamsList[j]);
+                }
+
+                if (spawnCount == 2)
+                {
+                    puckScript.EnableHydraClientRpc();
                 }
 
                 Debug.Log(

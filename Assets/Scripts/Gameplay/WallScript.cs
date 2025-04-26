@@ -20,7 +20,7 @@ public class WallScript : MonoBehaviour
 
     public void WallEnabled(bool enabled)
     {
-        if (!enabled && SR.enabled)
+        if (!enabled && SR.enabled && SFX.enabled && gameObject.activeInHierarchy)
         {
             PS.Play();
             SFX.volume = SoundManagerScript.Instance.GetSFXVolume();
