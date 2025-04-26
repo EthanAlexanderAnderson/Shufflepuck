@@ -372,11 +372,11 @@ public class ChallengeManager : MonoBehaviour
         challengeData.ongoingChallenges.Add(new Challenge
         {
             challengeText = "Beat the hard CPU",
-            condition = new HighscoreCondition { targetHighscore = 1, difficultyLevel = 2 },
+            condition = new MatchesCondition { targetMacthes = 1, matchResult = "Win", difficultyLevel = 2 },
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 80 },
-                new Reward { type = RewardType.CraftingCredits, amount = 10 }
+                new Reward { type = RewardType.CraftingCredits, amount = 15 }
             }
         });
 
@@ -386,7 +386,8 @@ public class ChallengeManager : MonoBehaviour
             condition = new MatchesCondition { targetMacthes = 3, matchResult = "Win", difficultyLevel = 0 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 40 }
+                new Reward { type = RewardType.XP, amount = 40 },
+                new Reward { type = RewardType.CraftingCredits, amount = 15 }
             }
         });
 
@@ -440,7 +441,7 @@ public class ChallengeManager : MonoBehaviour
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 50 },
-                new Reward { type = RewardType.CraftingCredits, amount = 20 }
+                new Reward { type = RewardType.CraftingCredits, amount = 30 }
             }
         });
 
@@ -473,8 +474,7 @@ public class ChallengeManager : MonoBehaviour
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 80 },
-                new Reward { type = RewardType.StandardPacks, amount = 2 },
-                new Reward { type = RewardType.CraftingCredits, amount = 30 }
+                new Reward { type = RewardType.StandardPacks, amount = 2 }
             }
         });
 
@@ -507,7 +507,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new HighscoreCondition { targetHighscore = 17, difficultyLevel = -1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 80 },
+                new Reward { type = RewardType.XP, amount = 85 },
                 new Reward { type = RewardType.StandardPacks, amount = 3 }
             }
         });
@@ -539,7 +539,7 @@ public class ChallengeManager : MonoBehaviour
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 90 },
-                new Reward { type = RewardType.CraftingCredits, amount = 30 }
+                new Reward { type = RewardType.CraftingCredits, amount = 45 }
             }
         });
 
@@ -578,6 +578,16 @@ public class ChallengeManager : MonoBehaviour
 
         challengeData.ongoingChallenges.Add(new Challenge
         {
+            challengeText = "Reach a daily login streak of 4",
+            condition = new StreakCondition { targetStreak = 4 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 200 }
+            }
+        });
+
+        challengeData.ongoingChallenges.Add(new Challenge
+        {
             challengeText = "Reach level 20",
             condition = new LevelCondition { targetLevel = 20 },
             rewards = new List<Reward>
@@ -594,7 +604,7 @@ public class ChallengeManager : MonoBehaviour
             {
                 new Reward { type = RewardType.XP, amount = 150 },
                 new Reward { type = RewardType.StandardPacks, amount = 2 },
-                new Reward { type = RewardType.CraftingCredits, amount = 150 }
+                new Reward { type = RewardType.CraftingCredits, amount = 75 }
             }
         });
 
@@ -616,8 +626,8 @@ public class ChallengeManager : MonoBehaviour
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 130 },
-                new Reward { type = RewardType.StandardPacks, amount = 2 },
-                new Reward { type = RewardType.CraftingCredits, amount = 100 }
+                new Reward { type = RewardType.StandardPacks, amount = 1 },
+                new Reward { type = RewardType.CraftingCredits, amount = 25 }
             }
         });
 
@@ -628,7 +638,7 @@ public class ChallengeManager : MonoBehaviour
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 300 },
-                new Reward { type = RewardType.PlusPacks, amount = 2 }
+                new Reward { type = RewardType.PlusPacks, amount = 1 }
             }
         });
 
@@ -664,14 +674,13 @@ public class ChallengeManager : MonoBehaviour
             }
         });
 
-        // Everything above this is perfect, don't touch it
         challengeData.ongoingChallenges.Add(new Challenge
         {
             challengeText = "Win a match using 'plus one'",
             condition = new WinUsingCondition { ID = 0 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 200 },
+                new Reward { type = RewardType.XP, amount = 100 },
                 new Reward { type = RewardType.StandardPacks, amount = 1 }
             }
         });
@@ -695,7 +704,7 @@ public class ChallengeManager : MonoBehaviour
             {
                 new Reward { type = RewardType.XP, amount = 200 },
                 new Reward { type = RewardType.StandardPacks, amount = 2 },
-                new Reward { type = RewardType.CraftingCredits, amount = 200 }
+                new Reward { type = RewardType.CraftingCredits, amount = 100 }
             }
         });
 
@@ -705,7 +714,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 1 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 200 },
+                new Reward { type = RewardType.XP, amount = 100 },
                 new Reward { type = RewardType.StandardPacks, amount = 1 }
             }
         });
@@ -727,7 +736,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 2 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 200 },
+                new Reward { type = RewardType.XP, amount = 100 },
                 new Reward { type = RewardType.StandardPacks, amount = 1 }
             }
         });
@@ -749,7 +758,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 3 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 200 },
+                new Reward { type = RewardType.XP, amount = 100 },
                 new Reward { type = RewardType.StandardPacks, amount = 1 }
             }
         });
@@ -771,7 +780,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 5 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 200 },
+                new Reward { type = RewardType.XP, amount = 100 },
                 new Reward { type = RewardType.StandardPacks, amount = 1 }
             }
         });
@@ -783,8 +792,8 @@ public class ChallengeManager : MonoBehaviour
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 240 },
-                new Reward { type = RewardType.StandardPacks, amount = 4 },
-                new Reward { type = RewardType.CraftingCredits, amount = 200 }
+                new Reward { type = RewardType.StandardPacks, amount = 2 },
+                new Reward { type = RewardType.CraftingCredits, amount = 50 }
             }
         });
 
@@ -794,7 +803,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 8 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 200 },
+                new Reward { type = RewardType.XP, amount = 100 },
                 new Reward { type = RewardType.StandardPacks, amount = 1 }
             }
         });
@@ -815,7 +824,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 10 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 200 },
+                new Reward { type = RewardType.XP, amount = 100 },
                 new Reward { type = RewardType.StandardPacks, amount = 1 }
             }
         });
@@ -826,7 +835,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 13 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 200 },
+                new Reward { type = RewardType.XP, amount = 100 },
                 new Reward { type = RewardType.StandardPacks, amount = 1 }
             }
         });
@@ -839,7 +848,7 @@ public class ChallengeManager : MonoBehaviour
             {
                 new Reward { type = RewardType.XP, amount = 300 },
                 new Reward { type = RewardType.StandardPacks, amount = 3 },
-                new Reward { type = RewardType.CraftingCredits, amount = 300 }
+                new Reward { type = RewardType.CraftingCredits, amount = 150 }
             }
         });
 
@@ -849,7 +858,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 14 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 200 },
+                new Reward { type = RewardType.XP, amount = 100 },
                 new Reward { type = RewardType.StandardPacks, amount = 1 }
             }
         });
@@ -861,7 +870,7 @@ public class ChallengeManager : MonoBehaviour
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 500 },
-                new Reward { type = RewardType.PlusPacks, amount = 3 }
+                new Reward { type = RewardType.PlusPacks, amount = 2 }
             }
         });
 
@@ -881,7 +890,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 25 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 200 },
+                new Reward { type = RewardType.XP, amount = 100 },
                 new Reward { type = RewardType.StandardPacks, amount = 1 }
             }
         });
@@ -893,8 +902,8 @@ public class ChallengeManager : MonoBehaviour
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 360 },
-                new Reward { type = RewardType.StandardPacks, amount = 6 },
-                new Reward { type = RewardType.CraftingCredits, amount = 300 }
+                new Reward { type = RewardType.StandardPacks, amount = 3 },
+                new Reward { type = RewardType.CraftingCredits, amount = 75 }
             }
         });
 
@@ -904,7 +913,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 26 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 200 },
+                new Reward { type = RewardType.XP, amount = 100 },
                 new Reward { type = RewardType.StandardPacks, amount = 1 }
             }
         });
@@ -915,7 +924,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 27 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 200 },
+                new Reward { type = RewardType.XP, amount = 100 },
                 new Reward { type = RewardType.StandardPacks, amount = 1 }
             }
         });
@@ -947,7 +956,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 4 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 400 },
+                new Reward { type = RewardType.XP, amount = 200 },
                 new Reward { type = RewardType.StandardPacks, amount = 2 }
             }
         });
@@ -970,7 +979,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 6 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 400 },
+                new Reward { type = RewardType.XP, amount = 200 },
                 new Reward { type = RewardType.StandardPacks, amount = 2 }
             }
         });
@@ -983,7 +992,7 @@ public class ChallengeManager : MonoBehaviour
             {
                 new Reward { type = RewardType.XP, amount = 400 },
                 new Reward { type = RewardType.StandardPacks, amount = 4 },
-                new Reward { type = RewardType.CraftingCredits, amount = 400 }
+                new Reward { type = RewardType.CraftingCredits, amount = 200 }
             }
         });
 
@@ -993,7 +1002,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 7 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 400 },
+                new Reward { type = RewardType.XP, amount = 200 },
                 new Reward { type = RewardType.StandardPacks, amount = 2 }
             }
         });
@@ -1005,7 +1014,7 @@ public class ChallengeManager : MonoBehaviour
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.StandardPacks, amount = 25 },
-                new Reward { type = RewardType.PlusPacks, amount = 5 }
+                new Reward { type = RewardType.PlusPacks, amount = 2 }
             }
         });
 
@@ -1015,7 +1024,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 9 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 400 },
+                new Reward { type = RewardType.XP, amount = 200 },
                 new Reward { type = RewardType.StandardPacks, amount = 2 }
             }
         });
@@ -1026,7 +1035,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 2, targetNumberUsed = 5 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 350 },
+                new Reward { type = RewardType.XP, amount = 170 },
                 new Reward { type = RewardType.StandardPacks, amount = 3 }
             }
         });
@@ -1037,7 +1046,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 11 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 400 },
+                new Reward { type = RewardType.XP, amount = 200 },
                 new Reward { type = RewardType.StandardPacks, amount = 2 }
             }
         });
@@ -1048,7 +1057,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new HighscoreCondition { targetHighscore = 12, difficultyLevel = 0 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 300 },
+                new Reward { type = RewardType.XP, amount = 240 },
                 new Reward { type = RewardType.StandardPacks, amount = 1 }
             }
         });
@@ -1059,7 +1068,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 12 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 400 },
+                new Reward { type = RewardType.XP, amount = 200 },
                 new Reward { type = RewardType.StandardPacks, amount = 2 }
             }
         });
@@ -1072,7 +1081,7 @@ public class ChallengeManager : MonoBehaviour
             {
                 new Reward { type = RewardType.XP, amount = 500 },
                 new Reward { type = RewardType.StandardPacks, amount = 5 },
-                new Reward { type = RewardType.CraftingCredits, amount = 500 }
+                new Reward { type = RewardType.CraftingCredits, amount = 250 }
             }
         });
 
@@ -1082,7 +1091,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 18 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 400 },
+                new Reward { type = RewardType.XP, amount = 200 },
                 new Reward { type = RewardType.StandardPacks, amount = 2 }
             }
         });
@@ -1093,7 +1102,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new HighscoreCondition { targetHighscore = 9, difficultyLevel = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 450 },
+                new Reward { type = RewardType.XP, amount = 240 },
                 new Reward { type = RewardType.StandardPacks, amount = 2 }
             }
         });
@@ -1104,7 +1113,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 24 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 400 },
+                new Reward { type = RewardType.XP, amount = 200 },
                 new Reward { type = RewardType.StandardPacks, amount = 2 }
             }
         });
@@ -1115,7 +1124,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 3, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 350 },
+                new Reward { type = RewardType.XP, amount = 250 },
                 new Reward { type = RewardType.StandardPacks, amount = 3 }
             }
         });
@@ -1126,7 +1135,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 28 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 400 },
+                new Reward { type = RewardType.XP, amount = 200 },
                 new Reward { type = RewardType.StandardPacks, amount = 2 }
             }
         });
@@ -1138,7 +1147,7 @@ public class ChallengeManager : MonoBehaviour
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 1000 },
-                new Reward { type = RewardType.PlusPacks, amount = 5 }
+                new Reward { type = RewardType.PlusPacks, amount = 3 }
             }
         });
 
@@ -1153,14 +1162,13 @@ public class ChallengeManager : MonoBehaviour
             }
         });
 
-        // TODO: add in-betweeners
         challengeData.ongoingChallenges.Add(new Challenge
         {
             challengeText = "Win a match using 'chaos'",
             condition = new WinUsingCondition { ID = 15 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 600 },
+                new Reward { type = RewardType.XP, amount = 300 },
                 new Reward { type = RewardType.StandardPacks, amount = 3 }
             }
         });
@@ -1171,7 +1179,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new HighscoreCondition { targetHighscore = 7, difficultyLevel = 2 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 450 },
+                new Reward { type = RewardType.XP, amount = 240 },
                 new Reward { type = RewardType.StandardPacks, amount = 2 }
             }
         });
@@ -1182,7 +1190,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 16 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 600 },
+                new Reward { type = RewardType.XP, amount = 300 },
                 new Reward { type = RewardType.StandardPacks, amount = 3 }
             }
         });
@@ -1204,7 +1212,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 16 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 600 },
+                new Reward { type = RewardType.XP, amount = 300 },
                 new Reward { type = RewardType.StandardPacks, amount = 3 }
             }
         });
@@ -1226,7 +1234,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 19 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 600 },
+                new Reward { type = RewardType.XP, amount = 300 },
                 new Reward { type = RewardType.StandardPacks, amount = 3 }
             }
         });
@@ -1239,7 +1247,7 @@ public class ChallengeManager : MonoBehaviour
             {
                 new Reward { type = RewardType.XP, amount = 250 },
                 new Reward { type = RewardType.StandardPacks, amount = 2 },
-                new Reward { type = RewardType.CraftingCredits, amount = 200 }
+                new Reward { type = RewardType.CraftingCredits, amount = 50 }
             }
         });
 
@@ -1249,7 +1257,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 20 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 600 },
+                new Reward { type = RewardType.XP, amount = 300 },
                 new Reward { type = RewardType.StandardPacks, amount = 3 }
             }
         });
@@ -1282,7 +1290,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 21 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 800 },
+                new Reward { type = RewardType.XP, amount = 400 },
                 new Reward { type = RewardType.StandardPacks, amount = 4 }
             }
         });
@@ -1304,7 +1312,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 22 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 800 },
+                new Reward { type = RewardType.XP, amount = 400 },
                 new Reward { type = RewardType.StandardPacks, amount = 4 }
             }
         });
@@ -1317,7 +1325,7 @@ public class ChallengeManager : MonoBehaviour
             {
                 new Reward { type = RewardType.XP, amount = 450 },
                 new Reward { type = RewardType.StandardPacks, amount = 2 },
-                new Reward { type = RewardType.CraftingCredits, amount = 250 }
+                new Reward { type = RewardType.CraftingCredits, amount = 150 }
             }
         });
 
@@ -1327,8 +1335,19 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 23 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 800 },
+                new Reward { type = RewardType.XP, amount = 400 },
                 new Reward { type = RewardType.StandardPacks, amount = 4 }
+            }
+        });
+
+        challengeData.ongoingChallenges.Add(new Challenge
+        {
+            challengeText = "Reach an medium highscore of 12",
+            condition = new HighscoreCondition { targetHighscore = 12, difficultyLevel = 1 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 400 },
+                new Reward { type = RewardType.StandardPacks, amount = 2 }
             }
         });
 
@@ -1361,8 +1380,7 @@ public class ChallengeManager : MonoBehaviour
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 750 },
-                new Reward { type = RewardType.StandardPacks, amount = 2 },
-                new Reward { type = RewardType.CraftingCredits, amount = 250 }
+                new Reward { type = RewardType.StandardPacks, amount = 2 }
             }
         });
 
@@ -1372,7 +1390,7 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = 29 + 5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 1000 },
+                new Reward { type = RewardType.XP, amount = 500 },
                 new Reward { type = RewardType.StandardPacks, amount = 5 }
             }
         });
@@ -1385,6 +1403,17 @@ public class ChallengeManager : MonoBehaviour
             {
                 new Reward { type = RewardType.XP, amount = 850 },
                 new Reward { type = RewardType.StandardPacks, amount = 3 }
+            }
+        });
+
+        challengeData.ongoingChallenges.Add(new Challenge
+        {
+            challengeText = "Reach a combined highscore of 36",
+            condition = new HighscoreCondition { targetHighscore = 36, difficultyLevel = -1 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 650 },
+                new Reward { type = RewardType.StandardPacks, amount = 5 }
             }
         });
 
@@ -1407,7 +1436,18 @@ public class ChallengeManager : MonoBehaviour
             {
                 new Reward { type = RewardType.XP, amount = 1000 },
                 new Reward { type = RewardType.StandardPacks, amount = 10 },
-                new Reward { type = RewardType.CraftingCredits, amount = 100 }
+                new Reward { type = RewardType.CraftingCredits, amount = 1000 }
+            }
+        });
+
+        challengeData.ongoingChallenges.Add(new Challenge
+        {
+            challengeText = "Win 50 online matches",
+            condition = new MatchesCondition { targetMacthes = 50, matchResult = "Win", difficultyLevel = -1 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 5000 },
+                new Reward { type = RewardType.PlusPacks, amount = 10 }
             }
         });
 
@@ -1433,5 +1473,38 @@ public class ChallengeManager : MonoBehaviour
         // load challenges
         DailyChallengeManagerScript.Instance.SetText();
         OngoingChallengeManagerScript.Instance.EvaluateChallengeAndSetText();
+
+#if UNITY_EDITOR
+        int totalXPRewardForAllOngoingChallenges = 0;
+        int totalStandardPackRewardForAllOngoingChallenges = 0;
+        int totalPlusPackRewardForAllOngoingChallenges = 0;
+        int totalCraftingCreditRewardForAllOngoingChallenges = 0;
+        for (int i = 0; i < challengeData.ongoingChallenges.Count; i++)
+        {
+            foreach (var reward in challengeData.ongoingChallenges[i].rewards)
+            {
+                if (reward.type == RewardType.XP)
+                {
+                    totalXPRewardForAllOngoingChallenges += reward.amount;
+                }
+                else if (reward.type == RewardType.StandardPacks)
+                {
+                    totalStandardPackRewardForAllOngoingChallenges += reward.amount;
+                }
+                else if (reward.type == RewardType.PlusPacks)
+                {
+                    totalPlusPackRewardForAllOngoingChallenges += reward.amount;
+                }
+                else if (reward.type == RewardType.CraftingCredits)
+                {
+                    totalCraftingCreditRewardForAllOngoingChallenges += reward.amount;
+                }
+            }
+        }
+        Debug.Log("totalXPRewardForAllOngoingChallenges: " + totalXPRewardForAllOngoingChallenges);
+        Debug.Log("totalStandardPackRewardForAllOngoingChallenges: " + totalStandardPackRewardForAllOngoingChallenges);
+        Debug.Log("totalPlusPackRewardForAllOngoingChallenges: " + totalPlusPackRewardForAllOngoingChallenges);
+        Debug.Log("totalCraftingCreditRewardForAllOngoingChallenges: " + totalCraftingCreditRewardForAllOngoingChallenges);
+#endif
     }
 }
