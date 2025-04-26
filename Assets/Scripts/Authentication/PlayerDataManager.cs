@@ -37,8 +37,7 @@ public class PlayerDataManager : MonoBehaviour
         else
             Destroy(gameObject);
     }
-
-    public void TestSaveButtonHelper() { TestSave(); }
+    public void TestSaveButtonHelper() { _ = TestSave(); }
     public async Task TestSave()
     {
         if (!AuthenticationService.Instance.IsSignedIn) return;
@@ -57,7 +56,7 @@ public class PlayerDataManager : MonoBehaviour
         }
     }
 
-    public void SyncWithCloudIfNeededButtonHelper() { SyncWithCloudIfNeeded(); }
+    public void SyncWithCloudIfNeededButtonHelper() { _ = SyncWithCloudIfNeeded(); }
     public async Task SyncWithCloudIfNeeded()
     {
         if (!AuthenticationService.Instance.IsSignedIn) return;
@@ -119,7 +118,7 @@ public class PlayerDataManager : MonoBehaviour
         SceneManager.LoadScene("SampleScene");
     }
 
-    public void SaveAllDataButtonHelper() { SaveAllData(); }
+    public void SaveAllDataButtonHelper() { _ = SaveAllData(); }
     public async Task SaveAllData()
     {
         if (!AuthenticationService.Instance.IsSignedIn) return;
@@ -156,7 +155,7 @@ public class PlayerDataManager : MonoBehaviour
     }
 
     // for now, we just load puck playerpref as test
-    public void LoadAllDataButtonHelper() { LoadAllData(); }
+    public void LoadAllDataButtonHelper() { _ = LoadAllData(); }
     public async Task LoadAllData()
     {
         if (!AuthenticationService.Instance.IsSignedIn) return;

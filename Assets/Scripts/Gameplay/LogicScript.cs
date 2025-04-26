@@ -310,11 +310,8 @@ public class LogicScript : MonoBehaviour
         CPUShotAngle = -1f;
 
         CPUBehaviorScript.TurnReset();
-
-        readyToStartOpponentTurn = true;
     }
 
-    bool readyToStartOpponentTurn = false;
     public float powerupWaitTime = 0;
     private void OpponentShootingHelper()
     {

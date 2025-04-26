@@ -1,8 +1,10 @@
 using UnityEngine;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
+#if UNITY_ANDROID
 using GooglePlayGames;
 using GooglePlayGames.BasicApi;
+#endif
 using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
 #if UNITY_IOS
@@ -184,9 +186,10 @@ public class PlayerAuthentication : MonoBehaviour
 
     // ---------- ACCOUNT LINKING UI METHODS ----------
 
-#if UNITY_ANDROID
+
     public void LinkGooglePlayGames()
     {
+#if UNITY_ANDROID
         PlayGamesPlatform.Instance.Authenticate(success =>
         {
             if (success == SignInStatus.Success)
@@ -197,9 +200,11 @@ public class PlayerAuthentication : MonoBehaviour
                 });
             }
         });
-    }
+#else
+        Debug.Log("This service is not yet available on your device.");
 #endif
-
+    }
+#if UNITY_ANDROID
     private async void LinkWithGooglePlay(string authCode)
     {
         try
@@ -213,10 +218,11 @@ public class PlayerAuthentication : MonoBehaviour
             Debug.LogError($"Failed to link Google Play: {e.Message}");
         }
     }
+#endif
 
-#if UNITY_IOS
     public async void LinkWithAppleGameCenter()
     {
+#if UNITY_IOS
         try
         {
             AuthenticateGameCenterPlayer();
@@ -244,10 +250,12 @@ public class PlayerAuthentication : MonoBehaviour
         {
             Debug.LogWarning($"Failed to link Apple Game Center: {e.Message}");
         }
-    }
+#else
+        Debug.Log("This service is not yet available on your device.");
 #endif
+    }
 
-    private async Task HandlePostSignInAsync()
+private async Task HandlePostSignInAsync()
     {
         if (AuthenticationService.Instance.IsSignedIn)
         {

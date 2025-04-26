@@ -29,7 +29,7 @@ public class LaserScript : MonoBehaviour
 
     // moving parameters
     [SerializeField] private float angleParameter = 0.6f;
-    [SerializeField] private float powerParameter = 10f;
+    //[SerializeField] private float powerParameter = 10f;
 
     // pucks in laser path
     List<GameObject> pucksInPath = new();
