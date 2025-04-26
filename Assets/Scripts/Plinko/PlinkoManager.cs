@@ -62,7 +62,7 @@ public class PlinkoManager : MonoBehaviour
         }
         else if (PlinkoReward > 0) // skin reward
         {
-            rewardText.text = "UNLOCK";
+            rewardText.text = PuckSkinManager.Instance.IsPlinkoSkinUnlocked(PlinkoReward) ? "" : "UNLOCK";
             rewardImage.sprite = PuckSkinManager.Instance.ColorIDtoPuckSprite(PlinkoReward);
             rewardImageAnimation.SetActive(PlinkoReward == 40);
         }
@@ -204,10 +204,11 @@ public class PlinkoManager : MonoBehaviour
 
             if (rand < threshold)
             {
-                PlayerPrefs.SetInt("PlinkoReward", plinkoUnlockableIDsCopy[i, 0]);
-                rewardText.text = "UNLOCK";
-                rewardImage.sprite = PuckSkinManager.Instance.ColorIDtoPuckSprite(plinkoUnlockableIDsCopy[i, 0]);
-                rewardImageAnimation.SetActive(plinkoUnlockableIDsCopy[i, 0] == 40);
+                int plinkoReward = plinkoUnlockableIDsCopy[i, 0];
+                PlayerPrefs.SetInt("PlinkoReward", plinkoReward);
+                rewardText.text = PuckSkinManager.Instance.IsPlinkoSkinUnlocked(plinkoReward) ? "" : "UNLOCK";
+                rewardImage.sprite = PuckSkinManager.Instance.ColorIDtoPuckSprite(plinkoReward);
+                rewardImageAnimation.SetActive(plinkoReward == 40);
                 Debug.Log("New Plinko Reward: " + PlayerPrefs.GetInt("PlinkoReward"));
                 return;
             }
@@ -270,6 +271,7 @@ public class PlinkoManager : MonoBehaviour
                 PuckSkinManager.Instance.UnlockPuckID(plinkoreward);
                 PuckSkinManager.Instance.UnlockPlinkoSkin(plinkoreward);
                 UIManagerScript.Instance.SetErrorMessage("New puck unlocked!");
+                rewardText.text = "";
             }
             else
             {
