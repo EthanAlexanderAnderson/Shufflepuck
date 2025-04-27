@@ -85,17 +85,6 @@ public class LogicScript : MonoBehaviour
     {
         PowerupCardData.EncodeDecodeTest();
 
-#if (UNITY_EDITOR)
-        PlayerPrefs.SetInt("easyWin", 0);
-        PlayerPrefs.SetInt("easyHighscore", 14);
-        PlayerPrefs.SetInt("mediumHighscore", 12);
-        PlayerPrefs.SetInt("hardHighscore", 10);
-        // TODO: REMOVE
-        PlayerPrefs.SetInt("CraftingCredits", 999);
-        PlayerPrefs.SetInt("StandardPacks", 999);
-        PlayerPrefs.SetInt("PlusPacks", 999);
-#endif
-
         // connect scripts
         bar = BarScript.Instance;
         line = LineScript.Instance;

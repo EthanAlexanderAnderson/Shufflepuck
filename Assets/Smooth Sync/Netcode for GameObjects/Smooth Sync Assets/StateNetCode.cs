@@ -123,12 +123,12 @@ namespace Smooth
 
             if (smoothSyncScript.hasRigidbody)
             {
-                velocity = smoothSyncScript.rb.velocity;
+                velocity = smoothSyncScript.rb.linearVelocity;
                 angularVelocity = smoothSyncScript.rb.angularVelocity * Mathf.Rad2Deg;
             }
             else if (smoothSyncScript.hasRigidbody2D)
             {
-                velocity = smoothSyncScript.rb2D.velocity;
+                velocity = smoothSyncScript.rb2D.linearVelocity;
                 angularVelocity.x = 0;
                 angularVelocity.y = 0;
                 angularVelocity.z = smoothSyncScript.rb2D.angularVelocity;

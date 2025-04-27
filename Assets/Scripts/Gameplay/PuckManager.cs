@@ -155,7 +155,7 @@ public class PuckManager : MonoBehaviour
 
             Vector2 center = puckCenterCollider.transform.TransformPoint(puckCenterCollider.offset);
             float radius = puckCenterCollider.radius * puckCenterCollider.transform.lossyScale.x;
-            float velocity = rb.velocity.magnitude;
+            float velocity = rb.linearVelocity.magnitude;
 
             float minDistance = float.MaxValue;
 

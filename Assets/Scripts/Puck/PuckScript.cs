@@ -100,7 +100,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
 
         // Calculate the magnitude of the velocity vector to determine the sliding noise volume
-        velocity = rb.velocity.magnitude;
+        velocity = rb.linearVelocity.magnitude;
         if (IsServer) { velocityNetworkedRounded.Value = velocity; }
         velocity = Math.Max(velocity, velocityNetworkedRounded.Value); // this is so joiner now has velocity
 
@@ -201,7 +201,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 rb.bodyType = RigidbodyType2D.Kinematic;
                 spriteRenderer.color = new Color(0.5f, 0.5f, 0.5f, 1f);
                 rb.angularVelocity = 0;
-                rb.velocity = Vector2.zero;
+                rb.linearVelocity = Vector2.zero;
             }
 
             if (trail.endColor == Color.yellow)

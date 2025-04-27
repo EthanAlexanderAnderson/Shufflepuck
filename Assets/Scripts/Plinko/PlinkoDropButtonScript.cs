@@ -38,7 +38,7 @@ public class PlinkoDropButtonScript : MonoBehaviour
         foreach (GameObject puck in pucks)
         {
             // slightly move all pucks
-            if (puck.GetComponent<Rigidbody2D>().velocity.y <= 0.01f && puck.transform.position.y < 6.9f)
+            if (puck.GetComponent<Rigidbody2D>().linearVelocity.y <= 0.01f && puck.transform.position.y < 6.9f)
             {
                 puck.transform.position = new Vector3(puck.transform.position.x - 0.001f, puck.transform.position.y, puck.transform.position.z);
             }
