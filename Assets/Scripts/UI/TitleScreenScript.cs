@@ -29,7 +29,6 @@ public class TitleScreenScript : MonoBehaviour
 
         if (LevelManager.Instance == null || PuckSkinManager.Instance == null)
         {
-            Debug.LogWarning("LevelManager or PuckSkinManager not initialized yet.");
             return;
         }
 

@@ -29,12 +29,12 @@ public class ProfileScreenScript : MonoBehaviour
             if (!string.IsNullOrEmpty(username))
             {
                 usernameText.text = username;
-                authenticationButtonsParent.SetActive(false);
+                //authenticationButtonsParent.SetActive(false);
                 //saveButtonsParent.SetActive(true);
             }
             else
             {
-                authenticationButtonsParent.SetActive(true);
+                //authenticationButtonsParent.SetActive(true);
             }
 
             // TODO: put ID somewhere

@@ -61,6 +61,7 @@ public class PlayerDataManager : MonoBehaviour
     {
         if (!AuthenticationService.Instance.IsSignedIn) return;
 
+        /*
         // set username and id in cloud
         try
         {
@@ -76,6 +77,7 @@ public class PlayerDataManager : MonoBehaviour
         {
             Debug.Log($"loginData save failed {e}");
         }
+        */
 
         PlinkoDataSwap();
 
@@ -96,6 +98,25 @@ public class PlayerDataManager : MonoBehaviour
                 {
                     if (PlayerPrefs.GetInt("easyWin") > 0)
                     {
+                        var loadresults = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { "LoadAll" });
+
+                        if (loadresults.TryGetValue("LoadAll", out var loadvalue))
+                        {
+                            int loadall = loadvalue.Value.GetAs<int>(); // Convert JSON object to int
+                            if (loadall == 1)
+                            {
+                                Debug.Log("Attempting to load all data from cloud...");
+                                await LoadAllData();
+                                PlayerPrefs.SetInt("LoadAll", 0);
+                                await SaveDataInt("LoadAll");
+                                SceneManager.LoadScene("SampleScene");
+                                return;
+                            }
+                        }
+
+                        PlayerPrefs.SetInt("LoadAll", 0);
+                        await SaveDataInt("LoadAll");
+
                         Debug.Log("Attempting to save all data to cloud...");
                         await SaveAllData();
                     }
@@ -147,6 +168,10 @@ public class PlayerDataManager : MonoBehaviour
         {
             await CloudSaveService.Instance.Data.Player.SaveAsync(playerData);
             Debug.Log("Player data successfully saved to Cloud.");
+            if (UIManagerScript.Instance != null)
+            {
+                UIManagerScript.Instance.SetErrorMessage("Player data successfully saved to Cloud.");
+            }
         }
         else
         {
@@ -160,8 +185,6 @@ public class PlayerDataManager : MonoBehaviour
     {
         if (!AuthenticationService.Instance.IsSignedIn) return;
 
-        // TODO: daily quest date, main quest progress
-
         foreach (string key in intKeys)
         {
             await LoadDataInt(key);
@@ -170,6 +193,10 @@ public class PlayerDataManager : MonoBehaviour
         foreach (string key in stringKeys)
         {
             await LoadDataString(key);
+        }
+        if (UIManagerScript.Instance != null)
+        {
+            UIManagerScript.Instance.SetErrorMessage("Player data successfully loaded from Cloud.");
         }
     }
 
@@ -210,7 +237,7 @@ public class PlayerDataManager : MonoBehaviour
         {
             try
             {
-                string valueFromFile = outValue.Value.GetAs<string>(); // Convert JSON object to int
+                string valueFromFile = outValue.Value.GetAs<string>(); // Convert JSON object to string
                 Debug.Log($"Loaded data: {key} = {valueFromFile}");
                 PlayerPrefs.SetString(key, valueFromFile);
             }
