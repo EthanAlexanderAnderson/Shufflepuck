@@ -26,7 +26,7 @@ public class ScreenLog : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         if (PlayerPrefs.GetInt("puck") != -3 && PlayerPrefs.GetInt("debug", 0) != 1)
         {
-            gameObject.SetActive(false);
+            //gameObject.SetActive(false);
         }
     }
 

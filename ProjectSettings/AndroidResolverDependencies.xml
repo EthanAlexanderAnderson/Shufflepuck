@@ -1,11 +1,11 @@
 <dependencies>
   <packages>
-    <package>com.google.games:gpgs-plugin-support:2.0.0</package>
+    <package>androidx.appcompat:appcompat:1.5.0+</package>
+    <package>androidx.appcompat:appcompat-resources:1.5.0+</package>
+    <package>androidx.core:core:1.7.0+</package>
+    <package>com.google.android.gms:play-services-games-v2:20.1.2+</package>
   </packages>
-  <files>
-    <file>Assets/GeneratedLocalRepo/GooglePlayGames/com.google.play.games/Editor/m2repository/com/google/games/gpgs-plugin-support/2.0.0/gpgs-plugin-support-2.0.0.aar</file>
-    <file>Assets/GeneratedLocalRepo/GooglePlayGames/com.google.play.games/Editor/m2repository/com/google/games/gpgs-plugin-support/2.0.0/gpgs-plugin-support-2.0.0.pom</file>
-  </files>
+  <files />
   <settings>
     <setting name="androidAbis" value="arm64-v8a,armeabi-v7a" />
     <setting name="bundleId" value="com.EthanAnderson.Shufflepuck" />

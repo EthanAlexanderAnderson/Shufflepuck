@@ -25,7 +25,7 @@ public class ProfileScreenScript : MonoBehaviour
     {
         if (PlayerAuthentication.Instance != null)
         {
-            (username, id, imgURL) = PlayerAuthentication.Instance.GetProfile();
+            (username, id) = PlayerAuthentication.Instance.GetProfile();
             if (!string.IsNullOrEmpty(username))
             {
                 usernameText.text = username;

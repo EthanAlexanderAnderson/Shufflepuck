@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:versionCode="1" android:versionName="1.0">
+  <queries />
+  <application>
+    <meta-data android:name="com.google.android.gms.games.APP_ID" android:value="\u003869943184418" tools:replace="android:value" />
+  </application>
+</manifest>

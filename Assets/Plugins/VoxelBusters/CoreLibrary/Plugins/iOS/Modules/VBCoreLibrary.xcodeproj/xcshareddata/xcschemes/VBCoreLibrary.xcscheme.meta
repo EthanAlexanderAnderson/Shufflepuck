@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 099f5593259fa431c8960ff7296b06b4
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 301752
+  packageName: Essential Kit V3 - IAP, Leaderboards, Cloud Save, Notifications, Gallery
+    & More
+  packageVersion: 3.4.2
+  assetPath: Assets/Plugins/VoxelBusters/CoreLibrary/Plugins/iOS/Modules/VBCoreLibrary.xcodeproj/xcshareddata/xcschemes/VBCoreLibrary.xcscheme
+  uploadId: 751299

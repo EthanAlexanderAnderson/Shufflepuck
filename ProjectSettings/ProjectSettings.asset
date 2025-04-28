@@ -140,8 +140,11 @@ PlayerSettings:
   loadStoreDebugModeEnabled: 0
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
-  bundleVersion: 5.0.0
-  preloadedAssets: []
+  bundleVersion: 5.0.0.1
+  preloadedAssets:
+  - {fileID: 11400000, guid: 438f126c7eec2ba429bd7b60128bf35b, type: 2}
+  - {fileID: 11400000, guid: 2ef2c980eb9590b489e152a224cb0fe5, type: 2}
+  - {fileID: -2152404887594493162, guid: 4aac3c516928f8746b9122ddc530043b, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -175,9 +178,9 @@ PlayerSettings:
     iPhone: 24
     tvOS: 0
   overrideDefaultApplicationIdentifier: 1
-  AndroidBundleVersionCode: 43
+  AndroidBundleVersionCode: 45
   AndroidMinSdkVersion: 23
-  AndroidTargetSdkVersion: 0
+  AndroidTargetSdkVersion: 34
   AndroidPreferredInstallLocation: 1
   aotOptions: 
   stripEngineCode: 1
@@ -193,7 +196,7 @@ PlayerSettings:
   VertexChannelCompressionMask: 4054
   iPhoneSdkVersion: 988
   iOSSimulatorArchitecture: 0
-  iOSTargetOSVersionString: 14.0
+  iOSTargetOSVersionString: 15.0
   tvOSSdkVersion: 0
   tvOSSimulatorArchitecture: 0
   tvOSRequireExtendedGameController: 0
@@ -259,10 +262,10 @@ PlayerSettings:
   templatePackageId: com.unity.template.mobile2d@3.0.0
   templateDefaultScene: Assets/Scenes/SampleScene.unity
   useCustomMainManifest: 0
-  useCustomLauncherManifest: 0
+  useCustomLauncherManifest: 1
   useCustomMainGradleTemplate: 1
-  useCustomLauncherGradleManifest: 0
-  useCustomBaseGradleTemplate: 0
+  useCustomLauncherGradleManifest: 1
+  useCustomBaseGradleTemplate: 1
   useCustomGradlePropertiesTemplate: 1
   useCustomGradleSettingsTemplate: 1
   useCustomProguardFile: 0
@@ -838,15 +841,17 @@ PlayerSettings:
   webGLMemoryLinearGrowthStep: 16
   webGLMemoryGeometricGrowthStep: 0.2
   webGLMemoryGeometricGrowthCap: 96
+  webGLEnableWebGPU: 0
   webGLPowerPreference: 2
   webGLWebAssemblyTable: 0
   webGLWebAssemblyBigInt: 0
   webGLCloseOnQuit: 0
   webWasm2023: 0
-  webEnableSubmoduleStrippingCompatibility: 0
   scriptingDefineSymbols:
+    Android: ENABLE_VOXELBUSTERS_ESSENTIAL_KIT
     Server: DEDICATED_SERVER
-    Standalone: DEDICATED_SERVER
+    Standalone: DEDICATED_SERVER;ENABLE_VOXELBUSTERS_ESSENTIAL_KIT
+    iPhone: ENABLE_VOXELBUSTERS_ESSENTIAL_KIT
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:
@@ -973,4 +978,3 @@ PlayerSettings:
   insecureHttpOption: 0
   androidVulkanDenyFilterList: []
   androidVulkanAllowFilterList: []
-  androidVulkanDeviceFilterListAsset: {fileID: 0}

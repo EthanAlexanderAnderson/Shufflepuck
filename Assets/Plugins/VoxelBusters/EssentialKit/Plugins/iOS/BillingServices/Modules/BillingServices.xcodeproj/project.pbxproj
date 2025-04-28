@@ -1,0 +1,671 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		8D081EC82BFECD7F00751D5B /* BillingServicesErrorCode+StoreKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D081EC72BFECD7F00751D5B /* BillingServicesErrorCode+StoreKit.swift */; };
+		8D41DEF12BB00B6A00DE9AB5 /* IBillingServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D41DEF02BB00B6A00DE9AB5 /* IBillingServices.swift */; };
+		8D41DEF32BB04ACB00DE9AB5 /* BillingServicesError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D41DEF22BB04ACB00DE9AB5 /* BillingServicesError.swift */; };
+		8D41DEF52BB04E9700DE9AB5 /* BillingServicesDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D41DEF42BB04E9700DE9AB5 /* BillingServicesDelegate.swift */; };
+		8D7965672BE4C3420059D7C2 /* BillingProductOfferPricingPhase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7965662BE4C3420059D7C2 /* BillingProductOfferPricingPhase.swift */; };
+		8D7965692BE4C47E0059D7C2 /* BillingPrice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7965682BE4C47E0059D7C2 /* BillingPrice.swift */; };
+		8DA744702BBFBB6E00E9AE54 /* BillingProductSubscriptionInfo+StoreKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA7446F2BBFBB6E00E9AE54 /* BillingProductSubscriptionInfo+StoreKit.swift */; };
+		8DA744722BBFBDD500E9AE54 /* BillingProductSubscriptionPeriod+StoreKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA744712BBFBDD500E9AE54 /* BillingProductSubscriptionPeriod+StoreKit.swift */; };
+		8DA744742BBFBE5400E9AE54 /* BillingProductSubscriptionPeriodUnit+StoreKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA744732BBFBE5400E9AE54 /* BillingProductSubscriptionPeriodUnit+StoreKit.swift */; };
+		8DA744762BBFD21000E9AE54 /* BillingProductOffer+StoreKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA744752BBFD20F00E9AE54 /* BillingProductOffer+StoreKit.swift */; };
+		8DA744782BBFD9BC00E9AE54 /* BillingProductOfferPaymentMode+StoreKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA744772BBFD9BC00E9AE54 /* BillingProductOfferPaymentMode+StoreKit.swift */; };
+		8DA7447C2BBFF69E00E9AE54 /* BillingServicesEnvironment+StoreKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA7447B2BBFF69E00E9AE54 /* BillingServicesEnvironment+StoreKit.swift */; };
+		8DA7447E2BBFF9AC00E9AE54 /* BillingProductType+StoreKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA7447D2BBFF9AC00E9AE54 /* BillingProductType+StoreKit.swift */; };
+		8DA744802BBFFAF400E9AE54 /* BillingProductOwnershipType+StoreKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA7447F2BBFFAF400E9AE54 /* BillingProductOwnershipType+StoreKit.swift */; };
+		8DA744822BBFFE9C00E9AE54 /* BillingProductRevocationReason+StoreKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA744812BBFFE9C00E9AE54 /* BillingProductRevocationReason+StoreKit.swift */; };
+		8DA744842BC002D200E9AE54 /* BillingProductSubscriptionStatus+StoreKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA744832BC002D200E9AE54 /* BillingProductSubscriptionStatus+StoreKit.swift */; };
+		8DA744862BC012F800E9AE54 /* BillingProductOfferType+StoreKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA744852BC012F800E9AE54 /* BillingProductOfferType+StoreKit.swift */; };
+		8DA744882BC0160F00E9AE54 /* BillingProductSubscriptionRenewalInfo+StoreKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA744872BC0160F00E9AE54 /* BillingProductSubscriptionRenewalInfo+StoreKit.swift */; };
+		8DA7448A2BC0233D00E9AE54 /* BillingProductRenewalState+StoreKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA744892BC0233C00E9AE54 /* BillingProductRenewalState+StoreKit.swift */; };
+		8DA7448C2BC0318400E9AE54 /* BillingProductSubscriptionExpirationReason+StoreKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA7448B2BC0318400E9AE54 /* BillingProductSubscriptionExpirationReason+StoreKit.swift */; };
+		8DA7448E2BC03BBF00E9AE54 /* BillingProductSubscriptionPriceIncreaseStatus+StoreKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA7448D2BC03BBF00E9AE54 /* BillingProductSubscriptionPriceIncreaseStatus+StoreKit.swift */; };
+		8DA7B3EE2BB43948009D21A5 /* BillingTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA7B3ED2BB43948009D21A5 /* BillingTransaction.swift */; };
+		8DA7B3F22BB43FA8009D21A5 /* BillingTransaction+StoreKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA7B3F12BB43FA8009D21A5 /* BillingTransaction+StoreKit.swift */; };
+		8DC9CEAA2BEB72C300FCE47F /* BillingTransactionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DC9CEA92BEB72C300FCE47F /* BillingTransactionState.swift */; };
+		8DD0D3FA2BBEB6560059AEE3 /* BillingProductOwnershipType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD0D3F92BBEB6560059AEE3 /* BillingProductOwnershipType.swift */; };
+		8DD0D3FC2BBEB7920059AEE3 /* BillingProductRevocationReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD0D3FB2BBEB7920059AEE3 /* BillingProductRevocationReason.swift */; };
+		8DD0D3FE2BBEB7BD0059AEE3 /* BillingServicesEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD0D3FD2BBEB7BD0059AEE3 /* BillingServicesEnvironment.swift */; };
+		8DD0D4002BBEB7DC0059AEE3 /* BillingProductType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD0D3FF2BBEB7DC0059AEE3 /* BillingProductType.swift */; };
+		8DD0D4022BBEB7F30059AEE3 /* BillingProductRenewalState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD0D4012BBEB7F30059AEE3 /* BillingProductRenewalState.swift */; };
+		8DD0D4042BBEB8070059AEE3 /* BillingProductOfferCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD0D4032BBEB8070059AEE3 /* BillingProductOfferCategory.swift */; };
+		8DD0D4062BBEB8210059AEE3 /* BillingProductSubscriptionExpirationReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD0D4052BBEB8210059AEE3 /* BillingProductSubscriptionExpirationReason.swift */; };
+		8DD0D4082BBEB8370059AEE3 /* BillingProductSubscriptionPriceIncreaseStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD0D4072BBEB8370059AEE3 /* BillingProductSubscriptionPriceIncreaseStatus.swift */; };
+		8DD0D40C2BBEB8C90059AEE3 /* BillingProductSubscriptionRenewalInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD0D40B2BBEB8C90059AEE3 /* BillingProductSubscriptionRenewalInfo.swift */; };
+		8DD0D40E2BBEB8DD0059AEE3 /* BillingProductSubscriptionStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD0D40D2BBEB8DD0059AEE3 /* BillingProductSubscriptionStatus.swift */; };
+		8DD0D4102BBEF2980059AEE3 /* BillingProductSubscriptionInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD0D40F2BBEF2980059AEE3 /* BillingProductSubscriptionInfo.swift */; };
+		8DD0D4122BBF1BB40059AEE3 /* BillingPeriodUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD0D4112BBF1BB40059AEE3 /* BillingPeriodUnit.swift */; };
+		8DD0D4142BBF1C110059AEE3 /* BillingProductOfferPaymentMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD0D4132BBF1C110059AEE3 /* BillingProductOfferPaymentMode.swift */; };
+		8DD0D4162BBF1C5D0059AEE3 /* BillingPeriod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD0D4152BBF1C5D0059AEE3 /* BillingPeriod.swift */; };
+		8DD0D4182BBF1C760059AEE3 /* BillingProductOffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD0D4172BBF1C760059AEE3 /* BillingProductOffer.swift */; };
+		8DDAC0752BB5561F002EB17B /* VBCoreLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DDAC0742BB5561F002EB17B /* VBCoreLibrary.framework */; };
+		8DDD28B62BB1BE37003A0361 /* BillingServicesErrorCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDD28B52BB1BE37003A0361 /* BillingServicesErrorCode.swift */; };
+		8DDD28B82BB2C55B003A0361 /* BillingProductDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDD28B72BB2C55B003A0361 /* BillingProductDefinition.swift */; };
+		8DDD28BA2BB2D23F003A0361 /* BillingServicesInitializeStoreResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDD28B92BB2D23F003A0361 /* BillingServicesInitializeStoreResult.swift */; };
+		8DDD28BE2BB2D461003A0361 /* BillingProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDD28BD2BB2D461003A0361 /* BillingProduct.swift */; };
+		8DDD28C02BB2D599003A0361 /* BillingProduct+StoreKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDD28BF2BB2D599003A0361 /* BillingProduct+StoreKit.swift */; };
+		8DDD28C22BB31747003A0361 /* BuyProductOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDD28C12BB31747003A0361 /* BuyProductOptions.swift */; };
+		8DDD28C42BB388D8003A0361 /* BillingProductOfferRedeemDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDD28C32BB388D8003A0361 /* BillingProductOfferRedeemDetails.swift */; };
+		8DDD28C82BB390FE003A0361 /* BillingServicesRestorePurchasesResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDD28C72BB390FE003A0361 /* BillingServicesRestorePurchasesResult.swift */; };
+		8DDD28CA2BB3995F003A0361 /* BillingServicesSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDD28C92BB3995F003A0361 /* BillingServicesSettings.swift */; };
+		8DDD28CC2BB41CF5003A0361 /* BillingServicesTransactionStateChangeResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDD28CB2BB41CF5003A0361 /* BillingServicesTransactionStateChangeResult.swift */; };
+		8DE6B31B2BB4E937001D9897 /* BillingServicesRestorePurchasesResult+StoreKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DE6B31A2BB4E937001D9897 /* BillingServicesRestorePurchasesResult+StoreKit.swift */; };
+		8DF7D1682BAED6A400AD8D1E /* BillingServicesStoreKitImplementation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF7D1672BAED6A400AD8D1E /* BillingServicesStoreKitImplementation.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		8D081EC72BFECD7F00751D5B /* BillingServicesErrorCode+StoreKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BillingServicesErrorCode+StoreKit.swift"; sourceTree = "<group>"; };
+		8D3258CB2BBA67C900A0814F /* VBCoreLibrary.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = VBCoreLibrary.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D41DEF02BB00B6A00DE9AB5 /* IBillingServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IBillingServices.swift; sourceTree = "<group>"; };
+		8D41DEF22BB04ACB00DE9AB5 /* BillingServicesError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingServicesError.swift; sourceTree = "<group>"; };
+		8D41DEF42BB04E9700DE9AB5 /* BillingServicesDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingServicesDelegate.swift; sourceTree = "<group>"; };
+		8D6423522BADD9EF0001BF3D /* BillingServices.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BillingServices.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D65EFB82BEA1AAE00004D3D /* VBCoreLibrary.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = VBCoreLibrary.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D7965662BE4C3420059D7C2 /* BillingProductOfferPricingPhase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingProductOfferPricingPhase.swift; sourceTree = "<group>"; };
+		8D7965682BE4C47E0059D7C2 /* BillingPrice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingPrice.swift; sourceTree = "<group>"; };
+		8DA7446F2BBFBB6E00E9AE54 /* BillingProductSubscriptionInfo+StoreKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BillingProductSubscriptionInfo+StoreKit.swift"; sourceTree = "<group>"; };
+		8DA744712BBFBDD500E9AE54 /* BillingProductSubscriptionPeriod+StoreKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BillingProductSubscriptionPeriod+StoreKit.swift"; sourceTree = "<group>"; };
+		8DA744732BBFBE5400E9AE54 /* BillingProductSubscriptionPeriodUnit+StoreKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BillingProductSubscriptionPeriodUnit+StoreKit.swift"; sourceTree = "<group>"; };
+		8DA744752BBFD20F00E9AE54 /* BillingProductOffer+StoreKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BillingProductOffer+StoreKit.swift"; sourceTree = "<group>"; };
+		8DA744772BBFD9BC00E9AE54 /* BillingProductOfferPaymentMode+StoreKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BillingProductOfferPaymentMode+StoreKit.swift"; sourceTree = "<group>"; };
+		8DA7447B2BBFF69E00E9AE54 /* BillingServicesEnvironment+StoreKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BillingServicesEnvironment+StoreKit.swift"; sourceTree = "<group>"; };
+		8DA7447D2BBFF9AC00E9AE54 /* BillingProductType+StoreKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BillingProductType+StoreKit.swift"; sourceTree = "<group>"; };
+		8DA7447F2BBFFAF400E9AE54 /* BillingProductOwnershipType+StoreKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BillingProductOwnershipType+StoreKit.swift"; sourceTree = "<group>"; };
+		8DA744812BBFFE9C00E9AE54 /* BillingProductRevocationReason+StoreKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BillingProductRevocationReason+StoreKit.swift"; sourceTree = "<group>"; };
+		8DA744832BC002D200E9AE54 /* BillingProductSubscriptionStatus+StoreKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BillingProductSubscriptionStatus+StoreKit.swift"; sourceTree = "<group>"; };
+		8DA744852BC012F800E9AE54 /* BillingProductOfferType+StoreKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BillingProductOfferType+StoreKit.swift"; sourceTree = "<group>"; };
+		8DA744872BC0160F00E9AE54 /* BillingProductSubscriptionRenewalInfo+StoreKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BillingProductSubscriptionRenewalInfo+StoreKit.swift"; sourceTree = "<group>"; };
+		8DA744892BC0233C00E9AE54 /* BillingProductRenewalState+StoreKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BillingProductRenewalState+StoreKit.swift"; sourceTree = "<group>"; };
+		8DA7448B2BC0318400E9AE54 /* BillingProductSubscriptionExpirationReason+StoreKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BillingProductSubscriptionExpirationReason+StoreKit.swift"; sourceTree = "<group>"; };
+		8DA7448D2BC03BBF00E9AE54 /* BillingProductSubscriptionPriceIncreaseStatus+StoreKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BillingProductSubscriptionPriceIncreaseStatus+StoreKit.swift"; sourceTree = "<group>"; };
+		8DA7B3ED2BB43948009D21A5 /* BillingTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingTransaction.swift; sourceTree = "<group>"; };
+		8DA7B3F12BB43FA8009D21A5 /* BillingTransaction+StoreKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BillingTransaction+StoreKit.swift"; sourceTree = "<group>"; };
+		8DC9CEA92BEB72C300FCE47F /* BillingTransactionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingTransactionState.swift; sourceTree = "<group>"; };
+		8DD0D3F92BBEB6560059AEE3 /* BillingProductOwnershipType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingProductOwnershipType.swift; sourceTree = "<group>"; };
+		8DD0D3FB2BBEB7920059AEE3 /* BillingProductRevocationReason.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingProductRevocationReason.swift; sourceTree = "<group>"; };
+		8DD0D3FD2BBEB7BD0059AEE3 /* BillingServicesEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingServicesEnvironment.swift; sourceTree = "<group>"; };
+		8DD0D3FF2BBEB7DC0059AEE3 /* BillingProductType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingProductType.swift; sourceTree = "<group>"; };
+		8DD0D4012BBEB7F30059AEE3 /* BillingProductRenewalState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingProductRenewalState.swift; sourceTree = "<group>"; };
+		8DD0D4032BBEB8070059AEE3 /* BillingProductOfferCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingProductOfferCategory.swift; sourceTree = "<group>"; };
+		8DD0D4052BBEB8210059AEE3 /* BillingProductSubscriptionExpirationReason.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingProductSubscriptionExpirationReason.swift; sourceTree = "<group>"; };
+		8DD0D4072BBEB8370059AEE3 /* BillingProductSubscriptionPriceIncreaseStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingProductSubscriptionPriceIncreaseStatus.swift; sourceTree = "<group>"; };
+		8DD0D40B2BBEB8C90059AEE3 /* BillingProductSubscriptionRenewalInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingProductSubscriptionRenewalInfo.swift; sourceTree = "<group>"; };
+		8DD0D40D2BBEB8DD0059AEE3 /* BillingProductSubscriptionStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingProductSubscriptionStatus.swift; sourceTree = "<group>"; };
+		8DD0D40F2BBEF2980059AEE3 /* BillingProductSubscriptionInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingProductSubscriptionInfo.swift; sourceTree = "<group>"; };
+		8DD0D4112BBF1BB40059AEE3 /* BillingPeriodUnit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingPeriodUnit.swift; sourceTree = "<group>"; };
+		8DD0D4132BBF1C110059AEE3 /* BillingProductOfferPaymentMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingProductOfferPaymentMode.swift; sourceTree = "<group>"; };
+		8DD0D4152BBF1C5D0059AEE3 /* BillingPeriod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingPeriod.swift; sourceTree = "<group>"; };
+		8DD0D4172BBF1C760059AEE3 /* BillingProductOffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingProductOffer.swift; sourceTree = "<group>"; };
+		8DDAC0742BB5561F002EB17B /* VBCoreLibrary.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = VBCoreLibrary.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8DDD28B52BB1BE37003A0361 /* BillingServicesErrorCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingServicesErrorCode.swift; sourceTree = "<group>"; };
+		8DDD28B72BB2C55B003A0361 /* BillingProductDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingProductDefinition.swift; sourceTree = "<group>"; };
+		8DDD28B92BB2D23F003A0361 /* BillingServicesInitializeStoreResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingServicesInitializeStoreResult.swift; sourceTree = "<group>"; };
+		8DDD28BD2BB2D461003A0361 /* BillingProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingProduct.swift; sourceTree = "<group>"; };
+		8DDD28BF2BB2D599003A0361 /* BillingProduct+StoreKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BillingProduct+StoreKit.swift"; sourceTree = "<group>"; };
+		8DDD28C12BB31747003A0361 /* BuyProductOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuyProductOptions.swift; sourceTree = "<group>"; };
+		8DDD28C32BB388D8003A0361 /* BillingProductOfferRedeemDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingProductOfferRedeemDetails.swift; sourceTree = "<group>"; };
+		8DDD28C72BB390FE003A0361 /* BillingServicesRestorePurchasesResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingServicesRestorePurchasesResult.swift; sourceTree = "<group>"; };
+		8DDD28C92BB3995F003A0361 /* BillingServicesSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingServicesSettings.swift; sourceTree = "<group>"; };
+		8DDD28CB2BB41CF5003A0361 /* BillingServicesTransactionStateChangeResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingServicesTransactionStateChangeResult.swift; sourceTree = "<group>"; };
+		8DE6B31A2BB4E937001D9897 /* BillingServicesRestorePurchasesResult+StoreKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BillingServicesRestorePurchasesResult+StoreKit.swift"; sourceTree = "<group>"; };
+		8DF7D1672BAED6A400AD8D1E /* BillingServicesStoreKitImplementation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingServicesStoreKitImplementation.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8D64234F2BADD9EF0001BF3D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8DDAC0752BB5561F002EB17B /* VBCoreLibrary.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		8D6423482BADD9EF0001BF3D = {
+			isa = PBXGroup;
+			children = (
+				8D6423542BADD9EF0001BF3D /* BillingServices */,
+				8D6423532BADD9EF0001BF3D /* Products */,
+				8DDAC0732BB5561F002EB17B /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		8D6423532BADD9EF0001BF3D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8D6423522BADD9EF0001BF3D /* BillingServices.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8D6423542BADD9EF0001BF3D /* BillingServices */ = {
+			isa = PBXGroup;
+			children = (
+				8D660FBF2BB82F4000D0BE3A /* Enums */,
+				8D660FBE2BB82F3600D0BE3A /* Types */,
+				8D41DEF02BB00B6A00DE9AB5 /* IBillingServices.swift */,
+				8DF7D1672BAED6A400AD8D1E /* BillingServicesStoreKitImplementation.swift */,
+				8D41DEF42BB04E9700DE9AB5 /* BillingServicesDelegate.swift */,
+			);
+			path = BillingServices;
+			sourceTree = "<group>";
+		};
+		8D660FBE2BB82F3600D0BE3A /* Types */ = {
+			isa = PBXGroup;
+			children = (
+				8D7965652BE4C18A0059D7C2 /* Common */,
+				8DF122152BC3753F00FCC118 /* Subscription */,
+				8DF122142BC3752700FCC118 /* RestorePurchase */,
+				8DF122132BC374FD00FCC118 /* Transaction */,
+				8DF122122BC374D800FCC118 /* Product */,
+				8DDD28B92BB2D23F003A0361 /* BillingServicesInitializeStoreResult.swift */,
+				8DDD28C92BB3995F003A0361 /* BillingServicesSettings.swift */,
+			);
+			path = Types;
+			sourceTree = "<group>";
+		};
+		8D660FBF2BB82F4000D0BE3A /* Enums */ = {
+			isa = PBXGroup;
+			children = (
+				8DDD28B52BB1BE37003A0361 /* BillingServicesErrorCode.swift */,
+				8D41DEF22BB04ACB00DE9AB5 /* BillingServicesError.swift */,
+				8DD0D3F92BBEB6560059AEE3 /* BillingProductOwnershipType.swift */,
+				8DD0D3FB2BBEB7920059AEE3 /* BillingProductRevocationReason.swift */,
+				8DD0D3FD2BBEB7BD0059AEE3 /* BillingServicesEnvironment.swift */,
+				8DD0D3FF2BBEB7DC0059AEE3 /* BillingProductType.swift */,
+				8DD0D4012BBEB7F30059AEE3 /* BillingProductRenewalState.swift */,
+				8DD0D4032BBEB8070059AEE3 /* BillingProductOfferCategory.swift */,
+				8DD0D4052BBEB8210059AEE3 /* BillingProductSubscriptionExpirationReason.swift */,
+				8DD0D4072BBEB8370059AEE3 /* BillingProductSubscriptionPriceIncreaseStatus.swift */,
+				8DD0D4112BBF1BB40059AEE3 /* BillingPeriodUnit.swift */,
+				8DD0D4132BBF1C110059AEE3 /* BillingProductOfferPaymentMode.swift */,
+				8DA744732BBFBE5400E9AE54 /* BillingProductSubscriptionPeriodUnit+StoreKit.swift */,
+				8DA744772BBFD9BC00E9AE54 /* BillingProductOfferPaymentMode+StoreKit.swift */,
+				8DA7447B2BBFF69E00E9AE54 /* BillingServicesEnvironment+StoreKit.swift */,
+				8DA7447D2BBFF9AC00E9AE54 /* BillingProductType+StoreKit.swift */,
+				8DA7447F2BBFFAF400E9AE54 /* BillingProductOwnershipType+StoreKit.swift */,
+				8DA744812BBFFE9C00E9AE54 /* BillingProductRevocationReason+StoreKit.swift */,
+				8DA744852BC012F800E9AE54 /* BillingProductOfferType+StoreKit.swift */,
+				8DA744892BC0233C00E9AE54 /* BillingProductRenewalState+StoreKit.swift */,
+				8DA7448B2BC0318400E9AE54 /* BillingProductSubscriptionExpirationReason+StoreKit.swift */,
+				8DA7448D2BC03BBF00E9AE54 /* BillingProductSubscriptionPriceIncreaseStatus+StoreKit.swift */,
+				8DC9CEA92BEB72C300FCE47F /* BillingTransactionState.swift */,
+				8D081EC72BFECD7F00751D5B /* BillingServicesErrorCode+StoreKit.swift */,
+			);
+			path = Enums;
+			sourceTree = "<group>";
+		};
+		8D7965652BE4C18A0059D7C2 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				8DD0D4152BBF1C5D0059AEE3 /* BillingPeriod.swift */,
+				8D7965682BE4C47E0059D7C2 /* BillingPrice.swift */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
+		8DDAC0732BB5561F002EB17B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8D65EFB82BEA1AAE00004D3D /* VBCoreLibrary.framework */,
+				8D3258CB2BBA67C900A0814F /* VBCoreLibrary.framework */,
+				8DDAC0742BB5561F002EB17B /* VBCoreLibrary.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		8DF122122BC374D800FCC118 /* Product */ = {
+			isa = PBXGroup;
+			children = (
+				8DD0D4172BBF1C760059AEE3 /* BillingProductOffer.swift */,
+				8DDD28B72BB2C55B003A0361 /* BillingProductDefinition.swift */,
+				8DDD28BD2BB2D461003A0361 /* BillingProduct.swift */,
+				8DDD28BF2BB2D599003A0361 /* BillingProduct+StoreKit.swift */,
+				8DDD28C12BB31747003A0361 /* BuyProductOptions.swift */,
+				8DA744752BBFD20F00E9AE54 /* BillingProductOffer+StoreKit.swift */,
+				8DDD28C32BB388D8003A0361 /* BillingProductOfferRedeemDetails.swift */,
+				8D7965662BE4C3420059D7C2 /* BillingProductOfferPricingPhase.swift */,
+			);
+			path = Product;
+			sourceTree = "<group>";
+		};
+		8DF122132BC374FD00FCC118 /* Transaction */ = {
+			isa = PBXGroup;
+			children = (
+				8DDD28CB2BB41CF5003A0361 /* BillingServicesTransactionStateChangeResult.swift */,
+				8DA7B3ED2BB43948009D21A5 /* BillingTransaction.swift */,
+				8DA7B3F12BB43FA8009D21A5 /* BillingTransaction+StoreKit.swift */,
+			);
+			path = Transaction;
+			sourceTree = "<group>";
+		};
+		8DF122142BC3752700FCC118 /* RestorePurchase */ = {
+			isa = PBXGroup;
+			children = (
+				8DDD28C72BB390FE003A0361 /* BillingServicesRestorePurchasesResult.swift */,
+				8DE6B31A2BB4E937001D9897 /* BillingServicesRestorePurchasesResult+StoreKit.swift */,
+			);
+			path = RestorePurchase;
+			sourceTree = "<group>";
+		};
+		8DF122152BC3753F00FCC118 /* Subscription */ = {
+			isa = PBXGroup;
+			children = (
+				8DD0D40B2BBEB8C90059AEE3 /* BillingProductSubscriptionRenewalInfo.swift */,
+				8DD0D40D2BBEB8DD0059AEE3 /* BillingProductSubscriptionStatus.swift */,
+				8DD0D40F2BBEF2980059AEE3 /* BillingProductSubscriptionInfo.swift */,
+				8DA7446F2BBFBB6E00E9AE54 /* BillingProductSubscriptionInfo+StoreKit.swift */,
+				8DA744712BBFBDD500E9AE54 /* BillingProductSubscriptionPeriod+StoreKit.swift */,
+				8DA744832BC002D200E9AE54 /* BillingProductSubscriptionStatus+StoreKit.swift */,
+				8DA744872BC0160F00E9AE54 /* BillingProductSubscriptionRenewalInfo+StoreKit.swift */,
+			);
+			path = Subscription;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		8D64234D2BADD9EF0001BF3D /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		8D6423512BADD9EF0001BF3D /* BillingServices */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8D6423662BADD9FB0001BF3D /* Build configuration list for PBXNativeTarget "BillingServices" */;
+			buildPhases = (
+				8D64234D2BADD9EF0001BF3D /* Headers */,
+				8D64234E2BADD9EF0001BF3D /* Sources */,
+				8D64234F2BADD9EF0001BF3D /* Frameworks */,
+				8D6423502BADD9EF0001BF3D /* Resources */,
+				8D3258D12BBBB6DC00A0814F /* Run Script */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BillingServices;
+			productName = BillingServices;
+			productReference = 8D6423522BADD9EF0001BF3D /* BillingServices.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		8D6423492BADD9EF0001BF3D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1520;
+				LastUpgradeCheck = 1520;
+				TargetAttributes = {
+					8D6423512BADD9EF0001BF3D = {
+						CreatedOnToolsVersion = 15.2;
+						LastSwiftMigration = 1520;
+					};
+				};
+			};
+			buildConfigurationList = 8D64234C2BADD9EF0001BF3D /* Build configuration list for PBXProject "BillingServices" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 8D6423482BADD9EF0001BF3D;
+			productRefGroup = 8D6423532BADD9EF0001BF3D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8D6423512BADD9EF0001BF3D /* BillingServices */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8D6423502BADD9EF0001BF3D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		8D3258D12BBBB6DC00A0814F /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/bash\n# Only WORKSPACE_DIR is nearly giving the root project directory. Rest all are giving the directory where this sub-project exists.\nROOT_DIR=\"\"\n\nif [[ \"$WORKSPACE_DIR\" == *.xcodeproj ]]; then\n    ROOT_DIR=\"$(dirname \"$WORKSPACE_DIR\")\"\nelse\n    ROOT_DIR=\"$WORKSPACE_DIR\"\nfi\n\nsource \"${ROOT_DIR}/VoxelBusters/copy_framework_as_dependency.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8D64234E2BADD9EF0001BF3D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8DA7448E2BC03BBF00E9AE54 /* BillingProductSubscriptionPriceIncreaseStatus+StoreKit.swift in Sources */,
+				8D7965672BE4C3420059D7C2 /* BillingProductOfferPricingPhase.swift in Sources */,
+				8DA7447C2BBFF69E00E9AE54 /* BillingServicesEnvironment+StoreKit.swift in Sources */,
+				8DDD28BE2BB2D461003A0361 /* BillingProduct.swift in Sources */,
+				8DDD28CA2BB3995F003A0361 /* BillingServicesSettings.swift in Sources */,
+				8DD0D3FE2BBEB7BD0059AEE3 /* BillingServicesEnvironment.swift in Sources */,
+				8DDD28C02BB2D599003A0361 /* BillingProduct+StoreKit.swift in Sources */,
+				8DDD28C42BB388D8003A0361 /* BillingProductOfferRedeemDetails.swift in Sources */,
+				8DD0D4082BBEB8370059AEE3 /* BillingProductSubscriptionPriceIncreaseStatus.swift in Sources */,
+				8DD0D4062BBEB8210059AEE3 /* BillingProductSubscriptionExpirationReason.swift in Sources */,
+				8DDD28CC2BB41CF5003A0361 /* BillingServicesTransactionStateChangeResult.swift in Sources */,
+				8D41DEF52BB04E9700DE9AB5 /* BillingServicesDelegate.swift in Sources */,
+				8DD0D4102BBEF2980059AEE3 /* BillingProductSubscriptionInfo.swift in Sources */,
+				8DA744862BC012F800E9AE54 /* BillingProductOfferType+StoreKit.swift in Sources */,
+				8DD0D4002BBEB7DC0059AEE3 /* BillingProductType.swift in Sources */,
+				8DD0D4022BBEB7F30059AEE3 /* BillingProductRenewalState.swift in Sources */,
+				8DA744782BBFD9BC00E9AE54 /* BillingProductOfferPaymentMode+StoreKit.swift in Sources */,
+				8DD0D4042BBEB8070059AEE3 /* BillingProductOfferCategory.swift in Sources */,
+				8DA744882BC0160F00E9AE54 /* BillingProductSubscriptionRenewalInfo+StoreKit.swift in Sources */,
+				8DDD28C22BB31747003A0361 /* BuyProductOptions.swift in Sources */,
+				8DA744762BBFD21000E9AE54 /* BillingProductOffer+StoreKit.swift in Sources */,
+				8DE6B31B2BB4E937001D9897 /* BillingServicesRestorePurchasesResult+StoreKit.swift in Sources */,
+				8DA7448A2BC0233D00E9AE54 /* BillingProductRenewalState+StoreKit.swift in Sources */,
+				8DD0D4142BBF1C110059AEE3 /* BillingProductOfferPaymentMode.swift in Sources */,
+				8DA744822BBFFE9C00E9AE54 /* BillingProductRevocationReason+StoreKit.swift in Sources */,
+				8D7965692BE4C47E0059D7C2 /* BillingPrice.swift in Sources */,
+				8DF7D1682BAED6A400AD8D1E /* BillingServicesStoreKitImplementation.swift in Sources */,
+				8DDD28C82BB390FE003A0361 /* BillingServicesRestorePurchasesResult.swift in Sources */,
+				8DA7447E2BBFF9AC00E9AE54 /* BillingProductType+StoreKit.swift in Sources */,
+				8DA744702BBFBB6E00E9AE54 /* BillingProductSubscriptionInfo+StoreKit.swift in Sources */,
+				8DA7B3EE2BB43948009D21A5 /* BillingTransaction.swift in Sources */,
+				8DA744722BBFBDD500E9AE54 /* BillingProductSubscriptionPeriod+StoreKit.swift in Sources */,
+				8DD0D40C2BBEB8C90059AEE3 /* BillingProductSubscriptionRenewalInfo.swift in Sources */,
+				8D081EC82BFECD7F00751D5B /* BillingServicesErrorCode+StoreKit.swift in Sources */,
+				8DD0D4122BBF1BB40059AEE3 /* BillingPeriodUnit.swift in Sources */,
+				8DD0D4162BBF1C5D0059AEE3 /* BillingPeriod.swift in Sources */,
+				8DA7B3F22BB43FA8009D21A5 /* BillingTransaction+StoreKit.swift in Sources */,
+				8DA744742BBFBE5400E9AE54 /* BillingProductSubscriptionPeriodUnit+StoreKit.swift in Sources */,
+				8DDD28B82BB2C55B003A0361 /* BillingProductDefinition.swift in Sources */,
+				8DDD28B62BB1BE37003A0361 /* BillingServicesErrorCode.swift in Sources */,
+				8DA7448C2BC0318400E9AE54 /* BillingProductSubscriptionExpirationReason+StoreKit.swift in Sources */,
+				8DA744802BBFFAF400E9AE54 /* BillingProductOwnershipType+StoreKit.swift in Sources */,
+				8DD0D4182BBF1C760059AEE3 /* BillingProductOffer.swift in Sources */,
+				8DD0D40E2BBEB8DD0059AEE3 /* BillingProductSubscriptionStatus.swift in Sources */,
+				8D41DEF12BB00B6A00DE9AB5 /* IBillingServices.swift in Sources */,
+				8DDD28BA2BB2D23F003A0361 /* BillingServicesInitializeStoreResult.swift in Sources */,
+				8D41DEF32BB04ACB00DE9AB5 /* BillingServicesError.swift in Sources */,
+				8DC9CEAA2BEB72C300FCE47F /* BillingTransactionState.swift in Sources */,
+				8DA744842BC002D200E9AE54 /* BillingProductSubscriptionStatus+StoreKit.swift in Sources */,
+				8DD0D3FA2BBEB6560059AEE3 /* BillingProductOwnershipType.swift in Sources */,
+				8DD0D3FC2BBEB7920059AEE3 /* BillingProductRevocationReason.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		8D6423642BADD9FB0001BF3D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		8D6423652BADD9FB0001BF3D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		8D6423672BADD9FB0001BF3D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = voxelbusters.BillingServices;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "xrsimulator xros watchsimulator watchos macosx iphonesimulator iphoneos driverkit appletvsimulator appletvos";
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		8D6423682BADD9FB0001BF3D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = voxelbusters.BillingServices;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "xrsimulator xros watchsimulator watchos macosx iphonesimulator iphoneos driverkit appletvsimulator appletvos";
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8D64234C2BADD9EF0001BF3D /* Build configuration list for PBXProject "BillingServices" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8D6423642BADD9FB0001BF3D /* Debug */,
+				8D6423652BADD9FB0001BF3D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8D6423662BADD9FB0001BF3D /* Build configuration list for PBXNativeTarget "BillingServices" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8D6423672BADD9FB0001BF3D /* Debug */,
+				8D6423682BADD9FB0001BF3D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 8D6423492BADD9EF0001BF3D /* Project object */;
+}
