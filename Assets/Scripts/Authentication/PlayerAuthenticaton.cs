@@ -4,6 +4,7 @@ using Unity.Services.Core;
 using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
 using TMPro;
+using UnityEngine.UI;
 
 public class PlayerAuthentication : MonoBehaviour
 {
@@ -14,6 +15,10 @@ public class PlayerAuthentication : MonoBehaviour
     private string imgURL;
 
     [SerializeField] private TMP_Text loadingText;
+    [SerializeField] private GameObject titleScreen;
+    [SerializeField] private GameObject titleScreenBackground;
+    [SerializeField] private Sprite titleScreenDark;
+    [SerializeField] private Sprite titleScreenBackgroundDark;
 
     public (string username, string id, string imgURL) GetProfile()
     {
@@ -31,6 +36,8 @@ public class PlayerAuthentication : MonoBehaviour
         }
 
         DontDestroyOnLoad(gameObject);
+
+        LoadingSceneDarkMode();
 
         await InitializeUnityServices();
 
@@ -88,10 +95,33 @@ public class PlayerAuthentication : MonoBehaviour
             Debug.LogError($"An unexpected error occurred during sign in: {e.Message}");
         }
 
-        if (loadingText != null)
+        if (loadingText != null && loadingText.gameObject != null)
         {
             loadingText.text = "loading game...";
         }
         SceneManager.LoadScene("SampleScene");
+    }
+
+    private void LoadingSceneDarkMode()
+    {
+        try
+        {
+            int darkMode = PlayerPrefs.GetInt("darkMode", 0);
+            if (darkMode == 1)
+            {
+                if (titleScreen != null && titleScreenDark != null)
+                {
+                    titleScreen.GetComponent<Image>().sprite = titleScreenDark;
+                }
+                if (titleScreenBackground != null && titleScreenBackgroundDark != null)
+                {
+                    titleScreenBackground.GetComponent<Image>().sprite = titleScreenBackgroundDark;
+                }
+            }
+        }
+        catch (System.Exception)
+        {
+            Debug.Log("Failed to set dark mode on LoadingScene");
+        }
     }
 }
