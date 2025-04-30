@@ -59,15 +59,21 @@ public class PlayerAuthentication : MonoBehaviour
             if (AuthenticationService.Instance.IsSignedIn)
             {
                 Debug.Log("Player is already signed in.");
-                return;
+            }
+            else
+            {
+                await AuthenticationService.Instance.SignInAnonymouslyAsync();
+                Debug.Log($"Signed In Anon as {AuthenticationService.Instance.PlayerId}");
             }
 
-            await AuthenticationService.Instance.SignInAnonymouslyAsync();
-            Debug.Log($"Signed In Anon as {AuthenticationService.Instance.PlayerId}");
-            await HandlePostSignInAsync();
-            loadingText.text = "loading game...";
-
-            SceneManager.LoadScene("SampleScene");
+            if (AuthenticationService.Instance.IsSignedIn)
+            {
+                await PlayerDataManager.Instance.SyncWithCloudIfNeeded();
+            }
+            else
+            {
+                Debug.LogError("Sync Error: Couldn't Sign In.");
+            }
         }
         catch (AuthenticationException ex)
         {
@@ -81,17 +87,11 @@ public class PlayerAuthentication : MonoBehaviour
         {
             Debug.LogError($"An unexpected error occurred during sign in: {e.Message}");
         }
-    }
 
-    private async Task HandlePostSignInAsync()
-    {
-        if (AuthenticationService.Instance.IsSignedIn)
+        if (loadingText != null)
         {
-            await PlayerDataManager.Instance.SyncWithCloudIfNeeded();
+            loadingText.text = "loading game...";
         }
-        else
-        {
-            Debug.LogError("SaveAll/LoadAll Error: Not Signed In.");
-        }
+        SceneManager.LoadScene("SampleScene");
     }
 }

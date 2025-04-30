@@ -109,7 +109,6 @@ public class PlayerDataManager : MonoBehaviour
                                 await LoadAllData();
                                 PlayerPrefs.SetInt("LoadAll", 0);
                                 await SaveDataInt("LoadAll");
-                                SceneManager.LoadScene("SampleScene");
                                 return;
                             }
                         }
@@ -131,12 +130,13 @@ public class PlayerDataManager : MonoBehaviour
         {
             if (PlayerPrefs.GetInt("easyWin") > 0)
             {
+                PlayerPrefs.SetInt("LoadAll", 0);
+                await SaveDataInt("LoadAll");
+
                 Debug.Log("No prior backup, attempting to save all data to cloud...");
                 await SaveAllData();
             }
         }
-
-        SceneManager.LoadScene("SampleScene");
     }
 
     public void SaveAllDataButtonHelper() { _ = SaveAllData(); }
