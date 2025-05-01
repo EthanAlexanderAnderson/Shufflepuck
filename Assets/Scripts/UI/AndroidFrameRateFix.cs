@@ -11,7 +11,7 @@ public class AndroidFrameRateFix : MonoBehaviour
     {
         if (hasFocus)
         {
-            Debug.Log("App regained focus. Reapplying target framerate.");
+            Debug.Log("App focused. Reapplying target framerate.");
             ReapplyFramerate();
         }
         else

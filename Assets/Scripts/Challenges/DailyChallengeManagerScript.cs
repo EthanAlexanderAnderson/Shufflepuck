@@ -165,7 +165,15 @@ public class DailyChallengeManagerScript : MonoBehaviour
                     if (failsafe >= 1000)
                     {
                         Debug.Log("failsafe triggered");
-                        selectedChallenge = easyDailyChallenges[1];
+                        // TODO: this is a temp fix, make this not hardcoded by improving IsAssignable() logic
+                        if (PlayerPrefs.GetInt("easyHighscore") >= 23)
+                        {
+                            selectedChallenge = easyDailyChallenges[^1];
+                        }
+                        else
+                        {
+                            selectedChallenge = easyDailyChallenges[1];
+                        }
                     }
                 }
                 PlayerPrefs.SetInt("DailyChallenge1", easyDailyChallenges.IndexOf(selectedChallenge));
@@ -191,7 +199,15 @@ public class DailyChallengeManagerScript : MonoBehaviour
                     if (failsafe >= 1000)
                     {
                         Debug.Log("failsafe triggered");
-                        selectedChallenge = hardDailyChallenges[1];
+                        // TODO: this is a temp fix, make this not hardcoded by improving IsAssignable() logic
+                        if (PlayerPrefs.GetInt("hardHighscore") >= 19)
+                        {
+                            selectedChallenge = hardDailyChallenges[^1];
+                        }
+                        else
+                        {
+                            selectedChallenge = hardDailyChallenges[1];
+                        }
                     }
                 }
                 PlayerPrefs.SetInt("DailyChallenge2", hardDailyChallenges.IndexOf(selectedChallenge));
@@ -245,9 +261,9 @@ public class DailyChallengeManagerScript : MonoBehaviour
             DC1 = 0;
             PlayerPrefs.SetInt("DailyChallenge1", 0);
         }
-        if (DC1 >= numberOfHardDailyChallenges || DC1 <= (numberOfHardDailyChallenges * -1))
+        if (DC2 >= numberOfHardDailyChallenges || DC2 <= (numberOfHardDailyChallenges * -1))
         {
-            DC1 = 0;
+            DC2 = 0;
             PlayerPrefs.SetInt("DailyChallenge2", 0);
         }
 
@@ -256,10 +272,12 @@ public class DailyChallengeManagerScript : MonoBehaviour
         // Evalute condition is met
         if (DC1 > 0 && easyDailyChallenges[DC1].CheckCompletion(scoreDifference, difficulty))
         {
+            Debug.Log("easy daily challenge (" + DC1 + ") completed.");
             PlayerPrefs.SetInt("DailyChallenge1", -DC1);
         }
         if (DC2 > 0 && hardDailyChallenges[DC2].CheckCompletion(scoreDifference, difficulty))
         {
+            Debug.Log("hard daily challenge (" + DC2 + ") completed.");
             PlayerPrefs.SetInt("DailyChallenge2", -DC2);
         }
         SetText();

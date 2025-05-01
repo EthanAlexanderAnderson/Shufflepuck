@@ -486,19 +486,27 @@ public static class CPUBehaviorScript
             if (puckScript.IsPlayersPuck() && puckScript.IsResurrect())
             {
                 useCull = false;
-                break;
             }
+
             // don't use cull if CPU has factory in a scoring zone that would be destroyed
             if (!puckScript.IsPlayersPuck() && puckScript.IsFactory() && puckScript.GetZoneMultiplier() > 0)
             {
                 useCull = false;
-                break;
             }
 
+            // increase weight of cull
             if (puckScript.IsPlayersPuck() && !puckScript.IsHydra()) { validPucks++; }
             if (puckScript.IsPlayersPuck() && puckScript.IsFactory() && LogicScript.Instance.player.puckCount > 0) { validPucks++; } // a single player factory will trigger cull
             if (!puckScript.IsPlayersPuck() && puckScript.IsResurrect()) { validPucks++; } // a single CPU resurrect will trigger cull
-            if (puckScript.IsPlayersPuck() && puckScript.IsExponent() && (puckScript.IsErratic() || PowerupManager.Instance.GetDeck().Contains(4))) { validPucks++; } // a single exponent+erratic or exponent+forcefield will trigger cull
+            if (puckScript.IsPlayersPuck() && puckScript.IsExponent() && // single exponent
+               (puckScript.IsErratic() || // exponent + erratic
+                PowerupManager.Instance.GetDeck().Contains(4)) ||  // exponent + forcefield
+                puckScript.transform.position.y <= 9) // exponent + can be hit in
+            {
+                useCull = true; // exponent can override the CPU's desire to not destroy it's own factory or a players resurrect
+                validPucks += 2;
+                break;
+            }
         }
 
         return useCull && validPucks > 1;

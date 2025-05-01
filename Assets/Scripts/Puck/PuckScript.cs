@@ -353,11 +353,16 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public int ComputeValue() { return (puckBaseValue * zoneMultiplier) + (zoneMultiplier > 0 ? puckBonusValue : 0); }
     public int ComputeTotalFutureValue()
     {
-        if (zoneMultiplier <= 0) return 0;
-        int puckValue = ComputeValue();
+        if (zoneMultiplier <= 0 && transform.position.y > 9) return 0;
+
+        // for future value, if the puck is able to be hit into a scoring zone (below y 9), treat it as minimum zone mult of 1
+        // if the puck is also placed middle-ish, treat it as minimum zone mult of 2
+        int tempZoneMultForTotalFutureValue = Math.Max((transform.position.x > -5 && transform.position.x < 5) ? 2 : 1, zoneMultiplier);
+
+        int puckValue = (puckBaseValue * tempZoneMultForTotalFutureValue) + (tempZoneMultForTotalFutureValue > 0 ? puckBonusValue : 0);
         if (IsGrowth()) puckValue += LogicScript.Instance.player.puckCount * GetGrowthCount();
         if (IsFactory()) puckValue += LogicScript.Instance.player.puckCount * 2 * GetFactoryCount();
-        if (IsExponent()) puckValue += Math.Max(0, puckBaseValue * zoneMultiplier * (int)Math.Pow((int)Mathf.Pow(2, GetExponentCount()), LogicScript.Instance.player.puckCount) - (puckBaseValue * zoneMultiplier));
+        if (IsExponent()) puckValue += Math.Max(0, puckBaseValue * tempZoneMultForTotalFutureValue * (int)Math.Pow((int)Mathf.Pow(2, GetExponentCount()), LogicScript.Instance.player.puckCount) - (puckBaseValue * tempZoneMultForTotalFutureValue));
         return puckValue;
     }
     public int GetZoneMultiplier() { return zoneMultiplier; }
