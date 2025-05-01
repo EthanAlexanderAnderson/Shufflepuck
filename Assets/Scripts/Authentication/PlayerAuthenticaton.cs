@@ -117,6 +117,10 @@ public class PlayerAuthentication : MonoBehaviour
                 {
                     titleScreenBackground.GetComponent<Image>().sprite = titleScreenBackgroundDark;
                 }
+                if (loadingText != null)
+                {
+                    loadingText.color = Color.white;
+                }
             }
         }
         catch (System.Exception)
