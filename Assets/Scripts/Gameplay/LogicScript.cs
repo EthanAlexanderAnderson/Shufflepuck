@@ -511,8 +511,8 @@ public class LogicScript : MonoBehaviour
             // Calculate the distance between the mouse click position and the puck position
             float distance = Vector3.Distance(worldPosition, puck.transform.position);
 
-            // If the distance is less than or equal to 1 unit, the click is on or near a puck
-            if (distance <= 1f)
+            // If the distance is less than or equal to 1.5 units, the click is on or near a puck
+            if (distance <= 1.5f)
             {
                 return false; // Click is too close to a puck
             }
