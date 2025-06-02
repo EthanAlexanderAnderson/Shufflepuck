@@ -248,6 +248,8 @@ public class PackManager : MonoBehaviour
         pack.transform.localScale = new Vector3(3f, 3f, 3f);
         pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(RollRarity(), RollRankStandard(), RollHolo(false));
         targetOpened = 1;
+        openAnotherPlus = false;
+        openAnotherx10 = false;
     }
 
     public void OpenStandardTen()
@@ -293,6 +295,8 @@ public class PackManager : MonoBehaviour
             pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(RollRarity(), RollRankStandard(), RollHolo(false) || godpack);
         }
         targetOpened = 10;
+        openAnotherPlus = false;
+        openAnotherx10 = true;
     }
 
     public void OpenPlusOne()
@@ -313,6 +317,8 @@ public class PackManager : MonoBehaviour
         pack.transform.localScale = new Vector3(3f, 3f, 3f);
         pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(RollRarity(), RollRankPlus(), RollHolo(true));
         targetOpened = 1;
+        openAnotherPlus = true;
+        openAnotherx10 = false;
     }
 
     public void OpenPlusTen()
@@ -358,6 +364,8 @@ public class PackManager : MonoBehaviour
             pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(RollRarity(), RollRankPlus(), RollHolo(true) || godpack);
         }
         targetOpened = 10;
+        openAnotherPlus = true;
+        openAnotherx10 = true;
     }
 
     private int RollRarity()
@@ -580,5 +588,33 @@ public class PackManager : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
+    }
+
+    bool openAnotherPlus = false;
+    bool openAnotherx10 = false;
+    [SerializeField] private Image openAnotherButtonObject;
+    [SerializeField] private Sprite openAnotherStandardSprite;
+    [SerializeField] private Sprite openAnotherPlusSprite;
+
+    public void OpenAnother()
+    {
+        if (!openAnotherPlus && !openAnotherx10)
+        {
+            OpenStandardOne();
+        }
+        else if (!openAnotherPlus && openAnotherx10)
+        {
+            OpenStandardTen();
+        }
+        else if (openAnotherPlus && !openAnotherx10)
+        {
+            OpenPlusOne();
+        }
+        else if (openAnotherPlus && openAnotherx10)
+        {
+            OpenPlusTen();
+        }
+        openAnotherButtonObject.sprite = !openAnotherPlus ? openAnotherStandardSprite : openAnotherPlusSprite;
+        bottomText.text = "";
     }
 }
