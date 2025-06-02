@@ -174,7 +174,6 @@ public class LogicScript : MonoBehaviour
             UpdateScores();
             UI.ChangeUI(UI.gameResultScreen);
             UI.UpdateGameResult(player.GetScore(), opponent.GetScore(), difficulty, isLocal);
-            isLocal = false;
             arrow.SetActive(false);
             FogScript.Instance.DisableFog();
         }
