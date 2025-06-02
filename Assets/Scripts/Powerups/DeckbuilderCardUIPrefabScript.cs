@@ -501,7 +501,7 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
 
         // buttons
         craftMinusButton.interactable = (toCraftCount > 0);
-        craftConfirmButton.interactable = (toCraftCount > 0 && remainingCredits >= 0);
+        craftConfirmButton.interactable = (toCraftCount > 0 && remainingCredits >= 0) && (ownedCardVariationList[selectedCardVariationIndex].count + toCraftCount <= 4095);
         craftPlusButton.interactable = ((remainingCredits - craftCost) >= 0 && craftCost > 0);
     }
 
