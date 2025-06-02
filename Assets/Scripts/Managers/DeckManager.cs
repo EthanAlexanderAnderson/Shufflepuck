@@ -132,15 +132,25 @@ public class DeckManager : MonoBehaviour
     // Export the decklist to the clipboard
     public void ExportDeckList()
     {
+        int[] cardIndexes = new int[PowerupCardData.GetCardCount()];
+
         // Convert the decklist to string
         var stringDeckList = "";
         foreach (var encodedCard in deck)
         {
             var decodedCard = PowerupCardData.DecodeCard(encodedCard);
             int cardIndex = decodedCard.cardIndex;
-            if (cardIndex >= 0)
+            if (cardIndex >= 0 && cardIndex < PowerupCardData.GetCardCount())
             {
-                stringDeckList += PowerupCardData.GetCardName(cardIndex) + ": " + decodedCard.quantity + "\n";
+                cardIndexes[cardIndex]++;
+            }
+        }
+
+        for (int i = 0; i < cardIndexes.Length; i++)
+        {
+            if (cardIndexes[i] > 0)
+            {
+                stringDeckList += PowerupCardData.GetCardName(i) + ": " + cardIndexes[i] + "\n";
             }
         }
 
