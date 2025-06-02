@@ -11,6 +11,7 @@ public class PackOpenPrefabScript : MonoBehaviour
 
     int targetClicks;
     int clicks;
+    int storedClicks;
 
     int cardIndex;
     int rank;
@@ -18,10 +19,8 @@ public class PackOpenPrefabScript : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0) && puckImageObject.transform.localScale == Vector3.one && clicks < targetClicks)
+        if (((Input.GetMouseButtonDown(0) && !ClickIsNotOnPack()) || storedClicks > clicks) && puckImageObject.transform.localScale == Vector3.one && clicks < targetClicks)
         {
-            if (ClickIsNotOnPack() && !Application.isEditor) return;
-
             LeanTween.cancel(puckImageObject);
 
             ParticleSystem.MainModule main = rarityParticleSystem.main;
@@ -34,10 +33,8 @@ public class PackOpenPrefabScript : MonoBehaviour
             SoundManagerScript.Instance.PlayClickSFXPitch(3, clicks/10f);
             clicks++;
         }
-        else if (Input.GetMouseButtonDown(0) && puckImageObject.transform.localScale == Vector3.one && clicks == targetClicks)
+        else if (((Input.GetMouseButtonDown(0) && !ClickIsNotOnPack()) || storedClicks > clicks) && puckImageObject.transform.localScale == Vector3.one && clicks == targetClicks)
         {
-            if (ClickIsNotOnPack() && !Application.isEditor) return;
-
             LeanTween.cancel(puckImageObject);
 
             ParticleSystem.MainModule main = rarityParticleSystem.main;
@@ -52,6 +49,12 @@ public class PackOpenPrefabScript : MonoBehaviour
 
             SoundManagerScript.Instance.PlayClickSFXPitch(3, clicks/10f);
             clicks++;
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (ClickIsNotOnPack() && !Application.isEditor) return;
+            storedClicks++;
         }
     }
 
