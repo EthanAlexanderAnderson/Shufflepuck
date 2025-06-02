@@ -201,7 +201,7 @@ public class PackManager : MonoBehaviour
             int index = (packBooster * -1) - 1;
             mult = 1f + (level * boosterRankMult[index]);
         }
-        chanceMultText.text = $"x{mult}";
+        chanceMultText.text = $"x{Math.Truncate(100 * mult) / 100}";
     }
 
     public void RewardPacks(bool isPlus, int count)
