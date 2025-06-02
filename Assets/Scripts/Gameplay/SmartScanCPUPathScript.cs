@@ -27,6 +27,7 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
     public float CalculateValue(int modifiedDifficulty)
     {
         if (WallIsActive()) { return 0; }
+        if (LogicScript.Instance.opponent.puckCount >= 1 && LogicScript.Instance.player.puckCount <= 0 && LogicScript.Instance.opponent.GetScore() - LogicScript.Instance.player.GetScore() >= 1) { return 0; } // if cpu is winning, don't contact shot
         if (modifiedDifficulty < 0) { modifiedDifficulty = 0; }
 
         highestValue = 0;
