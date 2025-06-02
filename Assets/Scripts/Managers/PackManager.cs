@@ -118,8 +118,8 @@ public class PackManager : MonoBehaviour
             {
                 packBoosterIDs.Add((i, (5 - PowerupCardData.GetCardRarity(i)) * 100, 0));
             }
-            // small chance at boosting a specific card if you own less than 5
-            else if (sums[i] < 5)
+            // small chance at boosting a specific card if you own less than a full set
+            else if (sums[i] < (5 - PowerupCardData.GetCardRarity(i)))
             {
                 packBoosterIDs.Add((i, (5 - PowerupCardData.GetCardRarity(i)) * 10, 0));
             }
