@@ -250,6 +250,7 @@ public class PackManager : MonoBehaviour
         targetOpened = 1;
         openAnotherPlus = false;
         openAnotherx10 = false;
+        openAnotherButtonObject.sprite = !openAnotherPlus ? openAnotherStandardSprite : openAnotherPlusSprite;
     }
 
     public void OpenStandardTen()
@@ -297,6 +298,7 @@ public class PackManager : MonoBehaviour
         targetOpened = 10;
         openAnotherPlus = false;
         openAnotherx10 = true;
+        openAnotherButtonObject.sprite = !openAnotherPlus ? openAnotherStandardSprite : openAnotherPlusSprite;
     }
 
     public void OpenPlusOne()
@@ -319,6 +321,7 @@ public class PackManager : MonoBehaviour
         targetOpened = 1;
         openAnotherPlus = true;
         openAnotherx10 = false;
+        openAnotherButtonObject.sprite = !openAnotherPlus ? openAnotherStandardSprite : openAnotherPlusSprite;
     }
 
     public void OpenPlusTen()
@@ -366,6 +369,7 @@ public class PackManager : MonoBehaviour
         targetOpened = 10;
         openAnotherPlus = true;
         openAnotherx10 = true;
+        openAnotherButtonObject.sprite = !openAnotherPlus ? openAnotherStandardSprite : openAnotherPlusSprite;
     }
 
     private int RollRarity()
