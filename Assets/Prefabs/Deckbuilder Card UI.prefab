@@ -4838,6 +4838,7 @@ ParticleSystemRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4906,6 +4907,7 @@ GameObject:
   - component: {fileID: 8701094922153686976}
   - component: {fileID: 5148246111975798374}
   - component: {fileID: 818795766592984629}
+  - component: {fileID: 8421921001975534147}
   m_Layer: 5
   m_Name: Plus Button
   m_TagString: Untagged
@@ -5027,6 +5029,22 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &8421921001975534147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 110908840920468503}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0485704d27af3124c9a9948d4b1b8297, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  repeatDelay: 0.5
+  initialRepeatRate: 0.2
+  minRepeatRate: 0.05
+  acceleration: 0.95
 --- !u!1 &464639030955328116
 GameObject:
   m_ObjectHideFlags: 0
@@ -10015,6 +10033,7 @@ ParticleSystemRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -10083,6 +10102,7 @@ GameObject:
   - component: {fileID: 689458281952685059}
   - component: {fileID: 226425567104024633}
   - component: {fileID: 417460639547848499}
+  - component: {fileID: 1662967289499890191}
   m_Layer: 5
   m_Name: Craft Plus Button
   m_TagString: Untagged
@@ -10204,6 +10224,22 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &1662967289499890191
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 730454423297453411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0485704d27af3124c9a9948d4b1b8297, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  repeatDelay: 0.5
+  initialRepeatRate: 0.2
+  minRepeatRate: 0.05
+  acceleration: 0.95
 --- !u!1 &976891441832063750
 GameObject:
   m_ObjectHideFlags: 0
@@ -15906,6 +15942,7 @@ ParticleSystemRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -20837,6 +20874,7 @@ ParticleSystemRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -26316,6 +26354,7 @@ ParticleSystemRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -31942,6 +31981,7 @@ ParticleSystemRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -32124,6 +32164,7 @@ GameObject:
   - component: {fileID: 8627843913380545140}
   - component: {fileID: 7234351377945855245}
   - component: {fileID: 3164172767576326837}
+  - component: {fileID: 3383043763190284471}
   m_Layer: 5
   m_Name: Craft Minus Button
   m_TagString: Untagged
@@ -32245,6 +32286,22 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &3383043763190284471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5694753574828924727}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0485704d27af3124c9a9948d4b1b8297, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  repeatDelay: 0.5
+  initialRepeatRate: 0.2
+  minRepeatRate: 0.05
+  acceleration: 0.95
 --- !u!1 &5695848488496971110
 GameObject:
   m_ObjectHideFlags: 0
@@ -37505,6 +37562,7 @@ ParticleSystemRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -37709,6 +37767,7 @@ GameObject:
   - component: {fileID: 3629118209394770927}
   - component: {fileID: 739597067361159131}
   - component: {fileID: 7476842876608842775}
+  - component: {fileID: 3973912247248545783}
   m_Layer: 5
   m_Name: Minus Button
   m_TagString: Untagged
@@ -37830,6 +37889,22 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &3973912247248545783
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6299482845463679943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0485704d27af3124c9a9948d4b1b8297, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  repeatDelay: 0.5
+  initialRepeatRate: 0.2
+  minRepeatRate: 0.05
+  acceleration: 0.95
 --- !u!1 &6571794683100809565
 GameObject:
   m_ObjectHideFlags: 0
@@ -42668,6 +42743,7 @@ ParticleSystemRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
