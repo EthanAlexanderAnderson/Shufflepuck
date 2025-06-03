@@ -246,7 +246,8 @@ public class PackManager : MonoBehaviour
         // open the pack
         GameObject pack = Instantiate(cardOpenPrefab, packParent.transform);
         pack.transform.localScale = new Vector3(3f, 3f, 3f);
-        pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(RollRarity(), RollRankStandard(), RollHolo(false));
+        int cardIndex = RollRarity();
+        pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(cardIndex, RollRankStandard(cardIndex), RollHolo(false));
         targetOpened = 1;
         openAnotherPlus = false;
         openAnotherx10 = false;
@@ -267,12 +268,8 @@ public class PackManager : MonoBehaviour
         PlayerPrefs.SetInt("StandardPacks", standardPackCount - 10);
         UpdatePackSreenUI();
 
-        // god pack chance
-        bool godpack = false;
-        if (Random.Range(0, 1000) < 1) // 1 in 1000 : 0.1% chance
-        {
-            godpack = true;
-        }
+        // god pack chance (1 in 1000 : 0.1%)
+        bool godpack = Random.Range(0, 1000) < 1;
 
         // open the packs
         for (int i = 0; i < 10; i++)
@@ -293,7 +290,8 @@ public class PackManager : MonoBehaviour
                 pack.transform.localPosition = new Vector3(600f, 350f - 500f * (i-7), 0f);
             }
 
-            pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(RollRarity(), RollRankStandard(), RollHolo(false) || godpack);
+            int cardIndex = RollRarity();
+            pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(cardIndex, RollRankStandard(cardIndex), RollHolo(false) || godpack);
         }
         targetOpened = 10;
         openAnotherPlus = false;
@@ -317,7 +315,8 @@ public class PackManager : MonoBehaviour
 
         GameObject pack = Instantiate(cardOpenPrefab, packParent.transform);
         pack.transform.localScale = new Vector3(3f, 3f, 3f);
-        pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(RollRarity(), RollRankPlus(), RollHolo(true));
+        int cardIndex = RollRarity();
+        pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(cardIndex, RollRankPlus(cardIndex), RollHolo(true));
         targetOpened = 1;
         openAnotherPlus = true;
         openAnotherx10 = false;
@@ -338,12 +337,8 @@ public class PackManager : MonoBehaviour
         PlayerPrefs.SetInt("PlusPacks", plusPackCount - 10);
         UpdatePackSreenUI();
 
-        // god pack chance
-        bool godpack = false;
-        if (Random.Range(0, 100) < 1) // 1 in 100 : 1% chance
-        {
-            godpack = true;
-        }
+        // god pack chance (1 in 100 : 1%)
+        bool godpack = Random.Range(0, 100) < 1;
 
         // open packs
         for (int i = 0; i < 10; i++)
@@ -364,7 +359,8 @@ public class PackManager : MonoBehaviour
                 pack.transform.localPosition = new Vector3(600f, 350f - 500f * (i - 7), 0f);
             }
 
-            pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(RollRarity(), RollRankPlus(), RollHolo(true) || godpack);
+            int cardIndex = RollRarity();
+            pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(cardIndex, RollRankPlus(cardIndex), RollHolo(true) || godpack);
         }
         targetOpened = 10;
         openAnotherPlus = true;
@@ -430,7 +426,7 @@ public class PackManager : MonoBehaviour
         return returnValue;
     }
 
-    private int RollRankStandard()
+    private int RollRankStandard(int cardIndex)
     {
         int returnValue = 9999999;
 
@@ -488,10 +484,13 @@ public class PackManager : MonoBehaviour
             }
         }
 
+        // Downgrade to best undiscovered rank
+        returnValue = DowngradeRankIfNeeded(returnValue, cardIndex);
+
         return returnValue;
     }
 
-    private int RollRankPlus()
+    private int RollRankPlus(int cardIndex)
     {
         int returnValue = 9999999;
 
@@ -543,6 +542,36 @@ public class PackManager : MonoBehaviour
                     boosterPoints = -1; // don't reroll
                 }
             }
+        }
+
+        // Downgrade to worst undiscovered rank
+        returnValue = DowngradeRankIfNeeded(returnValue, cardIndex);
+        if (returnValue <= 0) returnValue = 1;
+
+        return returnValue;
+    }
+
+    // this makes sure you unlock the ranks somewhat in order, for crafting purposes
+    private int DowngradeRankIfNeeded(int returnValue, int cardIndex)
+    {
+        if (returnValue <= 0) return 0;
+
+        // Downgrade to worst undiscovered rank
+        try
+        {
+            // figure out which ranks we already own of this cardIndex
+            bool[] owns = new bool[4];
+            foreach (var v in PowerupCardData.GetAllVariations(cardIndex))
+                if (v.rank >= 0 && v.rank < 4 && !v.holo)
+                    owns[v.rank] = true;
+
+                // downgrade by one rank if we don't own it
+                while (returnValue > 0 && !owns[returnValue - 1])
+                    returnValue--;
+        }
+        catch (Exception)
+        {
+            Debug.LogWarning("Failed to check for downgrade.");
         }
 
         return returnValue;
