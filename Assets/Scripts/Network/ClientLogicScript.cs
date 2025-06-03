@@ -107,10 +107,12 @@ public class ClientLogicScript : NetworkBehaviour
                     case "angle":
                         angle = line.GetValue();
                         activeBar = bar.ChangeBar("power", logic.player.goingFirst);
+                        SoundManagerScript.Instance.PlayClickSFXAlterPitch(1, 1f);
                         break;
                     case "power":
                         power = line.GetValue();
                         activeBar = bar.ChangeBar("spin");
+                        SoundManagerScript.Instance.PlayClickSFXAlterPitch(1, 1.05f);
                         break;
                     case "spin":
                         spin = line.GetValue();
@@ -121,6 +123,7 @@ public class ClientLogicScript : NetworkBehaviour
                         line.isActive = false;
                         arrow.SetActive(false);
                         logic.player.isShooting = false;
+                        SoundManagerScript.Instance.PlayClickSFXAlterPitch(1, 1.1f);
                         break;
                 }
             }
