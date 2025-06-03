@@ -537,7 +537,8 @@ public class PowerupManager : NetworkBehaviour
         foreach (var puck in allPucks)
         {
             if (puck.transform.position.y > 0 && puck.transform.position.y < 20 &&
-                puck.transform.position.x > -12 && puck.transform.position.x < 12)
+                puck.transform.position.x > -12 && puck.transform.position.x < 12 &&
+                !puck.GetComponent<PuckScript>().IsLocked())
             {
                 validPucks.Add(puck);
             }
