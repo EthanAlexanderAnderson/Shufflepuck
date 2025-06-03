@@ -186,6 +186,7 @@ public class PlinkoManager : MonoBehaviour
                 var (_, level) = LevelManager.Instance.GetXPAndLevel();
                 rewardText.text = (int)(level / 10f) > 1 ? $"+{(int)(level / 10f)} +PACKS" : $"+{(int)(level / 10f)} +PACK";
                 rewardImage.sprite = plusPack;
+                rewardImageAnimation.SetActive(false);
                 return;
             }
             // only one puck left to unlock
