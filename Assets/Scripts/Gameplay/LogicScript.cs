@@ -129,7 +129,7 @@ public class LogicScript : MonoBehaviour
             }
 
             // do triple powerup
-            if (triplePowerup > 0 && activeCompetitor.activePuckScript != null && activeCompetitor.activePuckScript.IsSafe())
+            if (triplePowerup > 0 && activeCompetitor.activePuckScript != null && activeCompetitor.activePuckObject.transform.position.y > -3)
             {
                 activeCompetitor.activePuckScript.RemovePowerupText("triple");
                 puckManager.CreatePuck(activeCompetitor);
