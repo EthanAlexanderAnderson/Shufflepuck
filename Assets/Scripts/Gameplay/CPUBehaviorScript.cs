@@ -16,6 +16,7 @@ public static class CPUBehaviorScript
     static public int PowerupCountUsedThisTurn() { return powerupsUsedThisTurn.Count; }
     static private List<int> deck;
     static private int[] hand = { -1, -1, -1 };
+    static private int handSize;
     static private int playerDeckPowerLevel;
 
     static private int denyPowerup;
@@ -34,10 +35,10 @@ public static class CPUBehaviorScript
         difficulty = diff;
         GenerateDeck();
 
-        hand = new int[modifiedDifficulty];
+        hand = new int[handSize];
         powerupsUsedThisTurn = new();
 
-        for (int i = 0; i < modifiedDifficulty; i++)
+        for (int i = 0; i < hand.Length; i++)
         {
             hand[i] = -1;
         }
@@ -58,6 +59,9 @@ public static class CPUBehaviorScript
         // any cards in deck -> increases modified difficulty by 1
         // every additional 15 deck power -> increases modified difficulty by 1
         modifiedDifficulty = difficulty + (playerDeckPowerLevel + 14) / 15;
+
+        // set the CPU hand size based on the modified Difficulty & difficulty. Maximum easy = 3, medium = 7, hard = 15
+        handSize = Math.Min(modifiedDifficulty, (int)Math.Pow(2, difficulty + 2) - 1);
 
         // modify the deck power level based on CPU difficulty, for the purpose of CPU deckbuilding
         playerDeckPowerLevel -= (2 - difficulty) * 5;
@@ -104,8 +108,8 @@ public static class CPUBehaviorScript
         int deckCount = deck.Count;
 
         // initialize array with proper length
-        int[] previouslyGeneratedIndexes = new int[modifiedDifficulty];
-        for (int i = 0; i < modifiedDifficulty; i++)
+        int[] previouslyGeneratedIndexes = new int[handSize];
+        for (int i = 0; i < previouslyGeneratedIndexes.Length; i++)
         {
             previouslyGeneratedIndexes[i] = -1;
         }
@@ -234,6 +238,9 @@ public static class CPUBehaviorScript
             float randomValue = Random.Range(0f, 1f);
             if (pathiShotValue > highestValue || (pathiShotValue == highestValue && randomValue < 0.25))
             {
+                // easy and medium bot have a small chance to just ignore the higher value shot (10% and 5%)
+                if (randomValue < (0.05 * (2 - difficulty))) { continue; }
+
                 best = pathi;
                 highestValue = pathiShotValue;
             }
@@ -251,7 +258,13 @@ public static class CPUBehaviorScript
                 UseNextCard(5);
             }
 
-            return best.GetPath();
+            // add some variation to the shot angle based on diff. Weaker CPU (lower diff) is less accurate (more angle variation).
+            (float angle, float power, float spin) = best.GetPath();
+            int maxVariation = Mathf.Max(0, 2 - difficulty);
+            int variation = Random.Range(maxVariation * -4, (maxVariation * 4) +1);
+            angle += variation;
+
+            return (angle, power, spin);
         }
         // otherwise, Shoot random
         else

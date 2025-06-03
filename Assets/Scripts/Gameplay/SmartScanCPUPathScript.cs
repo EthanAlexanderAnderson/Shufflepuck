@@ -20,7 +20,7 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
     private List<Vector3> gizRayOrigin = new();
     private List<Vector3> gizDirection = new();
 
-    public (float, float, float) GetPath() => (((180f - bestAngle) - 60f) * 1.66666f, System.Math.Min(95f + powerModifier, 102.5f), 50f); // convert angel to line-readable format
+    public (float, float, float) GetPath() => (bestAngle, System.Math.Min(95f + powerModifier, 102.5f), 50f);
     public bool DoesPathRequirePhasePowerup() => false;
     public bool DoesPathRequireExplosionPowerup() => false; // TODO: requires explosion IF theres no pucks in front and there are 3+ pucks behind
 
@@ -80,6 +80,10 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
         // make sure we have good values
         if (highestValue <= 0 || (highestValue + valueModifier) <= 0) { return 0; } // this is just here so we don't Debug.Log for 0 value paths
         if (bestAngle < 60 || bestAngle > 120) { Debug.LogError("SMART SCAN ERROR: BAD ANGLE " + bestAngle); return 0; }
+        // convert angle to line-readable format
+        bestAngle = ((180f - bestAngle) - 60f) * 1.66666f;
+        // double check that bestAngle value is good
+        if (bestAngle < 0 || bestAngle > 100) { Debug.LogError("SMART SCAN ERROR: BAD ANGLE " + bestAngle); return 0; }
 
         // nerf based on modifiedDifficulty. (lower modifiedDifficulty = greater nerf). also additional nerf for earlier shots.
         int diffNerf = Mathf.Max(0, (int)Mathf.Pow(2f, 4 - modifiedDifficulty) + (LogicScript.Instance.opponent.puckCount - 3));
