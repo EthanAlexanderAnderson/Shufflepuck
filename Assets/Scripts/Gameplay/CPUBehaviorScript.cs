@@ -157,13 +157,14 @@ public static class CPUBehaviorScript
             }
         }
         // pick angle power spin
-        if (timeElapsed > waitingTime)
+        if (timeElapsed > waitingTime && (PuckManager.Instance.AllPucksAreSlowed() && difficulty < 2 || PuckManager.Instance.AllPucksAreSlowedMore()))
         {
             waitingTime += 999999f;
             denyPowerup = 0;
             return FindPath();
         }
 
+        // this stalls the CPU in LogicScript until we're ready to shoot
         return (-1f, -1f, -1f);
     }
 
