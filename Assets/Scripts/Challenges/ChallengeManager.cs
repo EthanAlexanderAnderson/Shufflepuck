@@ -66,7 +66,8 @@ public class ChallengeManager : MonoBehaviour
             condition = new BeatByCondition { winByTargetPoints = 7, difficultyLevel = 0 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 120 }
+                new Reward { type = RewardType.XP, amount = 120 },
+                new Reward { type = RewardType.StandardPacks, amount = 1 }
             }
         });
 
@@ -88,7 +89,7 @@ public class ChallengeManager : MonoBehaviour
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 240 },
-                new Reward { type = RewardType.StandardPacks, amount = 1 }
+                new Reward { type = RewardType.StandardPacks, amount = 2 }
             }
         });
 
@@ -110,7 +111,7 @@ public class ChallengeManager : MonoBehaviour
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 480 },
-                new Reward { type = RewardType.StandardPacks, amount = 2 }
+                new Reward { type = RewardType.StandardPacks, amount = 3 }
             }
         });
 
@@ -144,6 +145,28 @@ public class ChallengeManager : MonoBehaviour
             {
                 new Reward { type = RewardType.XP, amount = 1280 },
                 new Reward { type = RewardType.StandardPacks, amount = 4 }
+            }
+        });
+
+        challengeData.easyDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the easy CPU by 23 points",
+            condition = new BeatByCondition { winByTargetPoints = 23, difficultyLevel = 0 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 1920 },
+                new Reward { type = RewardType.StandardPacks, amount = 5 }
+            }
+        });
+
+        challengeData.easyDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the easy CPU by 25 points",
+            condition = new BeatByCondition { winByTargetPoints = 25, difficultyLevel = 0 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 2560 },
+                new Reward { type = RewardType.StandardPacks, amount = 5 }
             }
         });
 
@@ -194,7 +217,7 @@ public class ChallengeManager : MonoBehaviour
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 240 },
-                new Reward { type = RewardType.StandardPacks, amount = 1 }
+                new Reward { type = RewardType.StandardPacks, amount = 2 }
             }
         });
 
@@ -216,7 +239,7 @@ public class ChallengeManager : MonoBehaviour
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 480 },
-                new Reward { type = RewardType.StandardPacks, amount = 2 }
+                new Reward { type = RewardType.StandardPacks, amount = 3 }
             }
         });
 
@@ -238,7 +261,7 @@ public class ChallengeManager : MonoBehaviour
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 960 },
-                new Reward { type = RewardType.StandardPacks, amount = 3 }
+                new Reward { type = RewardType.StandardPacks, amount = 4 }
             }
         });
 
@@ -250,6 +273,28 @@ public class ChallengeManager : MonoBehaviour
             {
                 new Reward { type = RewardType.XP, amount = 1280 },
                 new Reward { type = RewardType.StandardPacks, amount = 4 }
+            }
+        });
+
+        challengeData.hardDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the hard CPU by 19 points",
+            condition = new BeatByCondition { winByTargetPoints = 19, difficultyLevel = 2 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 1920 },
+                new Reward { type = RewardType.StandardPacks, amount = 5 }
+            }
+        });
+
+        challengeData.hardDailyChallenges.Add(new Challenge
+        {
+            challengeText = "Beat the hard CPU by 21 points",
+            condition = new BeatByCondition { winByTargetPoints = 21, difficultyLevel = 2 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 2560 },
+                new Reward { type = RewardType.StandardPacks, amount = 5 }
             }
         });
 
