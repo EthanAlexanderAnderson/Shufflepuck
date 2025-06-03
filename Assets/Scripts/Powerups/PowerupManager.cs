@@ -94,7 +94,7 @@ public class PowerupManager : NetworkBehaviour
 
     // additional costs indexes
     private int[] cost2Discard = { 15, 16, 17 };
-    Dictionary<int, int> costPoints = new Dictionary<int, int> { { 18, 1 }, { 19, 2 }, { 20, 2 }, { 28, 1 } };
+    Dictionary<int, int> costPoints = new Dictionary<int, int> { { 18, 2 }, { 19, 2 }, { 20, 2 }, { 28, 1 } };
     Dictionary<int, int> costPucks = new Dictionary<int, int> { { 21, 1 }, { 22, 1 }, { 23, 1 }, { 29, 2 } };
 
     public int[] GetCost2Discard() { return cost2Discard; }
