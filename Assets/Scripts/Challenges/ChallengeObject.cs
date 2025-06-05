@@ -136,7 +136,7 @@ public class BeatByCondition : ChallengeCondition
     {
         string[] diffKeys = { "easyHighscore", "mediumHighscore", "hardHighscore" };
         // don't assign a daily challenge that is too hard or too easy
-        if (difficultyLevel >= 0 && (PlayerPrefs.GetInt(diffKeys[difficultyLevel]) < (winByTargetPoints + 2) || PlayerPrefs.GetInt(diffKeys[difficultyLevel]) > (winByTargetPoints + 6)))
+        if (difficultyLevel >= 0 && (PlayerPrefs.GetInt(diffKeys[difficultyLevel]) < (winByTargetPoints + 2) || PlayerPrefs.GetInt(diffKeys[difficultyLevel]) > (winByTargetPoints + 8)))
         {
             return false;
         }

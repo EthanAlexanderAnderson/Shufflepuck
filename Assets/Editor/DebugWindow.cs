@@ -86,6 +86,10 @@ public class DebugWindow : EditorWindow
         setDateAsYesterday.clicked += () => SetDateAsYesterday();
         rootVisualElement.Add(setDateAsYesterday);
 
+        Button setDateAs4HoursAgo = new() { text = "setDateAs4HoursAgo" };
+        setDateAs4HoursAgo.clicked += () => SetDateAs4HoursAgo();
+        rootVisualElement.Add(setDateAs4HoursAgo);
+
         Button setDateAsTomorrow = new() { text = "setDateAsTomorrow" };
         setDateAsTomorrow.clicked += () => SetDateAsTomorrow();
         rootVisualElement.Add(setDateAsTomorrow);
@@ -204,6 +208,12 @@ public class DebugWindow : EditorWindow
         PlayerPrefs.SetString("LastPlinkoRewardDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
         PlayerPrefs.SetString("LastDailyWinDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
         PlayerPrefs.SetString("LastPackBoosterDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
+        StreakManager.Instance.IncrementStreak();
+    }
+
+    private void SetDateAs4HoursAgo()
+    {
+        PlayerPrefs.SetString("LastChallengeDate", DateTime.Now.AddHours(-4).ToString());
         StreakManager.Instance.IncrementStreak();
     }
 

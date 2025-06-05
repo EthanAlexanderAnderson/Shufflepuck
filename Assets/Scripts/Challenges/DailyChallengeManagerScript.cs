@@ -27,6 +27,9 @@ public class DailyChallengeManagerScript : MonoBehaviour
     [SerializeField] private GameObject glow1;
     [SerializeField] private GameObject glow2;
 
+    // Ad Refresh
+    [SerializeField] private GameObject adRefreshButtonObject;
+
     private void Awake()
     {
         if (Instance == null)
@@ -123,6 +126,12 @@ public class DailyChallengeManagerScript : MonoBehaviour
             if (DateTime.Today.Subtract(lastChallengeDate).Days >= 1)
             {
                 AssignNewChallenge();
+                PlayerPrefs.SetInt("ChallengeRefreshesToday", 0);
+            }
+            // Check if more than 4 hours have passed since the last challenge and current time is ahead to prevent tampering
+            else if (DateTime.UtcNow > lastChallengeDate && DateTime.Now.Subtract(lastChallengeDate).TotalHours >= 4)
+            {
+                EnableAdRefreshButton();
             }
             else
             {
@@ -142,7 +151,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         int numberOfEasyDailyChallenges = easyDailyChallenges.Count;
         int numberOfHardDailyChallenges = hardDailyChallenges.Count;
 
-        PlayerPrefs.SetString("LastChallengeDate", DateTime.Today.ToString("yyyy-MM-dd"));
+        PlayerPrefs.SetString("LastChallengeDate", DateTime.Now.ToString());
 
         // only overwrite the challenge if it's not already completed (not a negative int id)
         if (PlayerPrefs.GetInt("DailyChallenge1", 0) >= 0)
@@ -158,7 +167,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
             {
                 Challenge selectedChallenge = easyDailyChallenges[DC1];
                 int failsafe = 0;
-                while (!selectedChallenge.condition.IsAssignable() && failsafe < 1000)
+                while ((!selectedChallenge.condition.IsAssignable() || PlayerPrefs.GetInt("DailyChallenge1") == easyDailyChallenges.IndexOf(selectedChallenge)) && failsafe < 1000)
                 {
                     selectedChallenge = easyDailyChallenges[UnityEngine.Random.Range(1, numberOfEasyDailyChallenges)];
                     failsafe++;
@@ -192,7 +201,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
             {
                 Challenge selectedChallenge = hardDailyChallenges[DC2];
                 int failsafe = 0;
-                while (!selectedChallenge.condition.IsAssignable() && failsafe < 1000)
+                while ((!selectedChallenge.condition.IsAssignable() || PlayerPrefs.GetInt("DailyChallenge2") == hardDailyChallenges.IndexOf(selectedChallenge)) && failsafe < 1000)
                 {
                     selectedChallenge = hardDailyChallenges[UnityEngine.Random.Range(1, numberOfHardDailyChallenges)];
                     failsafe++;
@@ -332,5 +341,24 @@ public class DailyChallengeManagerScript : MonoBehaviour
             SoundManagerScript.Instance.PlayWinSFX();
         }
         titleScreen.GetComponent<TitleScreenScript>().UpdateAlerts();
+    }
+
+    private void EnableAdRefreshButton()
+    {
+        // player is only allowed to refresh challenges twice a daily to discourage unhealthy play patterns
+        if (PlayerPrefs.GetInt("ChallengeRefreshesToday") >= 2) return;
+
+        adRefreshButtonObject.SetActive(true);
+        adRefreshButtonObject.transform.localScale = new(0f, 1f);
+        adRefreshButtonObject.transform.localPosition = new(-190f, adRefreshButtonObject.transform.localPosition.y);
+        LeanTween.scaleX(adRefreshButtonObject, 1f, 1).setEaseOutElastic();
+        LeanTween.moveLocalX(adRefreshButtonObject, -50f, 1).setEaseOutElastic();
+    }
+
+    public void ClickAdRefreshButton()
+    {
+        PlayerPrefs.SetInt("ChallengeRefreshesToday", PlayerPrefs.GetInt("ChallengeRefreshesToday") + 1);
+        AssignNewChallenge();
+        SetText();
     }
 }

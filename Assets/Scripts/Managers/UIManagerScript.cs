@@ -658,20 +658,20 @@ public class UIManagerScript : MonoBehaviour
         // hacky way of enabling darkmode for disabled objects (run this with parameter onenable)
         if (parentObject == null) { parentObject = activeUI; }
 
-        if (activeUI == gameHud)
+        if (parentObject == gameHud)
         {
             table.GetComponent<SpriteRenderer>().sprite = darkMode ? tableDark : tableLight;
         }
-        else if (activeUI.tag == "mainMenu")
+        else if (parentObject.tag == "mainMenu")
         {
             titleScreenBackground.GetComponent<Image>().sprite = darkMode ? titleScreenBackgroundDark : titleScreenBackgroundLight;
-            activeUI.GetComponent<Image>().sprite = darkMode ? titleScreenDark : titleScreenLight;
+            parentObject.GetComponent<Image>().sprite = darkMode ? titleScreenDark : titleScreenLight;
         }
         // force dark mode for pack open because it looks better with particle effects (lame i know)
-        else if (activeUI == packOpenScreen)
+        else if (parentObject == packOpenScreen)
         {
             titleScreenBackground.GetComponent<Image>().sprite = titleScreenBackgroundDark;
-            activeUI.GetComponent<Image>().sprite = titleScreenDark;
+            parentObject.GetComponent<Image>().sprite = titleScreenDark;
         }
         // swap text color to white for all children TMP objects with the blackText tag
         foreach (TMP_Text text in parentObject.GetComponentsInChildren<TMP_Text>())
