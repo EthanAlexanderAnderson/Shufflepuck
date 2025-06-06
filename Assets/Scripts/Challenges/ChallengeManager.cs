@@ -55,7 +55,7 @@ public class ChallengeManager : MonoBehaviour
             });
         }
 
-        // "WIN USING X" // TODO: variable quantity, rarity "win a hard match using 10 common cards"
+        // "WIN USING X" // TODO: variable quantity, "win a hard match using 10 common cards"
 
         // "Win an easy match using {cardIndex}"
         int winUsingX = System.DateTime.Parse(PlayerPrefs.GetString("LastChallengeDate")).Second % PowerupCardData.GetCardCount();
@@ -66,24 +66,23 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = winUsingX + 5, targetDifficultyLevel = 0 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 80 + (PowerupCardData.GetCardRarity(winUsingX) * 50) },
+                new Reward { type = RewardType.XP, amount = 80 + (PowerupCardData.GetCardRarity(winUsingX) * 60) },
                 new Reward { type = RewardType.StandardPacks, amount = 1 + PowerupCardData.GetCardRarity(winUsingX) }
             }
         });
 
-        // "Win an easy match using {Ranks}" (ranks)
-        string[] winUsingATexts = { null, "holo", "bronze", "gold", "diamond", "celestial" }; // TODO: any, different, rarity
+        // "Win an easy match using any {Type} card" (ranks)
+        string[] winUsingATexts = { "legendary", "epic", "rare", "uncommon", "common", "holo", "bronze", "gold", "diamond", "celestial" }; // TODO: any, different
         int winUsingA = (System.DateTime.Parse(PlayerPrefs.GetString("LastChallengeDate")).Second % winUsingATexts.Length);
-        if (winUsingATexts[winUsingA] == null) { winUsingA = 1; }
 
         challengeData.easyDailyChallenges.Add(new Challenge
         {
             challengeText = $"Win an easy match using any {winUsingATexts[winUsingA]} card",
-            condition = new WinUsingCondition { ID = -winUsingA, targetDifficultyLevel = 0 },
+            condition = new WinUsingCondition { ID = 4 - winUsingA, targetDifficultyLevel = 0 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 100 + (winUsingA * 50) },
-                new Reward { type = RewardType.StandardPacks, amount = winUsingA }
+                new Reward { type = RewardType.XP, amount = 60 + (Mathf.Abs(4 - winUsingA) * 40) },
+                new Reward { type = RewardType.StandardPacks, amount = Mathf.Abs(4 - winUsingA) }
             }
         });
 
@@ -152,23 +151,22 @@ public class ChallengeManager : MonoBehaviour
             condition = new WinUsingCondition { ID = winUsingX + 5, targetDifficultyLevel = 2 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 160 + (PowerupCardData.GetCardRarity(winUsingX) * 50) },
+                new Reward { type = RewardType.XP, amount = 160 + (PowerupCardData.GetCardRarity(winUsingX) * 80) },
                 new Reward { type = RewardType.StandardPacks, amount = 3 + PowerupCardData.GetCardRarity(winUsingX) }
             }
         });
 
-        // "Win a hard match using A" (ranks)
+        // "Win a hard match using any {Type} card" (ranks)
         winUsingA = (winUsingA + (winUsingATexts.Length / 2)) % winUsingATexts.Length;
-        if (winUsingATexts[winUsingA] == null) { winUsingA = 1; }
 
         challengeData.hardDailyChallenges.Add(new Challenge
         {
             challengeText = $"Win a hard match using any {winUsingATexts[winUsingA]} card",
-            condition = new WinUsingCondition { ID = -winUsingA, targetDifficultyLevel = 2 },
+            condition = new WinUsingCondition { ID = 4 - winUsingA, targetDifficultyLevel = 2 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 200 + (winUsingA * 50) },
-                new Reward { type = RewardType.StandardPacks, amount = winUsingA * 2 }
+                new Reward { type = RewardType.XP, amount = 120 + (Mathf.Abs(4 - winUsingA) * 60) },
+                new Reward { type = RewardType.StandardPacks, amount = Mathf.Abs(4 - winUsingA) * 2 }
             }
         });
 
