@@ -146,23 +146,28 @@ public class DailyChallengeManagerScript : MonoBehaviour
 
     private void AssignNewChallenge()
     {
+        PlayerPrefs.SetString("LastChallengeDate", DateTime.Now.ToString());
+
+        // re-generate daily challenges since their content depends on "LastChallengeDate" player pref
+        ChallengeManager.Instance.ReGenerateDailyChallenges();
+
         List<Challenge> easyDailyChallenges = ChallengeManager.Instance.challengeData.easyDailyChallenges;
         List<Challenge> hardDailyChallenges = ChallengeManager.Instance.challengeData.hardDailyChallenges;
         int numberOfEasyDailyChallenges = easyDailyChallenges.Count;
         int numberOfHardDailyChallenges = hardDailyChallenges.Count;
 
-        PlayerPrefs.SetString("LastChallengeDate", DateTime.Now.ToString());
 
         // only overwrite the challenge if it's not already completed (not a negative int id)
         if (PlayerPrefs.GetInt("DailyChallenge1", 0) >= 0)
         {
             int DC1 = UnityEngine.Random.Range(1, numberOfEasyDailyChallenges);
 
-            // ensure challenge is assignable
-            if (PlayerPrefs.GetInt("easyHighscore", 0) == 0)
+            // force default
+            if (PlayerPrefs.GetInt("easyHighscore", 0) <= 0 && PlayerPrefs.GetInt("easyWin") < 5)
             {
                 PlayerPrefs.SetInt("DailyChallenge1", 1);
             }
+            // ensure challenge is assignable
             else
             {
                 Challenge selectedChallenge = easyDailyChallenges[DC1];
@@ -173,16 +178,8 @@ public class DailyChallengeManagerScript : MonoBehaviour
                     failsafe++;
                     if (failsafe >= 1000)
                     {
-                        Debug.Log("failsafe triggered");
-                        // TODO: this is a temp fix, make this not hardcoded by improving IsAssignable() logic
-                        if (PlayerPrefs.GetInt("easyHighscore") >= 23)
-                        {
-                            selectedChallenge = easyDailyChallenges[^1];
-                        }
-                        else
-                        {
-                            selectedChallenge = easyDailyChallenges[1];
-                        }
+                        Debug.LogError("failsafe triggered");
+                        selectedChallenge = easyDailyChallenges[1];
                     }
                 }
                 PlayerPrefs.SetInt("DailyChallenge1", easyDailyChallenges.IndexOf(selectedChallenge));
@@ -192,11 +189,12 @@ public class DailyChallengeManagerScript : MonoBehaviour
         {
             int DC2 = UnityEngine.Random.Range(1, numberOfHardDailyChallenges);
 
-            // ensure challenge is assignable
-            if (PlayerPrefs.GetInt("hardHighscore", 0) == 0)
+            // force default
+            if (PlayerPrefs.GetInt("hardHighscore", 0) <= 0 && PlayerPrefs.GetInt("hardWin") < 5)
             {
                 PlayerPrefs.SetInt("DailyChallenge2", 1);
             }
+            // ensure challenge is assignable
             else
             {
                 Challenge selectedChallenge = hardDailyChallenges[DC2];
@@ -207,16 +205,8 @@ public class DailyChallengeManagerScript : MonoBehaviour
                     failsafe++;
                     if (failsafe >= 1000)
                     {
-                        Debug.Log("failsafe triggered");
-                        // TODO: this is a temp fix, make this not hardcoded by improving IsAssignable() logic
-                        if (PlayerPrefs.GetInt("hardHighscore") >= 19)
-                        {
-                            selectedChallenge = hardDailyChallenges[^1];
-                        }
-                        else
-                        {
-                            selectedChallenge = hardDailyChallenges[1];
-                        }
+                        Debug.LogError("failsafe triggered");
+                        selectedChallenge = hardDailyChallenges[1];
                     }
                 }
                 PlayerPrefs.SetInt("DailyChallenge2", hardDailyChallenges.IndexOf(selectedChallenge));
@@ -279,12 +269,18 @@ public class DailyChallengeManagerScript : MonoBehaviour
         if (isOnline == 1) { difficulty = -1; }
 
         // Evalute condition is met
-        if (DC1 > 0 && easyDailyChallenges[DC1].CheckCompletion(scoreDifference, difficulty))
+        if (DC1 > 0 &&
+            (easyDailyChallenges[DC1].condition is BeatByCondition && easyDailyChallenges[DC1].CheckCompletion(scoreDifference, difficulty)) ||
+            (easyDailyChallenges[DC1].condition is WinUsingCondition && easyDailyChallenges[DC1].CheckCompletion(PowerupManager.Instance.GetPlayerUsed(), difficulty))
+            )
         {
             Debug.Log("easy daily challenge (" + DC1 + ") completed.");
             PlayerPrefs.SetInt("DailyChallenge1", -DC1);
         }
-        if (DC2 > 0 && hardDailyChallenges[DC2].CheckCompletion(scoreDifference, difficulty))
+        if (DC2 > 0 &&
+            (hardDailyChallenges[DC2].condition is BeatByCondition && hardDailyChallenges[DC2].CheckCompletion(scoreDifference, difficulty)) ||
+            (hardDailyChallenges[DC2].condition is WinUsingCondition && hardDailyChallenges[DC2].CheckCompletion(PowerupManager.Instance.GetPlayerUsed(), difficulty))
+            )
         {
             Debug.Log("hard daily challenge (" + DC2 + ") completed.");
             PlayerPrefs.SetInt("DailyChallenge2", -DC2);
@@ -360,5 +356,25 @@ public class DailyChallengeManagerScript : MonoBehaviour
         PlayerPrefs.SetInt("ChallengeRefreshesToday", PlayerPrefs.GetInt("ChallengeRefreshesToday") + 1);
         AssignNewChallenge();
         SetText();
+    }
+
+    public void PackOpenDailyChallengeHelper(int type = 0)
+    {
+        int DC1 = PlayerPrefs.GetInt("DailyChallenge1", 0);
+        List<Challenge> easyDailyChallenges = ChallengeManager.Instance.challengeData.easyDailyChallenges;
+        int numberOfEasyDailyChallenges = easyDailyChallenges.Count;
+        if (DC1 >= numberOfEasyDailyChallenges || DC1 <= (numberOfEasyDailyChallenges * -1))
+        {
+            DC1 = 0;
+            PlayerPrefs.SetInt("DailyChallenge1", 0);
+        }
+
+        // Evalute condition is met
+        if (DC1 > 0 &&
+            easyDailyChallenges[DC1].condition is OpenPacksCondition && easyDailyChallenges[DC1].CheckCompletion())
+        {
+            Debug.Log("easy daily challenge (" + DC1 + ") completed.");
+            PlayerPrefs.SetInt("DailyChallenge1", -DC1);
+        }
     }
 }

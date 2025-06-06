@@ -252,6 +252,7 @@ public class PackManager : MonoBehaviour
         openAnotherPlus = false;
         openAnotherx10 = false;
         openAnotherButtonObject.sprite = !openAnotherPlus ? openAnotherStandardSprite : openAnotherPlusSprite;
+        DailyChallengeManagerScript.Instance.PackOpenDailyChallengeHelper(0);
     }
 
     public void OpenStandardTen()
@@ -297,6 +298,7 @@ public class PackManager : MonoBehaviour
         openAnotherPlus = false;
         openAnotherx10 = true;
         openAnotherButtonObject.sprite = !openAnotherPlus ? openAnotherStandardSprite : openAnotherPlusSprite;
+        DailyChallengeManagerScript.Instance.PackOpenDailyChallengeHelper(0);
     }
 
     public void OpenPlusOne()
@@ -321,6 +323,7 @@ public class PackManager : MonoBehaviour
         openAnotherPlus = true;
         openAnotherx10 = false;
         openAnotherButtonObject.sprite = !openAnotherPlus ? openAnotherStandardSprite : openAnotherPlusSprite;
+        DailyChallengeManagerScript.Instance.PackOpenDailyChallengeHelper(1);
     }
 
     public void OpenPlusTen()
@@ -366,6 +369,7 @@ public class PackManager : MonoBehaviour
         openAnotherPlus = true;
         openAnotherx10 = true;
         openAnotherButtonObject.sprite = !openAnotherPlus ? openAnotherStandardSprite : openAnotherPlusSprite;
+        DailyChallengeManagerScript.Instance.PackOpenDailyChallengeHelper(1);
     }
 
     private int RollRarity()

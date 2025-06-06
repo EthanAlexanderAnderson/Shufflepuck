@@ -74,7 +74,7 @@ public static class CPUBehaviorScript
         {
             int rarity = Random.Range(0, (int)Math.Pow(difficulty, 2) + 1);
             int randomCard = PowerupCardData.GetRandomCardOfRarity(rarity);
-            if (deck.Count(n => n == randomCard) < (5 - rarity) && EvaluatePowerupEquipage(randomCard) && PowerupCardData.CheckIfCardIsOwned(randomCard) && deck.Count(n => n == randomCard) < PowerupCardData.GetCardOwnedSum(randomCard))
+            if (deck.Count(n => n == randomCard) < (5 - rarity) && EvaluatePowerupEquipage(randomCard) && deck.Count(n => n == randomCard) < PowerupCardData.GetCardOwnedSum(randomCard + 5))
             {
                 deck.Add(randomCard);
                 CPUDeckPowerLevel += (rarity + 1);
@@ -484,6 +484,11 @@ public static class CPUBehaviorScript
 
     private static bool EvaluateCull()
     {
+        // TODO: If CPU has forcefield in hand, and EvaluatePowerupUsage(forcefield) == true, return false
+        // TODO: If forcefield is enabled and belongs to CPU and AllPucksAreSlowed == false, return false
+        // Make sure that cull usage is evaluated again after pucks come to a slow
+        // The CPU doesn't lock in shot parameters until AllPucksAreSlowedMore == true, and should keep evaluating cards until then, so this should work
+
         var allPucks = GameObject.FindGameObjectsWithTag("puck");
         bool useCull = true;
         int validPucks = 0;

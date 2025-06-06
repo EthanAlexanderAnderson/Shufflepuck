@@ -101,6 +101,7 @@ public class PowerupManager : NetworkBehaviour
     private List<int> deck;
     int[] hand = { -1, -1, -1 };
     private List<int> playerUsed;
+    public List<int> GetPlayerUsed() { return playerUsed; }
 
     private Competitor activeCompetitor;
     public Action<int>[] methodArray;

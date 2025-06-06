@@ -54,7 +54,13 @@ public static class PowerupCardData
         }
         return 0;
     }
-    public static int GetCardOwnedSum(int cardIndex)
+
+    // -7 = any, -6 = different, -5 = celestial, -4 = diamond, -3 = gold, -2 = bronze, -1 = holo, 0 - 4 rarity, 5+ index - 5
+    public static bool CheckIfCardIsOwned(int cardIndex)
+    {
+        return GetCardOwnedSum(cardIndex) > 0;
+    }
+    public static int GetCardOwnedSum(int ID)
     {
         // Get the card collection
         string collectionString = PlayerPrefs.GetString("CardCollection", "");
@@ -65,6 +71,7 @@ public static class PowerupCardData
         // iterate through collection
         string[] cardEncoded = collectionString.Split(',');
         int sum = 0;
+        List<int> indexesSeen = new List<int>();
 
         // Search for the card in the collection and return quantity
         for (int i = 0; i < cardEncoded.Length; i++)
@@ -72,23 +79,44 @@ public static class PowerupCardData
             if (int.TryParse(cardEncoded[i], out int encodedCard))
             {
                 var decodedCard = DecodeCard(encodedCard);
-                if (decodedCard.cardIndex == cardIndex)
+
+                // card index
+                if (ID >= 5 && decodedCard.cardIndex == (ID - 5))
                 {
-                    // Add the count to the current quantity
-                    if (decodedCard.quantity > 0)
-                    {
-                        sum += decodedCard.quantity;
-                    }
+                    sum += decodedCard.quantity;
+                }
+                // card rarity
+                else if (ID >= 0 && ID < 5 && PowerupCardData.GetCardRarity(decodedCard.cardIndex) == ID)
+                {
+                    sum += decodedCard.quantity;
+                }
+                // holo
+                else if (ID == -1 && decodedCard.holo)
+                {
+                    sum += decodedCard.quantity;
+                }
+                // rank
+                else if (ID >= -5 && ID < -1 && decodedCard.rank == (ID * -1) - 1)
+                {
+                    sum += decodedCard.quantity;
+                }
+                // different
+                else if (ID == -6)
+                {
+                    if (!indexesSeen.Contains(decodedCard.cardIndex)) indexesSeen.Add(decodedCard.cardIndex);
+                    sum = indexesSeen.Count;
+                }
+                // any
+                else if (ID == -7)
+                {
+                    sum += decodedCard.quantity;
                 }
             }
         }
 
         return sum;
     }
-    public static bool CheckIfCardIsOwned(int cardIndex)
-    {
-        return GetCardOwnedSum(cardIndex) > 0;
-    }
+
     public static int[] GetAllCardsOwnedSums()
     {
         int[] sums = new int[GetCardCount()];

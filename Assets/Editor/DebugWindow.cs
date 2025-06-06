@@ -102,6 +102,10 @@ public class DebugWindow : EditorWindow
         resetAllProgress.clicked += () => ResetAllProgress();
         rootVisualElement.Add(resetAllProgress);
 
+        Button reGenerateChallenges = new() { text = "reGenerateChallenges" };
+        reGenerateChallenges.clicked += () => ReGenerateChallenges();
+        rootVisualElement.Add(reGenerateChallenges);
+
         // simulate game win
         IntegerField diff = new IntegerField();
         diff.label = "Difficulty";
@@ -272,6 +276,11 @@ public class DebugWindow : EditorWindow
         PlayerPrefs.DeleteKey("Deck1");
 
         SetDateAsNull();
+    }
+
+    private void ReGenerateChallenges()
+    {
+        ChallengeManager.Instance.ReGenerateDailyChallenges();
     }
 
     private void SimulateGameWin(int diff, int winBy)

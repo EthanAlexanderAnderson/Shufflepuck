@@ -17,291 +17,122 @@ public class ChallengeManager : MonoBehaviour
 
     void Start()
     {
-        AddChallenges();
+        GenerateDailyChallenges();
+        GenerateOngoingChallenges();
     }
 
-    void AddChallenges()
+    void GenerateDailyChallenges()
     {
-        // EASY DAILY CHALLENGES
+        // clear old challenges
+        challengeData.easyDailyChallenges = new List<Challenge>();
+        challengeData.hardDailyChallenges = new List<Challenge>();
+
+        // ----- EASY DAILY CHALLENGES -----
         challengeData.easyDailyChallenges.Add(new Challenge
         {
             challengeText = "Claimed",
-            condition = new BeatByCondition { winByTargetPoints = 99999999, difficultyLevel = 3 },
+            condition = new BeatByCondition { winByTargetPoints = 99999999, targetDifficultyLevel = 3 },
             rewards = new List<Reward> { }
         });
 
+        // "BEAT THE EASY CPU BY X POINTS"
+
+        int[] easyBeatByScores = { 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31 };
+        int[] easyBeatByXPRewards = { 40, 80, 120, 160, 240, 320, 400, 560, 720, 880, 1200, 1520, 1840, 2480, 3120, 3760 };
+        int[] easyBeatByPackRewards = { 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 };
+
+        for (int i = 0; i < Mathf.Min(easyBeatByScores.Length, easyBeatByXPRewards.Length, easyBeatByPackRewards.Length); i++)
+        {
+            challengeData.easyDailyChallenges.Add(new Challenge
+            {
+                challengeText = easyBeatByScores[i] > 1 ? $"Beat the easy CPU by {easyBeatByScores[i]} points" : "Beat the easy CPU",
+                condition = new BeatByCondition { winByTargetPoints = easyBeatByScores[i], targetDifficultyLevel = 0 },
+                rewards = new List<Reward>
+                {
+                    new Reward { type = RewardType.XP, amount = easyBeatByXPRewards[i] },
+                    new Reward { type = RewardType.StandardPacks, amount = easyBeatByPackRewards[i] }
+                }
+            });
+        }
+
+        // "WIN USING X" // TODO: variable quantity, rarity "win a hard match using 10 common cards"
+
+        // "Win an easy match using {cardIndex}"
+        int winUsingX = System.DateTime.Parse(PlayerPrefs.GetString("LastChallengeDate")).Second % PowerupCardData.GetCardCount();
+        if (PowerupCardData.GetCardName(winUsingX) == null) { winUsingX = (winUsingX + 1) % PowerupCardData.GetCardCount(); }
         challengeData.easyDailyChallenges.Add(new Challenge
         {
-            challengeText = "Beat the easy CPU",
-            condition = new BeatByCondition { winByTargetPoints = 1, difficultyLevel = 0 },
+            challengeText = $"Win an easy match using '{PowerupCardData.GetCardName(winUsingX)}'",
+            condition = new WinUsingCondition { ID = winUsingX + 5, targetDifficultyLevel = 0 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 40 }
+                new Reward { type = RewardType.XP, amount = 80 + (PowerupCardData.GetCardRarity(winUsingX) * 50) },
+                new Reward { type = RewardType.StandardPacks, amount = 1 + PowerupCardData.GetCardRarity(winUsingX) }
             }
         });
 
-        challengeData.easyDailyChallenges.Add(new Challenge
-        {
-            challengeText = "Beat the easy CPU by 3 points",
-            condition = new BeatByCondition { winByTargetPoints = 3, difficultyLevel = 0 },
-            rewards = new List<Reward>
-            {
-                new Reward { type = RewardType.XP, amount = 60 }
-            }
-        });
+        // "Win an easy match using {Ranks}" (ranks)
+        string[] winUsingATexts = { null, "holo", "bronze", "gold", "diamond", "celestial" }; // TODO: any, different, rarity
+        int winUsingA = (System.DateTime.Parse(PlayerPrefs.GetString("LastChallengeDate")).Second % winUsingATexts.Length);
+        if (winUsingATexts[winUsingA] == null) { winUsingA = 1; }
 
         challengeData.easyDailyChallenges.Add(new Challenge
         {
-            challengeText = "Beat the easy CPU by 5 points",
-            condition = new BeatByCondition { winByTargetPoints = 5, difficultyLevel = 0 },
+            challengeText = $"Win an easy match using any {winUsingATexts[winUsingA]} card",
+            condition = new WinUsingCondition { ID = -winUsingA, targetDifficultyLevel = 0 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 80 }
+                new Reward { type = RewardType.XP, amount = 100 + (winUsingA * 50) },
+                new Reward { type = RewardType.StandardPacks, amount = winUsingA }
             }
         });
 
+        // TODO: "Win a match using Y and Z"
+
+        // "Open a pack"
         challengeData.easyDailyChallenges.Add(new Challenge
         {
-            challengeText = "Beat the easy CPU by 7 points",
-            condition = new BeatByCondition { winByTargetPoints = 7, difficultyLevel = 0 },
+            challengeText = "Open a pack",
+            condition = new OpenPacksCondition { targetNumberOpened = 1, targetPackType = -1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 120 },
-                new Reward { type = RewardType.StandardPacks, amount = 1 }
+                new Reward { type = RewardType.XP, amount = 100 }
             }
         });
 
-        challengeData.easyDailyChallenges.Add(new Challenge
-        {
-            challengeText = "Beat the easy CPU by 9 points",
-            condition = new BeatByCondition { winByTargetPoints = 9, difficultyLevel = 0 },
-            rewards = new List<Reward>
-            {
-                new Reward { type = RewardType.XP, amount = 160 },
-                new Reward { type = RewardType.StandardPacks, amount = 1 }
-            }
-        });
 
-        challengeData.easyDailyChallenges.Add(new Challenge
-        {
-            challengeText = "Beat the easy CPU by 11 points",
-            condition = new BeatByCondition { winByTargetPoints = 11, difficultyLevel = 0 },
-            rewards = new List<Reward>
-            {
-                new Reward { type = RewardType.XP, amount = 240 },
-                new Reward { type = RewardType.StandardPacks, amount = 2 }
-            }
-        });
-
-        challengeData.easyDailyChallenges.Add(new Challenge
-        {
-            challengeText = "Beat the easy CPU by 13 points",
-            condition = new BeatByCondition { winByTargetPoints = 13, difficultyLevel = 0 },
-            rewards = new List<Reward>
-            {
-                new Reward { type = RewardType.XP, amount = 320 },
-                new Reward { type = RewardType.StandardPacks, amount = 2 }
-            }
-        });
-
-        challengeData.easyDailyChallenges.Add(new Challenge
-        {
-            challengeText = "Beat the easy CPU by 15 points",
-            condition = new BeatByCondition { winByTargetPoints = 15, difficultyLevel = 0 },
-            rewards = new List<Reward>
-            {
-                new Reward { type = RewardType.XP, amount = 480 },
-                new Reward { type = RewardType.StandardPacks, amount = 3 }
-            }
-        });
-
-        challengeData.easyDailyChallenges.Add(new Challenge
-        {
-            challengeText = "Beat the easy CPU by 17 points",
-            condition = new BeatByCondition { winByTargetPoints = 17, difficultyLevel = 0 },
-            rewards = new List<Reward>
-            {
-                new Reward { type = RewardType.XP, amount = 640 },
-                new Reward { type = RewardType.StandardPacks, amount = 3 }
-            }
-        });
-
-        challengeData.easyDailyChallenges.Add(new Challenge
-        {
-            challengeText = "Beat the easy CPU by 19 points",
-            condition = new BeatByCondition { winByTargetPoints = 19, difficultyLevel = 0 },
-            rewards = new List<Reward>
-            {
-                new Reward { type = RewardType.XP, amount = 960 },
-                new Reward { type = RewardType.StandardPacks, amount = 4 }
-            }
-        });
-
-        challengeData.easyDailyChallenges.Add(new Challenge
-        {
-            challengeText = "Beat the easy CPU by 21 points",
-            condition = new BeatByCondition { winByTargetPoints = 21, difficultyLevel = 0 },
-            rewards = new List<Reward>
-            {
-                new Reward { type = RewardType.XP, amount = 1280 },
-                new Reward { type = RewardType.StandardPacks, amount = 4 }
-            }
-        });
-
-        challengeData.easyDailyChallenges.Add(new Challenge
-        {
-            challengeText = "Beat the easy CPU by 23 points",
-            condition = new BeatByCondition { winByTargetPoints = 23, difficultyLevel = 0 },
-            rewards = new List<Reward>
-            {
-                new Reward { type = RewardType.XP, amount = 1920 },
-                new Reward { type = RewardType.StandardPacks, amount = 5 }
-            }
-        });
-
-        challengeData.easyDailyChallenges.Add(new Challenge
-        {
-            challengeText = "Beat the easy CPU by 25 points",
-            condition = new BeatByCondition { winByTargetPoints = 25, difficultyLevel = 0 },
-            rewards = new List<Reward>
-            {
-                new Reward { type = RewardType.XP, amount = 2560 },
-                new Reward { type = RewardType.StandardPacks, amount = 5 }
-            }
-        });
-
-        // HARD DAILY CHALLENGES
+        // ----- HARD DAILY CHALLENGES -----
         challengeData.hardDailyChallenges.Add(new Challenge
         {
             challengeText = "Claimed",
-            condition = new BeatByCondition { winByTargetPoints = 99999999, difficultyLevel = 3 },
+            condition = new BeatByCondition { winByTargetPoints = 99999999, targetDifficultyLevel = 3 },
             rewards = new List<Reward> { }
         });
 
-        challengeData.hardDailyChallenges.Add(new Challenge
+        // "BEAT THE HARD CPU BY X POINTS"
+
+        int[] hardBeatByScores = { 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31 };
+        int[] hardBeatByXPRewards = { 80, 160, 240, 320, 480, 640, 800, 1120, 1440, 1760, 2400, 3040, 3680, 4960, 6240, 7520 };
+        int[] hardBeatByPackRewards = { 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14, 16, 16 };
+
+        for (int i = 0; i < Mathf.Min(hardBeatByScores.Length, hardBeatByXPRewards.Length, hardBeatByPackRewards.Length); i++)
         {
-            challengeText = "Beat the hard CPU",
-            condition = new BeatByCondition { winByTargetPoints = 1, difficultyLevel = 2 },
-            rewards = new List<Reward>
+            challengeData.hardDailyChallenges.Add(new Challenge
             {
-                new Reward { type = RewardType.XP, amount = 80 }
-            }
-        });
+                challengeText = hardBeatByScores[i] > 1 ? $"Beat the hard CPU by {hardBeatByScores[i]} points" : "Beat the hard CPU",
+                condition = new BeatByCondition { winByTargetPoints = hardBeatByScores[i], targetDifficultyLevel = 2 },
+                rewards = new List<Reward>
+                {
+                    new Reward { type = RewardType.XP, amount = hardBeatByXPRewards[i] },
+                    new Reward { type = RewardType.StandardPacks, amount = hardBeatByPackRewards[i] }
+                }
+            });
+        }
 
         challengeData.hardDailyChallenges.Add(new Challenge
         {
-            challengeText = "Beat the hard CPU by 3 points",
-            condition = new BeatByCondition { winByTargetPoints = 3, difficultyLevel = 2 },
-            rewards = new List<Reward>
-            {
-                new Reward { type = RewardType.XP, amount = 120 },
-                new Reward { type = RewardType.StandardPacks, amount = 1 }
-            }
-        });
-
-        challengeData.hardDailyChallenges.Add(new Challenge
-        {
-            challengeText = "Beat the hard CPU by 5 points",
-            condition = new BeatByCondition { winByTargetPoints = 5, difficultyLevel = 2 },
-            rewards = new List<Reward>
-            {
-                new Reward { type = RewardType.XP, amount = 160 },
-                new Reward { type = RewardType.StandardPacks, amount = 1 }
-            }
-        });
-
-        challengeData.hardDailyChallenges.Add(new Challenge
-        {
-            challengeText = "Beat the hard CPU by 7 points",
-            condition = new BeatByCondition { winByTargetPoints = 7, difficultyLevel = 2 },
-            rewards = new List<Reward>
-            {
-                new Reward { type = RewardType.XP, amount = 240 },
-                new Reward { type = RewardType.StandardPacks, amount = 2 }
-            }
-        });
-
-        challengeData.hardDailyChallenges.Add(new Challenge
-        {
-            challengeText = "Beat the hard CPU by 9 points",
-            condition = new BeatByCondition { winByTargetPoints = 9, difficultyLevel = 2 },
-            rewards = new List<Reward>
-            {
-                new Reward { type = RewardType.XP, amount = 320 },
-                new Reward { type = RewardType.StandardPacks, amount = 2 }
-            }
-        });
-
-        challengeData.hardDailyChallenges.Add(new Challenge
-        {
-            challengeText = "Beat the hard CPU by 11 points",
-            condition = new BeatByCondition { winByTargetPoints = 11, difficultyLevel = 2 },
-            rewards = new List<Reward>
-            {
-                new Reward { type = RewardType.XP, amount = 480 },
-                new Reward { type = RewardType.StandardPacks, amount = 3 }
-            }
-        });
-
-        challengeData.hardDailyChallenges.Add(new Challenge
-        {
-            challengeText = "Beat the hard CPU by 13 points",
-            condition = new BeatByCondition { winByTargetPoints = 13, difficultyLevel = 2 },
-            rewards = new List<Reward>
-            {
-                new Reward { type = RewardType.XP, amount = 640 },
-                new Reward { type = RewardType.StandardPacks, amount = 3 }
-            }
-        });
-
-        challengeData.hardDailyChallenges.Add(new Challenge
-        {
-            challengeText = "Beat the hard CPU by 15 points",
-            condition = new BeatByCondition { winByTargetPoints = 15, difficultyLevel = 2 },
-            rewards = new List<Reward>
-            {
-                new Reward { type = RewardType.XP, amount = 960 },
-                new Reward { type = RewardType.StandardPacks, amount = 4 }
-            }
-        });
-
-        challengeData.hardDailyChallenges.Add(new Challenge
-        {
-            challengeText = "Beat the hard CPU by 17 points",
-            condition = new BeatByCondition { winByTargetPoints = 17, difficultyLevel = 2 },
-            rewards = new List<Reward>
-            {
-                new Reward { type = RewardType.XP, amount = 1280 },
-                new Reward { type = RewardType.StandardPacks, amount = 4 }
-            }
-        });
-
-        challengeData.hardDailyChallenges.Add(new Challenge
-        {
-            challengeText = "Beat the hard CPU by 19 points",
-            condition = new BeatByCondition { winByTargetPoints = 19, difficultyLevel = 2 },
-            rewards = new List<Reward>
-            {
-                new Reward { type = RewardType.XP, amount = 1920 },
-                new Reward { type = RewardType.StandardPacks, amount = 5 }
-            }
-        });
-
-        challengeData.hardDailyChallenges.Add(new Challenge
-        {
-            challengeText = "Beat the hard CPU by 21 points",
-            condition = new BeatByCondition { winByTargetPoints = 21, difficultyLevel = 2 },
-            rewards = new List<Reward>
-            {
-                new Reward { type = RewardType.XP, amount = 2560 },
-                new Reward { type = RewardType.StandardPacks, amount = 5 }
-            }
-        });
-
-        challengeData.hardDailyChallenges.Add(new Challenge
-        {
-            challengeText = "Win an online game",
-            condition = new BeatByCondition { winByTargetPoints = 1, difficultyLevel = -1 },
+            challengeText = "Win an online match",
+            condition = new BeatByCondition { winByTargetPoints = 1, targetDifficultyLevel = -1 },
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 250 },
@@ -309,14 +140,61 @@ public class ChallengeManager : MonoBehaviour
             }
         });
 
+        // "WIN USING X" // TODO: variable quantity, rarity "win a hard match using 10 common cards"
 
+        // "Win a hard match using X" (card indexes)
+        winUsingX = (winUsingX + (PowerupCardData.GetCardCount() / 2)) % PowerupCardData.GetCardCount();
+        if (PowerupCardData.GetCardName(winUsingX) == null) { winUsingX = (winUsingX + 1) % PowerupCardData.GetCardCount(); }
 
+        challengeData.hardDailyChallenges.Add(new Challenge
+        {
+            challengeText = $"Win a hard match using '{PowerupCardData.GetCardName(winUsingX)}'",
+            condition = new WinUsingCondition { ID = winUsingX + 5, targetDifficultyLevel = 2 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 160 + (PowerupCardData.GetCardRarity(winUsingX) * 50) },
+                new Reward { type = RewardType.StandardPacks, amount = 3 + PowerupCardData.GetCardRarity(winUsingX) }
+            }
+        });
+
+        // "Win a hard match using A" (ranks)
+        winUsingA = (winUsingA + (winUsingATexts.Length / 2)) % winUsingATexts.Length;
+        if (winUsingATexts[winUsingA] == null) { winUsingA = 1; }
+
+        challengeData.hardDailyChallenges.Add(new Challenge
+        {
+            challengeText = $"Win a hard match using any {winUsingATexts[winUsingA]} card",
+            condition = new WinUsingCondition { ID = -winUsingA, targetDifficultyLevel = 2 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 200 + (winUsingA * 50) },
+                new Reward { type = RewardType.StandardPacks, amount = winUsingA * 2 }
+            }
+        });
+
+        // "Win an online match using X" (card indexes)
+        winUsingX = (winUsingX + (PowerupCardData.GetCardCount() / 3)) % PowerupCardData.GetCardCount();
+        if (PowerupCardData.GetCardName(winUsingX) == null) { winUsingX = (winUsingX + 1) % PowerupCardData.GetCardCount(); }
+
+        challengeData.hardDailyChallenges.Add(new Challenge
+        {
+            challengeText = $"Win an online match using '{PowerupCardData.GetCardName(winUsingX)}'",
+            condition = new WinUsingCondition { ID = winUsingX + 5, targetDifficultyLevel = -1 },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 250 + (PowerupCardData.GetCardRarity(winUsingX) * 100) },
+                new Reward { type = RewardType.PlusPacks, amount = 1 }
+            }
+        });
+    }
+
+    void GenerateOngoingChallenges() {
         // ONGOING CHALLENGES
         // 0 index can't exist because to complete a challenge means it is saved as a negative value
         challengeData.ongoingChallenges.Add(new Challenge
         {
             challengeText = "ERROR",
-            condition = new BeatByCondition { winByTargetPoints = 99999999, difficultyLevel = 3 },
+            condition = new BeatByCondition { winByTargetPoints = 99999999, targetDifficultyLevel = 3 },
             rewards = new List<Reward> { }
         });
 
@@ -1550,6 +1428,12 @@ public class ChallengeManager : MonoBehaviour
         Debug.Log("totalStandardPackRewardForAllOngoingChallenges: " + totalStandardPackRewardForAllOngoingChallenges);
         Debug.Log("totalPlusPackRewardForAllOngoingChallenges: " + totalPlusPackRewardForAllOngoingChallenges);
         Debug.Log("totalCraftingCreditRewardForAllOngoingChallenges: " + totalCraftingCreditRewardForAllOngoingChallenges);
+
+    }
 #endif
+
+    public void ReGenerateDailyChallenges()
+    {
+        GenerateDailyChallenges();
     }
 }
