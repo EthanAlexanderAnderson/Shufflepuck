@@ -155,7 +155,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         List<Challenge> hardDailyChallenges = ChallengeManager.Instance.challengeData.hardDailyChallenges;
         int numberOfEasyDailyChallenges = easyDailyChallenges.Count;
         int numberOfHardDailyChallenges = hardDailyChallenges.Count;
-
+        int xpRequirement = LevelManager.Instance.GetLevelUpXPRequirement();
 
         // only overwrite the challenge if it's not already completed (not a negative int id)
         if (PlayerPrefs.GetInt("DailyChallenge1", 0) >= 0)
@@ -172,7 +172,8 @@ public class DailyChallengeManagerScript : MonoBehaviour
             {
                 Challenge selectedChallenge = easyDailyChallenges[DC1];
                 int failsafe = 0;
-                while ((!selectedChallenge.condition.IsAssignable() || PlayerPrefs.GetInt("DailyChallenge1") == easyDailyChallenges.IndexOf(selectedChallenge)) && failsafe < 1000)
+                // Re-roll the challenge while it's not assignable or it's the same as the previous uncompleted challenge. Also, slightly favor challenges with XP value more than 1/5 of what is required to level up.
+                while ((!selectedChallenge.condition.IsAssignable() || PlayerPrefs.GetInt("DailyChallenge1") == easyDailyChallenges.IndexOf(selectedChallenge) || (selectedChallenge.rewards[0].amount < (xpRequirement / 5) && failsafe < 10)) && failsafe < 1000)
                 {
                     selectedChallenge = easyDailyChallenges[UnityEngine.Random.Range(1, numberOfEasyDailyChallenges)];
                     failsafe++;
@@ -199,7 +200,8 @@ public class DailyChallengeManagerScript : MonoBehaviour
             {
                 Challenge selectedChallenge = hardDailyChallenges[DC2];
                 int failsafe = 0;
-                while ((!selectedChallenge.condition.IsAssignable() || PlayerPrefs.GetInt("DailyChallenge2") == hardDailyChallenges.IndexOf(selectedChallenge)) && failsafe < 1000)
+                // Re-roll the challenge while it's not assignable or it's the same as the previous uncompleted challenge. Also, slightly favor challenges with XP value more than 1/3 of what is required to level up.
+                while ((!selectedChallenge.condition.IsAssignable() || PlayerPrefs.GetInt("DailyChallenge2") == hardDailyChallenges.IndexOf(selectedChallenge) || (selectedChallenge.rewards[0].amount < (xpRequirement / 3) && failsafe < 10)) && failsafe < 1000)
                 {
                     selectedChallenge = hardDailyChallenges[UnityEngine.Random.Range(1, numberOfHardDailyChallenges)];
                     failsafe++;
