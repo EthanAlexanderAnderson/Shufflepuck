@@ -17,6 +17,10 @@ public class LevelManager : MonoBehaviour
 
     [SerializeField] private Slider levelProgressBar;
 
+    private int baseXPRequirement = 100;
+    private int incrementXPRequirement = 10;
+    private int maximumXPRequirement = 1000;
+
     private void Awake()
     {
         if (Instance == null)
@@ -52,8 +56,9 @@ public class LevelManager : MonoBehaviour
 
         currentLevelText.text = level.ToString();
         nextLevelText.text = (level + 1).ToString();
-        xpText.text = (XPiterator + 100 + 10 * level).ToString() + "/" + (100 + 10 * level).ToString() + " XP";
-        levelProgressBarValue = (((float)XPiterator + 100 + 10 * (float)level) / (100 + 10 * (float)level) * 100);
+        int levelUpXpRequirement = Mathf.Min(maximumXPRequirement, baseXPRequirement + incrementXPRequirement * level);
+        xpText.text = (XPiterator + levelUpXpRequirement).ToString() + "/" + (levelUpXpRequirement).ToString() + " XP";
+        levelProgressBarValue = (((float)XPiterator + (float)levelUpXpRequirement) / (float)levelUpXpRequirement) * 100;
     }
 
     // gets current XP progress (not total XP) and current level
@@ -64,7 +69,7 @@ public class LevelManager : MonoBehaviour
         while (XPiterator >= 0)
         {
             leveliterator++;
-            XPiterator -= 100 + 10 * leveliterator;
+            XPiterator -= Mathf.Min(maximumXPRequirement, baseXPRequirement + incrementXPRequirement * leveliterator);
         }
         return (XPiterator, leveliterator);
     }
