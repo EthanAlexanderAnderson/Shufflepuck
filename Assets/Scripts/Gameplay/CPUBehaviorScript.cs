@@ -377,7 +377,7 @@ public static class CPUBehaviorScript
             3 => EvaluateBolt(),
             4 => !powerupsUsedThisTurn.Contains(cardIndex) && EvaluateForcefield(),
             5 => !powerupsUsedThisTurn.Contains(cardIndex) && usePhase,
-            6 => !powerupsUsedThisTurn.Contains(cardIndex) && EvaluateCull(), // TODO: somehow... CPU should wait to use cull until AFTER forcefield is used
+            6 => !powerupsUsedThisTurn.Contains(cardIndex) && EvaluateCull(),
             7 => LogicScript.Instance.opponent.puckCount > 2,
             8 => LogicScript.Instance.player.puckCount > 0,
             9 => !powerupsUsedThisTurn.Contains(cardIndex) && useExplosion,
@@ -491,10 +491,9 @@ public static class CPUBehaviorScript
 
     private static bool EvaluateCull()
     {
-        // TODO: If CPU has forcefield in hand, and EvaluatePowerupUsage(forcefield) == true, return false
-        // TODO: If forcefield is enabled and belongs to CPU and AllPucksAreSlowed == false, return false
-        // Make sure that cull usage is evaluated again after pucks come to a slow
-        // The CPU doesn't lock in shot parameters until AllPucksAreSlowedMore == true, and should keep evaluating cards until then, so this should work
+        // If CPU has forcefield in hand, and EvaluatePowerupUsage(forcefield) == true, and we can play both forcefield and then cull, return false so forcefield is played first.
+        // OR, if the pucks are moving, don't use cull yet, wait a bit until they are slowed.
+        if (!PuckManager.Instance.AllPucksAreSlowed() || (hand.Contains(4) && EvaluatePowerupUsage(4) && powerupsUsedThisTurn.Count <= 1)) { return false; }
 
         var allPucks = GameObject.FindGameObjectsWithTag("puck");
         bool useCull = true;
@@ -503,7 +502,7 @@ public static class CPUBehaviorScript
         {
             var puckScript = puck.GetComponent<PuckScript>();
 
-            if (puckScript.ComputeValue() > 0)
+            if (puckScript.ComputeValue() > 0 || !puckScript.IsShot())
             {
                 continue;
             }
