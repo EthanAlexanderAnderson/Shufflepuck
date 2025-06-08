@@ -415,6 +415,7 @@ public class PackManager : MonoBehaviour
             }
             else
             {
+                // if boosterPoints < 100, reroll with that percentage chance (15 booster points means 15% percent chance to reroll)
                 int boosterRand = Random.Range(0, 100);
                 if (boosterPoints > boosterRand)
                 {
@@ -476,6 +477,7 @@ public class PackManager : MonoBehaviour
             }
             else
             {
+                // if boosterPoints < 100, reroll with that percentage chance (15 booster points means 15% percent chance to reroll)
                 int boosterRand = Random.Range(0, 100);
                 if (boosterPoints > boosterRand)
                 {
@@ -536,6 +538,7 @@ public class PackManager : MonoBehaviour
             }
             else
             {
+                // if boosterPoints < 100, reroll with that percentage chance (15 booster points means 15% percent chance to reroll)
                 int boosterRand = Random.Range(0, 100);
                 if (boosterPoints > boosterRand)
                 {
@@ -604,6 +607,7 @@ public class PackManager : MonoBehaviour
             }
             else
             {
+                // if boosterPoints < 100, reroll with that percentage chance (15 booster points means 15% percent chance to reroll)
                 int boosterRand = Random.Range(0, 100);
                 if (boosterPoints > boosterRand)
                 {
