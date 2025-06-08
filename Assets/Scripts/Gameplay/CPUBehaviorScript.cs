@@ -28,6 +28,7 @@ public static class CPUBehaviorScript
         waitingTime = 1f;
         LogicScript.Instance.powerupWaitTime = 0;
         usePhase = false;
+        useExplosion = false;
     }
 
     public static void FullReset(int diff)
@@ -208,9 +209,9 @@ public static class CPUBehaviorScript
         return false;
     }
 
-    // TODO: save selected path info somewhere so we can query it to see if we need to use explosion or phase in the second pass of card usage
     static CPUPathInterface pathi;
     static bool usePhase = false;
+    static bool useExplosion = false;
     public static (float, float, float) FindPath()
     {
         // if Fog is active and foresight isn't, shoot random
@@ -252,11 +253,17 @@ public static class CPUBehaviorScript
             Debug.Log("Found path with highest value " + highestValue);
             best.EnablePathVisualization();
 
-            // try to phase lol
+            // Use phase if the path requires it
             usePhase = best.DoesPathRequirePhasePowerup();
             if (best.DoesPathRequirePhasePowerup() && hand.Any(n => n != -1) && PowerupCountUsedThisTurn() < 3)
             {
                 UseNextCard(5);
+            }
+            // Use explosion if the path requires it
+            useExplosion = best.DoesPathRequireExplosionPowerup();
+            if (best.DoesPathRequireExplosionPowerup() && hand.Any(n => n != -1) && PowerupCountUsedThisTurn() < 3)
+            {
+                UseNextCard(9);
             }
 
             // add some variation to the shot angle based on diff. Weaker CPU (lower diff) is less accurate (more angle variation).
@@ -333,7 +340,7 @@ public static class CPUBehaviorScript
             6 => true,
             7 => true,
             8 => true,
-            9 => false, // TODO
+            9 => true,
             10 => !PowerupManager.Instance.DeckContains(1),
             11 => true,
             12 => true,
@@ -373,7 +380,7 @@ public static class CPUBehaviorScript
             6 => !powerupsUsedThisTurn.Contains(cardIndex) && EvaluateCull(), // TODO: somehow... CPU should wait to use cull until AFTER forcefield is used
             7 => LogicScript.Instance.opponent.puckCount > 2,
             8 => LogicScript.Instance.player.puckCount > 0,
-            9 => false, // TODO: explostion path
+            9 => !powerupsUsedThisTurn.Contains(cardIndex) && useExplosion,
             10 => !powerupsUsedThisTurn.Contains(cardIndex) && LogicScript.Instance.player.puckCount > 0,
             11 => !powerupsUsedThisTurn.Contains(13) && LogicScript.Instance.player.puckCount > 0,
             12 => LogicScript.Instance.opponent.puckCount > 2 && !powerupsUsedThisTurn.Contains(22) && !powerupsUsedThisTurn.Contains(16),
