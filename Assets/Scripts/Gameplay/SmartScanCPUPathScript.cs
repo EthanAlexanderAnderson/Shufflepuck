@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
 {
-    
+
     [SerializeField] private GameObject anchorPoint;
 
     [SerializeField] private float scanDistance = 30f; // Max raycast distance
@@ -19,6 +19,7 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
     private List<Vector3> hitPoints = new();
     private List<Vector3> gizRayOrigin = new();
     private List<Vector3> gizDirection = new();
+    private List<int> bestPathIndices = new(); // Indexes of best path rays
 
     public (float, float, float) GetPath() => (bestAngle, System.Math.Min(95f + powerModifier, 102.5f), 50f);
     public bool DoesPathRequirePhasePowerup() => false;
@@ -35,10 +36,11 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
         bestAngle = 0;
         powerModifier = 0;
 
-        // these 3 lists are just for gizmos
+        // these lists are just for gizmos
         gizRayOrigin.Clear();
         gizDirection.Clear();
         hitPoints.Clear();
+        bestPathIndices.Clear();
 
         GameObject[] allPucks = GameObject.FindGameObjectsWithTag("puck");
 
@@ -62,13 +64,22 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
                 (isVisible, tempPowerModifier, tempValueModifier) = CheckPuckVisibility(puck);
                 if (isVisible)
                 {
-                    float angle = GetAngleToAnchor(puckPosition);puck.GetComponent<PuckScript>();
+                    float angle = GetAngleToAnchor(puckPosition);
                     if ((puckValue + tempValueModifier) > (highestValue + valueModifier))
                     {
                         highestValue = puckValue;
                         valueModifier = tempValueModifier;
                         bestAngle = angle;
                         powerModifier = tempPowerModifier;
+                        // track which path is selected as best so we can highlight it in blue with gizmos
+                        bestPathIndices.Clear();
+                        int raysPerPuck = 4;
+                        int puckIndex = gizRayOrigin.Count / raysPerPuck - 1;
+                        for (int j = 0; j < raysPerPuck; j++)
+                        {
+                            bestPathIndices.Add(puckIndex * raysPerPuck + j);
+                        }
+
                     }
                 }
             }
@@ -206,7 +217,14 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
         // draw scan lines from puck
         for (int i = 0; i < gizDirection.Count; i++)
         {
-            Debug.DrawRay(gizRayOrigin[i], gizDirection[i] * scanDistance);
+            if (bestPathIndices.Contains(i))
+            {
+                Debug.DrawRay(gizRayOrigin[i], gizDirection[i] * scanDistance, Color.blue);
+            }
+            else
+            {
+                Debug.DrawRay(gizRayOrigin[i], gizDirection[i] * scanDistance);
+            }
         }
     }
 
