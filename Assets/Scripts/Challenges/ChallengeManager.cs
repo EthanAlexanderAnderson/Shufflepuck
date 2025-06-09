@@ -89,6 +89,20 @@ public class ChallengeManager : MonoBehaviour
 
         // TODO: "Win a match using Y and Z"
 
+        // "Win an easy match using X different cards"
+        int winUsingD = 5 + (System.DateTime.Parse(PlayerPrefs.GetString("LastChallengeDate")).Second % 6);
+
+        challengeData.easyDailyChallenges.Add(new Challenge
+        {
+            challengeText = $"Win an easy match using {winUsingD} different cards",
+            condition = new WinUsingCondition { ID = -7, targetDifficultyLevel = 0, targetNumberUsed = winUsingD },
+            rewards = new List<Reward>
+            {
+                new Reward { type = RewardType.XP, amount = 100 + (winUsingD * 10) },
+                new Reward { type = RewardType.StandardPacks, amount = 1 }
+            }
+        });
+
         // "Open a pack"
         challengeData.easyDailyChallenges.Add(new Challenge
         {
@@ -96,10 +110,10 @@ public class ChallengeManager : MonoBehaviour
             condition = new OpenPacksCondition { targetNumberOpened = 1, targetPackType = -1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 100 }
+                new Reward { type = RewardType.XP, amount = 100 },
+                new Reward { type = RewardType.CraftingCredits, amount = 100 }
             }
         });
-
 
         // ----- HARD DAILY CHALLENGES -----
         challengeData.hardDailyChallenges.Add(new Challenge
