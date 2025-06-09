@@ -72,8 +72,9 @@ public class ChallengeManager : MonoBehaviour
         });
 
         // "Win an easy match using any {Type} card" (ranks)
-        string[] winUsingATexts = { "legendary", "epic", "rare", "uncommon", "common", "holo", "bronze", "gold", "diamond", "celestial" }; // TODO: any, different
+        string[] winUsingATexts = { "legendary", "epic", "rare", "uncommon", "common", "holo", null, "bronze", "gold", "diamond", "celestial" }; // TODO: any, different
         int winUsingA = (System.DateTime.Parse(PlayerPrefs.GetString("LastChallengeDate")).Second % winUsingATexts.Length);
+        if (winUsingATexts[winUsingA] == null) { winUsingA = (winUsingA - 1) % winUsingATexts.Length; }
 
         challengeData.easyDailyChallenges.Add(new Challenge
         {
@@ -158,6 +159,7 @@ public class ChallengeManager : MonoBehaviour
 
         // "Win a hard match using any {Type} card" (ranks)
         winUsingA = (winUsingA + (winUsingATexts.Length / 2)) % winUsingATexts.Length;
+        if (winUsingATexts[winUsingA] == null) { winUsingA = (winUsingA - 1) % winUsingATexts.Length; }
 
         challengeData.hardDailyChallenges.Add(new Challenge
         {
@@ -852,8 +854,8 @@ public class ChallengeManager : MonoBehaviour
 
         challengeData.ongoingChallenges.Add(new Challenge
         {
-            challengeText = "Win a match using any bronze card",
-            condition = new WinUsingCondition { ID = -2, targetNumberUsed = 1 },
+            challengeText = "Win a match using any holo card",
+            condition = new WinUsingCondition { ID = -1, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 500 },
@@ -1074,7 +1076,7 @@ public class ChallengeManager : MonoBehaviour
 
         challengeData.ongoingChallenges.Add(new Challenge
         {
-            challengeText = "Win a match using any gold card",
+            challengeText = "Win a match using any bronze card",
             condition = new WinUsingCondition { ID = -3, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
@@ -1196,7 +1198,7 @@ public class ChallengeManager : MonoBehaviour
 
         challengeData.ongoingChallenges.Add(new Challenge
         {
-            challengeText = "Win a match using any diamond card",
+            challengeText = "Win a match using any gold card",
             condition = new WinUsingCondition { ID = -4, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
@@ -1285,8 +1287,8 @@ public class ChallengeManager : MonoBehaviour
 
         challengeData.ongoingChallenges.Add(new Challenge
         {
-            challengeText = "Win a match using any holo card",
-            condition = new WinUsingCondition { ID = -1, targetNumberUsed = 1 },
+            challengeText = "Win a match using any diamond card",
+            condition = new WinUsingCondition { ID = -5, targetNumberUsed = 1 },
             rewards = new List<Reward>
             {
                 new Reward { type = RewardType.XP, amount = 500 },

@@ -196,6 +196,18 @@ public class DebugWindow : EditorWindow
         Debug.Log(log);
 
         PowerupCardData.LogRarityStats();
+
+        log = "";
+        log += "holo: " + PowerupCardData.GetCardOwnedSum(-1) + "\n";
+        log += "standard: " + PowerupCardData.GetCardOwnedSum(-2) + "\n";
+        log += "bronze: " + PowerupCardData.GetCardOwnedSum(-3) + "\n";
+        log += "gold: " + PowerupCardData.GetCardOwnedSum(-4) + "\n";
+        log += "diamond: " + PowerupCardData.GetCardOwnedSum(-5) + "\n";
+        log += "celestial: " + PowerupCardData.GetCardOwnedSum(-6) + "\n";
+        log += "different: " + PowerupCardData.GetCardOwnedSum(-7) + "\n";
+        log += "any: " + PowerupCardData.GetCardOwnedSum(-8) + "\n";
+
+        Debug.Log(log);
     }
 
     private void SetDateAs0001()

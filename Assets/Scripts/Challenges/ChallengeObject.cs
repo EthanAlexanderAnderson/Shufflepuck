@@ -271,7 +271,7 @@ public class HighscoreCondition : ChallengeCondition
 // Card Condition, example: "Win a match using 'plus one'", "Win a match using any holo card", "Win matches using 'growth' 3 times", "Win a match using any common card"
 public class WinUsingCondition : ChallengeCondition
 {
-    public int ID; // -7 = any, -6 = different, -5 = celestial, -4 = diamond, -3 = gold, -2 = bronze, -1 = holo, 0 - 4 rarity, 5+ index - 5
+    public int ID; // -8 = any, -7 = different, -6 = celestial, -5 = diamond, -4 = gold, -3 = bronze, -2 = standard, -1 = holo, 0 - 4 rarity, 5+ index - 5
     public int targetNumberUsed = 1;
     public int targetDifficultyLevel = -3; // Example: Any Difficulty = -3, Online = -1, Easy = 0, Medium = 1, Hard = 2
 
@@ -312,18 +312,18 @@ public class WinUsingCondition : ChallengeCondition
                     currentNumberUsed += decodedCard.quantity;
                 }
                 // rank
-                else if (ID >= -5 && ID < -1 && decodedCard.rank == (ID * -1) - 1)
+                else if (ID >= -6 && ID < -1 && decodedCard.rank == (ID * -1) - 2)
                 {
                     currentNumberUsed += decodedCard.quantity;
                 }
                 // different
-                else if (ID == -6 )
+                else if (ID == -7 )
                 {
                     if (!indexesSeen.Contains(decodedCard.cardIndex)) indexesSeen.Add(decodedCard.cardIndex);
                     currentNumberUsed = indexesSeen.Count;
                 }
                 // any
-                else if (ID == -7)
+                else if (ID == -8)
                 {
                     currentNumberUsed += decodedCard.quantity;
                 }
@@ -353,6 +353,7 @@ public class WinUsingCondition : ChallengeCondition
             List<int> indexesSeen = new List<int>();
 
             // for each card the player used
+            //  -8 = any, -7 = different, -6 = celestial, -5 = diamond, -4 = gold, -3 = bronze, -2 = standard, -1 = holo, 0 - 4 rarity, 5+ index - 5
             for (int i = 0; i < playerUsed.Count; i++)
             {
                 var decodedCard = PowerupCardData.DecodeCard(playerUsed[i]);
@@ -373,18 +374,18 @@ public class WinUsingCondition : ChallengeCondition
                     currentNumberUsed += decodedCard.quantity;
                 }
                 // rank
-                else if (ID >= -5 && ID < -1 && decodedCard.rank == (ID * -1) - 1)
+                else if (ID >= -6 && ID < -1 && decodedCard.rank == (ID * -1) - 2)
                 {
                     currentNumberUsed += decodedCard.quantity;
                 }
                 // different
-                else if (ID == -6)
+                else if (ID == -7)
                 {
                     if (!indexesSeen.Contains(decodedCard.cardIndex)) indexesSeen.Add(decodedCard.cardIndex);
                     currentNumberUsed = indexesSeen.Count;
                 }
                 // any
-                else if (ID == -7)
+                else if (ID == -8)
                 {
                     currentNumberUsed += decodedCard.quantity;
                 }

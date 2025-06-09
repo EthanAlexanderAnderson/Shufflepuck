@@ -55,7 +55,7 @@ public static class PowerupCardData
         return 0;
     }
 
-    // -7 = any, -6 = different, -5 = celestial, -4 = diamond, -3 = gold, -2 = bronze, -1 = holo, 0 - 4 rarity, 5+ index - 5
+    //  -8 = any, -7 = different, -6 = celestial, -5 = diamond, -4 = gold, -3 = bronze, -2 = standard, -1 = holo, 0 - 4 rarity, 5+ index - 5
     public static bool CheckIfCardIsOwned(int cardIndex)
     {
         return GetCardOwnedSum(cardIndex) > 0;
@@ -96,18 +96,18 @@ public static class PowerupCardData
                     sum += decodedCard.quantity;
                 }
                 // rank
-                else if (ID >= -5 && ID < -1 && decodedCard.rank == (ID * -1) - 1)
+                else if (ID >= -6 && ID < -1 && decodedCard.rank == (ID * -1) - 2)
                 {
                     sum += decodedCard.quantity;
                 }
                 // different
-                else if (ID == -6)
+                else if (ID == -7)
                 {
                     if (!indexesSeen.Contains(decodedCard.cardIndex)) indexesSeen.Add(decodedCard.cardIndex);
                     sum = indexesSeen.Count;
                 }
                 // any
-                else if (ID == -7)
+                else if (ID == -8)
                 {
                     sum += decodedCard.quantity;
                 }
