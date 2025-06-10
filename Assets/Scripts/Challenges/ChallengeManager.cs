@@ -1442,9 +1442,8 @@ public class ChallengeManager : MonoBehaviour
         Debug.Log("totalStandardPackRewardForAllOngoingChallenges: " + totalStandardPackRewardForAllOngoingChallenges);
         Debug.Log("totalPlusPackRewardForAllOngoingChallenges: " + totalPlusPackRewardForAllOngoingChallenges);
         Debug.Log("totalCraftingCreditRewardForAllOngoingChallenges: " + totalCraftingCreditRewardForAllOngoingChallenges);
-
-    }
 #endif
+    }
 
     public void ReGenerateDailyChallenges()
     {

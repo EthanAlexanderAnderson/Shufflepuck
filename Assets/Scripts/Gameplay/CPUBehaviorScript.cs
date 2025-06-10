@@ -71,7 +71,7 @@ public static class CPUBehaviorScript
 
         int CPUDeckPowerLevel = 0;
         int failSafe = 0;
-        while (CPUDeckPowerLevel < playerDeckPowerLevel && failSafe < 1000)
+        while (CPUDeckPowerLevel < playerDeckPowerLevel && failSafe < 1000 && deck.Count < (difficulty + 1) * 15)
         {
             int rarity = Random.Range(0, (int)Math.Pow(difficulty, 2) + 1);
             int randomCard = PowerupCardData.GetRandomCardOfRarity(rarity);
