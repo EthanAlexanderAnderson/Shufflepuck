@@ -158,7 +158,7 @@ public static class CPUBehaviorScript
             }
         }
         // pick angle power spin
-        if (timeElapsed > waitingTime && (PuckManager.Instance.AllPucksAreSlowed() && difficulty < 2 || PuckManager.Instance.AllPucksAreSlowedMore()))
+        if (timeElapsed > waitingTime && (PuckManager.Instance.AllPucksAreSlowed() && difficulty < 2 || PuckManager.Instance.AllPucksAreSlowedMore() || timeElapsed > 30))
         {
             waitingTime += 999999f;
             denyPowerup = 0;
