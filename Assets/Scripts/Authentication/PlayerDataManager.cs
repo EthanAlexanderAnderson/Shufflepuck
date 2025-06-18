@@ -24,7 +24,7 @@ public class PlayerDataManager : MonoBehaviour
     };
 
     string[] stringKeys = {
-        "LastChallengeDate", "LastPlinkoRewardDate", "LastDailyWinDate", "LastPackBoosterDate",
+        "LastChallengeDate", "LastPlinkoRewardDate", "LastDailyWinDate", "LastPackBoosterDate", "LastStreakDate",
         "ChallengeRefreshesToday",
         "PlinkoSkinsUnlocked",
         "Deck1", "Deck2", "Deck3", "Deck4", "Deck5", "CardCollection",

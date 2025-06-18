@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using System.Globalization;
 
 public class DailyChallengeManagerScript : MonoBehaviour
 {
@@ -56,12 +57,12 @@ public class DailyChallengeManagerScript : MonoBehaviour
         int numberOfHardDailyChallenges = hardDailyChallenges.Count;
 
         // assert the challenge ID is within range, prevent index error
-        if (DC1 >= numberOfEasyDailyChallenges || DC1 <= (numberOfEasyDailyChallenges * -1) || DC1 <= (numberOfEasyDailyChallenges * -1) || DC1 <= (numberOfEasyDailyChallenges * -1))
+        if (Mathf.Abs(DC1) >= numberOfEasyDailyChallenges)
         {
             DC1 = 0;
             PlayerPrefs.SetInt("DailyChallenge1", 0);
         }
-        if (DC2 >= numberOfHardDailyChallenges || DC2 <= (numberOfHardDailyChallenges * -1) || DC2 >= numberOfHardDailyChallenges || DC2 <= (numberOfHardDailyChallenges * -1))
+        if (Mathf.Abs(DC2) >= numberOfHardDailyChallenges)
         {
             DC2 = 0;
             PlayerPrefs.SetInt("DailyChallenge2", 0);
@@ -93,6 +94,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         UpdateCountdown();
     }
 
+    private bool challengeAssignedToday = false;
     private void UpdateCountdown()
     {
         // Calculate the time remaining until midnight
@@ -108,8 +110,9 @@ public class DailyChallengeManagerScript : MonoBehaviour
         }
 
         // Check if the countdown has reached zero
-        if (timeUntilMidnight.TotalSeconds <= 0)
+        if (timeUntilMidnight.TotalSeconds <= 0 && !challengeAssignedToday)
         {
+            challengeAssignedToday = true;
             AssignNewChallenge();
         }
     }
@@ -120,7 +123,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         string lastSavedDate = PlayerPrefs.GetString("LastChallengeDate", string.Empty);
         DateTime lastChallengeDate;
 
-        if (DateTime.TryParse(lastSavedDate, out lastChallengeDate))
+        if (DateTime.TryParseExact(lastSavedDate, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out lastChallengeDate))
         {
             // Compare the last saved date to today's date & make sure current date is NEWER than lastChallengeDate to prevent device time tampering
             if (DateTime.Today.Subtract(lastChallengeDate).Days >= 1)
@@ -129,7 +132,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
                 PlayerPrefs.SetInt("ChallengeRefreshesToday", 0);
             }
             // Check if more than 4 hours have passed since the last challenge and current time is ahead to prevent tampering
-            else if (DateTime.UtcNow > lastChallengeDate && DateTime.Now.Subtract(lastChallengeDate).TotalHours >= 4)
+            else if (DateTime.Now.Subtract(lastChallengeDate).TotalHours >= 4)
             {
                 EnableAdRefreshButton();
             }
@@ -146,7 +149,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
 
     private void AssignNewChallenge()
     {
-        PlayerPrefs.SetString("LastChallengeDate", DateTime.Now.ToString());
+        PlayerPrefs.SetString("LastChallengeDate", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 
         // re-generate daily challenges since their content depends on "LastChallengeDate" player pref
         ChallengeManager.Instance.ReGenerateDailyChallenges();
@@ -231,12 +234,12 @@ public class DailyChallengeManagerScript : MonoBehaviour
         // bonus XP for first win of the day
         string dailyWin = "";
         string lastSavedDate = PlayerPrefs.GetString("LastDailyWinDate", string.Empty);
-        DateTime lastChallengeDate;
+        DateTime lastWinDate;
 
-        if (DateTime.TryParse(lastSavedDate, out lastChallengeDate))
+        if (DateTime.TryParseExact(lastSavedDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out lastWinDate))
         {
-            // Compare the last saved date to today's date & make sure current date is NEWER than lastChallengeDate to prevent device time tampering
-            if (DateTime.Today.Subtract(lastChallengeDate).Days >= 1)
+            // Compare the last win date to today's date & make sure current date is NEWER than lastWinDate to prevent device time tampering
+            if (DateTime.Today.Subtract(lastWinDate).Days >= 1)
             {
                 dailyWin += "\nDaily Win +50XP";
                 LevelManager.Instance.AddXP(50);
@@ -257,12 +260,12 @@ public class DailyChallengeManagerScript : MonoBehaviour
         List<Challenge> hardDailyChallenges = ChallengeManager.Instance.challengeData.hardDailyChallenges;
         int numberOfEasyDailyChallenges = easyDailyChallenges.Count;
         int numberOfHardDailyChallenges = hardDailyChallenges.Count;
-        if (DC1 >= numberOfEasyDailyChallenges || DC1 <= (numberOfEasyDailyChallenges * -1))
+        if (Mathf.Abs(DC1) >= numberOfEasyDailyChallenges)
         {
             DC1 = 0;
             PlayerPrefs.SetInt("DailyChallenge1", 0);
         }
-        if (DC2 >= numberOfHardDailyChallenges || DC2 <= (numberOfHardDailyChallenges * -1))
+        if (Mathf.Abs(DC2) >= numberOfHardDailyChallenges)
         {
             DC2 = 0;
             PlayerPrefs.SetInt("DailyChallenge2", 0);
@@ -365,7 +368,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         int DC1 = PlayerPrefs.GetInt("DailyChallenge1", 0);
         List<Challenge> easyDailyChallenges = ChallengeManager.Instance.challengeData.easyDailyChallenges;
         int numberOfEasyDailyChallenges = easyDailyChallenges.Count;
-        if (DC1 >= numberOfEasyDailyChallenges || DC1 <= (numberOfEasyDailyChallenges * -1))
+        if (Mathf.Abs(DC1) >= numberOfEasyDailyChallenges)
         {
             DC1 = 0;
             PlayerPrefs.SetInt("DailyChallenge1", 0);

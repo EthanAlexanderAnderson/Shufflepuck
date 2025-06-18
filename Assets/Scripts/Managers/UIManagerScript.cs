@@ -501,7 +501,7 @@ public class UIManagerScript : MonoBehaviour
     public void SetErrorMessage(string msg)
     {
         // modifiers here are for puck select screen
-        if (msg.Contains("Unlocked"))
+        if (msg.Contains("Unlocked") || msg.Contains("Rewarded"))
         {
             errorMessage.color = new Color(0.4862745f, 0.7725491f, 0.4627451f);
         }
