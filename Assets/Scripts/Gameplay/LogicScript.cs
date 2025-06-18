@@ -434,7 +434,7 @@ public class LogicScript : MonoBehaviour
         line.GetComponent<LineScript>().FullSpeed();
         bar.ChangeBar("none");
         UI.ChangeUI(UI.gameHud);
-        powerupManager.DisableForceFieldIfNecessary();
+        ForcefieldScript.Instance.DisableForcefield();
         FogScript.Instance.DisableFog();
         powerupsMenu.SetActive(false);
     }
