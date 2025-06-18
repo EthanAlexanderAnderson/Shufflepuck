@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -29,40 +30,47 @@ public class StreakManager : MonoBehaviour
 
     public void IncrementStreak()
     {
-        streak = PlayerPrefs.GetInt("Streak", 1);
+        // Try to get the streak. If no streak has ever been saved, defaults to 0.
+        streak = PlayerPrefs.GetInt("Streak", 0);
 
-        // Get the last saved date or use a default if it's the first time
-        string lastSavedDate = PlayerPrefs.GetString("LastChallengeDate", string.Empty);
-        DateTime lastChallengeDate;
+        // Try to get the last streak date. If no streak date has ever been saved, defaults to an empty string.
+        string lastSavedDate = PlayerPrefs.GetString("LastStreakDate", string.Empty);
+        DateTime LastStreakDate;
 
-        if (DateTime.TryParse(lastSavedDate, out lastChallengeDate))
+        // Try to Parse the last streak date
+        if (DateTime.TryParseExact(lastSavedDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out LastStreakDate))
         {
             // If the last recored date is yesterday, increment the streak
-            if (lastChallengeDate.Date == DateTime.Today.AddDays(-1))
+            if (LastStreakDate.Date == DateTime.Today.AddDays(-1))
             {
-                PlayerPrefs.SetInt("Streak", streak + 1);
                 streak++;
+                PlayerPrefs.SetInt("Streak", streak);
                 if (((streak % 7) == 0 && streak > 0))
                 {
                     var reward = ((streak - 1) / 7 + 1);
                     var dropped = PlayerPrefs.GetInt("PlinkoPegsDropped", 0);
                     PlayerPrefs.SetInt("PlinkoPegsDropped", dropped - reward);
-                    Debug.Log("Unlocked: +" + reward + " drops for streak reward!");
-                    UIManagerScript.Instance.SetErrorMessage("Unlocked: +" + reward + " drops for streak reward!");
+                    Debug.Log("Rewarded: +" + reward + " drops for streak reward!");
+                    // TODO: change startup function calling to not change UI screens so this message still shows
+                    if (UIManagerScript.Instance != null) UIManagerScript.Instance.SetErrorMessage("Rewarded: +" + reward + " drops for streak reward!");
                 }
             }
             // If the last recorded date is not yesterday or today, reset the streak
-            else if (lastChallengeDate.Date != DateTime.Today)
+            else if (LastStreakDate.Date != DateTime.Today)
             {
                 PlayerPrefs.SetInt("Streak", 1);
                 streak = 1;
             }
         }
-        else // no date ever written
+        // Can't Parse the last streak date (No streak date has ever been saved)
+        else
         {
-            PlayerPrefs.SetInt("Streak", 1);
+            streak++;
+            PlayerPrefs.SetInt("Streak", streak);
         }
 
+        PlayerPrefs.SetString("LastStreakDate", DateTime.Today.ToString("yyyy-MM-dd"));
+        PlayerPrefs.Save();
         Debug.Log("Daily Login Streak: " + streak);
         SetText();
     }
