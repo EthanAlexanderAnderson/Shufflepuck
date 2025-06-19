@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using DateTime = System.DateTime;
+using System.Globalization;
 
 public class ChallengeManager : MonoBehaviour
 {
@@ -26,6 +28,14 @@ public class ChallengeManager : MonoBehaviour
         // clear old challenges
         challengeData.easyDailyChallenges = new List<Challenge>();
         challengeData.hardDailyChallenges = new List<Challenge>();
+
+        // use datetime Seconds as pseudorandom seed for challenges
+        int pseudorandomSeed = 0;
+        // Try to read the DateTime from the "LastChallengeDate" PlayerPref
+        if (DateTime.TryParseExact(PlayerPrefs.GetString("LastChallengeDate", string.Empty), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime lastChallengeDateTime))
+        {
+            pseudorandomSeed = lastChallengeDateTime.Second;
+        }
 
         // ----- EASY DAILY CHALLENGES -----
         challengeData.easyDailyChallenges.Add(new Challenge
@@ -58,7 +68,7 @@ public class ChallengeManager : MonoBehaviour
         // "WIN USING X" // TODO: variable quantity, "win a hard match using 10 common cards"
 
         // "Win an easy match using {cardIndex}"
-        int winUsingX = System.DateTime.Parse(PlayerPrefs.GetString("LastChallengeDate")).Second % PowerupCardData.GetCardCount();
+        int winUsingX = pseudorandomSeed % PowerupCardData.GetCardCount();
         if (PowerupCardData.GetCardName(winUsingX) == null) { winUsingX = (winUsingX + 1) % PowerupCardData.GetCardCount(); }
         challengeData.easyDailyChallenges.Add(new Challenge
         {
@@ -73,7 +83,7 @@ public class ChallengeManager : MonoBehaviour
 
         // "Win an easy match using any {Type} card" (ranks)
         string[] winUsingATexts = { "legendary", "epic", "rare", "uncommon", "common", "holo", null, "bronze", "gold", "diamond", "celestial" }; // TODO: any, different
-        int winUsingA = (System.DateTime.Parse(PlayerPrefs.GetString("LastChallengeDate")).Second % winUsingATexts.Length);
+        int winUsingA = (pseudorandomSeed % winUsingATexts.Length);
         if (winUsingATexts[winUsingA] == null) { winUsingA = (winUsingA - 1) % winUsingATexts.Length; }
 
         challengeData.easyDailyChallenges.Add(new Challenge
@@ -90,7 +100,7 @@ public class ChallengeManager : MonoBehaviour
         // TODO: "Win a match using Y and Z"
 
         // "Win an easy match using X different cards"
-        int winUsingD = 5 + (System.DateTime.Parse(PlayerPrefs.GetString("LastChallengeDate")).Second % 6);
+        int winUsingD = 5 + (pseudorandomSeed % 6);
 
         challengeData.easyDailyChallenges.Add(new Challenge
         {
@@ -1438,10 +1448,10 @@ public class ChallengeManager : MonoBehaviour
                 }
             }
         }
-        Debug.Log("totalXPRewardForAllOngoingChallenges: " + totalXPRewardForAllOngoingChallenges);
-        Debug.Log("totalStandardPackRewardForAllOngoingChallenges: " + totalStandardPackRewardForAllOngoingChallenges);
-        Debug.Log("totalPlusPackRewardForAllOngoingChallenges: " + totalPlusPackRewardForAllOngoingChallenges);
-        Debug.Log("totalCraftingCreditRewardForAllOngoingChallenges: " + totalCraftingCreditRewardForAllOngoingChallenges);
+        Debug.Log("totalXPRewardForOngoingQuests: " + totalXPRewardForAllOngoingChallenges);
+        Debug.Log("totalStandardPacksForOngoingQuests: " + totalStandardPackRewardForAllOngoingChallenges);
+        Debug.Log("totalPlusPacksForOngoingQuests: " + totalPlusPackRewardForAllOngoingChallenges);
+        Debug.Log("totalCraftingCreditForOngoingQuests: " + totalCraftingCreditRewardForAllOngoingChallenges);
 #endif
     }
 

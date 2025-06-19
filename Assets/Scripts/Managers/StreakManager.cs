@@ -33,12 +33,8 @@ public class StreakManager : MonoBehaviour
         // Try to get the streak. If no streak has ever been saved, defaults to 0.
         streak = PlayerPrefs.GetInt("Streak", 0);
 
-        // Try to get the last streak date. If no streak date has ever been saved, defaults to an empty string.
-        string lastSavedDate = PlayerPrefs.GetString("LastStreakDate", string.Empty);
-        DateTime LastStreakDate;
-
-        // Try to Parse the last streak date
-        if (DateTime.TryParseExact(lastSavedDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out LastStreakDate))
+        // Try to read the DateTime from the "LastStreakDate" PlayerPref
+        if (DateTime.TryParseExact(PlayerPrefs.GetString("LastStreakDate", string.Empty), "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime LastStreakDate))
         {
             // If the last recored date is yesterday, increment the streak
             if (LastStreakDate.Date == DateTime.Today.AddDays(-1))
@@ -58,14 +54,14 @@ public class StreakManager : MonoBehaviour
             // If the last recorded date is not yesterday or today, reset the streak
             else if (LastStreakDate.Date != DateTime.Today)
             {
-                PlayerPrefs.SetInt("Streak", 1);
                 streak = 1;
+                PlayerPrefs.SetInt("Streak", streak);
             }
         }
         // Can't Parse the last streak date (No streak date has ever been saved)
         else
         {
-            streak++;
+            streak = 1;
             PlayerPrefs.SetInt("Streak", streak);
         }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -83,14 +84,11 @@ public class PackManager : MonoBehaviour
 
     private void CheckForNewDailyPackBooster()
     {
-        // Get the last saved date or use a default if it's the first time
-        string lastSavedDate = PlayerPrefs.GetString("LastPackBoosterDate", string.Empty);
-        DateTime lastChallengeDate;
-
-        if (DateTime.TryParse(lastSavedDate, out lastChallengeDate))
+        // Try to read the DateTime from the "LastPackBoosterDate" PlayerPref
+        if (DateTime.TryParseExact(PlayerPrefs.GetString("LastPackBoosterDate", string.Empty), "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime lastPackBoosterDate))
         {
             // Compare the last saved date to today's date & make sure current date is NEWER than lastChallengeDate to prevent device time tampering
-            if (DateTime.Today.Subtract(lastChallengeDate).Days >= 1)
+            if (DateTime.Today.Subtract(lastPackBoosterDate).Days >= 1)
             {
                 AssignNewPackBooster();
             }

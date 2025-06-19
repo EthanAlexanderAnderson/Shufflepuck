@@ -119,26 +119,26 @@ public class DailyChallengeManagerScript : MonoBehaviour
 
     private void CheckForNewDailyChallenge()
     {
-        // Get the last saved date or use a default if it's the first time
-        string lastSavedDate = PlayerPrefs.GetString("LastChallengeDate", string.Empty);
-        DateTime lastChallengeDate;
-
-        if (DateTime.TryParseExact(lastSavedDate, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out lastChallengeDate))
+        // Try to read the DateTime from the "LastChallengeDate" PlayerPref
+        if (DateTime.TryParseExact(PlayerPrefs.GetString("LastChallengeDate", string.Empty), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime lastChallengeDateTime))
         {
             // Compare the last saved date to today's date & make sure current date is NEWER than lastChallengeDate to prevent device time tampering
-            if (DateTime.Today.Subtract(lastChallengeDate).Days >= 1)
+            if (DateTime.Today.Subtract(lastChallengeDateTime).Days >= 1)
             {
                 AssignNewChallenge();
                 PlayerPrefs.SetInt("ChallengeRefreshesToday", 0);
             }
             // Check if more than 4 hours have passed since the last challenge and current time is ahead to prevent tampering
-            else if (DateTime.Now.Subtract(lastChallengeDate).TotalHours >= 4)
+            else if (DateTime.Now.Subtract(lastChallengeDateTime).TotalHours >= 4)
             {
                 EnableAdRefreshButton();
+                Debug.Log("Daily quests already assigned: " + PlayerPrefs.GetInt("DailyChallenge1", 0) + " & " + PlayerPrefs.GetInt("DailyChallenge2", 0));
+                Debug.Log("Daily quest AD refresh is available now.");
             }
             else
             {
-                Debug.Log("Today's daily challenges are already assigned. easy: " + PlayerPrefs.GetInt("DailyChallenge1", 0) + "   hard: " + PlayerPrefs.GetInt("DailyChallenge2", 0));
+                Debug.Log("Daily quests already assigned: " + PlayerPrefs.GetInt("DailyChallenge1", 0) + " & " + PlayerPrefs.GetInt("DailyChallenge2", 0));
+                Debug.Log("Hours until daily quest AD refresh: " + Math.Round(4.0 - DateTime.Now.Subtract(lastChallengeDateTime).TotalHours, 4));
             }
         }
         else // no date ever written
@@ -233,10 +233,8 @@ public class DailyChallengeManagerScript : MonoBehaviour
 
         // bonus XP for first win of the day
         string dailyWin = "";
-        string lastSavedDate = PlayerPrefs.GetString("LastDailyWinDate", string.Empty);
-        DateTime lastWinDate;
-
-        if (DateTime.TryParseExact(lastSavedDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out lastWinDate))
+        // Try to read the DateTime from the "LastDailyWinDate" PlayerPref
+        if (DateTime.TryParseExact(PlayerPrefs.GetString("LastDailyWinDate", string.Empty), "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime lastWinDate))
         {
             // Compare the last win date to today's date & make sure current date is NEWER than lastWinDate to prevent device time tampering
             if (DateTime.Today.Subtract(lastWinDate).Days >= 1)
@@ -245,7 +243,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
                 LevelManager.Instance.AddXP(50);
                 PlayerPrefs.SetString("LastDailyWinDate", DateTime.Today.ToString("yyyy-MM-dd"));
             }
-        } 
+        }
         else // no date ever written
         {
             dailyWin += "\nDaily Win +50XP";
@@ -274,21 +272,23 @@ public class DailyChallengeManagerScript : MonoBehaviour
         if (isOnline == 1) { difficulty = -1; }
 
         // Evalute condition is met
-        if (DC1 > 0 &&
-            (easyDailyChallenges[DC1].condition is BeatByCondition && easyDailyChallenges[DC1].CheckCompletion(scoreDifference, difficulty)) ||
-            (easyDailyChallenges[DC1].condition is WinUsingCondition && easyDailyChallenges[DC1].CheckCompletion(PowerupManager.Instance.GetPlayerUsed(), difficulty))
-            )
+        if (DC1 > 0)
         {
-            Debug.Log("easy daily challenge (" + DC1 + ") completed.");
-            PlayerPrefs.SetInt("DailyChallenge1", -DC1);
+            if ((easyDailyChallenges[DC1].condition is BeatByCondition && easyDailyChallenges[DC1].CheckCompletion(scoreDifference, difficulty)) ||
+            (easyDailyChallenges[DC1].condition is WinUsingCondition && easyDailyChallenges[DC1].CheckCompletion(PowerupManager.Instance.GetPlayerUsed(), difficulty)))
+            {
+                Debug.Log("easy daily challenge (" + DC1 + ") completed.");
+                PlayerPrefs.SetInt("DailyChallenge1", -DC1);
+            }
         }
-        if (DC2 > 0 &&
-            (hardDailyChallenges[DC2].condition is BeatByCondition && hardDailyChallenges[DC2].CheckCompletion(scoreDifference, difficulty)) ||
-            (hardDailyChallenges[DC2].condition is WinUsingCondition && hardDailyChallenges[DC2].CheckCompletion(PowerupManager.Instance.GetPlayerUsed(), difficulty))
-            )
+        if (DC2 > 0)
         {
-            Debug.Log("hard daily challenge (" + DC2 + ") completed.");
-            PlayerPrefs.SetInt("DailyChallenge2", -DC2);
+            if ((hardDailyChallenges[DC2].condition is BeatByCondition && hardDailyChallenges[DC2].CheckCompletion(scoreDifference, difficulty)) ||
+            (hardDailyChallenges[DC2].condition is WinUsingCondition && hardDailyChallenges[DC2].CheckCompletion(PowerupManager.Instance.GetPlayerUsed(), difficulty)))
+            {
+                Debug.Log("hard daily challenge (" + DC2 + ") completed.");
+                PlayerPrefs.SetInt("DailyChallenge2", -DC2);
+            }
         }
         SetText();
 
