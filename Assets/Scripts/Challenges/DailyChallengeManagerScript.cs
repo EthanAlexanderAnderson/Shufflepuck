@@ -14,6 +14,9 @@ public class DailyChallengeManagerScript : MonoBehaviour
 
     [SerializeField] private TMP_Text countdownText;
 
+    [SerializeField] private GameObject ADRefreshCountdownParent;
+    [SerializeField] private TMP_Text ADRefreshCountdownText;
+
     [SerializeField] private TMP_Text challenge1Text;
     [SerializeField] private TMP_Text challenge2Text;
 
@@ -87,6 +90,12 @@ public class DailyChallengeManagerScript : MonoBehaviour
             hardRewardTexts[i].text = hardRewardStrings[i];
         }
         challenge2Text.text = hardDailyChallenges[Mathf.Abs(DC2)].challengeText;
+
+        // if both quests are completed, show how long is remaining until the next ad refresh
+        if (DC1 == 0 && DC2 == 0)
+        {
+            ADRefreshCountdownParent.SetActive(true);
+        }
     }
 
     void Update()
@@ -107,6 +116,24 @@ public class DailyChallengeManagerScript : MonoBehaviour
             // Update countdown text
             countdownText.text = string.Format("{0:D2}:{1:D2}:{2:D2}",
                 timeUntilMidnight.Hours, timeUntilMidnight.Minutes, timeUntilMidnight.Seconds);
+        }
+
+        // Calculate the time remaining until next ad refresh
+        if (ADRefreshCountdownParent.activeInHierarchy && DateTime.TryParseExact(PlayerPrefs.GetString("LastChallengeDate", string.Empty), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime lastChallengeDateTime))
+        {
+            if (ADRefreshCountdownText != null)
+            {
+                TimeSpan timeUntilNextAdRefresh = lastChallengeDateTime.AddHours(4) - now;
+                // Update countdown text
+                ADRefreshCountdownText.text = string.Format("{0:D2}:{1:D2}:{2:D2}",
+                    timeUntilNextAdRefresh.Hours, timeUntilNextAdRefresh.Minutes, timeUntilNextAdRefresh.Seconds);
+
+                // if ad refresh countdown is zero, hide the text
+                if (timeUntilNextAdRefresh.TotalSeconds <= 0)
+                {
+                    ADRefreshCountdownParent.SetActive(false);
+                }
+            }
         }
 
         // Check if the countdown has reached zero
@@ -354,6 +381,8 @@ public class DailyChallengeManagerScript : MonoBehaviour
         adRefreshButtonObject.transform.localPosition = new(-190f, adRefreshButtonObject.transform.localPosition.y);
         LeanTween.scaleX(adRefreshButtonObject, 1f, 1).setEaseOutElastic();
         LeanTween.moveLocalX(adRefreshButtonObject, -50f, 1).setEaseOutElastic();
+
+        ADRefreshCountdownParent.SetActive(false);
     }
 
     public void ClickAdRefreshButton()
