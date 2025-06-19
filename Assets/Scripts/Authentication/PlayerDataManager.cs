@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Unity.Services.CloudSave;
 using Unity.Services.Authentication;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class PlayerDataManager : MonoBehaviour
 {
@@ -18,14 +17,13 @@ public class PlayerDataManager : MonoBehaviour
         "easyWin", "easyLoss", "easyTie",
         "mediumWin", "mediumLoss", "mediumTie",
         "hardWin", "hardLoss", "hardTie",
-        "DailyChallenge1", "DailyChallenge2", "OngoingChallenge",
+        "DailyChallenge1", "DailyChallenge2", "OngoingChallenge", "ChallengeRefreshesToday",
         "PlinkoReward", "PlinkoPegsDropped", "WelcomeBonus", "Streak", "XP",
-        "CraftingCredits", "PackBooster", "StandardPacks", "PlusPacks"
+        "CraftingCredits", "PackBooster", "StandardPacks", "PlusPacks", "StandardPacksOpened", "PlusPacksOpened"
     };
 
     string[] stringKeys = {
         "LastChallengeDate", "LastPlinkoRewardDate", "LastDailyWinDate", "LastPackBoosterDate", "LastStreakDate",
-        "ChallengeRefreshesToday",
         "PlinkoSkinsUnlocked",
         "Deck1", "Deck2", "Deck3", "Deck4", "Deck5", "CardCollection",
         "WonUsing"
@@ -45,15 +43,13 @@ public class PlayerDataManager : MonoBehaviour
 
         try
         {
-            var playerData = new Dictionary<string, object>{
-            {"testKey", "a text value"},
-        };
+            var playerData = new Dictionary<string, object>{ {"testKey", "a text value"} };
             await CloudSaveService.Instance.Data.Player.SaveAsync(playerData);
             Debug.Log("Test save successful");
         }
         catch (System.Exception e)
         {
-            Debug.Log($"Test save failed {e}");
+            Debug.LogError($"Test save failed {e}");
         }
     }
 
