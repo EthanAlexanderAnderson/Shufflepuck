@@ -142,7 +142,7 @@ public class DeckManager : MonoBehaviour
             int cardIndex = decodedCard.cardIndex;
             if (cardIndex >= 0 && cardIndex < PowerupCardData.GetCardCount())
             {
-                cardIndexes[cardIndex]++;
+                cardIndexes[cardIndex] += decodedCard.quantity;
             }
         }
 
