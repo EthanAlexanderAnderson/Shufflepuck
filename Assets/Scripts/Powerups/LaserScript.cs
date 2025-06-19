@@ -100,7 +100,7 @@ public class LaserScript : MonoBehaviour
 
         laserEnabled = true;
         spriteRenderer.enabled = true;
-        LeanTween.alpha(gameObject, 1f, 0.5f).setEase(LeanTweenType.easeInQuart);
+        LeanTween.alpha(gameObject, 0.75f, 0.5f).setEase(LeanTweenType.easeInQuart);
 
         StopListeners();
         if (ClientLogicScript.Instance.isRunning) // vs online
@@ -150,6 +150,12 @@ public class LaserScript : MonoBehaviour
         }
         // turn off the laser
         StopListeners();
-        LeanTween.alpha(gameObject, 0f, 0.5f).setEase(LeanTweenType.easeInQuart).setOnComplete(DisableLaser);
+        LeanTween.alpha(gameObject, 1f, 0.01f).setEase(LeanTweenType.easeInQuart); // max opacity to emphasize shot
+        LeanTween.alpha(gameObject, 0f, 0.5f).setEase(LeanTweenType.easeInQuart).setDelay(0.02f).setOnComplete(DisableLaser); // fade out after shot
+
+        // play SFX
+        AudioSource SFX = GetComponent<AudioSource>();
+        SFX.volume = SoundManagerScript.Instance.GetSFXVolume() * 0.1f;
+        SFX.Play();
     }
 }
