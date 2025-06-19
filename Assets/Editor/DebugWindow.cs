@@ -212,35 +212,40 @@ public class DebugWindow : EditorWindow
 
     private void SetDateAs0001()
     {
-        PlayerPrefs.SetString("LastChallengeDate", "0001-01-01");
+        PlayerPrefs.SetString("LastChallengeDate", "0001-01-01 00:00:00");
         PlayerPrefs.SetString("LastPlinkoRewardDate", "0001-01-01");
         PlayerPrefs.SetString("LastDailyWinDate", "0001-01-01");
         PlayerPrefs.SetString("LastPackBoosterDate", "0001-01-01");
+        PlayerPrefs.SetString("LastStreakDate", "0001-01-01");
+
     }
 
     private void SetDateAsYesterday()
     {
-        PlayerPrefs.SetString("LastChallengeDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
+        PlayerPrefs.SetString("LastChallengeDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd HH:mm:ss"));
         PlayerPrefs.SetString("LastPlinkoRewardDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
         PlayerPrefs.SetString("LastDailyWinDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
         PlayerPrefs.SetString("LastPackBoosterDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
+        PlayerPrefs.SetString("LastStreakDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
         StreakManager.Instance.IncrementStreak();
     }
 
     private void SetDateAs4HoursAgo()
     {
-        PlayerPrefs.SetString("LastChallengeDate", DateTime.Now.AddHours(-4).ToString());
+        PlayerPrefs.SetString("LastChallengeDate", DateTime.Now.AddHours(-4).ToString("yyyy-MM-dd HH:mm:ss"));
         StreakManager.Instance.IncrementStreak();
     }
 
     private void SetDateAsTomorrow()
     {
-        var currentSavedDate = PlayerPrefs.GetString("LastChallengeDate", DateTime.Today.ToString("yyyy-MM-dd"));
+        var currentSavedDate = PlayerPrefs.GetString("LastChallengeDate", DateTime.Today.ToString("yyyy-MM-dd HH:mm:ss"));
         var tomorrow = DateTime.Parse(currentSavedDate).AddDays(1);
-        PlayerPrefs.SetString("LastChallengeDate", tomorrow.ToString("yyyy-MM-dd"));
+        PlayerPrefs.SetString("LastChallengeDate", tomorrow.ToString("yyyy-MM-dd HH:mm:ss"));
         PlayerPrefs.SetString("LastPlinkoRewardDate", tomorrow.ToString("yyyy-MM-dd"));
         PlayerPrefs.SetString("LastDailyWinDate", tomorrow.ToString("yyyy-MM-dd"));
         PlayerPrefs.SetString("LastPackBoosterDate", tomorrow.ToString("yyyy-MM-dd"));
+        PlayerPrefs.SetString("LastStreakDate", tomorrow.ToString("yyyy-MM-dd"));
+
     }
 
     private void SetDateAsNull()
@@ -249,6 +254,7 @@ public class DebugWindow : EditorWindow
         PlayerPrefs.DeleteKey("LastPlinkoRewardDate");
         PlayerPrefs.DeleteKey("LastDailyWinDate");
         PlayerPrefs.DeleteKey("LastPackBoosterDate");
+        PlayerPrefs.DeleteKey("LastStreakDate");
     }
 
     private void ResetAllProgress()
@@ -262,6 +268,9 @@ public class DebugWindow : EditorWindow
         PlayerPrefs.DeleteKey("onlineWin");
         PlayerPrefs.DeleteKey("onlineLoss");
         PlayerPrefs.DeleteKey("onlineTie");
+        PlayerPrefs.DeleteKey("localWin");
+        PlayerPrefs.DeleteKey("localLoss");
+        PlayerPrefs.DeleteKey("localTie");
         PlayerPrefs.DeleteKey("easyWin");
         PlayerPrefs.DeleteKey("easyLoss");
         PlayerPrefs.DeleteKey("easyTie");
@@ -269,14 +278,18 @@ public class DebugWindow : EditorWindow
         PlayerPrefs.DeleteKey("mediumLoss");
         PlayerPrefs.DeleteKey("mediumTie");
         PlayerPrefs.DeleteKey("hardWin");
+        PlayerPrefs.DeleteKey("hardLoss");
         PlayerPrefs.DeleteKey("hardTie");
         PlayerPrefs.DeleteKey("DailyChallenge1");
         PlayerPrefs.DeleteKey("DailyChallenge2");
         PlayerPrefs.DeleteKey("OngoingChallenge");
+        PlayerPrefs.DeleteKey("ChallengeRefreshesToday");
         PlayerPrefs.DeleteKey("Streak");
         PlayerPrefs.DeleteKey("PackBooster");
         PlayerPrefs.DeleteKey("StandardPacks");
         PlayerPrefs.DeleteKey("PlusPacks");
+        PlayerPrefs.DeleteKey("StandardPacksOpened");
+        PlayerPrefs.DeleteKey("PlusPacksOpened");
         PlayerPrefs.DeleteKey("WelcomeBonus");
         PlayerPrefs.DeleteKey("XP");
         PlayerPrefs.DeleteKey("CraftingCredits");
@@ -286,6 +299,11 @@ public class DebugWindow : EditorWindow
         PlayerPrefs.DeleteKey("ShowNewSkinAlert");
         PlayerPrefs.DeleteKey("PlinkoReward");
         PlayerPrefs.DeleteKey("Deck1");
+        PlayerPrefs.DeleteKey("Deck2");
+        PlayerPrefs.DeleteKey("Deck3");
+        PlayerPrefs.DeleteKey("Deck4");
+        PlayerPrefs.DeleteKey("Deck5");
+        PlayerPrefs.DeleteKey("LoadAll");
 
         SetDateAsNull();
     }
