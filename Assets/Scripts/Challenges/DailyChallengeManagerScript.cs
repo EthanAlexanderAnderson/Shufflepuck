@@ -150,7 +150,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         if (DateTime.TryParseExact(PlayerPrefs.GetString("LastChallengeDate", string.Empty), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime lastChallengeDateTime))
         {
             // Compare the last saved date to today's date & make sure current date is NEWER than lastChallengeDate to prevent device time tampering
-            if (DateTime.Today.Subtract(lastChallengeDateTime).Days >= 1)
+            if (lastChallengeDateTime.Date < DateTime.Today)
             {
                 AssignNewChallenge();
                 PlayerPrefs.SetInt("ChallengeRefreshesToday", 0);
