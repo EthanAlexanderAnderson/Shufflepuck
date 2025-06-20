@@ -63,7 +63,6 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     // for powerups
     [SerializeField] private bool phasePowerup = false;
-    public bool GetPhase() { return phasePowerup; }
 
     [SerializeField] private int growthPowerup = 0;
     public int GetGrowthCount() { return growthPowerup; }
@@ -194,12 +193,18 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 {
                     if (puck != gameObject && Vector2.Distance(puck.transform.position, transform.position) < 2)
                     {
-                        if (ClientLogicScript.Instance.isRunning && !IsServer) { break; }
                         phaseHasOverlap = true;
+                        if (ClientLogicScript.Instance.isRunning && !IsServer) { break; }
                         if (explosionPowerup > 0) // phase & explosion combo
                         {
                             puck.GetComponent<PuckScript>().DestroyPuck(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.ExplosionPowerup));
                             Explode();
+                        }
+                        // if two phases overlap, they can never phase in, so destroy them both
+                        if (puck.GetComponent<PuckScript>().IsPhase() && puck.GetComponent<PuckScript>().velocityNetworkedRounded.Value < 0.06f)
+                        {
+                            puck.GetComponent<PuckScript>().DestroyPuck();
+                            DestroyPuck();
                         }
                     }
                 }

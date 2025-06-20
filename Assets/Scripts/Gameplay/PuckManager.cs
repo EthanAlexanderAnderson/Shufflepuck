@@ -56,7 +56,7 @@ public class PuckManager : MonoBehaviour
         competitor.activePuckObject = Instantiate(puckPrefab, new Vector3(xpos, -10.0f, -1.0f), Quaternion.identity);
         competitor.activePuckScript = competitor.activePuckObject.GetComponent<PuckScript>();
         competitor.activePuckScript.InitPuck(competitor.isPlayer, competitor.puckSpriteID);
-        competitor.activePuckScript.SetPhase(targetPuckScript.GetPhase());
+        competitor.activePuckScript.SetPhase(targetPuckScript.IsPhase());
         for (int i = 0; i < targetPuckScript.GetPuckBonusValue(); i++)
         {
             competitor.activePuckScript.IncrementPuckBonusValue(1);
