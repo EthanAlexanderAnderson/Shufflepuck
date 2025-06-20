@@ -525,8 +525,8 @@ public static class CPUBehaviorScript
             if (!puckScript.IsPlayersPuck() && puckScript.IsResurrect()) { validPucks++; } // a single CPU resurrect will trigger cull
             if (puckScript.IsPlayersPuck() && puckScript.IsExponent() && // single exponent
                (puckScript.IsErratic() || // exponent + erratic
-                PowerupManager.Instance.GetDeck().Contains(4)) ||  // exponent + forcefield
-                puckScript.transform.position.y <= 9) // exponent + can be hit in
+                PowerupManager.Instance.GetDeck().Contains(4) ||  // exponent + forcefield
+                puckScript.transform.position.y <= 9)) // exponent + can be hit in
             {
                 useCull = true; // exponent can override the CPU's desire to not destroy it's own factory or a players resurrect
                 validPucks += 2;
