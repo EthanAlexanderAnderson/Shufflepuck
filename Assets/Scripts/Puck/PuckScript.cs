@@ -5,7 +5,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Unity.Netcode;
-using TMPro;
 using System;
 using System.Collections.Generic;
 
@@ -188,7 +187,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         {
             if (phasePowerup)
             {
-                // if this puck is within 2 units of the nearest puck, destroy it
+                // if this puck is within 2 units of the nearest puck, don't phase in
                 var phaseHasOverlap = false;
                 var pucks = GameObject.FindGameObjectsWithTag("puck");
                 foreach (var puck in pucks)
@@ -200,20 +199,35 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                         if (explosionPowerup > 0) // phase & explosion combo
                         {
                             puck.GetComponent<PuckScript>().DestroyPuck(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.ExplosionPowerup));
+                            Explode();
                         }
                     }
                 }
-                if (phaseHasOverlap)
+                if (!phaseHasOverlap)
                 {
-                    Explode();
-                    return;
+                    /// unphase it (make it visible again)
+                    spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+                    puckCollider.isTrigger = false;
+                    phasePowerup = false;
+                    RemoveAllPowerupText("phase");
+                    if (zoneMultiplier > 0)
+                    {
+                        if (IsPlayersPuck())
+                        {
+                            pointPlayerSFX.volume = SFXvolume;
+                            pointPlayerSFX.pitch = 0.9f + (0.05f * zoneMultiplier);
+                            pointPlayerSFX.Play();
+                        }
+                        else
+                        {
+                            pointCPUSFX.volume = SFXvolume;
+                            pointCPUSFX.pitch = 0.8f + (0.05f * zoneMultiplier);
+                            pointCPUSFX.Play();
+                        }
+                    }
+                    CreateScoreFloatingText();
+                    logic.UpdateScores();
                 }
-
-                // othewrise, unphase it (make it visible again)
-                spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
-                puckCollider.isTrigger = false;
-                phasePowerup = false;
-                RemovePowerupText("phase");
             }
 
             if (lockPowerup > 0 && rb.bodyType == RigidbodyType2D.Dynamic)
@@ -370,9 +384,10 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public bool IsSafe() { return safe; }
     public bool IsPastSafeLine() { return pastSafeLine; }
     public bool IsPlayersPuck() { return playersPuck; }
-    public int ComputeValue() { return (puckBaseValue * zoneMultiplier) + (zoneMultiplier > 0 ? puckBonusValue : 0); }
+    public int ComputeValue() { return phasePowerup ? 0 : (puckBaseValue * zoneMultiplier) + (zoneMultiplier > 0 ? puckBonusValue : 0); }
     public int ComputeTotalFutureValue()
     {
+        if (phasePowerup) return 0;
         if (zoneMultiplier <= 0 && transform.position.y > 9) return 0;
 
         // for future value, if the puck is able to be hit into a scoring zone (below y 9), treat it as minimum zone mult of 1
@@ -409,7 +424,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         if (isBoundry) { return; } // don't update score or play SFX for the safe line boundry. This is important for hydra / factory powerups.
 
         // if puck moves into higher scoring zone and gains a point play SFX
-        if (enteredZoneMultiplier > zoneMultiplier && (puckBaseValue + puckBonusValue) > 0)
+        if (enteredZoneMultiplier > zoneMultiplier && (puckBaseValue + puckBonusValue) > 0 && !phasePowerup)
         {
             if (IsPlayersPuck())
             {
@@ -425,7 +440,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             }
         }
         // if puck moves into the off zone, play minus sfx
-        else if (enteredZoneMultiplier < zoneMultiplier)
+        else if (enteredZoneMultiplier < zoneMultiplier && (puckBaseValue + puckBonusValue) > 0 && !phasePowerup)
         {
             if (IsPlayersPuck())
             {
@@ -632,6 +647,21 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     public void RemovePowerupText(string text)
     {
         powerupText.Remove(text);
+    }
+
+    public void RemoveAllPowerupText(string text = null)
+    {
+        if (text != null)
+        {
+            while (powerupText.Contains(text))
+            {
+                powerupText.Remove(text);
+            }
+        }
+        else
+        {
+            powerupText.Clear();
+        }
     }
 
     // text to show what powerup was used under the puck. Only fades, no up/shrink.
