@@ -21,6 +21,7 @@ public class LaserScript : MonoBehaviour
 
     // state
     private bool laserEnabled = false;
+    private int laserCount = 0;
 
     // base parameters
     [SerializeField] private float xBase = 0f;
@@ -99,6 +100,7 @@ public class LaserScript : MonoBehaviour
         if (!playersPuck) { return; } // only laser user
 
         laserEnabled = true;
+        laserCount++;
         spriteRenderer.enabled = true;
         LeanTween.alpha(gameObject, 0.75f, 0.5f).setEase(LeanTweenType.easeInQuart);
 
@@ -118,6 +120,7 @@ public class LaserScript : MonoBehaviour
     public void DisableLaser()
     {
         laserEnabled = false;
+        laserCount = 0;
         spriteRenderer.enabled = false;
         transform.localPosition = new Vector3(xBase, -30f, zBase);
     }
@@ -138,13 +141,17 @@ public class LaserScript : MonoBehaviour
         {
             if (puck != null)
             {
-                if (ClientLogicScript.Instance.isRunning)
+                // if a player uses more than 1 laser, destroy the puck that many times (to go through a shield basically)
+                for (int i = 0; i < laserCount; i++)
                 {
-                    puck.GetComponent<PuckScript>().DestroyPuckServerRpc();
-                }
-                else
-                {
-                    puck.GetComponent<PuckScript>().DestroyPuck();
+                    if (ClientLogicScript.Instance.isRunning)
+                    {
+                        puck.GetComponent<PuckScript>().DestroyPuckServerRpc();
+                    }
+                    else
+                    {
+                        puck.GetComponent<PuckScript>().DestroyPuck();
+                    }
                 }
             }
         }
