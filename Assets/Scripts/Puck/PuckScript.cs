@@ -64,20 +64,37 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     // for powerups
     [SerializeField] private bool phasePowerup = false;
+    public bool GetPhase() { return phasePowerup; }
+
     [SerializeField] private int growthPowerup = 0;
     public int GetGrowthCount() { return growthPowerup; }
+
     [SerializeField] private int lockPowerup = 0;
+    public int GetLockCount() { return lockPowerup; }
+
     [SerializeField] private int explosionPowerup = 0;
+    public int GetExplosionCount() { return explosionPowerup; }
+
     [SerializeField] private int hydraPowerup = 0;
+    public int GetHydraCount() { return hydraPowerup; }
+
     [SerializeField] private int shieldPowerup = 0;
+    public int GetShieldCount() { return shieldPowerup; }
+
     [SerializeField] private int resurrectPowerup = 0;
+    public int GetResurrectCount() { return resurrectPowerup; }
+
     [SerializeField] private int factoryPowerup = 0;
     public int GetFactoryCount() { return factoryPowerup; }
-    [SerializeField] private bool pushPowerup = false;
-    [SerializeField] private int exponentPowerup = 0;
-    [SerializeField] private int erraticPowerup = 0;
 
+    [SerializeField] private int pushPowerup = 0;
+    public int GetPushCount() { return pushPowerup; }
+
+    [SerializeField] private int exponentPowerup = 0;
     public int GetExponentCount() { return exponentPowerup; }
+
+    [SerializeField] private int erraticPowerup = 0;
+    public int GetErraticCount() { return erraticPowerup; }
 
     void OnEnable()
     {
@@ -154,11 +171,14 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         // for push
         if (IsShot() && pastSafeLine && IsSlowedMore())
         {
-            if (pushPowerup)
+            if (pushPowerup > 0)
             {
-                GetComponentInChildren<NearbyPuckScript>().TriggerPush();
-                pushPowerup = false;
-                RemovePowerupText("push");
+                for (int i = 0; i < pushPowerup; i++)
+                {
+                    GetComponentInChildren<NearbyPuckScript>().TriggerPush();
+                    RemovePowerupText("push");
+                }
+                pushPowerup = 0;
                 //PowerupAnimationManager.Instance.PlayPowerupActivationAnimation(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.PushPowerup), transform.position);
             }
         }
@@ -1073,7 +1093,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     public void EnablePush()
     {
-        pushPowerup = true;
+        pushPowerup++;
     }
 
     public void EnableErratic()

@@ -6,6 +6,7 @@ public class NearbyPuckScript : MonoBehaviour
     List<GameObject> pucksInPath = new();
     bool auraEnabled = false;
     int auraCount = 0;
+    public int GetAuraCount() { return auraCount; }
 
     bool isPlayersPuck = false;
 

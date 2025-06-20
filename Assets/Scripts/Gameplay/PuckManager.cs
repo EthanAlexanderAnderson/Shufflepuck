@@ -47,6 +47,86 @@ public class PuckManager : MonoBehaviour
         competitor.activePuckScript.InitPuck(competitor.isPlayer, competitor.puckSpriteID);
     }
 
+    // this method creates a puck that copies static effects of the provided puckscript
+    public void CreatePuckCopy(Competitor competitor, GameObject targetPuckObject)
+    {
+        PuckScript targetPuckScript = targetPuckObject.GetComponent<PuckScript>();
+
+        float xpos = (competitor.isPlayer ? -3.6f : 3.6f);
+        competitor.activePuckObject = Instantiate(puckPrefab, new Vector3(xpos, -10.0f, -1.0f), Quaternion.identity);
+        competitor.activePuckScript = competitor.activePuckObject.GetComponent<PuckScript>();
+        competitor.activePuckScript.InitPuck(competitor.isPlayer, competitor.puckSpriteID);
+        competitor.activePuckScript.SetPhase(targetPuckScript.GetPhase());
+        for (int i = 0; i < targetPuckScript.GetPuckBonusValue(); i++)
+        {
+            competitor.activePuckScript.IncrementPuckBonusValue(1);
+            competitor.activePuckScript.SetPowerupText("plus one");
+        }
+        int basevalue = targetPuckScript.GetPuckBaseValue();
+        while (basevalue >= 2)
+        {
+            competitor.activePuckScript.DoublePuckBaseValue();
+            competitor.activePuckScript.SetPowerupText("times two");
+            basevalue /= 2;
+        }
+        for (int i = 0; i < targetPuckScript.GetGrowthCount(); i++)
+        {
+            competitor.activePuckScript.EnableGrowth();
+            competitor.activePuckScript.SetPowerupText("growth");
+        }
+        for (int i = 0; i < targetPuckScript.GetLockCount(); i++)
+        {
+            competitor.activePuckScript.EnableLock();
+            competitor.activePuckScript.SetPowerupText("lock");
+        }
+        for (int i = 0; i < targetPuckScript.GetExplosionCount(); i++)
+        {
+            competitor.activePuckScript.EnableExplosion();
+            competitor.activePuckScript.SetPowerupText("explosion");
+        }
+        for (int i = 0; i < targetPuckScript.GetHydraCount(); i++)
+        {
+            competitor.activePuckScript.EnableHydra();
+            competitor.activePuckScript.SetPowerupText("hydra");
+        }
+        for (int i = 0; i < targetPuckScript.GetShieldCount(); i++)
+        {
+            competitor.activePuckScript.EnableShield();
+            competitor.activePuckScript.SetPowerupText("shield");
+        }
+        for (int i = 0; i < targetPuckScript.GetResurrectCount(); i++)
+        {
+            competitor.activePuckScript.EnableResurrect();
+            competitor.activePuckScript.SetPowerupText("resurrect");
+        }
+        for (int i = 0; i < targetPuckScript.GetFactoryCount(); i++)
+        {
+            competitor.activePuckScript.EnableFactory();
+            competitor.activePuckScript.SetPowerupText("factory");
+        }
+        for (int i = 0; i < targetPuckScript.GetPushCount(); i++)
+        {
+            competitor.activePuckScript.EnablePush();
+            competitor.activePuckObject.GetComponentInChildren<NearbyPuckScript>().EnablePush();
+            competitor.activePuckScript.SetPowerupText("push");
+        }
+        for (int i = 0; i < targetPuckScript.GetExponentCount(); i++)
+        {
+            competitor.activePuckScript.EnableExponent();
+            competitor.activePuckScript.SetPowerupText("exponent");
+        }
+        for (int i = 0; i < targetPuckScript.GetErraticCount(); i++)
+        {
+            competitor.activePuckScript.EnableErratic();
+            competitor.activePuckScript.SetPowerupText("erratic");
+        }
+        for (int i = 0; i < targetPuckObject.GetComponentInChildren<NearbyPuckScript>().GetAuraCount(); i++)
+        {
+            competitor.activePuckObject.GetComponentInChildren<NearbyPuckScript>().EnableAura();
+            competitor.activePuckScript.SetPowerupText("aura");
+        }
+    }
+
     public (int,int) UpdateScores()
     {
         int playerSum = 0;
