@@ -490,7 +490,7 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
 
         // text
         ownedCount1.text = ownedCardVariationList[selectedCardVariationIndex].count.ToString();
-        ownedCount2.text = selectedCurrency.ToString();
+        ownedCount2.text = selectedCurrency.ToString() + "/" + craftCost;
         ownedText2.text = selectedCardRank > 0 ? rankCraftNames[selectedCardRank - 1] + ":" : "";
         craftCreditsImage2.SetActive(selectedCardRank == 0);
         craftArrow1.enabled = (toCraftCount > 0);
