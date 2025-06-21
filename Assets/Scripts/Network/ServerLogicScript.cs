@@ -513,7 +513,7 @@ public class ServerLogicScript : NetworkBehaviour
 
                 if (spawnCount == 2)
                 {
-                    puckScript.EnableHydraClientRpc();
+                    puckScript.ActivateHydraClientRpc();
                 }
 
                 Debug.Log(

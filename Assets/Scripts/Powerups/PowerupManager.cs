@@ -309,9 +309,7 @@ public class PowerupManager : NetworkBehaviour
         if (NeedsToBeSentToServer(encodedCard)) { return; }
         PayCosts(encodedCard);
 
-        activeCompetitor.activePuckScript.IncrementPuckBonusValue(1);
-
-        activeCompetitor.activePuckScript.SetPowerupText("plus one");
+        activeCompetitor.activePuckScript.ActivatePlusOne();
     }
 
     public void ForesightPowerup(int encodedCard) // index 1 : enable the shot predicted location halo
@@ -403,8 +401,7 @@ public class PowerupManager : NetworkBehaviour
         if (NeedsToBeSentToServer(encodedCard)) { return; }
         PayCosts(encodedCard);
 
-        activeCompetitor.activePuckScript.SetPowerupText("phase");
-        activeCompetitor.activePuckScript.SetPhase(true);
+        activeCompetitor.activePuckScript.ActivatePhase();
     }
 
     public void CullPowerup(int encodedCard) // index 6 : destroy all pucks valued <= 0
@@ -439,9 +436,7 @@ public class PowerupManager : NetworkBehaviour
         if (NeedsToBeSentToServer(encodedCard)) { return; }
         PayCosts(encodedCard);
 
-        activeCompetitor.activePuckScript.EnableGrowth();
-
-        activeCompetitor.activePuckScript.SetPowerupText("growth");
+        activeCompetitor.activePuckScript.ActivateGrowth();
     }
 
     public void LockPowerup(int encodedCard) // index 8 : locked in place (can't be moved) after stopping
@@ -451,9 +446,7 @@ public class PowerupManager : NetworkBehaviour
         if (NeedsToBeSentToServer(encodedCard)) { return; }
         PayCosts(encodedCard);
 
-        activeCompetitor.activePuckScript.EnableLock();
-
-        activeCompetitor.activePuckScript.SetPowerupText("lock");
+        activeCompetitor.activePuckScript.ActivateLock();
     }
 
     public void ExplosionPowerup(int encodedCard) // index 9 : destroys itself and first touched puck
@@ -463,9 +456,7 @@ public class PowerupManager : NetworkBehaviour
         if (NeedsToBeSentToServer(encodedCard)) { return; }
         PayCosts(encodedCard);
 
-        activeCompetitor.activePuckScript.EnableExplosion();
-
-        activeCompetitor.activePuckScript.SetPowerupText("explosion");
+        activeCompetitor.activePuckScript.ActivateExplosion();
     }
 
     public void FogPowerup(int encodedCard) // index 10 : fog blocks your opponent's vision
@@ -485,9 +476,7 @@ public class PowerupManager : NetworkBehaviour
         if (NeedsToBeSentToServer(encodedCard)) { return; }
         PayCosts(encodedCard);
 
-        activeCompetitor.activePuckScript.EnableHydra();
-
-        activeCompetitor.activePuckScript.SetPowerupText("hydra");
+        activeCompetitor.activePuckScript.ActivateHydra();
     }
 
     public void FactoryPowerup(int encodedCard) // index 12 : active puck is valueless, but spawns a valued puck every shot
@@ -497,9 +486,7 @@ public class PowerupManager : NetworkBehaviour
         if (NeedsToBeSentToServer(encodedCard)) { return; }
         PayCosts(encodedCard);
 
-        activeCompetitor.activePuckScript.EnableFactory();
-
-        activeCompetitor.activePuckScript.SetPowerupText("factory");
+        activeCompetitor.activePuckScript.ActivateFactory();
     }
 
     public void ShieldPowerup(int encodedCard) // index 13 : prevent being destroyed once
@@ -509,9 +496,7 @@ public class PowerupManager : NetworkBehaviour
         if (NeedsToBeSentToServer(encodedCard)) { return; }
         PayCosts(encodedCard);
 
-        activeCompetitor.activePuckScript.EnableShield();
-
-        activeCompetitor.activePuckScript.SetPowerupText("shield");
+        activeCompetitor.activePuckScript.ActivateShield();
     }
 
     private bool isShuffling = false; // Flag to prevent multiple calls
@@ -539,7 +524,7 @@ public class PowerupManager : NetworkBehaviour
         {
             if (puck.transform.position.y > 0 && puck.transform.position.y < 20 &&
                 puck.transform.position.x > -12 && puck.transform.position.x < 12 &&
-                !puck.GetComponent<PuckScript>().IsLocked())
+                !puck.GetComponent<PuckScript>().HasLock())
             {
                 validPucks.Add(puck);
             }
@@ -592,7 +577,7 @@ public class PowerupManager : NetworkBehaviour
             yield return null; // Wait for the next frame
         }
         spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
-        if (puck.GetComponent<PuckScript>().IsLocked())
+        if (puck.GetComponent<PuckScript>().HasLock())
         {
             spriteRenderer.color = new Color(0.5f, 0.5f, 0.5f, 1f);
         }
@@ -647,9 +632,7 @@ public class PowerupManager : NetworkBehaviour
         if (NeedsToBeSentToServer(encodedCard)) { return; }
         PayCosts(encodedCard);
 
-        activeCompetitor.activePuckScript.DoublePuckBaseValue();
-
-        activeCompetitor.activePuckScript.SetPowerupText("times two");
+        activeCompetitor.activePuckScript.ActivateTimesTwo();
     }
 
     public void ResurrectPowerup(int encodedCard) // index 17 : +1 puck count when destroyed
@@ -659,9 +642,7 @@ public class PowerupManager : NetworkBehaviour
         if (NeedsToBeSentToServer(encodedCard)) { return; }
         PayCosts(encodedCard);
 
-        activeCompetitor.activePuckScript.EnableResurrect();
-
-        activeCompetitor.activePuckScript.SetPowerupText("resurrect");
+        activeCompetitor.activePuckScript.ActivateResurrect();
     }
 
     public void MillPowerup(int encodedCard) // index 18 : discard half your opponent's deck rounded up
@@ -747,7 +728,7 @@ public class PowerupManager : NetworkBehaviour
         if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { LogicScript.Instance.triplePowerup += 2; }
         else if (ClientLogicScript.Instance.isRunning && activeCompetitor.isPlayer) { ServerLogicScript.Instance.IncrementTriplePowerupServerRpc(); }
 
-        if (activeCompetitor.isPlayer) { activeCompetitor.activePuckScript.SetPowerupText("triple"); }
+        if (activeCompetitor.isPlayer) { activeCompetitor.activePuckScript.AddPowerupText("triple"); }
     }
 
     public void ExponentPowerup(int encodedCard) // index 22 : double base value every shot
@@ -757,8 +738,7 @@ public class PowerupManager : NetworkBehaviour
         if (NeedsToBeSentToServer(encodedCard)) { return; }
         PayCosts(encodedCard);
 
-        activeCompetitor.activePuckScript.EnableExponent();
-        activeCompetitor.activePuckScript.SetPowerupText("exponent");
+        activeCompetitor.activePuckScript.ActivateExponent();
     }
 
     public void LaserPowerup(int encodedCard) // index 23 : destroy all pucks in a line
@@ -778,9 +758,7 @@ public class PowerupManager : NetworkBehaviour
         if (NeedsToBeSentToServer(encodedCard)) { return; }
         PayCosts(encodedCard);
 
-        activeCompetitor.activePuckObject.GetComponentInChildren<NearbyPuckScript>().EnableAura();
-
-        activeCompetitor.activePuckScript.SetPowerupText("aura");
+        activeCompetitor.activePuckScript.ActivateAura();
     }
 
     public void PushPowerup(int encodedCard) // index 25 : upon stopping, push all pucks away from the active puck
@@ -790,10 +768,7 @@ public class PowerupManager : NetworkBehaviour
         if (NeedsToBeSentToServer(encodedCard)) { return; }
         PayCosts(encodedCard);
 
-        activeCompetitor.activePuckObject.GetComponentInChildren<NearbyPuckScript>().EnablePush();
-        activeCompetitor.activePuckScript.EnablePush();
-
-        activeCompetitor.activePuckScript.SetPowerupText("push");
+        activeCompetitor.activePuckScript.ActivatePush();
     }
 
     public void ErraticPowerup(int encodedCard) // index 26 : move randomly each shot
@@ -803,9 +778,7 @@ public class PowerupManager : NetworkBehaviour
         if (NeedsToBeSentToServer(encodedCard)) { return; }
         PayCosts(encodedCard);
 
-        activeCompetitor.activePuckScript.EnableErratic();
-
-        activeCompetitor.activePuckScript.SetPowerupText("erratic");
+        activeCompetitor.activePuckScript.ActivateErratic();
     }
 
     private int denyPowerup;
@@ -852,9 +825,7 @@ public class PowerupManager : NetworkBehaviour
         if (NeedsToBeSentToServer(encodedCard)) { return; }
         PayCosts(encodedCard);
 
-        activeCompetitor.activePuckScript.IncrementPuckBonusValue(3);
-
-        activeCompetitor.activePuckScript.SetPowerupText("plus three");
+        activeCompetitor.activePuckScript.ActivatePlusThree();
     }
 
     public bool IsOmniscient() { return activeCompetitor.isOmniscient; }
@@ -1034,8 +1005,7 @@ public class PowerupManager : NetworkBehaviour
 
             if (spawnCount == 2)
             {
-                puckScript.EnableHydra();
-                puckScript.SetPowerupText("hydra");
+                puckScript.ActivateHydra();
             }
         }
     }

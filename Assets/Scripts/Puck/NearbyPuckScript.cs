@@ -10,7 +10,7 @@ public class NearbyPuckScript : MonoBehaviour
 
     bool isPlayersPuck = false;
 
-    public void EnableAura()
+    public void ActivateAura()
     {
         auraEnabled = true;
         auraCount++;

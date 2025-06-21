@@ -50,7 +50,7 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
 
             PuckScript puckScript = puck.GetComponent<PuckScript>();
             if (puckScript == null) continue;
-            if (!puckScript.IsPlayersPuck() || puckScript.IsLocked()) continue;
+            if (!puckScript.IsPlayersPuck() || puckScript.HasLock()) continue;
 
             int puckValue = puckScript.ComputeTotalFutureValue();
 
@@ -110,7 +110,7 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
     {
         PuckScript targetPuckScript = puck.GetComponent<PuckScript>();
         // CPU puck should end up vaguely where the hitout puck was (unless the target puck will explode the shot puck), so start the shot value with that
-        int tempValueModifier = !targetPuckScript.IsExplosion() ? targetPuckScript.GetZoneMultiplier() : 0;
+        int tempValueModifier = !targetPuckScript.HasExplosion() ? targetPuckScript.GetZoneMultiplier() : 0;
         float tempPowerModifier = 0;
         bool needsExplosion = false;
 
@@ -163,7 +163,7 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
                     pucksInFront++;
                     var puckScript = hit.collider.GetComponent<PuckScript>();
                     // if there is a lock or explosion in front, the path is blocked
-                    if (puckScript.IsLocked() || puckScript.IsExplosion())
+                    if (puckScript.HasLock() || puckScript.HasExplosion())
                     {
                         return (false, 0, 0, false); // Puck is blocking
                     }
@@ -197,7 +197,7 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
 
                     var puckScript = hit.collider.GetComponent<PuckScript>();
                     if (puckScript.GetZoneMultiplier() <= 0) continue; // Ignore pucks in the offzone
-                    if (!puckScript.IsLocked()) // locked puck behind prevents knockout
+                    if (!puckScript.HasLock()) // locked puck behind prevents knockout
                     {
                         if (puckScript.IsPlayersPuck())
                         {

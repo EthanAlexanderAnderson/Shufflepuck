@@ -36,7 +36,7 @@ public class CPUPathScript : MonoBehaviour, CPUPathInterface
             return modifiedDifficulty < 2 ? 0 : value; // don't consider regular paths for easy/medium with no powerups
         }
         // explosion shot
-        else if (numberOfPucksCurrentlyInPath == 1 && pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsPlayersPuck() && !pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsHydra() && !pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsResurrect() && !requiresPhasePowerup)
+        else if (numberOfPucksCurrentlyInPath == 1 && pucksCurrentlyInPath[0].GetComponent<PuckScript>().IsPlayersPuck() && !pucksCurrentlyInPath[0].GetComponent<PuckScript>().HasHydra() && !pucksCurrentlyInPath[0].GetComponent<PuckScript>().HasResurrect() && !requiresPhasePowerup)
         {
             requiresExplosionPowerup = true;
             if (CPUBehaviorScript.HasExplosion())

@@ -56,74 +56,60 @@ public class PuckManager : MonoBehaviour
         competitor.activePuckObject = Instantiate(puckPrefab, new Vector3(xpos, -10.0f, -1.0f), Quaternion.identity);
         competitor.activePuckScript = competitor.activePuckObject.GetComponent<PuckScript>();
         competitor.activePuckScript.InitPuck(competitor.isPlayer, competitor.puckSpriteID);
-        competitor.activePuckScript.SetPhase(targetPuckScript.IsPhase());
-        for (int i = 0; i < targetPuckScript.GetPuckBonusValue(); i++)
+
+        // Activate powerups
+        for (int i = 0; i < targetPuckScript.GetPlusOneCount(); i++)
         {
-            competitor.activePuckScript.IncrementPuckBonusValue(1);
-            competitor.activePuckScript.SetPowerupText("plus one");
+            competitor.activePuckScript.ActivatePlusOne();
         }
-        int basevalue = targetPuckScript.GetPuckBaseValue();
-        while (basevalue >= 2)
-        {
-            competitor.activePuckScript.DoublePuckBaseValue();
-            competitor.activePuckScript.SetPowerupText("times two");
-            basevalue /= 2;
-        }
+        if (competitor.activePuckScript.HasPhase()) { competitor.activePuckScript.ActivatePhase(); }
         for (int i = 0; i < targetPuckScript.GetGrowthCount(); i++)
         {
-            competitor.activePuckScript.EnableGrowth();
-            competitor.activePuckScript.SetPowerupText("growth");
+            competitor.activePuckScript.ActivateGrowth();
         }
         for (int i = 0; i < targetPuckScript.GetLockCount(); i++)
         {
-            competitor.activePuckScript.EnableLock();
-            competitor.activePuckScript.SetPowerupText("lock");
+            competitor.activePuckScript.ActivateLock();
         }
         for (int i = 0; i < targetPuckScript.GetExplosionCount(); i++)
         {
-            competitor.activePuckScript.EnableExplosion();
-            competitor.activePuckScript.SetPowerupText("explosion");
+            competitor.activePuckScript.ActivateExplosion();
         }
         for (int i = 0; i < targetPuckScript.GetHydraCount(); i++)
         {
-            competitor.activePuckScript.EnableHydra();
-            competitor.activePuckScript.SetPowerupText("hydra");
+            competitor.activePuckScript.ActivateHydra();
         }
         for (int i = 0; i < targetPuckScript.GetShieldCount(); i++)
         {
-            competitor.activePuckScript.EnableShield();
-            competitor.activePuckScript.SetPowerupText("shield");
+            competitor.activePuckScript.ActivateShield();
+        }
+        for (int i = 0; i < targetPuckScript.GetTimesTwoCount(); i++)
+        {
+            competitor.activePuckScript.ActivateTimesTwo();
         }
         for (int i = 0; i < targetPuckScript.GetResurrectCount(); i++)
         {
-            competitor.activePuckScript.EnableResurrect();
-            competitor.activePuckScript.SetPowerupText("resurrect");
+            competitor.activePuckScript.ActivateResurrect();
         }
         for (int i = 0; i < targetPuckScript.GetFactoryCount(); i++)
         {
-            competitor.activePuckScript.EnableFactory();
-            competitor.activePuckScript.SetPowerupText("factory");
+            competitor.activePuckScript.ActivateFactory();
         }
         for (int i = 0; i < targetPuckScript.GetPushCount(); i++)
         {
-            competitor.activePuckScript.EnablePush();
-            competitor.activePuckObject.GetComponentInChildren<NearbyPuckScript>().EnablePush();
-            competitor.activePuckScript.SetPowerupText("push");
+            competitor.activePuckScript.ActivatePush();
         }
         for (int i = 0; i < targetPuckScript.GetExponentCount(); i++)
         {
-            competitor.activePuckScript.EnableExponent();
-            competitor.activePuckScript.SetPowerupText("exponent");
+            competitor.activePuckScript.ActivateExponent();
         }
         for (int i = 0; i < targetPuckScript.GetErraticCount(); i++)
         {
-            competitor.activePuckScript.EnableErratic();
-            competitor.activePuckScript.SetPowerupText("erratic");
+            competitor.activePuckScript.ActivateErratic();
         }
         for (int i = 0; i < targetPuckObject.GetComponentInChildren<NearbyPuckScript>().GetAuraCount(); i++)
         {
-            competitor.activePuckObject.GetComponentInChildren<NearbyPuckScript>().EnableAura();
-            competitor.activePuckScript.SetPowerupText("aura");
+            competitor.activePuckScript.ActivateAura();
         }
     }
 

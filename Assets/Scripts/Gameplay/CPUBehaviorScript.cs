@@ -429,12 +429,12 @@ public static class CPUBehaviorScript
                 // small postive weight relative to player puck total future value, and ignore shield to avoid exponent+shield being OP
                 playerPucks += puckScript.ComputeTotalFutureValue() / 10;
                 // small negative weight for player hydra
-                if (puckScript.IsHydra() && !puckScript.IsShield())
+                if (puckScript.HasHydra() && !puckScript.HasShield())
                 {
                     opponentPucks += 2;
                 }
                 // large negative weight for player resurrect
-                if (puckScript.IsResurrect() && !puckScript.IsShield())
+                if (puckScript.HasResurrect() && !puckScript.HasShield())
                 {
                     opponentPucks += 5;
                 }
@@ -444,14 +444,14 @@ public static class CPUBehaviorScript
             {
                 opponentPucks++;
                 // small negative weight relative to CPU puck total future value if it has no shield
-                opponentPucks += !puckScript.IsShield() ? puckScript.ComputeTotalFutureValue() / 10 : 0;
+                opponentPucks += !puckScript.HasShield() ? puckScript.ComputeTotalFutureValue() / 10 : 0;
                 // small postive weight for CPU hydra
-                if (puckScript.IsHydra() && !puckScript.IsShield())
+                if (puckScript.HasHydra() && !puckScript.HasShield())
                 {
                     playerPucks += 2;
                 }
                 // large postive weight for CPU resurrect
-                if (puckScript.IsResurrect() && !puckScript.IsShield())
+                if (puckScript.HasResurrect() && !puckScript.HasShield())
                 {
                     playerPucks += 5;
                 }
@@ -508,23 +508,23 @@ public static class CPUBehaviorScript
             }
 
             // don't use cull if player has resurrect that would trigger
-            if (puckScript.IsPlayersPuck() && puckScript.IsResurrect())
+            if (puckScript.IsPlayersPuck() && puckScript.HasResurrect())
             {
                 useCull = false;
             }
 
             // don't use cull if CPU has factory in a scoring zone that would be destroyed
-            if (!puckScript.IsPlayersPuck() && puckScript.IsFactory() && puckScript.GetZoneMultiplier() > 0)
+            if (!puckScript.IsPlayersPuck() && puckScript.HasFactory() && puckScript.GetZoneMultiplier() > 0)
             {
                 useCull = false;
             }
 
             // increase weight of cull
-            if (puckScript.IsPlayersPuck() && !puckScript.IsHydra()) { validPucks++; }
-            if (puckScript.IsPlayersPuck() && puckScript.IsFactory() && LogicScript.Instance.player.puckCount > 0) { validPucks++; } // a single player factory will trigger cull
-            if (!puckScript.IsPlayersPuck() && puckScript.IsResurrect()) { validPucks++; } // a single CPU resurrect will trigger cull
-            if (puckScript.IsPlayersPuck() && puckScript.IsExponent() && // single exponent
-               (puckScript.IsErratic() || // exponent + erratic
+            if (puckScript.IsPlayersPuck() && !puckScript.HasHydra()) { validPucks++; }
+            if (puckScript.IsPlayersPuck() && puckScript.HasFactory() && LogicScript.Instance.player.puckCount > 0) { validPucks++; } // a single player factory will trigger cull
+            if (!puckScript.IsPlayersPuck() && puckScript.HasResurrect()) { validPucks++; } // a single CPU resurrect will trigger cull
+            if (puckScript.IsPlayersPuck() && puckScript.HasExponent() && // single exponent
+               (puckScript.HasErratic() || // exponent + erratic
                 PowerupManager.Instance.GetDeck().Contains(4) ||  // exponent + forcefield
                 puckScript.transform.position.y <= 9)) // exponent + can be hit in
             {
