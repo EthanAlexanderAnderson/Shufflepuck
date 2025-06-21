@@ -255,7 +255,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             pastSafeLine = true;
         }
 
-        // phase powerup
+        // phase powerup (in motion)
         if (phasePowerup && (velocity > 1.0f || !IsShot())) // while moving, phase out
         {
             spriteRenderer.color = new Color(1f, 1f, 1f, 0.5f);
@@ -277,33 +277,48 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             }
         }
 
-        // for phase & lock powerup
+        // for phase & lock powerup stopping
         if (IsShot() && pastSafeLine && velocity < 0.06) // using specific velocity here so it happens before game end trigger
         {
             if (phasePowerup)
             {
-                // if this puck is within 2 units of the nearest puck, don't phase in
-                var phaseHasOverlap = false;
+                // handle overlaps
+                bool phaseHasOverlap = false;
+                bool phaseHasOverlapWithPhase = false;
                 var pucks = GameObject.FindGameObjectsWithTag("puck");
+                // if this puck comes to a stop overlapping with another phase, destroy them both because they can never fade in
                 foreach (var puck in pucks)
                 {
                     if (puck != gameObject && Vector2.Distance(puck.transform.position, transform.position) < 2)
                     {
                         phaseHasOverlap = true;
                         if (ClientLogicScript.Instance.isRunning && !IsServer) { break; }
-                        if (explosionPowerup > 0) // phase & explosion combo
-                        {
-                            puck.GetComponent<PuckScript>().DestroyPuck(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.ExplosionPowerup));
-                            Explode();
-                        }
-                        // if two phases overlap, they can never phase in, so destroy them both
+                        // if two stopped phases overlap, they can never phase in, so destroy them both
                         if (puck.GetComponent<PuckScript>().HasPhase() && puck.GetComponent<PuckScript>().velocityNetworkedRounded.Value < 0.06f)
                         {
+                            phaseHasOverlapWithPhase = true;
                             puck.GetComponent<PuckScript>().DestroyPuck();
                             DestroyPuck();
                         }
                     }
                 }
+                // if this puck has explosion and overlaps with a non-phased puck, explode them both
+                foreach (var puck in pucks)
+                {
+                    if (puck != gameObject && Vector2.Distance(puck.transform.position, transform.position) < 2)
+                    {
+                        phaseHasOverlap = true;
+                        if (ClientLogicScript.Instance.isRunning && !IsServer) { break; }
+                        // phase & explosion combo, explode both (don't do this if it's ALSO overlapping with a phase)
+                        if (HasExplosion() && !phaseHasOverlapWithPhase)
+                        {
+                            puck.GetComponent<PuckScript>().DestroyPuck(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.ExplosionPowerup));
+                            Explode();
+                        }
+                    }
+                }
+
+                // if phase comes to a stop unobstructed
                 if (!phaseHasOverlap)
                 {
                     /// unphase it (make it visible again)
@@ -311,6 +326,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                     puckCollider.isTrigger = false;
                     phasePowerup = false;
                     RemoveAllPowerupText("phase");
+                    // if it's in a scoring zone, give it score
                     if (zoneMultiplier > 0)
                     {
                         if (IsPlayersPuck())
@@ -331,6 +347,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 }
             }
 
+            // trigger lock upon stopping
             if (HasLock() && rb.bodyType == RigidbodyType2D.Dynamic)
             {
                 rb.bodyType = RigidbodyType2D.Kinematic;
@@ -339,6 +356,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 rb.linearVelocity = Vector2.zero;
             }
 
+            // reset trail color to white upon stopping
             if (trail.endColor == Color.yellow)
             {
                 trail.startColor = Color.white;
@@ -346,6 +364,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             }
         }
 
+        // after stopping, request cleanup of all pucks. So that this puck is destroyed if it is outside the play area
         if (!requestedCleanup && IsShot() && IsStopped())
         {
             if (LogicScript.Instance.gameIsRunning)
