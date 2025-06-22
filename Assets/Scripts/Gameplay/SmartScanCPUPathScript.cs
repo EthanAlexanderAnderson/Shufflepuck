@@ -187,6 +187,9 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
                 {
                     pucksBehind++;
 
+                    var puckScript = hit.collider.GetComponent<PuckScript>();
+                    if (puckScript.GetZoneMultiplier() <= 0 && hit.point.y > 9) continue; // Ignore pucks in the offzone
+
                     // if target puck is front and CPU Has Explosion in hand, ignore all pucks behind and mark this targetPuck as needing explosion
                     if (pucksInFront == 0 && CPUBehaviorScript.HasExplosion())
                     {
@@ -195,8 +198,6 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
                         break;
                     }
 
-                    var puckScript = hit.collider.GetComponent<PuckScript>();
-                    if (puckScript.GetZoneMultiplier() <= 0) continue; // Ignore pucks in the offzone
                     if (!puckScript.HasLock()) // locked puck behind prevents knockout
                     {
                         if (puckScript.IsPlayersPuck())
