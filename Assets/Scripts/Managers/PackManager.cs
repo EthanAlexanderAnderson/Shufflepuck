@@ -24,6 +24,8 @@ public class PackManager : MonoBehaviour
     [SerializeField] private Button openTenPlusButton;
 
     [SerializeField] private TMP_Text bottomText;
+    [SerializeField] private Button backButton;
+    [SerializeField] private Button openAnotherButton;
 
     [SerializeField] private GameObject PowerupPopupPrefab;
     [SerializeField] private GameObject boosterPopupParent;
@@ -223,7 +225,9 @@ public class PackManager : MonoBehaviour
         opened++;
         if (opened >= targetOpened)
         {
-            bottomText.text = dupeCreditReward > 0 ? ("+" + dupeCreditReward.ToString() + " credits") : "";
+            bottomText.text = dupeCreditReward > 0 ? ("+" + dupeCreditReward.ToString() + " credits") : "NEW";
+            backButton.interactable = true;
+            openAnotherButton.interactable = true;
         }
     }
 
@@ -252,6 +256,10 @@ public class PackManager : MonoBehaviour
         openAnotherButtonObject.sprite = !openAnotherPlus ? openAnotherStandardSprite : openAnotherPlusSprite;
         DailyChallengeManagerScript.Instance.PackOpenDailyChallengeHelper(0);
         PlayerPrefs.SetInt("StandardPacksOpened", PlayerPrefs.GetInt("StandardPacksOpened") + 1);
+
+        // disable buttons
+        backButton.interactable = false;
+        openAnotherButton.interactable = false;
     }
 
     public void OpenStandardTen()
@@ -299,6 +307,10 @@ public class PackManager : MonoBehaviour
         openAnotherButtonObject.sprite = !openAnotherPlus ? openAnotherStandardSprite : openAnotherPlusSprite;
         DailyChallengeManagerScript.Instance.PackOpenDailyChallengeHelper(0);
         PlayerPrefs.SetInt("StandardPacksOpened", PlayerPrefs.GetInt("StandardPacksOpened") + 10);
+
+        // disable buttons
+        backButton.interactable = false;
+        openAnotherButton.interactable = false;
     }
 
     public void OpenPlusOne()
@@ -325,6 +337,10 @@ public class PackManager : MonoBehaviour
         openAnotherButtonObject.sprite = !openAnotherPlus ? openAnotherStandardSprite : openAnotherPlusSprite;
         DailyChallengeManagerScript.Instance.PackOpenDailyChallengeHelper(1);
         PlayerPrefs.SetInt("PlusPacksOpened", PlayerPrefs.GetInt("PlusPacksOpened") + 1);
+
+        // disable buttons
+        backButton.interactable = false;
+        openAnotherButton.interactable = false;
     }
 
     public void OpenPlusTen()
@@ -372,6 +388,10 @@ public class PackManager : MonoBehaviour
         openAnotherButtonObject.sprite = !openAnotherPlus ? openAnotherStandardSprite : openAnotherPlusSprite;
         DailyChallengeManagerScript.Instance.PackOpenDailyChallengeHelper(1);
         PlayerPrefs.SetInt("PlusPacksOpened", PlayerPrefs.GetInt("PlusPacksOpened") + 10);
+
+        // disable buttons
+        backButton.interactable = false;
+        openAnotherButton.interactable = false;
     }
 
     private int RollRarity()
@@ -658,6 +678,6 @@ public class PackManager : MonoBehaviour
             OpenPlusTen();
         }
         openAnotherButtonObject.sprite = !openAnotherPlus ? openAnotherStandardSprite : openAnotherPlusSprite;
-        bottomText.text = "";
+        bottomText.text = "tap to open!";
     }
 }
