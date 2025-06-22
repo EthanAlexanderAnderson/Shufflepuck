@@ -49,6 +49,25 @@ public class PlinkoManager : MonoBehaviour
     };
     // plinko reward <= 0 means we reward plus packs, greater than 0 means we reward that much XP
 
+# if UNITY_EDITOR
+    // tracking for odds calculation in editor
+    private float dropped = 0;
+    private float mainRewards = 0;
+    private float sideRewards = 0;
+    private float bonusRewards = 0;
+
+    public void IncrementDropped(int type)
+    {
+        if (type == 0) { dropped++; }
+        else if (type == 1) { mainRewards++; }
+        else if (type == 2) { sideRewards++; }
+        else if (type == 3) { bonusRewards++; }
+        Debug.Log("Main Reward Odds: " + mainRewards / dropped);
+        Debug.Log("Side Reward Odds: " + sideRewards / dropped);
+        Debug.Log("Bonus Reward Odds: " + bonusRewards / dropped);
+    }
+#endif
+
     private bool IDisPlinkoUnlockable(int ID)
     {
         for (int i = 0; i < plinkoUnlockableIDs.GetLength(0); i++)
@@ -269,6 +288,10 @@ public class PlinkoManager : MonoBehaviour
 
     public void MainReward(Transform self)
     {
+#if UNITY_EDITOR
+        IncrementDropped(1);
+#endif
+
         int plinkoReward = PlayerPrefs.GetInt("PlinkoReward");
         var (_, level) = LevelManager.Instance.GetXPAndLevel();
 
@@ -341,6 +364,9 @@ public class PlinkoManager : MonoBehaviour
 
     public void SideReward(Transform self)
     {
+#if UNITY_EDITOR
+        IncrementDropped(2);
+#endif
         // get level for pack reward quantity
         var (_, level) = LevelManager.Instance.GetXPAndLevel();
 
@@ -357,6 +383,9 @@ public class PlinkoManager : MonoBehaviour
 
     public void BonusReward(Transform self)
     {
+#if UNITY_EDITOR
+        IncrementDropped(3);
+#endif
         // give the reward to the player
         LevelManager.Instance.AddXP(100);
 
