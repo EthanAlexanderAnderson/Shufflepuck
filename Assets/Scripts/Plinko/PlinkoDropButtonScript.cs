@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Random = UnityEngine.Random;
+using System;
 
 public class PlinkoDropButtonScript : MonoBehaviour
 {
@@ -37,8 +38,15 @@ public class PlinkoDropButtonScript : MonoBehaviour
         GameObject[] pucks = GameObject.FindGameObjectsWithTag("puck");
         foreach (GameObject puck in pucks)
         {
-            // slightly move all pucks
-            if (puck.GetComponent<Rigidbody2D>().linearVelocity.y <= 0.01f && puck.transform.position.y < 6.9f)
+            Rigidbody2D rb = puck.GetComponent<Rigidbody2D>();
+
+            // teleport fully stopped pucks
+            if (rb.linearVelocity.magnitude <= 0.0000001f && puck.transform.position.y < 7.9f)
+            {
+                puck.transform.position = new Vector3(puck.transform.position.x, 8.4f, puck.transform.position.z);
+            }
+            // slightly move all slowed pucks
+            else if (rb.linearVelocity.magnitude <= 0.05f && puck.transform.position.y < 7.9f)
             {
                 puck.transform.position = new Vector3(puck.transform.position.x - 0.001f, puck.transform.position.y, puck.transform.position.z);
             }
@@ -51,7 +59,7 @@ public class PlinkoDropButtonScript : MonoBehaviour
             }
 
             // if any single dropped puck exists (if this loop and if statement is entered at least once) then the back button should be disabled
-            if (puck.GetComponent<Rigidbody2D>().gravityScale > 0)
+            if (rb.gravityScale > 0)
             {
                 backButton.interactable = false;
             }
