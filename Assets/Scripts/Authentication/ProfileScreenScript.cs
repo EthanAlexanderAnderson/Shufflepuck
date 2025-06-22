@@ -19,6 +19,8 @@ public class ProfileScreenScript : MonoBehaviour
     private void OnEnable()
     {
         UpdateAuthenticationUI();
+        // temporary replace PFP with selected puck Icon
+        profilepicture.sprite = LogicScript.Instance.player.puckSprite;
     }
 
     public void UpdateAuthenticationUI()
@@ -72,5 +74,6 @@ public class ProfileScreenScript : MonoBehaviour
     {
         Debug.Log(AuthenticationService.Instance.PlayerId);
         GUIUtility.systemCopyBuffer = AuthenticationService.Instance.PlayerId;
+        UIManagerScript.Instance.SetErrorMessage("Copied Player ID to clipboard.");
     }
 }
