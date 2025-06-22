@@ -123,6 +123,7 @@ public class LaserScript : MonoBehaviour
         laserCount = 0;
         spriteRenderer.enabled = false;
         transform.localPosition = new Vector3(xBase, -30f, zBase);
+        StopListeners();
     }
 
     private void StopListeners()
