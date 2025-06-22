@@ -312,7 +312,7 @@ public static class CPUBehaviorScript
             deck.RemoveAt(indexToRemove);
         }
 
-        Debug.Log($"MillPowerupHelper: Removed {cardsToRemove} cards. {deck.Count} remain.");
+        Debug.Log($"Milled {cardsToRemove} cards. {deck.Count} remain.");
     }
 
 

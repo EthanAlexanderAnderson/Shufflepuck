@@ -165,5 +165,7 @@ public class LaserScript : MonoBehaviour
         AudioSource SFX = GetComponent<AudioSource>();
         SFX.volume = SoundManagerScript.Instance.GetSFXVolume() * 0.1f;
         SFX.Play();
+
+        Debug.Log("Triggered LaserPowerup");
     }
 }

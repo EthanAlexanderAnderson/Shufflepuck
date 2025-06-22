@@ -882,6 +882,7 @@ public class PowerupManager : NetworkBehaviour
             if (Array.Exists(cost2Discard, x => x == index) && !activeCompetitor.isOmniscient)
             {
                 DiscardHand();
+                Debug.Log((activeCompetitor.isPlayer ? "Player" : "Opponent") + " Paid Cost: 2 Discards");
             }
             // otherwise only discard the played card
             else
@@ -896,6 +897,7 @@ public class PowerupManager : NetworkBehaviour
         if (costPoints.ContainsKey(index) && !chaosEnsuing && !activeCompetitor.isOmniscient)
         {
             LogicScript.Instance.ModifyScoreBonus(activeCompetitor.isPlayer, -costPoints[index]);
+            Debug.Log((activeCompetitor.isPlayer ? "Player" : "Opponent") + " Paid Cost: " + costPoints[index] + " Points");
         }
         // if the played card costs 1 puck, pay the cost
         if (costPucks.ContainsKey(index) && !chaosEnsuing && !activeCompetitor.isOmniscient)
@@ -906,6 +908,7 @@ public class PowerupManager : NetworkBehaviour
             {
                 ServerLogicScript.Instance.AdjustPuckCountServerRpc(true, -costPucks[index]);
             }
+            Debug.Log((activeCompetitor.isPlayer ? "Player" : "Opponent") + " Paid Cost: " + costPucks[index] + " Pucks");
         }
 
         if (index != Array.IndexOf(methodArray, OmnisciencePowerup))
@@ -925,6 +928,8 @@ public class PowerupManager : NetworkBehaviour
         }
         // add the powerup animation to the animation queue
         PowerupAnimationManager.Instance.AddPowerupPopupEffectAnimationToQueue(activeCompetitor.isPlayer, encodedCard);
+
+        Debug.Log((activeCompetitor.isPlayer ? "Player" : "Opponent") + " Activated " + methodArray[index].Method.Name);
     }
 
     private bool NeedsToBeSentToServer(int encodedCard)

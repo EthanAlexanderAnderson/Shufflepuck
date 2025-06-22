@@ -281,6 +281,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 {
                     GetComponentInChildren<NearbyPuckScript>().TriggerPush();
                     RemovePowerupText("push");
+                    Debug.Log((playersPuck ? "Player" : "Opponent") + " Triggered PushPowerup");
                 }
                 pushPowerup = 0;
                 //PowerupAnimationManager.Instance.PlayPowerupActivationAnimation(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.PushPowerup), transform.position);
@@ -336,6 +337,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                     puckCollider.isTrigger = false;
                     phasePowerup = false;
                     RemoveAllPowerupText("phase");
+                    Debug.Log((playersPuck ? "Player" : "Opponent") + " Triggered PhasePowerup");
                     // if it's in a scoring zone, give it score
                     if (zoneMultiplier > 0)
                     {
@@ -364,6 +366,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 spriteRenderer.color = new Color(0.5f, 0.5f, 0.5f, 1f);
                 rb.angularVelocity = 0;
                 rb.linearVelocity = Vector2.zero;
+                Debug.Log((playersPuck ? "Player" : "Opponent") + " Triggered LockPowerup");
             }
 
             // reset trail color to white upon stopping
@@ -735,6 +738,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 ServerLogicScript.Instance.PuckSpawnHelperServerRpc(playersPuck, transform.position.x, transform.position.y, 2);
                 hydraPowerup--;
                 RemovePowerupText("hydra");
+                Debug.Log((playersPuck ? "Player" : "Opponent") + " Triggered HydraPowerup");
                 //PowerupAnimationManager.Instance.PlayPowerupActivationAnimation(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.HydraPowerup), transform.position);
             }
             else
@@ -742,6 +746,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 PowerupManager.Instance.PuckSpawnHelper(playersPuck, transform.position.x, transform.position.y, 2);
                 hydraPowerup--;
                 RemovePowerupText("hydra");
+                Debug.Log((playersPuck ? "Player" : "Opponent") + " Triggered HydraPowerup");
                 //PowerupAnimationManager.Instance.PlayPowerupActivationAnimation(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.HydraPowerup), transform.position);
             }
         }
@@ -753,6 +758,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 ServerLogicScript.Instance.AdjustPuckCountServerRpc(playersPuck, 1); // requires ownership
                 resurrectPowerup--;
                 RemovePowerupText("resurrect");
+                Debug.Log((playersPuck ? "Player" : "Opponent") + " Triggered ResurrectPowerup");
                 //PowerupAnimationManager.Instance.PlayPowerupActivationAnimation(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.ResurrectPowerup), transform.position);
             }
             else
@@ -760,6 +766,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 LogicScript.Instance.IncrementPuckCount(playersPuck);
                 resurrectPowerup--;
                 RemovePowerupText("resurrect");
+                Debug.Log((playersPuck ? "Player" : "Opponent") + " Triggered ResurrectPowerup");
                 //PowerupAnimationManager.Instance.PlayPowerupActivationAnimation(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.ResurrectPowerup), transform.position);
             }
         }
@@ -775,6 +782,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
 
         // actually destroy the gameobject
+        Debug.Log("Destroying " + (playersPuck ? "Player" : "Opponent") + "'s Puck"); // TODO: add puck index here eventually
         Destroy(gameObject);
     }
 
@@ -977,6 +985,9 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     {
         if (this == null || transform == null || transform.position.y < 0) { return; }
         IncrementPuckBonusValue(1);
+        Debug.Log((playersPuck ? "Player" : "Opponent") + " Triggered GrowthPowerup");
+
+        // if puck has a value, play SFX and show score floating text
         if (ComputeValue() == 0) { return; }
         LogicScript.Instance.UpdateScores();
         if (IsPlayersPuck())
@@ -1039,6 +1050,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
             }
             RemovePowerupText("lock");
+            Debug.Log((playersPuck ? "Player" : "Opponent") + " Triggered LockPowerup");
         }
     }
 
@@ -1057,6 +1069,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
         explosionPowerup--;
         RemovePowerupText("explosion");
+        Debug.Log((playersPuck ? "Player" : "Opponent") + " Triggered ExplosionPowerup");
         DestroyPuck(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.ExplosionPowerup));
         explodeFromRPC = false;
     }
@@ -1128,6 +1141,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             PowerupManager.Instance.PuckSpawnHelper(playersPuck, transform.position.x, transform.position.y, 1);
         }
         //PowerupAnimationManager.Instance.PlayPowerupActivationAnimation(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.FactoryPowerup), transform.position);
+        Debug.Log((playersPuck ? "Player" : "Opponent") + " Triggered FactoryPowerup");
     }
 
     public void ActivateShield()
@@ -1146,6 +1160,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
         shieldPowerup--;
         RemovePowerupText("shield");
+        Debug.Log((playersPuck ? "Player" : "Opponent") + " Triggered ShieldPowerup");
         // Grey particles
         ParticleSystem collisionParticleEffect = Instantiate(collisionParticleEffectPrefab, transform.position, Quaternion.identity);
         ParticleSystem.EmissionModule emission = collisionParticleEffect.emission;
@@ -1224,6 +1239,9 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     {
         if (this == null || transform == null || transform.position.y < 0) { return; }
         DoublePuckBaseValue();
+        Debug.Log((playersPuck ? "Player" : "Opponent") + " Triggered ExponentPowerup");
+
+        // if puck has a value, play SFX and show score floating text
         if (ComputeValue() == 0) { return; }
         LogicScript.Instance.UpdateScores();
         if (IsPlayersPuck())
@@ -1314,6 +1332,8 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
 
         rb.AddForce(new Vector2(x, y).normalized*5, ForceMode2D.Impulse);
+
+        Debug.Log((playersPuck ? "Player" : "Opponent") + " Triggered ErraticPowerup");
     }
 
     public void ActivatePlusThree()
