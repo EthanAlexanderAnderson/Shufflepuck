@@ -649,7 +649,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         if (showFloatingText) { CreatePowerupFloatingText(); }
     }
 
-    public void RemovePowerupText(string text)
+    public void RemovePowerupText(string text, bool showFloatingText = true)
     {
         if (powerupText.ContainsKey(text))
         {
@@ -659,17 +659,21 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 powerupText.Remove(text);
             }
         }
+
+        if (showFloatingText) { CreatePowerupFloatingText(); }
     }
 
-    public void RemoveAllPowerupText(string text = null)
+    public void RemoveAllPowerupText(string text = null, bool showFloatingText = true)
     {
         if (text != null)
         {
             powerupText.Remove(text);
+            if (showFloatingText) { CreatePowerupFloatingText(); }
         }
         else
         {
             powerupText.Clear();
+            Destroy(activePowerupFloatingText);
         }
     }
 
