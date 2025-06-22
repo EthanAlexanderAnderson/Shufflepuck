@@ -552,8 +552,27 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             // Destroy the collided object
             if (Vector2.Distance(col.gameObject.transform.position, transform.position) < 2.2f) // make sure it's nearby (trying to fix a weird bug)
             {
-                col.gameObject.GetComponent<PuckScript>().DestroyPuck(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.ExplosionPowerup));
-                Explode();
+                // if this puck has multiple explosions effects, try to destroy the collided puck that many times. But don't use any more explosions than required to destroy it.
+                int explosionsTriggered = 0;
+                for (int i = 0; i < GetExplosionCount(); i++)
+                {
+                    // if the target puck has no shield, we only need to trigger one more explosion
+                    if (col.gameObject.GetComponent<PuckScript>().GetShieldCount() <= 0)
+                    {
+                        i += 9999;
+                    }
+                    // trigger a destroy on target puck
+                    if (col.gameObject != null && col.gameObject.GetComponent<PuckScript>() != null && col.gameObject.GetComponent<PuckScript>() != null)
+                    {
+                        col.gameObject.GetComponent<PuckScript>().DestroyPuck(Array.IndexOf(PowerupManager.Instance.methodArray, PowerupManager.Instance.ExplosionPowerup));
+                        explosionsTriggered++;
+                    }
+                }
+                // destroy THIS puck that many times
+                for (int i = 0; i < explosionsTriggered; i++)
+                {
+                    Explode();
+                }
             }
         }
     }
