@@ -26,6 +26,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     [SerializeField] private AudioSource breakSFX;
     [SerializeField] private GameObject animationLayer;
     [SerializeField] private TrailRenderer trail;
+    private GameObject velocityFloatingTextDebug;
     #endregion
 
     // ---------- LOCAL FIELDS ----------
@@ -198,6 +199,14 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     void OnEnable()
     {
         SFXvolume = SoundManagerScript.Instance.GetSFXVolume();
+
+        // in debug mode, show the pucks velocity
+        if (PlayerPrefs.GetInt("debug") == 1)
+        {
+            velocityFloatingTextDebug = Instantiate(floatingTextPrefab, transform.position + new Vector3(2f, -0.5f, 0), Quaternion.identity, transform);
+            velocityFloatingTextDebug.GetComponent<FloatingTextScript>().Initialize("", 0, 0, 0, new Vector2(2f, -0.5f), 0.75f, true, float.MaxValue);
+            velocityFloatingTextDebug.GetComponent<TMPro.TMP_Text>().horizontalAlignment = TMPro.HorizontalAlignmentOptions.Left;
+        }
     }
 
     void FixedUpdate()
@@ -215,6 +224,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         velocity = rb.linearVelocity.magnitude;
         if (IsServer) { velocityNetworkedRounded.Value = velocity; }
         velocity = Math.Max(velocity, velocityNetworkedRounded.Value); // this is so joiner now has velocity
+        if (PlayerPrefs.GetInt("debug") == 1) { velocityFloatingTextDebug.GetComponent<FloatingTextScript>().SetText((Mathf.Floor(velocity * 10000f) / 10000f).ToString()); }
 
         // play sliding noise SFX
         if (LogicScript.Instance.gameIsRunning || ClientLogicScript.Instance.isRunning)
@@ -489,15 +499,6 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
         if (zoneMultiplier != enteredZoneMultiplier)
         {
-            // if this puck object already has a floating text, destroy it
-            foreach (Transform child in transform)
-            {
-                if (child.gameObject.CompareTag("floatingText"))
-                {
-                    Destroy(child.gameObject);
-                }
-            }
-
             zoneMultiplier = enteredZoneMultiplier;
             // show floating text
             CreateScoreFloatingText();
@@ -616,10 +617,17 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     // --- Floating Text ---
     #region Floating Text
+    private GameObject activeScoreFloatingText;
     private void CreateScoreFloatingText()
     {
-        var floatingText = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity, transform);
-        floatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, 1.5f + (ComputeValue() / 10), true);
+        // Destroy previous score floating text if it exists
+        if (activeScoreFloatingText != null)
+        {
+            Destroy(activeScoreFloatingText);
+        }
+
+        activeScoreFloatingText = Instantiate(floatingTextPrefab, transform.position + new Vector3(0, 0.5f, 0), Quaternion.identity, transform);
+        activeScoreFloatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, new Vector2(0, 0.5f), 1.5f + (ComputeValue() / 10), true);
     }
 
     public void AddPowerupText(string text, bool showFloatingText = true)
@@ -689,7 +697,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
         // Create new powerup floating text
         activePowerupFloatingText = Instantiate(floatingTextPrefab, transform.position + new Vector3(0, -1.5f, 0), Quaternion.identity, transform);
-        activePowerupFloatingText.GetComponent<FloatingTextScript>().Initialize(string.Join("\n", GetFormattedPowerupText()), 0, 0, 0.1f, 1, true);
+        activePowerupFloatingText.GetComponent<FloatingTextScript>().Initialize(string.Join("\n", GetFormattedPowerupText()), 0, 0, 0.1f, new Vector2(0, -1.5f), 1, true);
     }
 
     public void OnPointerClick(PointerEventData eventData)
