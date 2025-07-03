@@ -82,7 +82,11 @@ public class ServerLogicScript : NetworkBehaviour
                     return;
                 }
             }
-            CreatePuck(triplePowerupUserCompetitorIndex == activeCompetitorIndex ? 0 : 1);
+            int isNonActiveCompetitorBit = triplePowerupUserCompetitorIndex == activeCompetitorIndex ? 0 : 1;
+            GameObject previousActivePuckObject = competitorList[activeCompetitorIndex ^ isNonActiveCompetitorBit].activePuckObject;
+            previousActivePuckObject.GetComponent<PuckScript>().RemovePowerupText("triple");
+            CreatePuck(isNonActiveCompetitorBit);
+            competitorList[activeCompetitorIndex ^ isNonActiveCompetitorBit].activePuckScript.CopyPuckStaticEffectsHelperClientRpc(previousActivePuckObject.GetComponent<NetworkObject>());
             Shoot(lastShotAngle + Random.Range(-10.0f, 10.0f), lastShotPower + Random.Range(-10.0f, 10.0f), 50, triplePowerupUserCompetitorIndex == activeCompetitorIndex ? 0 : 1);
             triplePowerup--;
         }

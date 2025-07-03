@@ -132,7 +132,9 @@ public class LogicScript : MonoBehaviour
             if (triplePowerup > 0 && activeCompetitor.activePuckScript != null && activeCompetitor.activePuckObject.transform.position.y > -3)
             {
                 activeCompetitor.activePuckScript.RemovePowerupText("triple");
-                puckManager.CreatePuckCopy(activeCompetitor, activeCompetitor.activePuckObject);
+                GameObject previousActivePuckObject = activeCompetitor.activePuckObject;
+                puckManager.CreatePuck(activeCompetitor);
+                activeCompetitor.activePuckScript.CopyPuckStaticEffects(previousActivePuckObject);
                 activeCompetitor.ShootActivePuck(triplePower + Random.Range(-10.0f, 10.0f), tripleAngle + Random.Range(-10.0f, 10.0f), 50, false);
                 triplePowerup--;
             }
