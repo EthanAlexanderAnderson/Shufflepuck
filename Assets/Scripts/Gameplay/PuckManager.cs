@@ -250,13 +250,12 @@ public class PuckManager : MonoBehaviour
                 }
             }
 
-            float distanceToExit = minDistance - radius;
+            float distanceToExit = Math.Abs(minDistance - radius);
             if (distanceToExit < (velocity * 2))
             {
                 return false;
             }
         }
-
         return true;
     }
 
