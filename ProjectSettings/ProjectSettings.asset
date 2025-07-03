@@ -260,11 +260,11 @@ PlayerSettings:
   templateDefaultScene: Assets/Scenes/SampleScene.unity
   useCustomMainManifest: 0
   useCustomLauncherManifest: 0
-  useCustomMainGradleTemplate: 0
+  useCustomMainGradleTemplate: 1
   useCustomLauncherGradleManifest: 0
   useCustomBaseGradleTemplate: 0
-  useCustomGradlePropertiesTemplate: 0
-  useCustomGradleSettingsTemplate: 0
+  useCustomGradlePropertiesTemplate: 1
+  useCustomGradleSettingsTemplate: 1
   useCustomProguardFile: 0
   AndroidTargetArchitectures: 3
   AndroidSplashScreenScale: 0
@@ -845,8 +845,10 @@ PlayerSettings:
   webWasm2023: 0
   webEnableSubmoduleStrippingCompatibility: 0
   scriptingDefineSymbols:
+    Android: ENABLE_VOXELBUSTERS_ESSENTIAL_KIT
     Server: DEDICATED_SERVER
-    Standalone: DEDICATED_SERVER
+    Standalone: DEDICATED_SERVER;ENABLE_VOXELBUSTERS_ESSENTIAL_KIT
+    iPhone: ENABLE_VOXELBUSTERS_ESSENTIAL_KIT
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
+using VoxelBusters.CoreLibrary;
+using VoxelBusters.EssentialKit;
+using System;
 
 public class PlayerAuthentication : MonoBehaviour
 {
@@ -15,6 +18,7 @@ public class PlayerAuthentication : MonoBehaviour
     private string imgURL;
 
     [SerializeField] private TMP_Text loadingText;
+    [SerializeField] private TMP_Text progressText;
     [SerializeField] private GameObject titleScreen;
     [SerializeField] private GameObject titleScreenBackground;
     [SerializeField] private Sprite titleScreenDark;
@@ -39,10 +43,107 @@ public class PlayerAuthentication : MonoBehaviour
 
         LoadingSceneDarkMode();
 
+        loadingText.text = "starting online services...";
+
         await InitializeUnityServices();
 
-        await SignInAnonymously();
+        if (GameServices.IsAvailable())
+        {
+            GameServices.Authenticate();
+        }
+        else
+        {
+            Debug.LogError("GameServices is not available");
+            // TODO: sign in anon then load main scene
+        }
     }
+
+    private void OnEnable()
+    {
+        // register for events
+        GameServices.OnAuthStatusChange += OnAuthStatusChange;
+    }
+
+    private void OnDisable()
+    {
+        // unregister from events
+        GameServices.OnAuthStatusChange -= OnAuthStatusChange;
+    }
+
+    private async void OnAuthStatusChange(GameServicesAuthStatusChangeResult result, Error error)
+    {
+        if (error != null || result.AuthStatus != LocalPlayerAuthStatus.Authenticated)
+        {
+            Debug.LogError("Failed to authenticate with Game Services");
+            return;
+        }
+
+        string localPlayer = result.LocalPlayer.ToString();
+
+        // Link / Sign in
+        try
+        {
+            if (AuthenticationService.Instance.IsSignedIn)
+            {
+                // Already signed in anonymously: now link
+                if (Application.platform == RuntimePlatform.Android)
+                {
+                    Debug.Log("Linking with GooglePlayGames...");
+                    loadingText.text = "linking with GooglePlayGames...";
+                    string androidServerAuthCode = await GetGooglePlayGamesServerAuthCodeAsync();
+                    await AuthenticationService.Instance.LinkWithGooglePlayGamesAsync(androidServerAuthCode);
+                    Debug.Log($"Linked with GooglePlayGames as {AuthenticationService.Instance.PlayerId}");
+                }
+                else if (Application.platform == RuntimePlatform.IPhonePlayer)
+                {
+                    Debug.Log("Linking with AppleGameCenter...");
+                    loadingText.text = "linking with AppleGameCenter...";
+                    var (appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp) = await GetAppleCredentialsAsync(localPlayer);
+                    await AuthenticationService.Instance.LinkWithAppleGameCenterAsync(appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp);
+                    Debug.Log($"Linked with AppleGameCenter as {AuthenticationService.Instance.PlayerId}");
+                }
+            }
+            else
+            {
+                // Not signed in yet: sign in directly
+                if (Application.platform == RuntimePlatform.Android)
+                {
+                    Debug.Log("Signing In with GooglePlayGames...");
+                    loadingText.text = "signing in with GooglePlayGames...";
+                    string androidServerAuthCode = await GetGooglePlayGamesServerAuthCodeAsync();
+                    await AuthenticationService.Instance.SignInWithGooglePlayGamesAsync(androidServerAuthCode);
+                    Debug.Log($"Signed In with GooglePlayGames as {AuthenticationService.Instance.PlayerId}");
+                }
+                else if (Application.platform == RuntimePlatform.IPhonePlayer)
+                {
+                    Debug.Log("Signing In with AppleGameCenter...");
+                    loadingText.text = "signing in with AppleGameCenter...";
+                    var (appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp) = await GetAppleCredentialsAsync(localPlayer);
+                    await AuthenticationService.Instance.SignInWithAppleGameCenterAsync(appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp);
+                    Debug.Log($"Signed In with AppleGameCenter as {AuthenticationService.Instance.PlayerId}");
+                }
+            }
+
+            // Now sync cloud data
+            if (AuthenticationService.Instance.IsSignedIn)
+            {
+                loadingText.text = "syncing with cloud...";
+                await PlayerDataManager.Instance.SyncWithCloudIfNeeded();
+            }
+        }
+        catch (AuthenticationException ex)
+        {
+            Debug.LogError("Auth error: " + ex.Message);
+        }
+        catch (RequestFailedException ex)
+        {
+            Debug.LogError("Request failed: " + ex.Message);
+        }
+
+        loadingText.text = "loading game...";
+        SceneManager.LoadScene("SampleScene");
+    }
+
 
     async Task InitializeUnityServices()
     {
@@ -59,8 +160,65 @@ public class PlayerAuthentication : MonoBehaviour
         }
     }
 
+    private Task<string> GetGooglePlayGamesServerAuthCodeAsync()
+    {
+        var tcs = new TaskCompletionSource<string>();
+
+        GameServices.LoadServerCredentials((result, error) =>
+        {
+            if (error == null && result?.ServerCredentials?.AndroidProperties != null)
+            {
+                string code = result.ServerCredentials.AndroidProperties.ServerAuthCode;
+                Debug.Log("ServerAuthCode: " + code);
+                tcs.SetResult(code);
+            }
+            else
+            {
+                tcs.SetException(new Exception("Failed to get ServerAuthCode"));
+            }
+        });
+
+        return tcs.Task;
+    }
+
+    private Task<(string signature, string playerId, string publicKeyUrl, string salt, ulong timestamp)> GetAppleCredentialsAsync(string localPlayerId)
+    {
+        var tcs = new TaskCompletionSource<(string signature, string playerId, string publicKeyUrl, string salt, ulong timestamp)>();
+
+        GameServices.LoadServerCredentials((result, error) =>
+        {
+            if (error == null && result?.ServerCredentials?.IosProperties != null)
+            {
+                var props = result.ServerCredentials.IosProperties;
+
+                Debug.Log("Apple Signature: " + props.Signature);
+                Debug.Log("Salt: " + props.Salt);
+                Debug.Log("Timestamp: " + props.Timestamp);
+
+                tcs.SetResult((
+                    signature: props.Signature.ToString(),
+                    playerId: localPlayerId,
+                    publicKeyUrl: props.PublicKeyUrl,
+                    salt: props.Salt.ToString(),
+                    timestamp: (ulong)props.Timestamp
+                ));
+            }
+            else
+            {
+                tcs.SetException(new Exception("Failed to get Apple Game Center credentials."));
+            }
+        });
+
+        return tcs.Task;
+    }
+
     private async Task SignInAnonymously()
     {
+        if (loadingText != null && loadingText.gameObject != null)
+        {
+            loadingText.text = "signing in...";
+        }
+
         try
         {
             if (AuthenticationService.Instance.IsSignedIn)
@@ -75,6 +233,11 @@ public class PlayerAuthentication : MonoBehaviour
 
             if (AuthenticationService.Instance.IsSignedIn)
             {
+                if (loadingText != null && loadingText.gameObject != null)
+                {
+                    loadingText.text = "syncing with cloud...";
+                }
+
                 await PlayerDataManager.Instance.SyncWithCloudIfNeeded();
             }
             else
@@ -94,12 +257,6 @@ public class PlayerAuthentication : MonoBehaviour
         {
             Debug.LogError($"An unexpected error occurred during sign in: {e.Message}");
         }
-
-        if (loadingText != null && loadingText.gameObject != null)
-        {
-            loadingText.text = "loading game...";
-        }
-        SceneManager.LoadScene("SampleScene");
     }
 
     private void LoadingSceneDarkMode()
@@ -127,5 +284,10 @@ public class PlayerAuthentication : MonoBehaviour
         {
             Debug.Log("Failed to set dark mode on LoadingScene");
         }
+    }
+
+    public void SetProgressText(string text)
+    {
+        progressText.text = text;
     }
 }

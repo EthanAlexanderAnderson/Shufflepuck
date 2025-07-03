@@ -182,15 +182,18 @@ public class PlayerDataManager : MonoBehaviour
     {
         if (!AuthenticationService.Instance.IsSignedIn) return;
 
-        foreach (string key in intKeys)
+        for (int i = 0; i < intKeys.Length; i++)
         {
-            await LoadDataInt(key);
+            await LoadDataInt(intKeys[i]);
+            PlayerAuthentication.Instance.SetProgressText($"{i}/{intKeys.Length + stringKeys.Length}");
         }
 
-        foreach (string key in stringKeys)
+        for (int i = 0; i < stringKeys.Length; i++)
         {
-            await LoadDataString(key);
+            await LoadDataString(stringKeys[i]);
+            PlayerAuthentication.Instance.SetProgressText($"{i + intKeys.Length}/{intKeys.Length + stringKeys.Length}");
         }
+
         if (UIManagerScript.Instance != null)
         {
             UIManagerScript.Instance.SetErrorMessage("Player data successfully loaded from Cloud.");
