@@ -79,20 +79,12 @@ public class PowerupPopupPrefabScript : MonoBehaviour
         }
 
         // Rank & Holo
-        if (rank >= 0 && rank < rankTexts.Length)
-        {
-            rankParticleSystemOngoingMain = rankParticleSystemOngoing.main;
-            rankParticleSystemBurstMain = rankParticleSystemBurst.main;
-            SetRank(rank);
-            if (cardIndex >= 0)
-            {
-                cardRankObject.SetActive(true);
-                cardRankText.text = rankTexts[rank];
-            }
-
-            holoParent.SetActive(holo);
-            cardIconOutlineObject.SetActive(holo);
-        }
+        rankParticleSystemOngoingMain = rankParticleSystemOngoing.main;
+        rankParticleSystemBurstMain = rankParticleSystemBurst.main;
+        SetRank(rank);
+        cardRankText.text = rankTexts[rank];
+        holoParent.SetActive(holo);
+        cardIconOutlineObject.SetActive(holo);
     }
 
     // TODO: Bool:AnimateOut Float:Speed
