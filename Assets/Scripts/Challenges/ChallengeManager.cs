@@ -1389,12 +1389,12 @@ public class ChallengeManager : MonoBehaviour
 
         challengeData.ongoingChallenges.Add(new Challenge
         {
-            challengeText = "Win 50 online matches",
-            condition = new MatchesCondition { targetMacthes = 50, matchResult = "Win", difficultyLevel = -1 },
+            challengeText = "Win 15 online matches",
+            condition = new MatchesCondition { targetMacthes = 15, matchResult = "Win", difficultyLevel = -1 },
             rewards = new List<Reward>
             {
-                new Reward { type = RewardType.XP, amount = 5000 },
-                new Reward { type = RewardType.PlusPacks, amount = 10 }
+                new Reward { type = RewardType.XP, amount = 1500 },
+                new Reward { type = RewardType.PlusPacks, amount = 5 }
             }
         });
 
