@@ -82,7 +82,10 @@ public class PowerupPopupPrefabScript : MonoBehaviour
         rankParticleSystemOngoingMain = rankParticleSystemOngoing.main;
         rankParticleSystemBurstMain = rankParticleSystemBurst.main;
         SetRank(rank);
-        cardRankText.text = rankTexts[rank];
+        if (rank > 0 && rank < rankTexts.Length)
+        {
+            cardRankText.text = rankTexts[rank];
+        }
         holoParent.SetActive(holo);
         cardIconOutlineObject.SetActive(holo);
     }
