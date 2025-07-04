@@ -183,7 +183,7 @@ public class PackManager : MonoBehaviour
             powerupPopupScript.InitializePowerupPopup(currentReward, (currentReward * -1) - 1, currentReward == -1);
         }
 
-        var (popupEffectIconObject, popupEffectIconOutlineObject, popupEffectTextObject, popupEffectRarityObject) = powerupPopupScript.GetObjects();
+        var (popupEffectIconObject, popupEffectIconOutlineObject, popupEffectTextObject, popupEffectRarityObject, _) = powerupPopupScript.GetObjects();
         popupEffectIconObject.transform.localScale = new Vector3(1f, 1f, 1f);
         popupEffectIconOutlineObject.transform.localScale = new Vector3(1f, 1f, 1f);
         popupEffectTextObject.transform.localScale = new Vector3(1f, 1f, 1f);
@@ -227,7 +227,7 @@ public class PackManager : MonoBehaviour
         {
             bottomText.text = dupeCreditReward > 0 ? ("+" + dupeCreditReward.ToString() + " credits") : "NEW";
             backButton.interactable = true;
-            openAnotherButton.interactable = true;
+            openAnotherButton.interactable = PlayerPrefs.GetInt(!openAnotherPlus ? "StandardPacks" : "PlusPacks") > 0;
         }
     }
 
@@ -287,15 +287,15 @@ public class PackManager : MonoBehaviour
 
             if (i < 3)
             {
-                pack.transform.localPosition = new Vector3(-600f, 350f - 500f * i, 0f);
+                pack.transform.localPosition = new Vector3(-600f, 450f - 520f * i, 0f);
             }
             else if (i < 7)
             {
-                pack.transform.localPosition = new Vector3(0f, 600f - 500f * (i - 3), 0f);
+                pack.transform.localPosition = new Vector3(0f, 700f - 520f * (i - 3), 0f);
             }
             else if (i < 10)
             {
-                pack.transform.localPosition = new Vector3(600f, 350f - 500f * (i-7), 0f);
+                pack.transform.localPosition = new Vector3(600f, 450f - 520f * (i-7), 0f);
             }
 
             int cardIndex = RollRarity();
@@ -368,15 +368,15 @@ public class PackManager : MonoBehaviour
 
             if (i < 3)
             {
-                pack.transform.localPosition = new Vector3(-600f, 350f - 500f * i, 0f);
+                pack.transform.localPosition = new Vector3(-600f, 450f - 520f * i, 0f);
             }
             else if (i < 7)
             {
-                pack.transform.localPosition = new Vector3(0f, 600f - 500f * (i - 3), 0f);
+                pack.transform.localPosition = new Vector3(0f, 700f - 520f * (i - 3), 0f);
             }
             else if (i < 10)
             {
-                pack.transform.localPosition = new Vector3(600f, 350f - 500f * (i - 7), 0f);
+                pack.transform.localPosition = new Vector3(600f, 450f - 520f * (i - 7), 0f);
             }
 
             int cardIndex = RollRarity();

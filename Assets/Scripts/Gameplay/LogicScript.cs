@@ -118,7 +118,7 @@ public class LogicScript : MonoBehaviour
         }
 
         // only do this stuff when game is running (not in menu etc.)
-        if (gameIsRunning && (player.puckCount > 0 || opponent.puckCount > 0))
+        if (gameIsRunning)
         {
             // update wall status
             if (wallCount == 0 && puckManager.AllPucksAreSlowedMore())
@@ -132,7 +132,9 @@ public class LogicScript : MonoBehaviour
             if (triplePowerup > 0 && activeCompetitor.activePuckScript != null && activeCompetitor.activePuckObject.transform.position.y > -3)
             {
                 activeCompetitor.activePuckScript.RemovePowerupText("triple");
-                puckManager.CreatePuckCopy(activeCompetitor, activeCompetitor.activePuckObject);
+                GameObject previousActivePuckObject = activeCompetitor.activePuckObject;
+                puckManager.CreatePuck(activeCompetitor);
+                activeCompetitor.activePuckScript.CopyPuckStaticEffects(previousActivePuckObject);
                 activeCompetitor.ShootActivePuck(triplePower + Random.Range(-10.0f, 10.0f), tripleAngle + Random.Range(-10.0f, 10.0f), 50, false);
                 triplePowerup--;
             }
@@ -164,11 +166,11 @@ public class LogicScript : MonoBehaviour
                 OpponentShootingHelper();
             }
 
-            // lastly, increment timer while game is running
+            // lastly, increment CPU shooting helper timer while game is running
             timer += Time.deltaTime;
         }
         // ran out of pucks (game over)
-        else if (gameIsRunning && puckManager.AllPucksAreStopped() && puckManager.AllPucksAreNotNearingScoreZoneEdge())
+        if (gameIsRunning && puckManager.AllPucksAreStopped() && puckManager.AllPucksAreNotNearingScoreZoneEdge() && player.puckCount <= 0 && opponent.puckCount <= 0)
         {
             gameIsRunning = false;
             UpdateScores();
@@ -188,7 +190,7 @@ public class LogicScript : MonoBehaviour
         }
 
         // if we start our turn with no pucks remaining, skip our turn
-        if (player.puckCount <= 0 && opponent.puckCount > 0)
+        if (player.puckCount <= 0)
         {
             player.isTurn = false;
             opponent.isTurn = true;
@@ -260,7 +262,7 @@ public class LogicScript : MonoBehaviour
     private void StartingOpponentsTurnHelper()
     {
         // if opponents starts their turn with no pucks remaining, skip their turn
-        if (opponent.puckCount <= 0 && player.puckCount > 0)
+        if (opponent.puckCount <= 0)
         {
             opponent.isTurn = false;
             player.isTurn = true;

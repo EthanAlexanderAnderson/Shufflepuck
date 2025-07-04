@@ -1347,6 +1347,81 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
         IncrementPuckBonusValue(3);
     }
+
+    // this method copies static effects from the source puck to this puck
+    public void CopyPuckStaticEffects(GameObject sourcePuckObject)
+    {
+        PuckScript sourcePuckScript = sourcePuckObject.GetComponent<PuckScript>();
+
+        // Activate powerups
+        for (int i = 0; i < sourcePuckScript.GetPlusOneCount(); i++)
+        {
+            ActivatePlusOne();
+        }
+        if (HasPhase()) { ActivatePhase(); }
+        for (int i = 0; i < sourcePuckScript.GetGrowthCount(); i++)
+        {
+            ActivateGrowth();
+        }
+        for (int i = 0; i < sourcePuckScript.GetLockCount(); i++)
+        {
+            ActivateLock();
+        }
+        for (int i = 0; i < sourcePuckScript.GetExplosionCount(); i++)
+        {
+            ActivateExplosion();
+        }
+        for (int i = 0; i < sourcePuckScript.GetHydraCount(); i++)
+        {
+            ActivateHydra();
+        }
+        for (int i = 0; i < sourcePuckScript.GetShieldCount(); i++)
+        {
+            ActivateShield();
+        }
+        for (int i = 0; i < sourcePuckScript.GetTimesTwoCount(); i++)
+        {
+            ActivateTimesTwo();
+        }
+        for (int i = 0; i < sourcePuckScript.GetResurrectCount(); i++)
+        {
+            ActivateResurrect();
+        }
+        for (int i = 0; i < sourcePuckScript.GetFactoryCount(); i++)
+        {
+            ActivateFactory();
+        }
+        for (int i = 0; i < sourcePuckScript.GetPushCount(); i++)
+        {
+            ActivatePush();
+        }
+        for (int i = 0; i < sourcePuckScript.GetExponentCount(); i++)
+        {
+            ActivateExponent();
+        }
+        for (int i = 0; i < sourcePuckScript.GetErraticCount(); i++)
+        {
+            ActivateErratic();
+        }
+        for (int i = 0; i < GetComponentInChildren<NearbyPuckScript>().GetAuraCount(); i++)
+        {
+            ActivateAura();
+        }
+    }
+
+    [ClientRpc]
+    public void CopyPuckStaticEffectsHelperClientRpc(NetworkObjectReference sourceRef)
+    {
+        if (sourceRef.TryGet(out NetworkObject sourceObj))
+        {
+            Debug.Log("Copying static effects from " + sourceObj.ToString());
+            CopyPuckStaticEffects(sourceObj.gameObject);
+        }
+        else
+        {
+            Debug.LogError("Failed to copy static effects onto triple puck.");
+        }
+    }
     #endregion
 
     public ParticleSystem.MinMaxGradient SetParticleColor()

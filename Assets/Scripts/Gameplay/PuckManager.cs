@@ -47,72 +47,6 @@ public class PuckManager : MonoBehaviour
         competitor.activePuckScript.InitPuck(competitor.isPlayer, competitor.puckSpriteID);
     }
 
-    // this method creates a puck that copies static effects of the provided puckscript
-    public void CreatePuckCopy(Competitor competitor, GameObject targetPuckObject)
-    {
-        PuckScript targetPuckScript = targetPuckObject.GetComponent<PuckScript>();
-
-        float xpos = (competitor.isPlayer ? -3.6f : 3.6f);
-        competitor.activePuckObject = Instantiate(puckPrefab, new Vector3(xpos, -10.0f, -1.0f), Quaternion.identity);
-        competitor.activePuckScript = competitor.activePuckObject.GetComponent<PuckScript>();
-        competitor.activePuckScript.InitPuck(competitor.isPlayer, competitor.puckSpriteID);
-
-        // Activate powerups
-        for (int i = 0; i < targetPuckScript.GetPlusOneCount(); i++)
-        {
-            competitor.activePuckScript.ActivatePlusOne();
-        }
-        if (competitor.activePuckScript.HasPhase()) { competitor.activePuckScript.ActivatePhase(); }
-        for (int i = 0; i < targetPuckScript.GetGrowthCount(); i++)
-        {
-            competitor.activePuckScript.ActivateGrowth();
-        }
-        for (int i = 0; i < targetPuckScript.GetLockCount(); i++)
-        {
-            competitor.activePuckScript.ActivateLock();
-        }
-        for (int i = 0; i < targetPuckScript.GetExplosionCount(); i++)
-        {
-            competitor.activePuckScript.ActivateExplosion();
-        }
-        for (int i = 0; i < targetPuckScript.GetHydraCount(); i++)
-        {
-            competitor.activePuckScript.ActivateHydra();
-        }
-        for (int i = 0; i < targetPuckScript.GetShieldCount(); i++)
-        {
-            competitor.activePuckScript.ActivateShield();
-        }
-        for (int i = 0; i < targetPuckScript.GetTimesTwoCount(); i++)
-        {
-            competitor.activePuckScript.ActivateTimesTwo();
-        }
-        for (int i = 0; i < targetPuckScript.GetResurrectCount(); i++)
-        {
-            competitor.activePuckScript.ActivateResurrect();
-        }
-        for (int i = 0; i < targetPuckScript.GetFactoryCount(); i++)
-        {
-            competitor.activePuckScript.ActivateFactory();
-        }
-        for (int i = 0; i < targetPuckScript.GetPushCount(); i++)
-        {
-            competitor.activePuckScript.ActivatePush();
-        }
-        for (int i = 0; i < targetPuckScript.GetExponentCount(); i++)
-        {
-            competitor.activePuckScript.ActivateExponent();
-        }
-        for (int i = 0; i < targetPuckScript.GetErraticCount(); i++)
-        {
-            competitor.activePuckScript.ActivateErratic();
-        }
-        for (int i = 0; i < targetPuckObject.GetComponentInChildren<NearbyPuckScript>().GetAuraCount(); i++)
-        {
-            competitor.activePuckScript.ActivateAura();
-        }
-    }
-
     public (int,int) UpdateScores()
     {
         int playerSum = 0;
@@ -250,13 +184,12 @@ public class PuckManager : MonoBehaviour
                 }
             }
 
-            float distanceToExit = minDistance - radius;
+            float distanceToExit = Math.Abs(minDistance - radius);
             if (distanceToExit < (velocity * 2))
             {
                 return false;
             }
         }
-
         return true;
     }
 

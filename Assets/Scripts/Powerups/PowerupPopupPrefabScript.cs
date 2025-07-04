@@ -26,8 +26,13 @@ public class PowerupPopupPrefabScript : MonoBehaviour
     [SerializeField] private Image cardRarityIcon;
     [SerializeField] private TMP_Text cardRarityText;
 
+    [SerializeField] private GameObject cardRankObject;
+    [SerializeField] private TMP_Text cardRankText;
+
     private string[] rarityTexts = { "common", "uncomon", "rare", "epic", "legendary" };
     [SerializeField] private Sprite[] rarityIcons = new Sprite[5];
+
+    private string[] rankTexts = { "", "bronze", "gold", "diamond", "celestial" };
 
     [SerializeField] private Sprite questionMarkIconSprite;
     private string[] boosterTexts = { "any holo", "any bronze", "any gold", "any diamond", "any celestial" };
@@ -77,6 +82,10 @@ public class PowerupPopupPrefabScript : MonoBehaviour
         rankParticleSystemOngoingMain = rankParticleSystemOngoing.main;
         rankParticleSystemBurstMain = rankParticleSystemBurst.main;
         SetRank(rank);
+        if (rank > 0 && rank < rankTexts.Length)
+        {
+            cardRankText.text = rankTexts[rank];
+        }
         holoParent.SetActive(holo);
         cardIconOutlineObject.SetActive(holo);
     }
@@ -88,6 +97,7 @@ public class PowerupPopupPrefabScript : MonoBehaviour
         LeanTween.scale(cardIconObject, new Vector3(1f, 1f, 1f), 0.5f).setEase(LeanTweenType.easeOutElastic);
         LeanTween.scale(cardTextObject, new Vector3(1f, 1f, 1f), 0.5f).setEase(LeanTweenType.easeOutElastic).setDelay(0.2f);
         LeanTween.scale(cardRarityObject, new Vector3(1f, 1f, 1f), 0.5f).setEase(LeanTweenType.easeOutElastic).setDelay(0.4f);
+        LeanTween.scale(cardRankObject, new Vector3(1f, 1f, 1f), 0.5f).setEase(LeanTweenType.easeOutElastic).setDelay(0.6f);
     }
 
     // TODO: get feedback on rank colors
@@ -100,24 +110,28 @@ public class PowerupPopupPrefabScript : MonoBehaviour
                 cardText.color = new Color(0.9f, 0.4f, 0f, 1f);
                 rankParticleSystemOngoingMain.startColor = new Color(1f, 0.35f, 0f, 1f);
                 rankParticleSystemBurstMain.startColor = new Color(1f, 0.35f, 0f, 1f);
+                cardRankText.color = new Color(0.9f, 0.4f, 0f, 1f);
                 break;
             case 2:
                 cardIcon.color = new Color(0.95f, 0.7f, 0f, 1f);
                 cardText.color = new Color(0.95f, 0.7f, 0f, 1f);
                 rankParticleSystemOngoingMain.startColor = new Color(0.9f, 0.7f, 0f, 1f);
                 rankParticleSystemBurstMain.startColor = new Color(0.9f, 0.7f, 0f, 1f);
+                cardRankText.color = new Color(0.9f, 0.7f, 0f, 1f);
                 break;
             case 3:
                 cardIcon.color = new Color(0f, 1f, 1f, 1f);
                 cardText.color = new Color(0f, 1f, 1f, 1f);
                 rankParticleSystemOngoingMain.startColor = new Color(0f, 1f, 1f, 1f);
                 rankParticleSystemBurstMain.startColor = new Color(0f, 1f, 1f, 1f);
+                cardRankText.color = new Color(0f, 1f, 1f, 1f);
                 break;
             case 4:
                 cardIcon.color = new Color(1f, 0f, 1f, 1f);
                 cardText.color = new Color(1f, 0f, 1f, 1f);
                 rankParticleSystemOngoingMain.startColor = new Color(1f, 0f, 1f, 1f);
                 rankParticleSystemBurstMain.startColor = new Color(1f, 0f, 1f, 1f);
+                cardRankText.color = new Color(1f, 0f, 1f, 1f);
                 break;
             default:
                 //cardIcon.color = new Color(1f, 1f, 1f, 1f);
@@ -149,8 +163,8 @@ public class PowerupPopupPrefabScript : MonoBehaviour
         }
     }
 
-    public (GameObject, GameObject, GameObject, GameObject) GetObjects()
+    public (GameObject, GameObject, GameObject, GameObject, GameObject) GetObjects()
     {
-        return (cardIconObject, cardIconOutlineObject, cardTextObject, cardRarityObject);
+        return (cardIconObject, cardIconOutlineObject, cardTextObject, cardRarityObject, cardRankObject);
     }
 }
