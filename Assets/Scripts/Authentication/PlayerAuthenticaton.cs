@@ -43,7 +43,7 @@ public class PlayerAuthentication : MonoBehaviour
 
         LoadingSceneDarkMode();
 
-        loadingText.text = "starting online services...";
+        SetLoadingText("starting online services...");
 
         await InitializeUnityServices();
 
@@ -54,7 +54,9 @@ public class PlayerAuthentication : MonoBehaviour
         else
         {
             Debug.LogError("GameServices is not available");
-            // TODO: sign in anon then load main scene
+            await SignInAnonymously();
+            SetLoadingText("loading game...");
+            SceneManager.LoadScene("SampleScene");
         }
     }
 
@@ -75,10 +77,15 @@ public class PlayerAuthentication : MonoBehaviour
         if (error != null || result.AuthStatus != LocalPlayerAuthStatus.Authenticated)
         {
             Debug.LogError("Failed to authenticate with Game Services");
+            await SignInAnonymously();
+            SetLoadingText("loading game...");
+            SceneManager.LoadScene("SampleScene");
             return;
         }
 
-        string localPlayer = result.LocalPlayer.ToString();
+        string localPlayer = result.LocalPlayer.Identifier;
+        username = result.LocalPlayer.DisplayName;
+        Debug.Log("Username: " + username);
 
         // Link / Sign in
         try
@@ -89,7 +96,7 @@ public class PlayerAuthentication : MonoBehaviour
                 if (Application.platform == RuntimePlatform.Android)
                 {
                     Debug.Log("Linking with GooglePlayGames...");
-                    loadingText.text = "linking with GooglePlayGames...";
+                    SetLoadingText("linking with GooglePlayGames...");
                     string androidServerAuthCode = await GetGooglePlayGamesServerAuthCodeAsync();
                     await AuthenticationService.Instance.LinkWithGooglePlayGamesAsync(androidServerAuthCode);
                     Debug.Log($"Linked with GooglePlayGames as {AuthenticationService.Instance.PlayerId}");
@@ -97,7 +104,7 @@ public class PlayerAuthentication : MonoBehaviour
                 else if (Application.platform == RuntimePlatform.IPhonePlayer)
                 {
                     Debug.Log("Linking with AppleGameCenter...");
-                    loadingText.text = "linking with AppleGameCenter...";
+                    SetLoadingText("linking with AppleGameCenter...");
                     var (appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp) = await GetAppleCredentialsAsync(localPlayer);
                     await AuthenticationService.Instance.LinkWithAppleGameCenterAsync(appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp);
                     Debug.Log($"Linked with AppleGameCenter as {AuthenticationService.Instance.PlayerId}");
@@ -109,7 +116,7 @@ public class PlayerAuthentication : MonoBehaviour
                 if (Application.platform == RuntimePlatform.Android)
                 {
                     Debug.Log("Signing In with GooglePlayGames...");
-                    loadingText.text = "signing in with GooglePlayGames...";
+                    SetLoadingText("signing in with GooglePlayGames...");
                     string androidServerAuthCode = await GetGooglePlayGamesServerAuthCodeAsync();
                     await AuthenticationService.Instance.SignInWithGooglePlayGamesAsync(androidServerAuthCode);
                     Debug.Log($"Signed In with GooglePlayGames as {AuthenticationService.Instance.PlayerId}");
@@ -117,7 +124,7 @@ public class PlayerAuthentication : MonoBehaviour
                 else if (Application.platform == RuntimePlatform.IPhonePlayer)
                 {
                     Debug.Log("Signing In with AppleGameCenter...");
-                    loadingText.text = "signing in with AppleGameCenter...";
+                    SetLoadingText("signing in with AppleGameCenter...");
                     var (appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp) = await GetAppleCredentialsAsync(localPlayer);
                     await AuthenticationService.Instance.SignInWithAppleGameCenterAsync(appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp);
                     Debug.Log($"Signed In with AppleGameCenter as {AuthenticationService.Instance.PlayerId}");
@@ -127,7 +134,7 @@ public class PlayerAuthentication : MonoBehaviour
             // Now sync cloud data
             if (AuthenticationService.Instance.IsSignedIn)
             {
-                loadingText.text = "syncing with cloud...";
+                SetLoadingText("syncing with cloud...");
                 await PlayerDataManager.Instance.SyncWithCloudIfNeeded();
             }
         }
@@ -140,7 +147,7 @@ public class PlayerAuthentication : MonoBehaviour
             Debug.LogError("Request failed: " + ex.Message);
         }
 
-        loadingText.text = "loading game...";
+        SetLoadingText("loading game...");
         SceneManager.LoadScene("SampleScene");
     }
 
@@ -214,10 +221,7 @@ public class PlayerAuthentication : MonoBehaviour
 
     private async Task SignInAnonymously()
     {
-        if (loadingText != null && loadingText.gameObject != null)
-        {
-            loadingText.text = "signing in...";
-        }
+        SetLoadingText("signing in...");
 
         try
         {
@@ -233,10 +237,7 @@ public class PlayerAuthentication : MonoBehaviour
 
             if (AuthenticationService.Instance.IsSignedIn)
             {
-                if (loadingText != null && loadingText.gameObject != null)
-                {
-                    loadingText.text = "syncing with cloud...";
-                }
+                SetLoadingText("syncing with cloud...");
 
                 await PlayerDataManager.Instance.SyncWithCloudIfNeeded();
             }
@@ -286,8 +287,15 @@ public class PlayerAuthentication : MonoBehaviour
         }
     }
 
+    public void SetLoadingText(string text)
+    {
+        if (loadingText == null) return;
+        loadingText.text = text;
+    }
+
     public void SetProgressText(string text)
     {
+        if (progressText == null) return;
         progressText.text = text;
     }
 }
