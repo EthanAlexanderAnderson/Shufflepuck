@@ -86,6 +86,8 @@ public class PlayerAuthentication : MonoBehaviour
         string localPlayer = result.LocalPlayer.Identifier;
         username = result.LocalPlayer.DisplayName;
         Debug.Log("Username: " + username);
+        id = result.LocalPlayer.Identifier;
+        Debug.Log("Identifier: " + username);
 
         // Link / Sign in
         try

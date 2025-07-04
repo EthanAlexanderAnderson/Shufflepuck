@@ -75,5 +75,8 @@ public class ProfileScreenScript : MonoBehaviour
         Debug.Log(AuthenticationService.Instance.PlayerId);
         GUIUtility.systemCopyBuffer = AuthenticationService.Instance.PlayerId;
         UIManagerScript.Instance.SetErrorMessage("Copied Player ID to clipboard.");
+
+        Debug.Log("unity player ID: " + AuthenticationService.Instance.PlayerId);
+        Debug.Log("native platform player ID: " + id);
     }
 }
