@@ -25,8 +25,7 @@ public class ScreenLog : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
         // TODO REVERT
-        //gameObject.SetActive(PlayerPrefs.GetInt("debug", 0) == 1);
-        gameObject.SetActive(true);
+        gameObject.SetActive(PlayerPrefs.GetInt("debug", 0) == 1);
     }
 
     void OnEnable()
