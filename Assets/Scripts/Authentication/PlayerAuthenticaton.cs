@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using VoxelBusters.CoreLibrary;
 using VoxelBusters.EssentialKit;
 using System;
+using UnityEngine.Networking;
 
 public class PlayerAuthentication : MonoBehaviour
 {
@@ -43,8 +44,16 @@ public class PlayerAuthentication : MonoBehaviour
 
         LoadingSceneDarkMode();
 
-        SetLoadingText("starting online services...");
+        SetLoadingText("checking connection...");
+        if (!await HasInternetConnection())
+        {
+            Debug.LogWarning("No internet connection.");
+            SetLoadingText("loading game...");
+            SceneManager.LoadScene("SampleScene");
+            return;
+        }
 
+        SetLoadingText("starting online services...");
         await InitializeUnityServices();
 
         if (GameServices.IsAvailable())
@@ -149,6 +158,11 @@ public class PlayerAuthentication : MonoBehaviour
             Debug.LogError("Request failed: " + ex.Message);
         }
 
+        // if native login fails, try anon login
+        if (!AuthenticationService.Instance.IsSignedIn)
+        {
+            await SignInAnonymously();
+        }
         SetLoadingText("loading game...");
         SceneManager.LoadScene("SampleScene");
     }
@@ -299,5 +313,18 @@ public class PlayerAuthentication : MonoBehaviour
     {
         if (progressText == null) return;
         progressText.text = text;
+    }
+
+    public async Task<bool> HasInternetConnection()
+    {
+        using (UnityWebRequest request = UnityWebRequest.Head("https://www.google.com/generate_204"))
+        {
+            request.timeout = 3; // short timeout to avoid delay
+
+            await request.SendWebRequest();
+
+            return !request.result.Equals(UnityWebRequest.Result.ConnectionError) &&
+                   !request.result.Equals(UnityWebRequest.Result.ProtocolError);
+        }
     }
 }
