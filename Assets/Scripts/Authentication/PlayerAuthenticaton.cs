@@ -92,11 +92,10 @@ public class PlayerAuthentication : MonoBehaviour
             return;
         }
 
-        string localPlayer = result.LocalPlayer.Identifier;
         username = result.LocalPlayer.DisplayName;
         Debug.Log("Username: " + username);
         id = result.LocalPlayer.Identifier;
-        Debug.Log("Identifier: " + username);
+        Debug.Log("Identifier: " + id);
 
         // Link / Sign in
         try
@@ -116,7 +115,7 @@ public class PlayerAuthentication : MonoBehaviour
                 {
                     Debug.Log("Linking with AppleGameCenter...");
                     SetLoadingText("linking with AppleGameCenter...");
-                    var (appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp) = await GetAppleCredentialsAsync(localPlayer);
+                    var (appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp) = await GetAppleCredentialsAsync(result.LocalPlayer.DeveloperScopeIdentifier);
                     await AuthenticationService.Instance.LinkWithAppleGameCenterAsync(appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp);
                     Debug.Log($"Linked with AppleGameCenter as {AuthenticationService.Instance.PlayerId}");
                 }
@@ -136,7 +135,7 @@ public class PlayerAuthentication : MonoBehaviour
                 {
                     Debug.Log("Signing In with AppleGameCenter...");
                     SetLoadingText("signing in with AppleGameCenter...");
-                    var (appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp) = await GetAppleCredentialsAsync(localPlayer);
+                    var (appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp) = await GetAppleCredentialsAsync(result.LocalPlayer.DeveloperScopeIdentifier);
                     await AuthenticationService.Instance.SignInWithAppleGameCenterAsync(appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp);
                     Debug.Log($"Signed In with AppleGameCenter as {AuthenticationService.Instance.PlayerId}");
                 }
@@ -204,7 +203,7 @@ public class PlayerAuthentication : MonoBehaviour
         return tcs.Task;
     }
 
-    private Task<(string signature, string playerId, string publicKeyUrl, string salt, ulong timestamp)> GetAppleCredentialsAsync(string localPlayerId)
+    private Task<(string signature, string playerId, string publicKeyUrl, string salt, ulong timestamp)> GetAppleCredentialsAsync(string appleTeamPlayerId)
     {
         var tcs = new TaskCompletionSource<(string signature, string playerId, string publicKeyUrl, string salt, ulong timestamp)>();
 
@@ -214,15 +213,17 @@ public class PlayerAuthentication : MonoBehaviour
             {
                 var props = result.ServerCredentials.IosProperties;
 
-                Debug.Log("Apple Signature: " + props.Signature);
-                Debug.Log("Salt: " + props.Salt);
-                Debug.Log("Timestamp: " + props.Timestamp);
+                Debug.Log("Signature: " + Convert.ToBase64String(props.Signature));
+                Debug.Log("Team Player Id: " + appleTeamPlayerId);
+                Debug.Log("Public Key Url: " + props.PublicKeyUrl);
+                Debug.Log("Salt: " + Convert.ToBase64String(props.Salt));
+                Debug.Log("Timestamp: " + (ulong)props.Timestamp);
 
                 tcs.SetResult((
-                    signature: props.Signature.ToString(),
-                    playerId: localPlayerId,
+                    signature: Convert.ToBase64String(props.Signature),
+                    playerId: appleTeamPlayerId,
                     publicKeyUrl: props.PublicKeyUrl,
-                    salt: props.Salt.ToString(),
+                    salt: Convert.ToBase64String(props.Salt),
                     timestamp: (ulong)props.Timestamp
                 ));
             }
