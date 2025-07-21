@@ -459,6 +459,40 @@ public class ServerLogicScript : NetworkBehaviour
         }
     }
 
+    // Spawn Powerup
+    [ServerRpc(RequireOwnership = false)]
+    public void SpawnServerRpc()
+    {
+        if (!IsServer) return;
+        try
+        {
+            Competitor competitor = competitorList[activeCompetitorIndex];
+            int puckSpriteID = competitor.puckSpriteID;
+
+            GameObject puckObject = Instantiate(puck, new Vector3(Random.Range(-10f, 10), Random.Range(1f, 15f), -1.0f), Quaternion.identity);
+            puckObject.GetComponent<NetworkObject>().Spawn();
+
+            PuckScript puckScript = puckObject.GetComponent<PuckScript>();
+
+            // tell the active competitor this new puck is theirs, tell non-active competitors it's not theirs
+            for (int i = 0; i < competitorList.Count; i++)
+            {
+                puckScript.InitPuckClientRpc(i == activeCompetitorIndex, puckSpriteID, clientRpcParamsList[i]);
+            }
+
+            Debug.Log(
+                $"Puck has been spawned. \n" +
+                $"Owned by Client Index #{activeCompetitorIndex} \n" +
+                $"Client ID : {clients[activeCompetitorIndex]} \n" +
+                $"Puck Skin ID: {competitor.puckSpriteID} \n");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError(e);
+            clientLogic.SetErrorMessageClientRpc(4);
+        }
+    }
+
     // Hydra Powerup
     [ServerRpc(RequireOwnership = true)] // this is true so it only fires once
     public void PuckSpawnHelperServerRpc(bool playersPuck, float x, float y, int spawnCount, ServerRpcParams rpcParams = default)

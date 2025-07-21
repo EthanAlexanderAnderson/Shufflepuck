@@ -37,6 +37,8 @@ public class ClientLogicScript : NetworkBehaviour
     public float power;
     public float spin;
     public GameObject puckHalo;
+    private int weakenCount;
+    [ClientRpc] public void IncrementWeaken() { weakenCount++; Debug.Log("increment weaken"); }
 
     // wall
     private int wallCount = 3;
@@ -87,6 +89,7 @@ public class ClientLogicScript : NetworkBehaviour
             ServerLogicScript.Instance.CleanupDeadPucksServerRpc();
             activeBar = bar.ChangeBar("angle", logic.player.goingFirst);
             line.isActive = true;
+            bar.SetWeakenBarCover(weakenCount);
             arrow.SetActive(true);
             GameHUDManager.Instance.ChangeTurnText("Your Turn");
             serverLogic.CreatePuckServerRpc();
@@ -121,6 +124,7 @@ public class ClientLogicScript : NetworkBehaviour
                         GameHUDManager.Instance.ChangeTurnText("Opponent's Turn");
                         UI.shotClockText.text = ""; // clear shot clock
                         line.isActive = false;
+                        weakenCount = 0;
                         arrow.SetActive(false);
                         logic.player.isShooting = false;
                         SoundManagerScript.Instance.PlayClickSFXAlterPitch(1, 1.1f);
@@ -150,6 +154,7 @@ public class ClientLogicScript : NetworkBehaviour
             GameHUDManager.Instance.ChangeTurnText("Opponent's Turn");
             UI.shotClockText.text = ""; // clear shot clock
             line.isActive = false;
+            weakenCount = 0;
             arrow.SetActive(false);
             logic.player.isShooting = false;
             powerupsMenu.SetActive(false);
@@ -227,6 +232,7 @@ public class ClientLogicScript : NetworkBehaviour
         receivedGameResult = true;
         FogScript.Instance.DisableFog();
         LaserScript.Instance.DisableLaser();
+        puckManager.ResetAlphaOnAllPucks();
     }
 
     // Server tells the client to switch to game scene and start the game.
@@ -274,6 +280,8 @@ public class ClientLogicScript : NetworkBehaviour
 
         puckHalo.SetActive(false);
         bar.ToggleDim(false);
+        weakenCount = 0;
+        bar.SetWeakenBarCover(weakenCount);
         UI.onlineRematchButton.SetActive(false);
         GameHUDManager.Instance.ChangeTurnText("Opponent's Turn");
         line.GetComponent<LineScript>().FullSpeed();

@@ -39,6 +39,9 @@ public class LogicScript : MonoBehaviour
     // powerups
     [SerializeField] private GameObject powerupsMenu; // set in editor
     public int triplePowerup;
+    int weakenCount = 0;
+    int nextWeakenCount = 0;
+    public void IncrementWeaken() { nextWeakenCount++; }
 
     // game state
     public bool gameIsRunning { get; private set; }
@@ -178,6 +181,7 @@ public class LogicScript : MonoBehaviour
             UI.UpdateGameResult(player.GetScore(), opponent.GetScore(), difficulty, isLocal);
             arrow.SetActive(false);
             FogScript.Instance.DisableFog();
+            puckManager.ResetAlphaOnAllPucks();
         }
     }
 
@@ -205,6 +209,7 @@ public class LogicScript : MonoBehaviour
         bar.ToggleDim(false);
         line.isActive = true;
         arrow.SetActive(true);
+        bar.SetWeakenBarCover(weakenCount);
         GameHUDManager.Instance.ChangeTurnText(isLocal ? "Player 1's Turn" : "Your Turn");
         if (player.puckCount == 1)
         {
@@ -239,6 +244,11 @@ public class LogicScript : MonoBehaviour
             case "power":
                 soundManager.PlayClickSFXAlterPitch(1, 1.05f);
                 power = line.GetValue();
+                // weaken powerup
+                Debug.Log("weakenCount: " + weakenCount);
+                power = Math.Min(power, 100 - weakenCount * 10);
+                weakenCount = nextWeakenCount;
+                nextWeakenCount = 0;
                 // if non-hard diff, end turn
                 if (difficulty < 2)
                 {
@@ -278,6 +288,7 @@ public class LogicScript : MonoBehaviour
             bar.ToggleDim(true);
         }
         line.isActive = true;
+        bar.SetWeakenBarCover(weakenCount);
         arrow.SetActive(true);
         puckHalo.SetActive(difficulty == 0);
         GameHUDManager.Instance.ChangeTurnText(isLocal ? "Player 2's Turn" : "CPU's Turn");
@@ -324,6 +335,11 @@ public class LogicScript : MonoBehaviour
         {
             if (difficulty < 2)
             {
+                // weaken powerup
+                Debug.Log("weakenCount: " + weakenCount);
+                CPUShotPower = Math.Min(CPUShotPower, 100 - weakenCount * 10);
+                weakenCount = nextWeakenCount;
+                nextWeakenCount = 0;
                 Shoot(CPUShotAngle, CPUShotPower);
                 tempTime = 0;
             }
@@ -335,6 +351,11 @@ public class LogicScript : MonoBehaviour
         // after 4.5 seconds elapsed, CPU selects spin (for hard mode only)
         if (CPUShotSpin >= 0 && Mathf.Abs(line.GetValue() - CPUShotSpin) < (timer - (tempTime + 4.5 + powerupWaitTime))/2 && activeBar == "spin")
         {
+            // weaken powerup
+            Debug.Log("weakenCount: " + weakenCount);
+            CPUShotPower = Math.Min(CPUShotPower, 100 - weakenCount * 10);
+            weakenCount = nextWeakenCount;
+            nextWeakenCount = 0;
             Shoot(CPUShotAngle, CPUShotPower, CPUShotSpin);
             tempTime = 0;
         }

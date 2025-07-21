@@ -27,6 +27,18 @@ public class CPUPathScript : MonoBehaviour, CPUPathInterface
     {
         DisablePathVisualization();
         List<GameObject> pucksCurrentlyInPath = GetPucksInPath();
+
+        // remove players ghosts from pucks in path
+        for (int i = 0; i < pucksCurrentlyInPath.Count; i++)
+        {
+            PuckScript ps = pucksCurrentlyInPath[i].GetComponent<PuckScript>();
+            if (ps.IsPlayersPuck() && ps.HasGhost())
+            {
+                pucksCurrentlyInPath.RemoveAt(i);
+                i--;
+            }
+        }
+
         int numberOfPucksCurrentlyInPath = pucksCurrentlyInPath.Count;
         requiresExplosionPowerup = false;
 
@@ -98,7 +110,7 @@ public class CPUPathScript : MonoBehaviour, CPUPathInterface
     public void EnablePathVisualization(int mode = 0)
     {
 #if (UNITY_EDITOR)
-        if (UIManagerScript.Instance.debugMode <= 0 && mode > 0) { return;  }
+        if (UIManagerScript.Instance.debugMode <= 0) { return;  }
         GetComponent<LineRenderer>().enabled = true;
         if (mode == 0)
         {

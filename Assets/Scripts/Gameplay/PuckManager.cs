@@ -272,4 +272,13 @@ public class PuckManager : MonoBehaviour
         float t = Mathf.Clamp01(Vector2.Dot(ap, ab) / ab.sqrMagnitude);
         return a + t * ab;
     }
+
+    public void ResetAlphaOnAllPucks()
+    {
+        var allPucks = GameObject.FindGameObjectsWithTag("puck");
+        foreach (var puck in allPucks)
+        {
+            puck.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 1f);
+        }
+    }
 }

@@ -77,7 +77,9 @@ public static class CPUBehaviorScript
             int randomCard = PowerupCardData.GetRandomCardOfRarity(rarity);
             if (deck.Count(n => n == randomCard) < (5 - rarity) && EvaluatePowerupEquipage(randomCard) && deck.Count(n => n == randomCard) < PowerupCardData.GetCardOwnedSum(randomCard + 5))
             {
-                deck.Add(randomCard);
+                //deck.Add(randomCard);
+                //deck.Add(36);
+                //deck.Add(8);
                 CPUDeckPowerLevel += (rarity + 1);
             }
             failSafe++;
@@ -362,6 +364,13 @@ public static class CPUBehaviorScript
             28 => !PowerupManager.Instance.DeckContains(18), // TODO: add investment only based on the CPU deck size (or playerdeckpowerlevel) to make sure it will be usable at somepoint
             29 => false, // TODO: equip omniscience only if cpu deck contains over 2/3 cards with a cost
             30 => false, // don't change this one from false, this is Plus Three
+            31 => true,
+            32 => true,
+            33 => true,
+            34 => true,
+            35 => true,
+            36 => true,
+            37 => true,
             _ => false,
         };
     }
@@ -403,6 +412,13 @@ public static class CPUBehaviorScript
             28 => (deck.Count) < (LogicScript.Instance.opponent.puckCount - 1) * 3,
             29 => false,
             30 => DeckInExcess(),
+            31 => !powerupsUsedThisTurn.Contains(cardIndex),
+            32 => LogicScript.Instance.player.puckCount > 0,
+            33 => !powerupsUsedThisTurn.Contains(cardIndex),
+            34 => LogicScript.Instance.player.puckCount > 0,
+            35 => true,
+            36 => true,
+            37 => true,
             _ => false,
         };
     }

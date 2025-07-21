@@ -50,7 +50,7 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
 
             PuckScript puckScript = puck.GetComponent<PuckScript>();
             if (puckScript == null) continue;
-            if (!puckScript.IsPlayersPuck() || puckScript.HasLock()) continue;
+            if (!puckScript.IsPlayersPuck() || puckScript.HasLock() || puckScript.HasGhost()) continue;
 
             int puckValue = puckScript.ComputeTotalFutureValue();
 
@@ -111,7 +111,7 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
         PuckScript targetPuckScript = puck.GetComponent<PuckScript>();
         // CPU puck should end up vaguely where the hitout puck was (unless the target puck will explode the shot puck), so start the shot value with that
         int tempValueModifier = !targetPuckScript.HasExplosion() ? targetPuckScript.GetZoneMultiplier() : 0;
-        float tempPowerModifier = 0;
+        float tempPowerModifier = (targetPuckScript.GetHeavyCount() * 2.5f) + (targetPuckScript.GetTetherCount() * 2.5f);
         bool needsExplosion = false;
 
         Vector3[] offsets = { new(-1f, 0, 0), new(1f, 0, 0) }; // 1 for puck width
@@ -150,9 +150,10 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
 
             foreach (var hit in Physics2D.RaycastAll(rayOrigins[i], directions[i], scanDistance, puckLayer))
             {
-                // Ignore non-puck collisions, self-hit, and CPU's active puck
+                // Ignore non-puck collisions, self-hit, CPU's active puck, and player's ghost pucks
                 if (!hit.collider.CompareTag("puck") || hit.collider.gameObject == puck ||
-                    hit.collider.gameObject == LogicScript.Instance.opponent.activePuckObject)
+                    hit.collider.gameObject == LogicScript.Instance.opponent.activePuckObject ||
+                    (hit.collider.GetComponent<PuckScript>().IsPlayersPuck() && hit.collider.GetComponent<PuckScript>().HasGhost()))
                     continue;
 
                 hitPoints.Add(hit.point);
@@ -171,6 +172,7 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
                     else if (puckScript.IsPlayersPuck())
                     {
                         tempPowerModifier += 2.5f;
+                        tempPowerModifier += (puckScript.GetHeavyCount() * 2.5f) + (puckScript.GetTetherCount() * 2.5f);
                         tempValueModifier += puckScript.ComputeTotalFutureValue() - 1; // minus 1 here, so we slightly favor aiming towards the front puck
                     }
                     // if there is a CPU puck in front, make the path slightly less valuable
@@ -203,6 +205,7 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
                         if (puckScript.IsPlayersPuck())
                         {
                             tempPowerModifier += 2.5f;
+                            tempPowerModifier += (puckScript.GetHeavyCount() * 2.5f) + (puckScript.GetTetherCount() * 2.5f);
                             tempValueModifier += puckScript.ComputeTotalFutureValue();
                         }
                         else // it's okay to have CPU pucks behind, it just makes the path less valuable

@@ -9,6 +9,7 @@ public class BarScript : MonoBehaviour
     public static BarScript Instance;
 
     // dependancies
+    [SerializeField] private SpriteRenderer lineSpriteRenderer;
     private LineScript line;
 
     [SerializeField] private SpriteRenderer spriteRenderer;
@@ -19,6 +20,8 @@ public class BarScript : MonoBehaviour
     [SerializeField] private Sprite powerBarMid;
     [SerializeField] private Sprite powerBarOut;
     [SerializeField] private Sprite spinBar;
+
+    [SerializeField] private GameObject weakenBarCover;
 
     private void Awake()
     {
@@ -49,9 +52,12 @@ public class BarScript : MonoBehaviour
                 // set sprite
                 spriteRenderer.enabled = true;
                 spriteRenderer.sprite = (isPlayer ? angleBarLeft : angleBarRight);
+                lineSpriteRenderer.enabled = true;
                 // set text
                 barText.text = "angle";
                 barTextCanvas.SetActive(true);
+                // set weaken cover as off
+                weakenBarCover.SetActive(false);
                 break;
             case "power":
                 // animation
@@ -64,9 +70,12 @@ public class BarScript : MonoBehaviour
                 var lineValue = line.GetValue();
                 var notPlayerAngleModifier = (isPlayer ? 0 : 27);
                 spriteRenderer.sprite = (lineValue > (50 - notPlayerAngleModifier) && lineValue < (77 - notPlayerAngleModifier) ? powerBarMid : powerBarOut);
+                lineSpriteRenderer.enabled = true;
                 // set text
                 barText.text = "power";
                 barTextCanvas.SetActive(true);
+                // set weaken cover as on
+                weakenBarCover.SetActive(true);
                 break;
             case "spin":
                 // animation
@@ -77,9 +86,12 @@ public class BarScript : MonoBehaviour
                 // set sprite
                 spriteRenderer.enabled = true;
                 spriteRenderer.sprite = spinBar;
+                lineSpriteRenderer.enabled = true;
                 // set text
                 barText.text = "spin";
                 barTextCanvas.SetActive(true);
+                // set weaken cover as off
+                weakenBarCover.SetActive(false);
                 break;
             case "none":
                 // animation
@@ -98,6 +110,7 @@ public class BarScript : MonoBehaviour
     private void DisableBarImageAndText()
     {
         spriteRenderer.enabled = false;
+        lineSpriteRenderer.enabled = false;
         barText.text = "";
         barTextCanvas.SetActive(false);
     }
@@ -112,5 +125,11 @@ public class BarScript : MonoBehaviour
         {
             spriteRenderer.color = new Color(1, 1, 1, 1);
         }
+    }
+
+    public void SetWeakenBarCover(int weakenCount)
+    {
+        weakenBarCover.transform.localScale = new Vector2(0.442f * weakenCount, 1.1f);
+        weakenBarCover.transform.localPosition = new Vector2(10.75f - (1.1f * weakenCount), 0f);
     }
 }

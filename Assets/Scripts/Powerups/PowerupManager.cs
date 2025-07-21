@@ -22,6 +22,8 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private Button powerupButton2;
     [SerializeField] private Button powerupButton3;
 
+    [SerializeField] private GameObject floatingTextPrefab;
+
     // images
     [SerializeField] private Sprite plusOneImage;
     [SerializeField] private Sprite foresightImage;
@@ -54,6 +56,13 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private Sprite investmentImage;
     [SerializeField] private Sprite omniscienceImage;
     [SerializeField] private Sprite plusThreeImage;
+    [SerializeField] private Sprite ghostImage;
+    [SerializeField] private Sprite heavyImage;
+    [SerializeField] private Sprite shrinkImage;
+    [SerializeField] private Sprite tetherImage;
+    [SerializeField] private Sprite spawnImage;
+    [SerializeField] private Sprite weakenImage;
+    [SerializeField] private Sprite fortuneImage;
 
     [SerializeField] private Sprite plusOneIcon;
     [SerializeField] private Sprite foresightIcon;
@@ -86,6 +95,13 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private Sprite investmentIcon;
     [SerializeField] private Sprite omniscienceIcon;
     [SerializeField] private Sprite plusThreeIcon;
+    [SerializeField] private Sprite ghostIcon;
+    [SerializeField] private Sprite heavyIcon;
+    [SerializeField] private Sprite shrinkIcon;
+    [SerializeField] private Sprite tetherIcon;
+    [SerializeField] private Sprite spawnIcon;
+    [SerializeField] private Sprite weakenIcon;
+    [SerializeField] private Sprite fortuneIcon;
 
     public Sprite[] powerupIcons;
     public string[] powerupTexts;
@@ -146,13 +162,20 @@ public class PowerupManager : NetworkBehaviour
             DenyPowerup, // 27
             InvestmentPowerup, // 28
             OmnisciencePowerup, // 29
-            PlusThreePowerup // 30
+            PlusThreePowerup, // 30
+            GhostPowerup, // 31
+            HeavyPowerup, // 32
+            ShrinkPowerup, // 33
+            TetherPowerup, // 34
+            SpawnPowerup, // 35
+            WeakenPowerup, // 36
+            FortunePowerup // 37
         };
 
-        powerupIcons = new Sprite[] { plusOneIcon, foresightIcon, blockIcon, boltIcon, forceFieldIcon, phaseIcon, cullIcon, growthIcon, lockIcon, explosionIcon, fogIcon, hydraIcon, factoryIcon, shieldIcon, shuffleIcon, chaosIcon, timesTwoIcon, resurrectIcon, millIcon, researchIcon, insanityIcon, tripleIcon, exponentIcon, laserIcon, auraIcon, pushIcon, erraticIcon, denyIcon, investmentIcon, omniscienceIcon, plusThreeIcon };
-        powerupTexts = new string[] { "plus one", "foresight", "block", "bolt", "force field", "phase", "cull", "growth", "lock", "explosion", "fog", "hydra", "factory", "shield", "shuffle", "chaos", "times two", "resurrect", "mill", "research", "insanity", "triple", "exponent", "laser", "aura", "push", "erratic", "deny", "investment", "omniscience", "plus three" };
+        powerupIcons = new Sprite[] { plusOneIcon, foresightIcon, blockIcon, boltIcon, forceFieldIcon, phaseIcon, cullIcon, growthIcon, lockIcon, explosionIcon, fogIcon, hydraIcon, factoryIcon, shieldIcon, shuffleIcon, chaosIcon, timesTwoIcon, resurrectIcon, millIcon, researchIcon, insanityIcon, tripleIcon, exponentIcon, laserIcon, auraIcon, pushIcon, erraticIcon, denyIcon, investmentIcon, omniscienceIcon, plusThreeIcon, ghostIcon, heavyIcon, shrinkIcon, tetherIcon, spawnIcon, weakenIcon, fortuneIcon };
+        powerupTexts = new string[] { "plus one", "foresight", "block", "bolt", "force field", "phase", "cull", "growth", "lock", "explosion", "fog", "hydra", "factory", "shield", "shuffle", "chaos", "times two", "resurrect", "mill", "research", "insanity", "triple", "exponent", "laser", "aura", "push", "erratic", "deny", "investment", "omniscience", "plus three", "ghost", "heavy", "shrink", "tether", "spawn", "weaken", "fortune" };
         powerupButtons = new Button[] { powerupButton1, powerupButton2, powerupButton3 };
-        powerupSprites = new Sprite[] { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage, cullImage, growthImage, lockImage, explosionImage, fogImage, hydraImage, factoryImage, shieldImage, shuffleImage, chaosImage, timesTwoImage, resurrectImage, millImage, researchImage, insanityImage, tripleImage, exponentImage, laserImage, auraImage, pushImage, erraticImage, denyImage, investmentImage, omniscienceImage, plusThreeImage };
+        powerupSprites = new Sprite[] { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage, cullImage, growthImage, lockImage, explosionImage, fogImage, hydraImage, factoryImage, shieldImage, shuffleImage, chaosImage, timesTwoImage, resurrectImage, millImage, researchImage, insanityImage, tripleImage, exponentImage, laserImage, auraImage, pushImage, erraticImage, denyImage, investmentImage, omniscienceImage, plusThreeImage, ghostImage, heavyImage, shrinkImage, tetherImage, spawnImage, weakenImage, fortuneImage };
     }
 
     public int GetMethodArrayLength()
@@ -837,6 +860,103 @@ public class PowerupManager : NetworkBehaviour
         PayCosts(encodedCard);
 
         activeCompetitor.isOmniscient = true;
+    }
+
+    public void GhostPowerup(int encodedCard) // index 31 : Puck is invisible to your opponent
+    {
+        var index = Array.IndexOf(methodArray, GhostPowerup);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(encodedCard)) { return; }
+        PayCosts(encodedCard);
+
+        activeCompetitor.activePuckScript.ActivateGhost();
+    }
+
+    public void HeavyPowerup(int encodedCard) // index 32 : Puck is heavy
+    {
+        var index = Array.IndexOf(methodArray, HeavyPowerup);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(encodedCard)) { return; }
+        PayCosts(encodedCard);
+
+        activeCompetitor.activePuckScript.ActivateHeavy();
+    }
+
+    public void ShrinkPowerup(int encodedCard) // index 33 : Puck is smaller
+    {
+        var index = Array.IndexOf(methodArray, ShrinkPowerup);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(encodedCard)) { return; }
+        PayCosts(encodedCard);
+
+        activeCompetitor.activePuckScript.ActivateShrink();
+    }
+
+    public void TetherPowerup(int encodedCard) // index 34 : Puck is tethered to its stopping position
+    {
+        var index = Array.IndexOf(methodArray, TetherPowerup);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(encodedCard)) { return; }
+        PayCosts(encodedCard);
+
+        activeCompetitor.activePuckScript.ActivateTether();
+    }
+
+    public void SpawnPowerup(int encodedCard) // index 35 : spawn a puck at a random position
+    {
+        var index = Array.IndexOf(methodArray, SpawnPowerup);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(encodedCard)) { return; }
+        PayCosts(encodedCard);
+
+        if (ClientLogicScript.Instance.isRunning)
+        {
+            if (activeCompetitor.isPlayer)
+            {
+                ServerLogicScript.Instance.SpawnServerRpc();
+            }
+            return;
+        }
+
+        GameObject spawnPuckObject = Instantiate(puckPrefab, new Vector3(Random.Range(-10f, 10), Random.Range(1f, 15f), -1.0f), Quaternion.identity);
+        PuckScript spawnPuckScript = spawnPuckObject.GetComponent<PuckScript>();
+        spawnPuckScript.InitPuck(activeCompetitor.isPlayer, activeCompetitor.puckSpriteID);
+        spawnPuckScript.InitSpawnedPuck();
+    }
+
+    public void WeakenPowerup(int encodedCard) // index 36 : reduce opponents next shot power
+    {
+        var index = Array.IndexOf(methodArray, WeakenPowerup);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(encodedCard)) { return; }
+        PayCosts(encodedCard);
+
+        if (ClientLogicScript.Instance.isRunning)
+        {
+            ClientLogicScript.Instance.IncrementWeaken();
+        }
+        else
+        {
+            LogicScript.Instance.IncrementWeaken();
+        }   
+    }
+
+    public void FortunePowerup(int encodedCard) // index 37 : 1 in 3 chance to activate times two
+    {
+        var index = Array.IndexOf(methodArray, FortunePowerup);
+        if (!CanPayCosts(index)) { return; }
+        if (NeedsToBeSentToServer(encodedCard)) { return; }
+        PayCosts(encodedCard);
+
+        if (Random.Range(0, 4) == 0)
+        {
+            activeCompetitor.activePuckScript.ActivateTimesTwo();
+        }
+        else
+        {
+            GameObject fortuneNopeText = Instantiate(floatingTextPrefab, activeCompetitor.activePuckObject.transform.position + new Vector3(0, 0.5f, 0), Quaternion.identity, transform);
+            fortuneNopeText.GetComponent<FloatingTextScript>().Initialize("nope!", 0.1f, 0, 0.005f, Vector2.zero, 0.25f, false, 5);
+        }
     }
 
     private bool CanPayCosts(int index)

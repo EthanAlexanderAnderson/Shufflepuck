@@ -27,6 +27,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     [SerializeField] private GameObject animationLayer;
     [SerializeField] private TrailRenderer trail;
     private GameObject velocityFloatingTextDebug;
+    [SerializeField] private GameObject tetherSnapParticlesPrefab;
     #endregion
 
     // ---------- LOCAL FIELDS ----------
@@ -39,6 +40,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     private bool requestedCleanup;
     private float velocity;
     public NetworkVariable<float> velocityNetworkedRounded = new NetworkVariable<float>();
+    private float baseLocalScale;
 
     // movement modifiers (constant)
     [SerializeField] private float powerModifier;
@@ -207,6 +209,9 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             velocityFloatingTextDebug.GetComponent<FloatingTextScript>().Initialize("", 0, 0, 0, new Vector2(2f, -0.5f), 0.75f, true, float.MaxValue);
             velocityFloatingTextDebug.GetComponent<TMPro.TMP_Text>().horizontalAlignment = TMPro.HorizontalAlignmentOptions.Left;
         }
+
+        baseLocalScale = transform.localScale.x;
+        Debug.Log("baseLocalScale: " + baseLocalScale);
     }
 
     void FixedUpdate()
@@ -214,8 +219,8 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         // if shot, add the force / torque once
         if (IsShot() && shotForceToAdd != Vector2.zero)
         {
-            rb.AddForce(shotForceToAdd);
-            rb.AddTorque(shotTorqueToAdd);
+            rb.AddForce(shotForceToAdd * rb.mass);
+            rb.AddTorque(shotTorqueToAdd * rb.mass);
             shotForceToAdd = Vector2.zero;
             shotTorqueToAdd = 0f;
         }
@@ -247,16 +252,16 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         if (!IsSlowed() && IsShot() && pastSafeLine)
         {
             // add horizontal spinning force
-            rb.AddForce((right * rb.angularVelocity * angularVelocityModifier) * -0.03f);
+            rb.AddForce(-0.03f * angularVelocityModifier * rb.angularVelocity * rb.mass * right);
 
             // add counter force downwards
             if (rb.angularVelocity > 0)
             {
-                rb.AddForce((up * rb.angularVelocity * angularVelocityModifier * counterForce) * -0.03f);
+                rb.AddForce(-0.03f * angularVelocityModifier * counterForce * rb.angularVelocity * rb.mass * up);
             }
             else
             {
-                rb.AddForce((up * rb.angularVelocity * angularVelocityModifier * counterForce) * 0.03f);
+                rb.AddForce(0.03f * angularVelocityModifier * counterForce * rb.angularVelocity * rb.mass * up);
             }
         }
 
@@ -265,10 +270,40 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             pastSafeLine = true;
         }
 
+        // tether powerup
+        if (tetherPosition != null)
+        {
+            Vector3 direction = tetherPosition.Value - transform.position;
+            float distance = direction.magnitude;
+            Vector3 force = 1 * distance * direction.normalized * GetTetherCount();
+
+            if (distance <= 4)
+            {
+                rb.AddForce(force);
+            }
+            // break tether
+            else
+            {
+                // create partcle effect
+                GameObject tetherSnapParticlesObject = Instantiate(tetherSnapParticlesPrefab, tetherPosition.Value, Quaternion.identity);
+                ParticleSystem.MainModule tspmain = tetherSnapParticlesObject.GetComponent<ParticleSystem>().main;
+                tspmain.startColor = SetParticleColor();
+                // remove the tether
+                tetherPosition = null;
+                RemoveAllPowerupText("tether");
+                tetherPowerup = 0;
+                // play break sfx
+                breakSFX.volume *= SFXvolume;
+                breakSFX.Play();
+                Destroy(tetherSnapParticlesObject, 3f);
+            }
+        }
+
         // phase powerup (in motion)
         if (phasePowerup && (velocity > 1.0f || !IsShot())) // while moving, phase out
         {
-            spriteRenderer.color = new Color(1f, 1f, 1f, 0.5f);
+            // conditional here is for ghost
+            spriteRenderer.color = spriteRenderer.color.a <= 0 ? new Color(1f, 1f, 1f, baseAlpha) : new Color(1f, 1f, 1f, 0.5f);
             puckCollider.isTrigger = true;
         }
 
@@ -333,7 +368,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 if (!phaseHasOverlap)
                 {
                     /// unphase it (make it visible again)
-                    spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+                    spriteRenderer.color = new Color(1f, 1f, 1f, baseAlpha);
                     puckCollider.isTrigger = false;
                     phasePowerup = false;
                     RemoveAllPowerupText("phase");
@@ -363,10 +398,26 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             if (HasLock() && rb.bodyType == RigidbodyType2D.Dynamic)
             {
                 rb.bodyType = RigidbodyType2D.Kinematic;
-                spriteRenderer.color = new Color(0.5f, 0.5f, 0.5f, 1f);
+                spriteRenderer.color = new Color(0.5f, 0.5f, 0.5f, baseAlpha);
                 rb.angularVelocity = 0;
                 rb.linearVelocity = Vector2.zero;
                 Debug.Log((playersPuck ? "Player" : "Opponent") + " Triggered LockPowerup");
+            }
+
+            // trigger tether upon stopping
+            if (HasTether() && tetherPosition == null)
+            {
+                tetherPosition = transform.position;
+                Debug.Log((playersPuck ? "Player" : "Opponent") + " Triggered TetherPowerup");
+                // create tether visual line
+                tether = gameObject.AddComponent<LineRenderer>();
+                tether.positionCount = 2;
+                tether.useWorldSpace = true;
+                tether.startWidth = 0.5f;
+                tether.endWidth = 0.5f;
+                tether.material = new Material(Shader.Find("Sprites/Default"));
+                tether.startColor = color[0];
+                tether.endColor = color[^1];
             }
 
             // reset trail color to white upon stopping
@@ -375,6 +426,27 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
                 trail.startColor = Color.white;
                 trail.endColor = Color.white;
             }
+        }
+
+        // for ghost powerup
+        if (HasGhost())
+        {
+            if (spriteRenderer.color.a > baseAlpha)
+            {
+                // conditional is for lock
+                spriteRenderer.color = rb.bodyType == RigidbodyType2D.Kinematic ? new Color(0.5f, 0.5f, 0.5f, spriteRenderer.color.a - 0.01f) : new Color(1f, 1f, 1f, spriteRenderer.color.a - 0.01f);
+            }
+        }
+
+        // draw tether line
+        if (HasTether() && tetherPosition != null)
+        {
+            tether.SetPosition(0, (Vector3)tetherPosition);
+            tether.SetPosition(1, transform.position);
+        }
+        else if (tether != null && !HasTether())
+        {
+            Destroy(tether);
         }
 
         // after stopping, request cleanup of all pucks. So that this puck is destroyed if it is outside the play area
@@ -447,8 +519,11 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         if (trail != null && powerParameter >= 95)
         {
             volumeBoost += 0.2f;
-            trail.startColor = powerParameter >= 99 ? Color.red : Color.yellow;
-            trail.endColor = Color.yellow;
+            if (!HasGhost() || IsPlayersPuck())
+            {
+                trail.startColor = powerParameter >= 99 ? Color.red : Color.yellow;
+                trail.endColor = Color.yellow;
+            }
         }
         shotSFX.volume = SFXvolume + volumeBoost;
         shotSFX.Play();
@@ -549,6 +624,13 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         else { CollisionFX(col.GetContact(0).point); }
         angularVelocityModifier = 0;
 
+        if (HasGhost())
+        {
+            // conditional is for lock
+            spriteRenderer.color = rb.bodyType == RigidbodyType2D.Kinematic ? new Color(0.5f, 0.5f, 0.5f, 1f) : new Color(1f, 1f, 1f, 1f);
+            CreatePowerupFloatingText();
+        }
+
         // explosion powerup
         if (ClientLogicScript.Instance.isRunning && !IsServer) return; // stop explosion shuffle bug
         if (HasExplosion() && col.gameObject.CompareTag("puck"))
@@ -623,6 +705,9 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     private GameObject activeScoreFloatingText;
     private void CreateScoreFloatingText()
     {
+        // don't show score floating text on opponent's ghost puck
+        if (HasGhost() & !IsPlayersPuck()) { return; }
+
         // Destroy previous score floating text if it exists
         if (activeScoreFloatingText != null)
         {
@@ -630,7 +715,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
 
         activeScoreFloatingText = Instantiate(floatingTextPrefab, transform.position + new Vector3(0, 0.5f, 0), Quaternion.identity, transform);
-        activeScoreFloatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, new Vector2(0, 0.5f), 1.5f + (ComputeValue() / 10), true);
+        activeScoreFloatingText.GetComponent<FloatingTextScript>().Initialize(ComputeValue().ToString(), 1, 1, 1, new Vector2(0, 0.5f), 1.5f + (ComputeValue() / 10) * ((shrinkPowerup + 1) / 1), true);
     }
 
     public void AddPowerupText(string text, bool showFloatingText = true)
@@ -660,7 +745,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             }
         }
 
-        if (showFloatingText) { CreatePowerupFloatingText(); }
+        if (showFloatingText && spriteRenderer.color.a > 0) { CreatePowerupFloatingText(); }
     }
 
     public void RemoveAllPowerupText(string text = null, bool showFloatingText = true)
@@ -668,7 +753,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         if (text != null)
         {
             powerupText.Remove(text);
-            if (showFloatingText) { CreatePowerupFloatingText(); }
+            if (showFloatingText && spriteRenderer.color.a > 0) { CreatePowerupFloatingText(); }
         }
         else
         {
@@ -704,11 +789,14 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
         // Create new powerup floating text
         activePowerupFloatingText = Instantiate(floatingTextPrefab, transform.position + new Vector3(0, -1.5f, 0), Quaternion.identity, transform);
-        activePowerupFloatingText.GetComponent<FloatingTextScript>().Initialize(string.Join("\n", GetFormattedPowerupText()), 0, 0, 0.1f, new Vector2(0, -1.5f), 1, true);
+        activePowerupFloatingText.GetComponent<FloatingTextScript>().Initialize(string.Join("\n", GetFormattedPowerupText()), 0, 0, 0.1f, new Vector2(0, -1.5f), 1 * ((shrinkPowerup + 1) / 1), true);
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        // return if this puck is invisible (ghost)
+        if (spriteRenderer.color.a <= 0) { return; }
+
         // show puck score when clicked
         CreateScoreFloatingText();
         // if powerupText has been set, show it
@@ -918,6 +1006,21 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     private int plusThreePowerup = 0;
     public int GetPlusThreeCount() { return plusThreePowerup; }
     public bool HasPlusThree() { return plusThreePowerup > 0; }
+
+    private bool ghostPowerup = false;
+    public bool HasGhost() { return ghostPowerup; }
+
+    private int heavyPowerup = 0;
+    public int GetHeavyCount() { return heavyPowerup; }
+    public bool HasHeavy() { return heavyPowerup > 0; }
+
+    private int shrinkPowerup = 0;
+    public int GetShrinkCount() { return shrinkPowerup; }
+    public bool HasShrink() { return shrinkPowerup > 0; }
+
+    private int tetherPowerup = 0;
+    public int GetTetherCount() { return tetherPowerup; }
+    public bool HasTether() { return tetherPowerup > 0; }
     #endregion
 
     // ---------- POWERUP ACTIVATORS & METHODS ----------
@@ -1051,7 +1154,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             if (lockPowerup <= 0)
             {
                 rb.bodyType = RigidbodyType2D.Dynamic;
-                spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+                spriteRenderer.color = new Color(1f, 1f, 1f, baseAlpha);
             }
             RemovePowerupText("lock");
             Debug.Log((playersPuck ? "Player" : "Opponent") + " Triggered LockPowerup");
@@ -1335,7 +1438,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             x = UnityEngine.Random.Range(0.5f, 1f);
         }
 
-        rb.AddForce(new Vector2(x, y).normalized*5, ForceMode2D.Impulse);
+        rb.AddForce(5 * rb.mass * new Vector2(x, y).normalized, ForceMode2D.Impulse);
 
         Debug.Log((playersPuck ? "Player" : "Opponent") + " Triggered ErraticPowerup");
     }
@@ -1346,6 +1449,54 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         AddPowerupText("plus three");
 
         IncrementPuckBonusValue(3);
+    }
+
+    private float baseAlpha = 1;
+    public void ActivateGhost()
+    {
+        ghostPowerup = true;
+        AddPowerupText("ghost");
+
+        // TODO makes sure this is unaffected by phase alpha change
+        baseAlpha = IsPlayersPuck() ? 0.75f : 0f;
+
+        spriteRenderer.color = new Color(1f, 1f, 1f, baseAlpha);
+        if (!IsPlayersPuck())
+        {
+            color = new Color[] { Color.clear };
+            trail.startColor = Color.clear;
+            trail.endColor = Color.clear;
+        }
+    }
+
+    public void ActivateHeavy()
+    {
+        heavyPowerup++; ;
+        AddPowerupText("heavy");
+
+        rb.mass *= 2f; // double the mass
+    }
+
+    public void ActivateShrink()
+    {
+        shrinkPowerup++;
+        AddPowerupText("shrink");
+
+        // shrink the puck
+        transform.localScale = Vector3.one * baseLocalScale * (1f / ((float)shrinkPowerup + 1f));
+        Debug.Log("baseLocalScale: " + baseLocalScale);
+        Debug.Log("shrinkPowerup: " + (float)shrinkPowerup);
+        Debug.Log("baseLocalScale * (1 / (shrinkPowerup + 1): " + baseLocalScale * (1f / ((float)shrinkPowerup + 1f)));
+        // grow the nearby collider
+        GetComponentInChildren<NearbyPuckScript>().gameObject.transform.localScale = Vector3.one * (((float)shrinkPowerup + 1f) / 1f);
+    }
+
+    private Vector3? tetherPosition = null;
+    private LineRenderer tether;
+    public void ActivateTether()
+    {
+        tetherPowerup++;
+        AddPowerupText("tether");
     }
 
     // this method copies static effects from the source puck to this puck
@@ -1406,6 +1557,26 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         for (int i = 0; i < GetComponentInChildren<NearbyPuckScript>().GetAuraCount(); i++)
         {
             ActivateAura();
+        }
+        for (int i = 0; i < sourcePuckScript.GetPlusThreeCount(); i++)
+        {
+            ActivatePlusThree();
+        }
+        if (sourcePuckScript.HasGhost())
+        {
+            ActivateGhost();
+        }
+        for (int i = 0; i < sourcePuckScript.GetHeavyCount(); i++)
+        {
+            ActivateHeavy();
+        }
+        for (int i = 0; i < sourcePuckScript.GetShrinkCount(); i++)
+        {
+            ActivateShrink();
+        }
+        for (int i = 0; i < sourcePuckScript.GetTetherCount(); i++)
+        {
+            ActivateTether();
         }
     }
 
