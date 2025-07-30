@@ -933,7 +933,7 @@ public class PowerupManager : NetworkBehaviour
 
         if (ClientLogicScript.Instance.isRunning)
         {
-            ClientLogicScript.Instance.IncrementWeaken();
+            ClientLogicScript.Instance.IncrementWeakenClientRpc();
         }
         else
         {

@@ -38,7 +38,7 @@ public class ClientLogicScript : NetworkBehaviour
     public float spin;
     public GameObject puckHalo;
     private int weakenCount;
-    [ClientRpc] public void IncrementWeaken() { weakenCount++; Debug.Log("increment weaken"); }
+    [ClientRpc] public void IncrementWeakenClientRpc() { weakenCount++; Debug.Log("increment weaken"); }
 
     // wall
     private int wallCount = 3;

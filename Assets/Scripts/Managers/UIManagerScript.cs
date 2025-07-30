@@ -68,6 +68,9 @@ public class UIManagerScript : MonoBehaviour
     // HUD
     [SerializeField] private Text turnText;
 
+    public TMP_Text playerUsernameText;
+    public TMP_Text opponentUsernameText;
+
     public Text playerPuckCountText;
     public Text opponentPuckCountText;
 
@@ -577,6 +580,7 @@ public class UIManagerScript : MonoBehaviour
         }
         ChangeUI(previousActiveUI);
     }
+
     // reset in-game HUD
     public void ResetHUD()
     {
@@ -590,6 +594,26 @@ public class UIManagerScript : MonoBehaviour
         opponentWinsObject.SetActive(playerWins > 0 || opponentWins > 0);
         ExitConfirmation.SetActive(false);
         RestartConfirmation.SetActive(false);
+
+        // set HUD username text
+        (string username, _, _) = PlayerAuthentication.Instance.GetProfile();
+        if (!string.IsNullOrEmpty(username))
+        {
+            playerUsernameText.text = username;
+        }
+        else
+        {
+            playerUsernameText.text = "you";
+        }
+
+        if (LogicScript.Instance.gameIsRunning)
+        {
+            opponentUsernameText.text = "CPU";
+        }
+        else if (ClientLogicScript.Instance.isRunning)
+        {
+            opponentUsernameText.text = "opponent";
+        }
     }
 
     public void ResetWaitingScreen(string waitingTextInput)
