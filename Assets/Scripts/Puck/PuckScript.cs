@@ -1509,7 +1509,10 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         {
             ActivatePlusOne();
         }
-        if (HasPhase()) { ActivatePhase(); }
+        if (sourcePuckScript.HasPhase())
+        {
+            ActivatePhase();
+        }
         for (int i = 0; i < sourcePuckScript.GetGrowthCount(); i++)
         {
             ActivateGrowth();
@@ -1554,7 +1557,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         {
             ActivateErratic();
         }
-        for (int i = 0; i < GetComponentInChildren<NearbyPuckScript>().GetAuraCount(); i++)
+        for (int i = 0; i < sourcePuckScript.gameObject.GetComponentInChildren<NearbyPuckScript>().GetAuraCount(); i++)
         {
             ActivateAura();
         }

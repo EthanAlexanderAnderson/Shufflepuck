@@ -29,7 +29,7 @@ public class PowerupPopupPrefabScript : MonoBehaviour
     [SerializeField] private GameObject cardRankObject;
     [SerializeField] private TMP_Text cardRankText;
 
-    private string[] rarityTexts = { "common", "uncomon", "rare", "epic", "legendary" };
+    private string[] rarityTexts = { "common", "uncommon", "rare", "epic", "legendary" };
     [SerializeField] private Sprite[] rarityIcons = new Sprite[5];
 
     private string[] rankTexts = { "", "bronze", "gold", "diamond", "celestial" };
