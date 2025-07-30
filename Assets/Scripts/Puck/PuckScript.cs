@@ -398,7 +398,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             if (HasLock() && rb.bodyType == RigidbodyType2D.Dynamic)
             {
                 rb.bodyType = RigidbodyType2D.Kinematic;
-                spriteRenderer.color = new Color(0.5f, 0.5f, 0.5f, baseAlpha);
+                spriteRenderer.color = HasPhase() ? new Color(0.5f, 0.5f, 0.5f, 0.5f) : new Color(0.5f, 0.5f, 0.5f, baseAlpha);
                 rb.angularVelocity = 0;
                 rb.linearVelocity = Vector2.zero;
                 Debug.Log((playersPuck ? "Player" : "Opponent") + " Triggered LockPowerup");
@@ -1154,7 +1154,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             if (lockPowerup <= 0)
             {
                 rb.bodyType = RigidbodyType2D.Dynamic;
-                spriteRenderer.color = new Color(1f, 1f, 1f, baseAlpha);
+                spriteRenderer.color = HasPhase() ? new Color(1f, 1f, 1f, 0.5f) : new Color(1f, 1f, 1f, baseAlpha);
             }
             RemovePowerupText("lock");
             Debug.Log((playersPuck ? "Player" : "Opponent") + " Triggered LockPowerup");
