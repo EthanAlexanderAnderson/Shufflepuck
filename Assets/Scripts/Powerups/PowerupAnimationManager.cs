@@ -110,16 +110,21 @@ public class PowerupAnimationManager : MonoBehaviour
         Sprite icon = PowerupManager.Instance.powerupIcons[index];
 
         GameObject floatingIcon = Instantiate(floatingIconPrefab, position, Quaternion.identity);
-        SpriteRenderer sr = floatingIcon.GetComponent<SpriteRenderer>();
+
+        Image[] images = floatingIcon.GetComponentsInChildren<Image>();
+        Image sr = images[0];
+        Image outline = images[1];
+
         sr.sprite = icon;
         sr.color = UIManagerScript.Instance.GetDarkMode() ? Color.white : Color.black;
-
+        outline.sprite = icon;
+        outline.color = UIManagerScript.Instance.GetDarkMode() ? Color.black : Color.white;
 
         floatingIcon.transform.localScale = new Vector3(0f, 0f, 0f);
 
         float duration = 0.5f;
 
-        LeanTween.scale(floatingIcon, new Vector3(0.75f, 0.75f, 0.75f), duration).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
+        LeanTween.scale(floatingIcon, new Vector3(0.02f, 0.02f, 0.02f), duration).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
         LeanTween.scale(floatingIcon, new Vector3(0f, 0f, 0f), duration).setEase(LeanTweenType.easeInElastic).setDelay(duration * 3 + 0.01f).setDestroyOnComplete(true);
     }
 }
