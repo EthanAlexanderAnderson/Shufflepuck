@@ -941,14 +941,38 @@ public class PowerupManager : NetworkBehaviour
         }   
     }
 
-    public void FortunePowerup(int encodedCard) // index 37 : 1 in 3 chance to activate times two
+    public void FortunePowerup(int encodedCard) // index 37 : 1 in 4 chance to activate times two
     {
         var index = Array.IndexOf(methodArray, FortunePowerup);
         if (!CanPayCosts(index)) { return; }
         if (NeedsToBeSentToServer(encodedCard)) { return; }
         PayCosts(encodedCard);
 
-        if (Random.Range(0, 4) == 0)
+        // TODO: pass args[] into NeedsToBeSentToServer (arrays of ints or floats are serializable)
+        if (ClientLogicScript.Instance.isRunning && IsServer)
+        {
+            FortuneCalcClientRpc(Random.Range(0, 4));
+        }
+        else if (LogicScript.Instance.gameIsRunning)
+        {
+            FortuneCalcVsCPU();
+        }
+    }
+
+    [ClientRpc] private void FortuneCalcClientRpc(int result)
+    {
+        if (!IsClient) return;
+        FortuneResult(result);
+    }
+
+    private void FortuneCalcVsCPU()
+    {
+        FortuneResult(Random.Range(0, 4));
+    }
+
+    private void FortuneResult(int result)
+    {
+        if (result == 0)
         {
             activeCompetitor.activePuckScript.ActivateTimesTwo();
         }

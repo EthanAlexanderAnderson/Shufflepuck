@@ -276,7 +276,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         {
             Vector3 direction = tetherPosition.Value - transform.position;
             float distance = direction.magnitude;
-            Vector3 force = 1 * distance * direction.normalized * GetTetherCount();
+            Vector3 force = 0.5f * distance * direction.normalized * GetTetherCount();
 
             if (distance <= 4)
             {
@@ -473,6 +473,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     #region Shooting
     public void Shoot(float angleParameter, float powerParameter, float spinParameter = 50)
     {
+        Debug.Log("Shooting: " + angleParameter + " | " + powerParameter + " | " + spinParameter);
         if (angleParameter < -5 || angleParameter > 105 || powerParameter < -5 || powerParameter > 105 || spinParameter < -5 || spinParameter > 105)
         {
             Debug.LogError("Invalid input: One or more parameters are out of the valid range (-5 to 105).");

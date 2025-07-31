@@ -38,7 +38,7 @@ public class ClientLogicScript : NetworkBehaviour
     public float spin;
     public GameObject puckHalo;
     private int weakenCount;
-    [ClientRpc] public void IncrementWeakenClientRpc() { weakenCount++; Debug.Log("increment weaken"); }
+    [ClientRpc] public void IncrementWeakenClientRpc() { if (!logic.player.isShooting) { weakenCount++; } }
 
     // wall
     private int wallCount = 3;
@@ -119,7 +119,7 @@ public class ClientLogicScript : NetworkBehaviour
                         break;
                     case "spin":
                         spin = line.GetValue();
-                        serverLogic.ShootServerRpc(angle, power, spin);
+                        serverLogic.ShootServerRpc(angle, Math.Min(power, 100 - weakenCount * 10), spin);
                         activeBar = bar.ChangeBar("none");
                         GameHUDManager.Instance.ChangeTurnText("Opponent's Turn");
                         UI.shotClockText.text = ""; // clear shot clock

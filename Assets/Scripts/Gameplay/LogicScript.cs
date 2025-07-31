@@ -374,7 +374,6 @@ public class LogicScript : MonoBehaviour
     {
         puckManager.CleanupDeadPucks();
         powerupManager.DisableForceFieldIfNecessary();
-        Debug.Log("Shooting: " + angle + " | " + power + " | " + spin);
         activeBar = bar.ChangeBar("none");
         line.isActive = false;
         arrow.SetActive(false);
