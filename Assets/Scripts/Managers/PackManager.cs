@@ -33,14 +33,7 @@ public class PackManager : MonoBehaviour
     [SerializeField] private TMP_Text chanceMultText;
     private GameObject powerupPopupObject;
     // pack booster Ids & probability weights & required level
-    List<(int id, int weight, int level)> packBoosterIDs = new()
-    {
-        (-5, 1, 50),
-        (-4, 10, 25),
-        (-3, 20, 15),
-        (-2, 40, 10),
-        (-1, 50, 0)
-    };
+    List<(int id, int weight, int level)> packBoosterIDs;
     float[] boosterRankMult = { 0.1f, 0.08f, 0.04f, 0.02f, 0.002f };
 
 
@@ -107,6 +100,52 @@ public class PackManager : MonoBehaviour
     {
         PlayerPrefs.SetString("LastPackBoosterDate", DateTime.Today.ToString("yyyy-MM-dd"));
         int currentPackBooster = PlayerPrefs.GetInt("PackBooster");
+
+        // celestial and holo are always assignable
+        packBoosterIDs = new()
+        {
+            (-5, 1, 50), // celestial
+            (-1, 50, 0) // holo
+        };
+
+        // add uncompleted ranks to weights list
+        bool[] canAssign = new bool[4];
+        for (int i = 0; i < PowerupCardData.GetCardCount(); i++)
+        {
+            if (PowerupCardData.GetCardName(i) == null)
+            {
+                continue;
+            }
+            // if any card is unowned in a specific rank, that rank is eligible to be assigned as the daily pack booster
+            bool[] owns = new bool[4];
+            foreach (var v in PowerupCardData.GetAllVariations(i))
+            {
+                if (v.rank >= 0 && v.rank < 4 && !v.holo)
+                {
+                    owns[v.rank] = true;
+                }
+            }
+            for (int j = 0; j < owns.Length; j++)
+            {
+                if (!owns[j])
+                {
+                    canAssign[j] = true;
+                }
+            }
+        }
+        List<(int id, int weight, int level)> rankPackBoosterIDsToAdd = new List<(int id, int weight, int level)>{
+            (-2, 40, 10), // bronze
+            (-3, 20, 15), // gold
+            (-4, 10, 25) // diamond
+            };
+        for (int i = 1; i < canAssign.Length; i++) // start at 1 for bronze (skip standard)
+        {
+            // actually add the weights using the data from the array above
+            if (canAssign[i])
+            {
+                packBoosterIDs.Add(rankPackBoosterIDsToAdd[i - 1]);
+            }
+        }
 
         // add unowned cards to weights list
         var sums = PowerupCardData.GetAllCardsOwnedSums();
