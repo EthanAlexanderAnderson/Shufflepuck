@@ -135,7 +135,7 @@ public class LogicScript : MonoBehaviour
             // do triple powerup
             if (triplePowerup > 0 && activeCompetitor.activePuckScript != null && activeCompetitor.activePuckObject.transform.position.y > -3)
             {
-                activeCompetitor.activePuckScript.RemovePowerupText("triple");
+                activeCompetitor.activePuckScript.RemoveAllPowerupText("triple");
                 GameObject previousActivePuckObject = activeCompetitor.activePuckObject;
                 puckManager.CreatePuck(activeCompetitor);
                 activeCompetitor.activePuckScript.CopyPuckStaticEffects(previousActivePuckObject);

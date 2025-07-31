@@ -211,13 +211,14 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
 
         baseLocalScale = transform.localScale.x;
-        Debug.Log("baseLocalScale: " + baseLocalScale);
+        //Debug.Log("baseLocalScale: " + baseLocalScale);
     }
 
     void FixedUpdate()
     {
         // if shot, add the force / torque once
         if (IsShot() && shotForceToAdd != Vector2.zero)
+        //if (IsShot() && shotForceToAdd != Vector2.zero && gameObject.transform.localScale.x == baseLocalScale)
         {
             rb.AddForce(shotForceToAdd * rb.mass);
             rb.AddTorque(shotTorqueToAdd * rb.mass);
