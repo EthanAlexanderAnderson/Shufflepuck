@@ -608,7 +608,8 @@ public class UIManagerScript : MonoBehaviour
 
         if (LogicScript.Instance.gameIsRunning)
         {
-            opponentUsernameText.text = "CPU";
+            string[] diffStrings = { "easy", "medium", "hard" };
+            opponentUsernameText.text = diffStrings[LogicScript.Instance.GetDifficulty()] + " CPU";
         }
         else if (ClientLogicScript.Instance.isRunning)
         {

@@ -48,6 +48,7 @@ public class LogicScript : MonoBehaviour
     public bool gameIsRunning { get; private set; }
     private float timer = 0;
     private int difficulty; // 0 easy 1 medium 2 hard
+    public int GetDifficulty() { return difficulty; }
 
     private bool isLocal;
     public bool IsLocal
