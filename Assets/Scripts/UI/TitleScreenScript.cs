@@ -9,6 +9,8 @@ public class TitleScreenScript : MonoBehaviour
     public GameObject rewardsAlert;
     public GameObject questsAlert;
 
+    public GameObject gameHUDUIParent;
+
     private void Awake()
     {
         if (Instance == null)
@@ -38,5 +40,14 @@ public class TitleScreenScript : MonoBehaviour
         bool unlockedReward = PuckSkinManager.Instance.IsPlinkoSkinUnlocked(plinkoReward);
         rewardsAlert.SetActive((PlayerPrefs.GetInt("PlinkoPegsDropped", 0) < level && !unlockedReward) ||
                                (PlayerPrefs.GetInt("StandardPacks", 0) > 0 || PlayerPrefs.GetInt("PlusPacks", 0) > 0));
+    }
+
+    public void PlayButton()
+    {
+        if (PlayerPrefs.GetInt("tutorialCompleted") == 0 && PlayerPrefs.GetInt("easyWin") == 0 && PlayerPrefs.GetInt("easyHighscore") == 0)
+        {
+            UIManagerScript.Instance.ChangeUI(gameHUDUIParent);
+            LogicScript.Instance.RestartGame(0);
+        }
     }
 }
