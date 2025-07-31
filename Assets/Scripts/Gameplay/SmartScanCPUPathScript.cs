@@ -50,7 +50,10 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
 
             PuckScript puckScript = puck.GetComponent<PuckScript>();
             if (puckScript == null) continue;
-            if (!puckScript.IsPlayersPuck() || puckScript.HasLock() || puckScript.HasGhost()) continue;
+            if (!puckScript.IsPlayersPuck() || puckScript.HasLock()) continue;
+            // chance CPU sees ghost (increase with diff)
+            int seeGhostChance = Random.Range(0, Mathf.Max(2, 7 - modifiedDifficulty));
+            if (seeGhostChance != 0 && puckScript.HasGhost()) { continue; }
 
             int puckValue = puckScript.ComputeTotalFutureValue();
 
