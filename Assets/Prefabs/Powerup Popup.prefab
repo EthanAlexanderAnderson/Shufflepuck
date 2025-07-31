@@ -15351,6 +15351,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 451ecd9b7e820c442a76d9b32276bdf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  floatingTextPrefab: {fileID: 4579905589776270658, guid: a4af9b0b007a49c4ca9fa4d76af0f273, type: 3}
   cardIconOutlineObject: {fileID: 6097384766758055279}
   cardIconOutline: {fileID: 8447967018400930994}
   cardIconObject: {fileID: 8146445834912518185}
@@ -15375,6 +15376,10 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 2cf5046612e12ac47841a938359f8f4a, type: 3}
   - {fileID: 21300000, guid: d4b631fc2637e034dbe487c851c92256, type: 3}
   questionMarkIconSprite: {fileID: 21300000, guid: e69fa90b3be26ad409991bc0efe54b0e, type: 3}
+  newTextSize: 20
+  newTextSpeedUpRate: 0
+  newTextShrinkUpRate: 0.01
+  newTextFadeUpRate: 0.1
 --- !u!1 &4552636857245505601
 GameObject:
   m_ObjectHideFlags: 0

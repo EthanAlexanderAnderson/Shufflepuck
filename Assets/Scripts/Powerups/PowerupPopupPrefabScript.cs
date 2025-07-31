@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 public class PowerupPopupPrefabScript : MonoBehaviour
 {
+    public GameObject floatingTextPrefab;
+
     // TODO: change "card" to "popup"
     [SerializeField] private GameObject cardIconOutlineObject;
     [SerializeField] private Image cardIconOutline;
@@ -37,7 +39,13 @@ public class PowerupPopupPrefabScript : MonoBehaviour
     [SerializeField] private Sprite questionMarkIconSprite;
     private string[] boosterTexts = { "any holo", "any bronze", "any gold", "any diamond", "any celestial" };
 
-    public void InitializePowerupPopup(int cardIndex, int rank, bool holo)
+    private bool isNew = false;
+    [SerializeField] private float newTextSize = 20;
+    [SerializeField] private float newTextUpRate = 0f;
+    [SerializeField] private float newTextShrinkRate = 0.01f;
+    [SerializeField] private float newTextFadeRate = 0.1f;
+
+    public void InitializePowerupPopup(int cardIndex, int rank, bool holo, bool isNew = false)
     {
         // for normal cards
         if (cardIndex >= 0)
@@ -88,6 +96,8 @@ public class PowerupPopupPrefabScript : MonoBehaviour
         }
         holoParent.SetActive(holo);
         cardIconOutlineObject.SetActive(holo);
+
+        this.isNew = isNew;
     }
 
     // TODO: Bool:AnimateOut Float:Speed
@@ -98,6 +108,12 @@ public class PowerupPopupPrefabScript : MonoBehaviour
         LeanTween.scale(cardTextObject, new Vector3(1f, 1f, 1f), 0.5f).setEase(LeanTweenType.easeOutElastic).setDelay(0.2f);
         LeanTween.scale(cardRarityObject, new Vector3(1f, 1f, 1f), 0.5f).setEase(LeanTweenType.easeOutElastic).setDelay(0.4f);
         LeanTween.scale(cardRankObject, new Vector3(1f, 1f, 1f), 0.5f).setEase(LeanTweenType.easeOutElastic).setDelay(0.6f);
+
+        if (isNew)
+        {
+            GameObject floatingText = Instantiate(floatingTextPrefab, this.transform);
+            floatingText.GetComponent<FloatingTextScript>().Initialize("NEW!", newTextUpRate, newTextShrinkRate, newTextFadeRate, Vector2.zero, newTextSize);
+        }
     }
 
     // TODO: get feedback on rank colors

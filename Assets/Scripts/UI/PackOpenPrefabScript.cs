@@ -62,7 +62,7 @@ public class PackOpenPrefabScript : MonoBehaviour
     {
         GameObject powerupPopupObject = Instantiate(PowerupPopupPrefab, cardParent.transform);
         PowerupPopupPrefabScript powerupPopupScript = powerupPopupObject.GetComponent<PowerupPopupPrefabScript>();
-        powerupPopupScript.InitializePowerupPopup(cardIndex, rank, holo);
+        powerupPopupScript.InitializePowerupPopup(cardIndex, rank, holo, PowerupCardData.GetCardOwnedCount(cardIndex, rank, holo) <= 1);
         powerupPopupScript.Animate();
         SoundManagerScript.Instance.PlayPowerupPopup(true);
         if (holo) SoundManagerScript.Instance.PlayPowerupPopup(true, 1);
