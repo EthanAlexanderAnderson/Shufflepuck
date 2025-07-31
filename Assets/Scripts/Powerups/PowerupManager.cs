@@ -748,7 +748,7 @@ public class PowerupManager : NetworkBehaviour
         if (NeedsToBeSentToServer(encodedCard)) { return; }
         PayCosts(encodedCard);
 
-        if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { LogicScript.Instance.triplePowerup += 2; }
+        if (LogicScript.Instance.gameIsRunning && activeCompetitor.isPlayer) { LogicScript.Instance.triplePowerup += 2; LogicScript.Instance.triplePowerupMax += 2; }
         else if (ClientLogicScript.Instance.isRunning && activeCompetitor.isPlayer) { ServerLogicScript.Instance.IncrementTriplePowerupServerRpc(); }
 
         if (activeCompetitor.isPlayer) { activeCompetitor.activePuckScript.AddPowerupText("triple"); }

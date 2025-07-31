@@ -39,6 +39,7 @@ public class LogicScript : MonoBehaviour
     // powerups
     [SerializeField] private GameObject powerupsMenu; // set in editor
     public int triplePowerup;
+    public int triplePowerupMax;
     int weakenCount = 0;
     int nextWeakenCount = 0;
     public void IncrementWeaken() { nextWeakenCount++; }
@@ -138,8 +139,14 @@ public class LogicScript : MonoBehaviour
                 GameObject previousActivePuckObject = activeCompetitor.activePuckObject;
                 puckManager.CreatePuck(activeCompetitor);
                 activeCompetitor.activePuckScript.CopyPuckStaticEffects(previousActivePuckObject);
-                activeCompetitor.ShootActivePuck(triplePower + Random.Range(-10.0f, 10.0f), tripleAngle + Random.Range(-10.0f, 10.0f), 50, false);
+                float nextTripleShotPowerup = triplePower - (((triplePowerupMax - triplePowerup) / 2) + 1) * 12;
+                float nextTripleShotAngle = tripleAngle - (8 - triplePowerup % 2 * 16);
+                activeCompetitor.ShootActivePuck(nextTripleShotAngle, nextTripleShotPowerup, 50f, false);
                 triplePowerup--;
+                if (triplePowerup == 0)
+                {
+                    triplePowerupMax = 0;
+                }
             }
 
             // start Players turn, do this then start shooting
@@ -372,7 +379,7 @@ public class LogicScript : MonoBehaviour
         arrow.SetActive(false);
         GameHUDManager.Instance.ChangeTurnText(string.Empty);
         activeCompetitor.ShootActivePuck(angle, power, spin);
-        (triplePower, tripleAngle, tripleSpin) = (angle, power, spin);
+        (tripleAngle, triplePower, tripleSpin) = (angle, power, spin);
         UI.PostShotUpdate(player.puckCount, opponent.puckCount);
         UI.UpdateShotDebugText(angle, power, spin);
         if (activeCompetitor.isPlayer)
@@ -414,6 +421,7 @@ public class LogicScript : MonoBehaviour
         UpdateScores();
         PowerupAnimationManager.Instance.ClearPowerupPopupEffectAnimationQueue();
         triplePowerup = 0;
+        triplePowerupMax = 0;
         LaserScript.Instance.DisableLaser();
 
         // load player & CPU decks

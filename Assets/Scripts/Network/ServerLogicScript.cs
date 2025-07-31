@@ -39,6 +39,7 @@ public class ServerLogicScript : NetworkBehaviour
 
     // variables for triplePowerup
     private int triplePowerup = 0;
+    private int triplePowerupMax = 0;
     private int triplePowerupUserCompetitorIndex = -1;
     private float lastShotAngle;
     private float lastShotPower;
@@ -87,8 +88,14 @@ public class ServerLogicScript : NetworkBehaviour
             previousActivePuckObject.GetComponent<PuckScript>().RemovePowerupText("triple");
             CreatePuck(isNonActiveCompetitorBit);
             competitorList[activeCompetitorIndex ^ isNonActiveCompetitorBit].activePuckScript.CopyPuckStaticEffectsHelperClientRpc(previousActivePuckObject.GetComponent<NetworkObject>());
-            Shoot(lastShotAngle + Random.Range(-10.0f, 10.0f), lastShotPower + Random.Range(-10.0f, 10.0f), 50, triplePowerupUserCompetitorIndex == activeCompetitorIndex ? 0 : 1);
+            float nextTripleShotPowerup = lastShotPower - (((triplePowerupMax - triplePowerup) / 2) + 1) * 12;
+            float nextTripleShotAngle = lastShotAngle - (8 - triplePowerup % 2 * 16);
+            Shoot(nextTripleShotAngle, nextTripleShotPowerup, 50f, triplePowerupUserCompetitorIndex == activeCompetitorIndex ? 0 : 1);
             triplePowerup--;
+            if (triplePowerup == 0)
+            {
+                triplePowerupMax = 0;
+            }
         }
 
         // If both players have 0 pucks (aka game is over)
@@ -587,6 +594,7 @@ public class ServerLogicScript : NetworkBehaviour
         int competitorIndex = clients.IndexOf(clientId);
         triplePowerupUserCompetitorIndex = competitorIndex;
         triplePowerup += 2;
+        triplePowerupMax += 2;
     }
 
     [ServerRpc(RequireOwnership = false)]
