@@ -77,8 +77,8 @@ public class ServerLogicScript : NetworkBehaviour
             var allPucks = GameObject.FindGameObjectsWithTag("puck");
             foreach (var puck in allPucks)
             {
-                // If any pucks are not safe, return
-                if (!puck.GetComponent<PuckScript>().IsSafe())
+                // If any pucks are not past -3, return
+                if (!(puck.transform.position.y < -3))
                 {
                     return;
                 }
