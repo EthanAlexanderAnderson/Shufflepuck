@@ -10,6 +10,7 @@ public class TitleScreenScript : MonoBehaviour
     public GameObject questsAlert;
 
     public GameObject gameHUDUIParent;
+    public GameObject playTypeParent;
 
     private void Awake()
     {
@@ -48,6 +49,10 @@ public class TitleScreenScript : MonoBehaviour
         {
             UIManagerScript.Instance.ChangeUI(gameHUDUIParent);
             LogicScript.Instance.RestartGame(0);
+        }
+        else
+        {
+            UIManagerScript.Instance.ChangeUI(playTypeParent);
         }
     }
 }
