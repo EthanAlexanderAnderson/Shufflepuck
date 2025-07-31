@@ -227,7 +227,7 @@ public class PackManager : MonoBehaviour
         {
             bottomText.text = dupeCreditReward > 0 ? ("+" + dupeCreditReward.ToString() + " credits") : "NEW";
             backButton.interactable = true;
-            openAnotherButton.interactable = PlayerPrefs.GetInt(!openAnotherPlus ? "StandardPacks" : "PlusPacks") > 0;
+            openAnotherButton.interactable = PlayerPrefs.GetInt(!openAnotherPlus ? "StandardPacks" : "PlusPacks") > (openAnotherx10 ? 9 : 0);
         }
     }
 
