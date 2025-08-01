@@ -19,7 +19,7 @@ public class PackOpenPrefabScript : MonoBehaviour
 
     private void Update()
     {
-        if (((Input.GetMouseButtonDown(0) && !ClickIsNotOnPack()) || storedClicks > clicks) && puckImageObject.transform.localScale == Vector3.one && clicks < targetClicks)
+        if ((AnyTouchOnPack() || storedClicks > clicks) && puckImageObject.transform.localScale == Vector3.one && clicks < targetClicks)
         {
             LeanTween.cancel(puckImageObject);
 
@@ -33,7 +33,7 @@ public class PackOpenPrefabScript : MonoBehaviour
             SoundManagerScript.Instance.PlayClickSFXPitch(3, clicks/10f);
             clicks++;
         }
-        else if (((Input.GetMouseButtonDown(0) && !ClickIsNotOnPack()) || storedClicks > clicks) && puckImageObject.transform.localScale == Vector3.one && clicks == targetClicks)
+        else if ((AnyTouchOnPack() || storedClicks > clicks) && puckImageObject.transform.localScale == Vector3.one && clicks == targetClicks)
         {
             LeanTween.cancel(puckImageObject);
 
@@ -51,11 +51,18 @@ public class PackOpenPrefabScript : MonoBehaviour
             clicks++;
         }
 
+#if UNITY_EDITOR
+        // In the editor, use mouse input fallback
         if (Input.GetMouseButtonDown(0))
         {
-            if (ClickIsNotOnPack() && !Application.isEditor) return;
             storedClicks++;
         }
+#else
+        if (AnyTouchOnPack())
+        {
+            storedClicks++;
+        }
+#endif
     }
 
     private void CreatePowerupPopupPrefab()
@@ -103,23 +110,22 @@ public class PackOpenPrefabScript : MonoBehaviour
         }
     }
 
-    private bool ClickIsNotOnPack()
+    private bool AnyTouchOnPack()
     {
-        Vector3 mousePosition = Input.mousePosition; // Get mouse position in screen space
-        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition); // Convert to world space
-
-        worldPosition.z = gameObject.transform.position.z; // Ensure the z-coordinate is set as the same as the pack to compare
-
-        float distance = Vector3.Distance(worldPosition, gameObject.transform.position); // get distance
-
-        // If the distance is less than or equal to 1 unit, the click is on or near the pack
-        if (distance > gameObject.transform.localScale.x * 1.6f)
+        foreach (Touch touch in Input.touches)
         {
-            return true; // Click is not on pack
+            if (touch.phase == TouchPhase.Began)
+            {
+                Vector3 touchPos = Camera.main.ScreenToWorldPoint(touch.position);
+                touchPos.z = gameObject.transform.position.z;
+
+                float distance = Vector3.Distance(touchPos, gameObject.transform.position);
+                if (distance <= gameObject.transform.localScale.x * 1.6f)
+                {
+                    return true; // At least one touch is on the pack
+                }
+            }
         }
-        else
-        {
-            return false;
-        }
+        return false; // No touches on pack
     }
 }
