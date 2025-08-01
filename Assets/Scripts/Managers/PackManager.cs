@@ -443,7 +443,7 @@ public class PackManager : MonoBehaviour
         int packBooster = PlayerPrefs.GetInt("PackBooster");
         int boosterPoints = packBooster >= 0 ? 50 + level * 10 : 0;
 
-        if (packBooster >= 0) Debug.Log("card booster points: " + boosterPoints);
+        if (packBooster >= 0) Debug.Log("card booster points: " + boosterPoints + " - card: " + packBooster);
 
         while (boosterPoints >= 0 && returnValue != packBooster)
         {
@@ -504,7 +504,7 @@ public class PackManager : MonoBehaviour
         if (packBooster > 0 && packBooster < 5)
         {
             boosterPoints = (int)(level * (float)(boosterRankMult[packBooster] * 100));
-            Debug.Log("rank booster points: " + boosterPoints);
+            Debug.Log("rank booster points: " + boosterPoints + " - rank: " + packBooster);
         }
 
         while (boosterPoints >= 0 && returnValue != packBooster)
@@ -569,7 +569,7 @@ public class PackManager : MonoBehaviour
         if (packBooster > 0 && packBooster < 5)
         {
             boosterPoints = (int)(level * (float)(boosterRankMult[packBooster] * 100));
-            Debug.Log("rank booster points: " + boosterPoints);
+            Debug.Log("rank booster points: " + boosterPoints + " - rank: " + packBooster);
         }
 
         while (boosterPoints >= 0 && returnValue != packBooster)
