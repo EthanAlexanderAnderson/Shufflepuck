@@ -31,6 +31,10 @@ public class LogicScript : MonoBehaviour
     private float power;
     private float spin;
 
+    // UI
+    [SerializeField] private GameObject exitConfirmationMenu;
+    [SerializeField] private GameObject restartConfirmationMenu;
+
     // wall
     private int wallCount = 3;
     [SerializeField] private GameObject wall; // set in editor
@@ -160,7 +164,7 @@ public class LogicScript : MonoBehaviour
             if ((Input.GetMouseButtonDown(0)) && gameIsRunning && (player.isShooting || isLocal) && powerupsMenu.activeInHierarchy == false)
             {
                 // make sure click is not on a puck
-                if (ClickNotOnPuck())
+                if (ClickNotOnPuck() && !exitConfirmationMenu.activeInHierarchy && !restartConfirmationMenu.activeInHierarchy)
                 {
                     PlayerShootingHelper();
                 }

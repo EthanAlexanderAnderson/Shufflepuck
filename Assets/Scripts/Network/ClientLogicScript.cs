@@ -28,6 +28,9 @@ public class ClientLogicScript : NetworkBehaviour
     private bool powerupsAreEnabled;
     [SerializeField] private GameObject powerupsMenu;
 
+    [SerializeField] private GameObject exitConfirmationMenu;
+    [SerializeField] private GameObject restartConfirmationMenu;
+
     // bar and line
     private BarScript bar;
     private LineScript line;
@@ -103,7 +106,7 @@ public class ClientLogicScript : NetworkBehaviour
         if (logic.player.isShooting && Input.GetMouseButtonDown(0) && powerupsMenu.activeInHierarchy == false)
         {
             // make sure click is on the bottom half of the screen
-            if (logic.ClickNotOnPuck())
+            if (logic.ClickNotOnPuck() && !exitConfirmationMenu.activeInHierarchy && !restartConfirmationMenu.activeInHierarchy)
             {
                 switch (activeBar)
                 {
