@@ -1459,10 +1459,8 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         ghostPowerup = true;
         AddPowerupText("ghost");
 
-        // TODO makes sure this is unaffected by phase alpha change
         baseAlpha = IsPlayersPuck() ? 0.75f : 0f;
 
-        spriteRenderer.color = new Color(1f, 1f, 1f, baseAlpha);
         if (!IsPlayersPuck())
         {
             color = new Color[] { Color.clear };
