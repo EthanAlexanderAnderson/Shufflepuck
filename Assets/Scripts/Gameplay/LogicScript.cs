@@ -373,7 +373,7 @@ public class LogicScript : MonoBehaviour
         }
 
         // fallback force shot after 20 seconds
-        if ((timer - tempTime) > 20)
+        if (((timer - tempTime) > 20) && opponent.isShooting)
         {
             (CPUShotAngle, CPUShotPower, CPUShotSpin) = CPUBehaviorScript.FindPath();
             CPUShotPower = Math.Min(CPUShotPower, 100 - weakenCount * 10);
