@@ -476,7 +476,28 @@ public class ServerLogicScript : NetworkBehaviour
             Competitor competitor = competitorList[activeCompetitorIndex];
             int puckSpriteID = competitor.puckSpriteID;
 
-            GameObject puckObject = Instantiate(puck, new Vector3(Random.Range(-10f, 10), Random.Range(1f, 15f), -1.0f), Quaternion.identity);
+            Vector3 spawnPosition = Vector3.zero;
+            bool tooClose = true;
+            int failSafe = 0;
+            while (tooClose && failSafe < 1000)
+            {
+                spawnPosition = new Vector3(Random.Range(-10f, 10), Random.Range(1f, 15f), -1.0f);
+                tooClose = false;
+                failSafe++;
+
+                // don't place the puck overlapping with another puck
+                var pucks = GameObject.FindGameObjectsWithTag("puck");
+                foreach (var puck in pucks)
+                {
+                    if (Vector2.Distance(spawnPosition, puck.transform.position) < 2)
+                    {
+                        tooClose = true;
+                        continue;
+                    }
+                }
+            }
+
+            GameObject puckObject = Instantiate(puck, spawnPosition, Quaternion.identity);
             puckObject.GetComponent<NetworkObject>().Spawn();
 
             PuckScript puckScript = puckObject.GetComponent<PuckScript>();

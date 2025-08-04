@@ -154,13 +154,13 @@ public static class CPUBehaviorScript
             {
                 if (UseNextCard())
                 {
-                    waitingTime += 1.75f;
-                    LogicScript.Instance.powerupWaitTime += 1.25f;
+                    waitingTime += 2f;
+                    LogicScript.Instance.powerupWaitTime += 1.75f;
                 }
             }
         }
         // pick angle power spin
-        if (timeElapsed > waitingTime && (PuckManager.Instance.AllPucksAreSlowed() && difficulty < 2 || PuckManager.Instance.AllPucksAreSlowedMore() || timeElapsed > 30))
+        if (timeElapsed > waitingTime && ((PuckManager.Instance.AllPucksAreSlowed() && difficulty < 2) || PuckManager.Instance.AllPucksAreSlowedMore() || timeElapsed > 15))
         {
             waitingTime += 999999f;
             denyPowerup = 0;
