@@ -606,12 +606,12 @@ public class UIManagerScript : MonoBehaviour
             playerUsernameText.text = "you";
         }
 
-        if (LogicScript.Instance.gameIsRunning)
+        if (LogicScript.Instance.gameIsRunning && !LogicScript.Instance.IsLocal)
         {
             string[] diffStrings = { "easy", "medium", "hard" };
             opponentUsernameText.text = diffStrings[LogicScript.Instance.GetDifficulty()] + " CPU";
         }
-        else if (ClientLogicScript.Instance.isRunning)
+        else if (ClientLogicScript.Instance.isRunning || LogicScript.Instance.IsLocal)
         {
             opponentUsernameText.text = "opponent";
         }
