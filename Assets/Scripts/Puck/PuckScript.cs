@@ -877,7 +877,8 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
         // actually destroy the gameobject
         Debug.Log("Destroying " + (playersPuck ? "Player" : "Opponent") + "'s Puck"); // TODO: add puck index here eventually
-        Destroy(gameObject);
+        // delay here to make sure hydra pucks count for last shot
+        Destroy(gameObject, 0.1f);
     }
 
     private void DestroyPuckFX(int effectIndex = -1)
