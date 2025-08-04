@@ -58,7 +58,7 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private Sprite plusThreeImage;
     [SerializeField] private Sprite ghostImage;
     [SerializeField] private Sprite heavyImage;
-    [SerializeField] private Sprite shrinkImage;
+    [SerializeField] private Sprite teleportImage;
     [SerializeField] private Sprite tetherImage;
     [SerializeField] private Sprite spawnImage;
     [SerializeField] private Sprite weakenImage;
@@ -97,7 +97,7 @@ public class PowerupManager : NetworkBehaviour
     [SerializeField] private Sprite plusThreeIcon;
     [SerializeField] private Sprite ghostIcon;
     [SerializeField] private Sprite heavyIcon;
-    [SerializeField] private Sprite shrinkIcon;
+    [SerializeField] private Sprite teleportIcon;
     [SerializeField] private Sprite tetherIcon;
     [SerializeField] private Sprite spawnIcon;
     [SerializeField] private Sprite weakenIcon;
@@ -165,17 +165,17 @@ public class PowerupManager : NetworkBehaviour
             PlusThreePowerup, // 30
             GhostPowerup, // 31
             HeavyPowerup, // 32
-            ShrinkPowerup, // 33
+            TeleportPowerup, // 33
             TetherPowerup, // 34
             SpawnPowerup, // 35
             WeakenPowerup, // 36
             FortunePowerup // 37
         };
 
-        powerupIcons = new Sprite[] { plusOneIcon, foresightIcon, blockIcon, boltIcon, forceFieldIcon, phaseIcon, cullIcon, growthIcon, lockIcon, explosionIcon, fogIcon, hydraIcon, factoryIcon, shieldIcon, shuffleIcon, chaosIcon, timesTwoIcon, resurrectIcon, millIcon, researchIcon, insanityIcon, tripleIcon, exponentIcon, laserIcon, auraIcon, pushIcon, erraticIcon, denyIcon, investmentIcon, omniscienceIcon, plusThreeIcon, ghostIcon, heavyIcon, shrinkIcon, tetherIcon, spawnIcon, weakenIcon, fortuneIcon };
-        powerupTexts = new string[] { "plus one", "foresight", "block", "bolt", "force field", "phase", "cull", "growth", "lock", "explosion", "fog", "hydra", "factory", "shield", "shuffle", "chaos", "times two", "resurrect", "mill", "research", "insanity", "triple", "exponent", "laser", "aura", "push", "erratic", "deny", "investment", "omniscience", "plus three", "ghost", "heavy", "shrink", "tether", "spawn", "weaken", "fortune" };
+        powerupIcons = new Sprite[] { plusOneIcon, foresightIcon, blockIcon, boltIcon, forceFieldIcon, phaseIcon, cullIcon, growthIcon, lockIcon, explosionIcon, fogIcon, hydraIcon, factoryIcon, shieldIcon, shuffleIcon, chaosIcon, timesTwoIcon, resurrectIcon, millIcon, researchIcon, insanityIcon, tripleIcon, exponentIcon, laserIcon, auraIcon, pushIcon, erraticIcon, denyIcon, investmentIcon, omniscienceIcon, plusThreeIcon, ghostIcon, heavyIcon, teleportIcon, tetherIcon, spawnIcon, weakenIcon, fortuneIcon };
+        powerupTexts = new string[] { "plus one", "foresight", "block", "bolt", "force field", "phase", "cull", "growth", "lock", "explosion", "fog", "hydra", "factory", "shield", "shuffle", "chaos", "times two", "resurrect", "mill", "research", "insanity", "triple", "exponent", "laser", "aura", "push", "erratic", "deny", "investment", "omniscience", "plus three", "ghost", "heavy", "teleport", "tether", "spawn", "weaken", "fortune" };
         powerupButtons = new Button[] { powerupButton1, powerupButton2, powerupButton3 };
-        powerupSprites = new Sprite[] { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage, cullImage, growthImage, lockImage, explosionImage, fogImage, hydraImage, factoryImage, shieldImage, shuffleImage, chaosImage, timesTwoImage, resurrectImage, millImage, researchImage, insanityImage, tripleImage, exponentImage, laserImage, auraImage, pushImage, erraticImage, denyImage, investmentImage, omniscienceImage, plusThreeImage, ghostImage, heavyImage, shrinkImage, tetherImage, spawnImage, weakenImage, fortuneImage };
+        powerupSprites = new Sprite[] { plusOneImage, foresightImage, blockImage, boltImage, forceFieldImage, phaseImage, cullImage, growthImage, lockImage, explosionImage, fogImage, hydraImage, factoryImage, shieldImage, shuffleImage, chaosImage, timesTwoImage, resurrectImage, millImage, researchImage, insanityImage, tripleImage, exponentImage, laserImage, auraImage, pushImage, erraticImage, denyImage, investmentImage, omniscienceImage, plusThreeImage, ghostImage, heavyImage, teleportImage, tetherImage, spawnImage, weakenImage, fortuneImage };
     }
 
     public int GetMethodArrayLength()
@@ -882,14 +882,80 @@ public class PowerupManager : NetworkBehaviour
         activeCompetitor.activePuckScript.ActivateHeavy();
     }
 
-    public void ShrinkPowerup(int encodedCard) // index 33 : Puck is smaller
+    public void TeleportPowerup(int encodedCard) // index 33 : teleport a random puck to a new position
     {
-        var index = Array.IndexOf(methodArray, ShrinkPowerup);
+        var index = Array.IndexOf(methodArray, TeleportPowerup);
         if (!CanPayCosts(index)) { return; }
         if (NeedsToBeSentToServer(encodedCard)) { return; }
         PayCosts(encodedCard);
 
-        activeCompetitor.activePuckScript.ActivateShrink();
+        // prevent joiner client from trying to do this (they can't anyway)
+        if (!IsServer && ClientLogicScript.Instance.isRunning)
+        {
+            return;
+        }
+
+        // sort by valid / non-valid
+        var allPucks = GameObject.FindGameObjectsWithTag("puck");
+        List<GameObject> validPucks = new();
+        foreach (var puck in allPucks)
+        {
+            if (puck.transform.position.y > 0 && puck.transform.position.y < 20 &&
+                puck.transform.position.x > -12 && puck.transform.position.x < 12 &&
+                !puck.GetComponent<PuckScript>().HasLock())
+            {
+                validPucks.Add(puck);
+            }
+        }
+
+        if (validPucks.Count <= 0) return;
+
+        // pick the puck to move
+        int randomIndex = Random.Range(0, validPucks.Count);
+        int failSafe = 0;
+        while (validPucks.Count > 1 && failSafe < 1000 &&
+              ((validPucks[randomIndex].GetComponent<PuckScript>().IsPlayersPuck() && validPucks[randomIndex].GetComponent<PuckScript>().ComputeValue() > 0) ||
+               !validPucks[randomIndex].GetComponent<PuckScript>().IsPlayersPuck() && validPucks[randomIndex].GetComponent<PuckScript>().ComputeValue() <= 0))
+        {
+            failSafe++;
+            randomIndex = Random.Range(0, validPucks.Count);
+        }
+
+        // move the puck & animation
+        validPucks[randomIndex].transform.localScale = new Vector3(0f, 0f, 0f);
+        LeanTween.cancel(validPucks[randomIndex]);
+
+        Vector3 newPosition = Vector3.zero;
+        bool tooClose = true;
+        failSafe = 0;
+        while (tooClose && failSafe < 1000)
+        {
+            newPosition = new Vector3(Random.Range(-10f, 10), Random.Range(1f, 15f), -1.0f);
+            tooClose = false;
+            failSafe++;
+
+            // don't place the puck too close to it's original position
+            if (Vector3.Distance(newPosition, validPucks[randomIndex].transform.position) < 6)
+            {
+                tooClose = true;
+                continue;
+            }
+
+            // don't place the puck overlapping with another puck
+            var pucks = GameObject.FindGameObjectsWithTag("puck");
+            foreach (var puck in pucks)
+            {
+                if (Vector2.Distance(newPosition, puck.transform.position) < 2)
+                {
+                    tooClose = true;
+                    continue;
+                }
+            }
+        }
+
+        Debug.Log(Vector3.Distance(newPosition, validPucks[randomIndex].transform.position));
+        validPucks[randomIndex].transform.position = newPosition;
+        LeanTween.scale(validPucks[randomIndex], new Vector3(0.2f, 0.2f, 0.2f), 0.5f).setEase(LeanTweenType.easeOutQuint).setDelay(0.01f);
     }
 
     public void TetherPowerup(int encodedCard) // index 34 : Puck is tethered to its stopping position
@@ -918,7 +984,28 @@ public class PowerupManager : NetworkBehaviour
             return;
         }
 
-        GameObject spawnPuckObject = Instantiate(puckPrefab, new Vector3(Random.Range(-10f, 10), Random.Range(1f, 15f), -1.0f), Quaternion.identity);
+        Vector3 spawnPosition = Vector3.zero;
+        bool tooClose = true;
+        int failSafe = 0;
+        while (tooClose && failSafe < 1000)
+        {
+            spawnPosition = new Vector3(Random.Range(-10f, 10), Random.Range(1f, 15f), -1.0f);
+            tooClose = false;
+            failSafe++;
+
+            // don't place the puck overlapping with another puck
+            var pucks = GameObject.FindGameObjectsWithTag("puck");
+            foreach (var puck in pucks)
+            {
+                if (Vector2.Distance(spawnPosition, puck.transform.position) < 2)
+                {
+                    tooClose = true;
+                    continue;
+                }
+            }
+        }
+
+        GameObject spawnPuckObject = Instantiate(puckPrefab, spawnPosition, Quaternion.identity);
         PuckScript spawnPuckScript = spawnPuckObject.GetComponent<PuckScript>();
         spawnPuckScript.InitPuck(activeCompetitor.isPlayer, activeCompetitor.puckSpriteID);
         spawnPuckScript.InitSpawnedPuck();
@@ -1132,6 +1219,8 @@ public class PowerupManager : NetworkBehaviour
             while (tooClose)
             {
                 pos = new Vector3(x + Random.Range(-randRange, randRange), Math.Max(0, y + Random.Range(-randRange, randRange)), -1.0f);
+                // expand possible range until we find a valid postion
+                randRange += 0.1f;
 
                 tooClose = false;
                 var pucks = GameObject.FindGameObjectsWithTag("puck");
@@ -1140,11 +1229,9 @@ public class PowerupManager : NetworkBehaviour
                     if (Vector2.Distance(puck.transform.position, pos) < 2)
                     {
                         tooClose = true;
-                        break;
+                        continue;
                     }
                 }
-                // expand possible range until we find a valid postion
-                randRange += 0.1f;
             }
 
             GameObject puckObject = Instantiate(puckPrefab, pos, Quaternion.identity);

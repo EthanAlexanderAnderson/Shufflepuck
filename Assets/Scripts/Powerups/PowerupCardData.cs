@@ -15,7 +15,7 @@ public class CardVariation
 
 public static class PowerupCardData
 {
-    private static string[] cardImportNames = { "PlusOne", "Foresight", "Block", "Bolt", "ForceField", "Phase", "Cull", "Growth", "Lock", "Explosion", "Fog", "Hydra", "Factory", "Shield", "Shuffle", "Chaos", "TimesTwo", "Resurrect", "Mill", "Research", "Insanity", "Triple", "Exponent", "Laser", "Aura", "Push", "Erratic", "Deny", "Investment", "Omniscience", null, "Ghost", "Heavy", "Shrink", "Tether", "Spawn", "Weaken", "Fortune" };
+    private static string[] cardImportNames = { "PlusOne", "Foresight", "Block", "Bolt", "ForceField", "Phase", "Cull", "Growth", "Lock", "Explosion", "Fog", "Hydra", "Factory", "Shield", "Shuffle", "Chaos", "TimesTwo", "Resurrect", "Mill", "Research", "Insanity", "Triple", "Exponent", "Laser", "Aura", "Push", "Erratic", "Deny", "Investment", "Omniscience", null, "Ghost", "Heavy", "Teleport", "Tether", "Spawn", "Weaken", "Fortune" };
     public static string GetCardName(int cardIndex) { return cardImportNames[cardIndex]; }
 
     // TODO: rename this function
