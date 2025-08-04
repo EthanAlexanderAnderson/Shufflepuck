@@ -371,6 +371,24 @@ public class LogicScript : MonoBehaviour
             Shoot(CPUShotAngle, CPUShotPower, CPUShotSpin);
             tempTime = 0;
         }
+
+        // fallback force shot after 20 seconds
+        if ((timer - tempTime) > 20)
+        {
+            (CPUShotAngle, CPUShotPower, CPUShotSpin) = CPUBehaviorScript.FindPath();
+            CPUShotPower = Math.Min(CPUShotPower, 100 - weakenCount * 10);
+            weakenCount = nextWeakenCount;
+            nextWeakenCount = 0;
+            if (difficulty < 2)
+            {
+                Shoot(CPUShotAngle, CPUShotPower);
+            }
+            else
+            {
+                Shoot(CPUShotAngle, CPUShotPower, CPUShotSpin);
+            }
+            tempTime = 0;
+        }
     }
 
     private float triplePower, tripleAngle, tripleSpin;
