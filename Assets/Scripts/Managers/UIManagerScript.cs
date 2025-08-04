@@ -596,7 +596,7 @@ public class UIManagerScript : MonoBehaviour
         RestartConfirmation.SetActive(false);
 
         // set HUD username text
-        (string username, _, _) = PlayerAuthentication.Instance.GetProfile();
+        string username = PlayerAuthentication.Instance.GetUsername();
         if (!string.IsNullOrEmpty(username))
         {
             playerUsernameText.text = username;

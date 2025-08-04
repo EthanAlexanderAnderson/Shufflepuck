@@ -24,6 +24,7 @@ using TMPro;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using Unity.Networking.Transport.Relay;
+using Unity.Collections;
 
 public class MatchmakerClient : MonoBehaviour
 { 
@@ -359,7 +360,7 @@ public class MatchmakerClient : MonoBehaviour
         try
         {
             if (serverLogic == null) { serverLogic = ServerLogicScript.Instance; }
-            serverLogic.AddPlayerServerRpc(logic.player.puckSpriteID, true); // TODO: instead of true, pass in "true" if the deck is NOT empty
+            serverLogic.AddPlayerServerRpc(logic.player.puckSpriteID, new FixedString32Bytes(PlayerAuthentication.Instance.GetUsername()));
         }
         catch (Exception e)
         {

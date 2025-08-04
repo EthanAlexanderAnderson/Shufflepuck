@@ -1,4 +1,5 @@
 using System;
+using Unity.Collections;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -71,7 +72,7 @@ public class DebugWindow : EditorWindow
         rootVisualElement.Add(destroy);
 
         Button addPlayer = new() { text = "addPlayer" };
-        addPlayer.clicked += () => ServerLogicScript.Instance.AddPlayerServerRpc(0, true);
+        addPlayer.clicked += () => ServerLogicScript.Instance.AddPlayerServerRpc(0, new FixedString32Bytes("username"));
         rootVisualElement.Add(addPlayer);
 
         Button printPlayerPrefs = new() { text = "printPlayerPrefs" };

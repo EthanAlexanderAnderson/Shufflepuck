@@ -4,6 +4,7 @@
 */
 
 using System;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -25,7 +26,6 @@ public class ClientLogicScript : NetworkBehaviour
 
     private bool receivedGameResult = false;
 
-    private bool powerupsAreEnabled;
     [SerializeField] private GameObject powerupsMenu;
 
     [SerializeField] private GameObject exitConfirmationMenu;
@@ -98,9 +98,9 @@ public class ClientLogicScript : NetworkBehaviour
             serverLogic.CreatePuckServerRpc();
             logic.player.isTurn = false;
             logic.player.isShooting = true;
-            shotTimer = powerupsAreEnabled ? 30 : 18;
-            if (powerupsAreEnabled) { powerupManager.ShuffleDeck(); }
-            powerupsMenu.SetActive(powerupsAreEnabled);
+            shotTimer = 30;
+            powerupManager.ShuffleDeck();
+            powerupsMenu.SetActive(true);
         }
 
         if (logic.player.isShooting && Input.GetMouseButtonDown(0) && powerupsMenu.activeInHierarchy == false)
@@ -241,21 +241,20 @@ public class ClientLogicScript : NetworkBehaviour
     // Server tells the client to switch to game scene and start the game.
     // Inputs the two puck skins used by the competitors.
     [ClientRpc]
-    public void RestartGameOnlineClientRpc(int puckSpriteID_0, int puckSpriteID_1, bool powerupsEnabled = false)
+    public void RestartGameOnlineClientRpc(int puckSpriteID_0, FixedString32Bytes username_0, int puckSpriteID_1, FixedString32Bytes username_1)
     {
         if (!IsClient) return;
 
         UI.ChangeUI(UI.gameHud);
 
         UI.SetReButtons(false);
-        if (powerupsAreEnabled) { powerupManager.LoadDeck(); }
+        powerupManager.LoadDeck();
 
         isRunning = true;
         wallCount = 3;
         WallScript.Instance.WallEnabled(true);
         UI.UpdateWallText(wallCount);
         receivedGameResult = false;
-        powerupsAreEnabled = powerupsEnabled;
         logic.player.puckCount = 5;
         logic.player.scoreBonus = 0;
         logic.opponent.puckCount = 5;
@@ -273,12 +272,14 @@ public class ClientLogicScript : NetworkBehaviour
             var swapAlt = puckSpriteID_0 == puckSpriteID_1 ? -1 : 1;
             UI.SetOpponentPuckIcon(puckSkinManager.ColorIDtoPuckSprite(puckSpriteID_1 * swapAlt), Math.Abs(puckSpriteID_1) == 40);
             logic.player.puckSpriteID = puckSpriteID_0;
+            if (!string.IsNullOrEmpty(username_1.ToString()) && username_1.ToString() != "You") UIManagerScript.Instance.opponentUsernameText.text = username_1.ToString();
         }
         else
         {
             var swapAlt = puckSpriteID_0 == puckSpriteID_1 ? -1 : 1;
             UI.SetOpponentPuckIcon(puckSkinManager.ColorIDtoPuckSprite(puckSpriteID_0 * swapAlt), Math.Abs(puckSpriteID_0) == 40);
             logic.player.puckSpriteID = puckSpriteID_1;
+            if (!string.IsNullOrEmpty(username_0.ToString()) && username_0.ToString() != "You") UIManagerScript.Instance.opponentUsernameText.text = username_0.ToString();
         }
 
         puckHalo.SetActive(false);

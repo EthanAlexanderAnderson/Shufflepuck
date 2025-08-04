@@ -30,6 +30,18 @@ public class PlayerAuthentication : MonoBehaviour
         return (username, id, imgURL);
     }
 
+    public string GetUsername()
+    {
+        // Ensure the string fits in FixedString32Bytes (max 32 characters) for online RPC
+        if (username.Length > 32)
+        {
+            Debug.LogWarning("Username too long. Truncating.");
+            username = username.Substring(0, 32);
+        }
+
+        return username;
+    }
+
     private async void Awake()
     {
         if (Instance == null)
