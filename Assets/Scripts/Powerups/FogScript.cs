@@ -6,6 +6,8 @@ public class FogScript : MonoBehaviour
     public static FogScript Instance;
 
     private bool fogEnabled = false;
+    private bool players = false;     // is the player the owner of the fog
+    private float targetAlpha = 1f;   // Opacity of the fog
     private float moveSpeed = 0.01f;  // Speed of movement
     private float fadeSpeed = 0.01f;  // Speed of fade in/out
     private bool movingRight = true;  // Direction flag
@@ -23,7 +25,7 @@ public class FogScript : MonoBehaviour
     void FixedUpdate()
     {
         // change opacity
-        if (fogEnabled && sr1.color.a < 1)
+        if (fogEnabled && sr1.color.a < targetAlpha)
         {
             sr1.color = new Color(1, 1, 1, sr1.color.a + fadeSpeed);
             sr2.color = new Color(1, 1, 1, sr2.color.a + fadeSpeed);
@@ -58,6 +60,7 @@ public class FogScript : MonoBehaviour
     private void EnableFog()
     {
         fogEnabled = true;
+        targetAlpha = players ? 0.5f : 1f;
     }
 
     public void DisableFog()
@@ -73,6 +76,7 @@ public class FogScript : MonoBehaviour
 
     public void StartListeners(bool playersPuck)
     {
+        players = playersPuck;
         StopListeners();
         if (ClientLogicScript.Instance.isRunning) // lock online
         {
@@ -83,7 +87,7 @@ public class FogScript : MonoBehaviour
             }
             else
             {
-                ClientLogicScript.OnOpponentShot += EnableFog;
+                EnableFog();
                 ClientLogicScript.OnPlayerShot += DisableFog;
             }
         }
@@ -96,7 +100,7 @@ public class FogScript : MonoBehaviour
             }
             else
             {
-                LogicScript.OnOpponentShot += EnableFog;
+                EnableFog();
                 LogicScript.OnPlayerShot += DisableFog;
             }
         }
