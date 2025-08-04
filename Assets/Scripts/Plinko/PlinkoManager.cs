@@ -34,17 +34,25 @@ public class PlinkoManager : MonoBehaviour
     // Plinko Unlockable Ids & probability weights
     int[,] plinkoUnlockableIDs =
     {
-        { 37, 15 },
-        { 34, 15 },
-        { 41, 15 },
-        { 42, 10 },
-        { 33, 10 },
-        { 38, 10 },
-        { 35, 6 },
-        { 43, 6 },
-        { 39, 6 },
-        { 36, 3 },
-        { 44, 3 },
+        { 37, 10 },
+        { 52, 10 },
+        { 48, 10 },
+        { 34, 10 },
+        { 50, 8 },
+        { 41, 8 },
+        { 49, 8 },
+        { 42, 8 },
+        { 47, 4 },
+        { 45, 4 },
+        { 33, 4 },
+        { 38, 4 },
+        { 35, 2 },
+        { 51, 2 },
+        { 46, 2 },
+        { 43, 2 },
+        { 39, 1 },
+        { 36, 1 },
+        { 44, 1 },
         { 40, 1 }
     };
     // plinko reward <= 0 means we reward plus packs, greater than 0 means we reward that much XP
