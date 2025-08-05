@@ -40,6 +40,8 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     private bool requestedCleanup;
     private float velocity;
     public NetworkVariable<float> velocityNetworkedRounded = new NetworkVariable<float>();
+    private float previousVelocity;
+    private bool isAccelerating;
     private float baseLocalScale;
     public float GetBaseLocalScale() { return baseLocalScale; }
 
@@ -212,7 +214,12 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
 
         baseLocalScale = transform.localScale.x;
-        //Debug.Log("baseLocalScale: " + baseLocalScale);
+
+        if (PlayerPrefs.GetInt("debug") == 1)
+        {
+            powerModifier = 20.5f;
+            rb.linearDamping = 1f;
+        }
     }
 
     void FixedUpdate()
@@ -228,10 +235,26 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         }
 
         // Calculate the magnitude of the velocity vector to determine the sliding noise volume
+        previousVelocity = velocity;
         velocity = rb.linearVelocity.magnitude;
         if (IsServer) { velocityNetworkedRounded.Value = velocity; }
         velocity = Math.Max(velocity, velocityNetworkedRounded.Value); // this is so joiner now has velocity
         if (PlayerPrefs.GetInt("debug") == 1) { velocityFloatingTextDebug.GetComponent<FloatingTextScript>().SetText((Mathf.Floor(velocity * 10000f) / 10000f).ToString()); }
+        // damp movement to make pucks come to a stop faster, debug mode only for now
+        // linear damping 1
+        // powermodifier 20.5
+        if (PlayerPrefs.GetInt("debug") == 1 && (LogicScript.Instance.gameIsRunning || ClientLogicScript.Instance.isRunning))
+        {
+            isAccelerating = velocity >= previousVelocity;
+            if (!isAccelerating && IsSlowed())
+            {
+                rb.linearDamping = Math.Clamp(5f / (velocity + Mathf.Epsilon), 1f, float.MaxValue);
+            }
+            else
+            {
+                rb.linearDamping = 1f; // normal default value
+            }
+        }
 
         // play sliding noise SFX
         if (LogicScript.Instance.gameIsRunning || ClientLogicScript.Instance.isRunning)
