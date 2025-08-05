@@ -33,6 +33,10 @@ public class PlayerAuthentication : MonoBehaviour
     public string GetUsername()
     {
         // Ensure the string fits in FixedString32Bytes (max 32 characters) for online RPC
+        if (string.IsNullOrEmpty(username))
+        {
+            username = "You";
+        }
         if (username.Length > 32)
         {
             Debug.LogWarning("Username too long. Truncating.");
