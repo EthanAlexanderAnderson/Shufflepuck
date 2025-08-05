@@ -45,6 +45,8 @@ public class PowerupPopupPrefabScript : MonoBehaviour
     [SerializeField] private float newTextShrinkRate = 0.01f;
     [SerializeField] private float newTextFadeRate = 0.1f;
 
+    private Vector3 initialCardRarityIconLocalPosition;
+
     public void InitializePowerupPopup(int cardIndex, int rank, bool holo, bool isNew = false)
     {
         // for normal cards
@@ -64,10 +66,12 @@ public class PowerupPopupPrefabScript : MonoBehaviour
                 cardRarityText.color = rarityColor;
                 cardRarityText.text = rarityTexts[rarity];
                 cardRarityIcon.sprite = rarityIcons[rarity];
+                Transform icon = cardRarityIcon.gameObject.transform;
+                if (initialCardRarityIconLocalPosition == Vector3.zero) { initialCardRarityIconLocalPosition = icon.localPosition; }
                 if (rarity > 2)
                 {
-                    Transform icon = cardRarityIcon.gameObject.transform;
-                    icon.localPosition = new Vector3(icon.localPosition.x + (rarity - 2) * 10, icon.localPosition.y);
+                    Debug.Log("initialCardRarityIconLocalPosition.x: " + initialCardRarityIconLocalPosition.x);
+                    icon.localPosition = new Vector3(initialCardRarityIconLocalPosition.x + (rarity - 2) * 10, initialCardRarityIconLocalPosition.y);
                 }
             }
             else
