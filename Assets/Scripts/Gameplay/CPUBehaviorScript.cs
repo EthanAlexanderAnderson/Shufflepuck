@@ -414,7 +414,7 @@ public static class CPUBehaviorScript
             30 => DeckInExcess(),
             31 => !powerupsUsedThisTurn.Contains(cardIndex),
             32 => LogicScript.Instance.player.puckCount > 0,
-            33 => !powerupsUsedThisTurn.Contains(cardIndex),
+            33 => EvaluateTeleport(),
             34 => LogicScript.Instance.player.puckCount > 0,
             35 => true,
             36 => true,
@@ -551,6 +551,47 @@ public static class CPUBehaviorScript
         }
 
         return useCull && validPucks > 1;
+    }
+
+    private static bool EvaluateTeleport()
+    {
+        // if the ratio of player pucks to opponent pucks is greater than 2, use teleport
+        var allPucks = GameObject.FindGameObjectsWithTag("puck");
+        float playerPucks = 0;
+        float opponentPucks = 0.001f; // so we don't divide by zero
+        foreach (var puck in allPucks)
+        {
+            var puckScript = puck.GetComponent<PuckScript>();
+
+            // ignore pucks with lock
+            if (puckScript.HasLock())
+            {
+                continue;
+            }
+
+            // players pucks
+            if (puckScript.IsPlayersPuck() && puckScript.ComputeValue() > 0)
+            {
+                playerPucks++;
+                // small postive weight relative to player puck total future value
+                playerPucks += puckScript.ComputeTotalFutureValue() / 10;
+            }
+            // CPUs pucks
+            else if (!puckScript.IsPlayersPuck() && puckScript.ComputeValue() > 0)
+            {
+                opponentPucks++;
+                // small negative weight relative to CPU puck total future value
+                opponentPucks += puckScript.ComputeTotalFutureValue() / 10;
+            }
+        }
+        if (playerPucks / opponentPucks > 2)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public static bool HasExplosion()

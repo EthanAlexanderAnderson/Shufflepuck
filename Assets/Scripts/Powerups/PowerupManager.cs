@@ -912,13 +912,15 @@ public class PowerupManager : NetworkBehaviour
 
         // pick the puck to move
         int randomIndex = Random.Range(0, validPucks.Count);
+        bool randomIndexIsActiveCompetitorsPuck = activeCompetitor.isPlayer ^ validPucks[randomIndex].GetComponent<PuckScript>().IsPlayersPuck();
         int failSafe = 0;
         while (validPucks.Count > 1 && failSafe < 1000 &&
-              ((validPucks[randomIndex].GetComponent<PuckScript>().IsPlayersPuck() && validPucks[randomIndex].GetComponent<PuckScript>().ComputeValue() > 0) ||
-               !validPucks[randomIndex].GetComponent<PuckScript>().IsPlayersPuck() && validPucks[randomIndex].GetComponent<PuckScript>().ComputeValue() <= 0))
+              ((!randomIndexIsActiveCompetitorsPuck && validPucks[randomIndex].GetComponent<PuckScript>().ComputeValue() > 0) ||
+               randomIndexIsActiveCompetitorsPuck && validPucks[randomIndex].GetComponent<PuckScript>().ComputeValue() <= 0))
         {
             failSafe++;
             randomIndex = Random.Range(0, validPucks.Count);
+            randomIndexIsActiveCompetitorsPuck = activeCompetitor.isPlayer ^ validPucks[randomIndex].GetComponent<PuckScript>().IsPlayersPuck();
         }
 
         // move the puck & animation
