@@ -418,7 +418,7 @@ public static class CPUBehaviorScript
             34 => LogicScript.Instance.player.puckCount > 0,
             35 => true,
             36 => true,
-            37 => true,
+            37 => !powerupsUsedThisTurn.Contains(12),
             _ => false,
         };
     }
