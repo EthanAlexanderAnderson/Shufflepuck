@@ -546,7 +546,7 @@ public class PowerupManager : NetworkBehaviour
         foreach (var puck in allPucks)
         {
             if (puck.transform.position.y > 0 && puck.transform.position.y < 20 &&
-                puck.transform.position.x > -12 && puck.transform.position.x < 12 &&
+                puck.transform.position.x > -11.6f && puck.transform.position.x < 11.6f &&
                 !puck.GetComponent<PuckScript>().HasLock())
             {
                 validPucks.Add(puck);
@@ -901,7 +901,7 @@ public class PowerupManager : NetworkBehaviour
         foreach (var puck in allPucks)
         {
             if (puck.transform.position.y > 0 && puck.transform.position.y < 20 &&
-                puck.transform.position.x > -12 && puck.transform.position.x < 12 &&
+                puck.transform.position.x > -11.6f && puck.transform.position.x < 11.6f &&
                 !puck.GetComponent<PuckScript>().HasLock())
             {
                 validPucks.Add(puck);
