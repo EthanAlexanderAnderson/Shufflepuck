@@ -57,6 +57,8 @@ public class ServerLogicScript : NetworkBehaviour
         shotTimer = 42;
     }
 
+    bool tripleSpawned = false;
+
     private void Update()
     {
         if (!IsServer) return;
@@ -70,30 +72,28 @@ public class ServerLogicScript : NetworkBehaviour
         }
 
         // do triple powerup
-        if (triplePowerup > 0)
+        int isNonActiveCompetitorBit = triplePowerupUserCompetitorIndex == activeCompetitorIndex ? 0 : 1;
+        if (triplePowerup > 0 && competitorList[activeCompetitorIndex ^ isNonActiveCompetitorBit].activePuckScript != null && competitorList[activeCompetitorIndex ^ isNonActiveCompetitorBit].activePuckObject.transform.position.y > -1 && !tripleSpawned)
         {
-            var allPucks = GameObject.FindGameObjectsWithTag("puck");
-            foreach (var puck in allPucks)
-            {
-                // If any pucks are not past -3, return
-                if (!(puck.transform.position.y < -3))
-                {
-                    return;
-                }
-            }
-            int isNonActiveCompetitorBit = triplePowerupUserCompetitorIndex == activeCompetitorIndex ? 0 : 1;
             GameObject previousActivePuckObject = competitorList[activeCompetitorIndex ^ isNonActiveCompetitorBit].activePuckObject;
-            previousActivePuckObject.GetComponent<PuckScript>().RemovePowerupText("triple");
+            previousActivePuckObject.GetComponent<PuckScript>().RemoveAllPowerupText("triple");
             CreatePuck(isNonActiveCompetitorBit);
             competitorList[activeCompetitorIndex ^ isNonActiveCompetitorBit].activePuckScript.CopyPuckStaticEffectsHelperClientRpc(previousActivePuckObject.GetComponent<NetworkObject>());
-            float nextTripleShotPowerup = lastShotPower - (((triplePowerupMax - triplePowerup) / 2) + 1) * 12;
+            tripleSpawned = true;
+        }
+        // do triple powerup
+        if (triplePowerup > 0 && competitorList[activeCompetitorIndex ^ isNonActiveCompetitorBit].activePuckScript != null && competitorList[activeCompetitorIndex ^ isNonActiveCompetitorBit].activePuckObject.transform.localScale.x == competitorList[activeCompetitorIndex ^ isNonActiveCompetitorBit].activePuckScript.GetBaseLocalScale() && tripleSpawned)
+        {
+            float nextTripleShotPower = lastShotPower - (((triplePowerupMax - triplePowerup) / 2) + 1) * 12;
             float nextTripleShotAngle = lastShotAngle - (8 - triplePowerup % 2 * 16);
-            Shoot(nextTripleShotAngle, nextTripleShotPowerup, 50f, triplePowerupUserCompetitorIndex == activeCompetitorIndex ? 0 : 1);
+            float nextTripleShotSpin = lastShotSpin;
+            Shoot(nextTripleShotAngle, nextTripleShotPower, nextTripleShotSpin, triplePowerupUserCompetitorIndex == activeCompetitorIndex ? 0 : 1);
             triplePowerup--;
             if (triplePowerup == 0)
             {
                 triplePowerupMax = 0;
             }
+            tripleSpawned = false;
         }
 
         // If both players have 0 pucks (aka game is over)

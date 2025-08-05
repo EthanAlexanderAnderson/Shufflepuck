@@ -41,6 +41,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
     private float velocity;
     public NetworkVariable<float> velocityNetworkedRounded = new NetworkVariable<float>();
     private float baseLocalScale;
+    public float GetBaseLocalScale() { return baseLocalScale; }
 
     // movement modifiers (constant)
     [SerializeField] private float powerModifier;

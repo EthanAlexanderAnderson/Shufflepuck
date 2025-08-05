@@ -118,6 +118,7 @@ public class LogicScript : MonoBehaviour
         UI.ChangeUI(UI.titleScreen);
     }
 
+    bool tripleSpawned = false;
     // Update is called once per frame
     void Update()
     {
@@ -138,20 +139,25 @@ public class LogicScript : MonoBehaviour
             }
 
             // do triple powerup
-            if (triplePowerup > 0 && activeCompetitor.activePuckScript != null && activeCompetitor.activePuckObject.transform.position.y > -3)
+            if (triplePowerup > 0 && activeCompetitor.activePuckScript != null && activeCompetitor.activePuckObject.transform.position.y > -1 && !tripleSpawned)
             {
                 activeCompetitor.activePuckScript.RemoveAllPowerupText("triple");
                 GameObject previousActivePuckObject = activeCompetitor.activePuckObject;
                 puckManager.CreatePuck(activeCompetitor);
                 activeCompetitor.activePuckScript.CopyPuckStaticEffects(previousActivePuckObject);
+                tripleSpawned = true;
+            }
+            if (triplePowerup > 0 && activeCompetitor.activePuckScript != null && activeCompetitor.activePuckObject.transform.localScale.x == activeCompetitor.activePuckScript.GetBaseLocalScale() && tripleSpawned)
+            {
                 float nextTripleShotPowerup = triplePower - (((triplePowerupMax - triplePowerup) / 2) + 1) * 12;
                 float nextTripleShotAngle = tripleAngle - (8 - triplePowerup % 2 * 16);
-                activeCompetitor.ShootActivePuck(nextTripleShotAngle, nextTripleShotPowerup, 50f, false);
+                activeCompetitor.ShootActivePuck(nextTripleShotAngle, nextTripleShotPowerup, tripleSpin, false);
                 triplePowerup--;
                 if (triplePowerup == 0)
                 {
                     triplePowerupMax = 0;
                 }
+                tripleSpawned = false;
             }
 
             // start Players turn, do this then start shooting
