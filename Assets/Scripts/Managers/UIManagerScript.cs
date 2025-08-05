@@ -152,7 +152,6 @@ public class UIManagerScript : MonoBehaviour
 
         puckScreen.SetActive(true);
         UpdateLocks();
-        PlayerPrefs.SetInt("ShowNewSkinAlert", 0);
         puckScreen.SetActive(false);
         plinkoScreen.SetActive(true);
         PlayerDataManager.Instance.PlinkoDataSwap();
@@ -463,7 +462,7 @@ public class UIManagerScript : MonoBehaviour
     }
 
     // unlock the unlockables based on player highscores
-    public void UpdateLocks()
+    public void UpdateLocks(bool setAlert = false)
     {
         foreach (GameObject go in GameObject.FindGameObjectsWithTag("customLock"))
         {
@@ -472,8 +471,8 @@ public class UIManagerScript : MonoBehaviour
             var id = CUS.Unlock();
             if (id > 0)
             {
-                PuckSkinManager.Instance.UnlockPuckID(id);
-                PuckSkinManager.Instance.UnlockPuckID(id * -1);
+                PuckSkinManager.Instance.UnlockPuckID(id, setAlert);
+                PuckSkinManager.Instance.UnlockPuckID(id * -1, setAlert);
             }
         }
         puckAlert.SetActive(PlayerPrefs.GetInt("ShowNewSkinAlert", 0) == 1);
@@ -528,7 +527,7 @@ public class UIManagerScript : MonoBehaviour
         newUI.SetActive(true);
         activeUI = newUI;
         SetErrorMessage("");
-        UpdateLocks(); // for non-puck locks (difficulty locks)
+        UpdateLocks(true); // for non-puck locks (difficulty locks)
         if (newUI == gameHud)
         {
             ResetHUD();
@@ -537,7 +536,7 @@ public class UIManagerScript : MonoBehaviour
         {
             // blink puck screen for unlocks
             puckScreen.SetActive(true);
-            UpdateLocks();
+            UpdateLocks(true);
             puckScreen.SetActive(false);
             playerWins = 0;
             opponentWins = 0;

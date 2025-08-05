@@ -328,7 +328,7 @@ public class PlinkoManager : MonoBehaviour
             // if the puck has not been unlocked already, unlock it. otherwise it is a duplicate and we should grant a drop
             if (!PuckSkinManager.Instance.IsPlinkoSkinUnlocked(plinkoReward))
             {
-                PuckSkinManager.Instance.UnlockPuckID(plinkoReward);
+                PuckSkinManager.Instance.UnlockPuckID(plinkoReward, true);
                 PuckSkinManager.Instance.UnlockPlinkoSkin(plinkoReward);
                 UIManagerScript.Instance.SetErrorMessage("New puck unlocked!");
                 rewardText.text = "";

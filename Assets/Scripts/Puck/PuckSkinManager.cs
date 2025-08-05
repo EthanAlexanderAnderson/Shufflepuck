@@ -207,17 +207,56 @@ public class PuckSkinManager : MonoBehaviour
         RandomizeCPUPuckSprite();
         if (logic.activeCompetitor != null)
         {
-            PlayerPrefs.SetInt("ShowNewSkinAlert", 0);
+            // TODO: replace this to remove id from NewSkinAlertIDs, and only if NewSkinAlertIDs is empty show the main menu alert (can prob get rid of "ShowNewSkinAlert" pref)
+            string raw = PlayerPrefs.GetString("NewSkinAlertIDs", "");
+            List<int> oldIDs = raw.Split(',')
+                      .Where(s => !string.IsNullOrWhiteSpace(s))
+                      .Select(s => int.TryParse(s, out int val) ? val : (int?)null)
+                      .Where(val => val.HasValue)
+                      .Select(val => val.Value)
+                      .ToList();
+            if (oldIDs.Contains(id) || oldIDs.Contains(-id))
+            {
+                oldIDs.Remove(id);
+                oldIDs.Remove(-id);
+                string newIDs = string.Join(",", oldIDs);
+                PlayerPrefs.SetString("NewSkinAlertIDs", newIDs);
+                PlayerPrefs.Save();
+            }
+            if (oldIDs.Count == 0)
+            {
+                PlayerPrefs.SetInt("ShowNewSkinAlert", 0);
+            }
         }
     }
 
-    public void UnlockPuckID(int id)
+    public void UnlockPuckID(int id, bool setAlert = false)
     {
         // if not already unlocked, add to list
         if (!unlockedPuckIDs.Contains(id))
         {
             unlockedPuckIDs.Add(id);
+
+            if (!setAlert) return;
+
+            // enable main menu alert
             PlayerPrefs.SetInt("ShowNewSkinAlert", 1);
+
+            // set which index is newly unlocked
+            string raw = PlayerPrefs.GetString("NewSkinAlertIDs", "");
+            List<int> oldIDs = raw.Split(',')
+                      .Where(s => !string.IsNullOrWhiteSpace(s))
+                      .Select(s => int.TryParse(s, out int val) ? val : (int?)null)
+                      .Where(val => val.HasValue)
+                      .Select(val => val.Value)
+                      .ToList();
+            if (!oldIDs.Contains(id))
+            {
+                oldIDs.Add(id);
+                string newIDs = string.Join(",", oldIDs);
+                PlayerPrefs.SetString("NewSkinAlertIDs", newIDs);
+                PlayerPrefs.Save();
+            }
         }
     }
 

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +14,23 @@ public class CustomUnlockScript : MonoBehaviour
     [SerializeField] private bool easy;
     [SerializeField] private bool medium;
     [SerializeField] private bool hard;
+
+    [SerializeField] private GameObject alertIcon;
+
+    private void OnEnable()
+    {
+        string raw = PlayerPrefs.GetString("NewSkinAlertIDs", "");
+            List<int> IDs = raw.Split(',')
+                      .Where(s => !string.IsNullOrWhiteSpace(s))
+                      .Select(s => int.TryParse(s, out int val) ? val : (int?)null)
+                      .Where(val => val.HasValue)
+                      .Select(val => val.Value)
+                      .ToList();
+            if (IDs.Contains(ID) || IDs.Contains(-ID))
+            {
+                alertIcon.SetActive(true);
+            }
+    }
 
     public int Unlock()
     {
