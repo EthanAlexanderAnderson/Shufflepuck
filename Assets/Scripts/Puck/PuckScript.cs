@@ -253,16 +253,16 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         if (!IsSlowed() && IsShot() && pastSafeLine)
         {
             // add horizontal spinning force
-            rb.AddForce(-0.03f * angularVelocityModifier * rb.angularVelocity * rb.mass * right);
+            rb.AddForce(-0.15f * angularVelocityModifier * rb.angularVelocity * rb.mass * transform.localScale.x * right);
 
             // add counter force downwards
             if (rb.angularVelocity > 0)
             {
-                rb.AddForce(-0.03f * angularVelocityModifier * counterForce * rb.angularVelocity * rb.mass * up);
+                rb.AddForce(-0.15f * angularVelocityModifier * counterForce * rb.angularVelocity * rb.mass * transform.localScale.x * up);
             }
             else
             {
-                rb.AddForce(0.03f * angularVelocityModifier * counterForce * rb.angularVelocity * rb.mass * up);
+                rb.AddForce(0.15f * angularVelocityModifier * counterForce * rb.angularVelocity * rb.mass * transform.localScale.x * up);
             }
         }
 
@@ -276,7 +276,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         {
             Vector3 direction = tetherPosition.Value - transform.position;
             float distance = direction.magnitude;
-            Vector3 force = 0.5f * distance * direction.normalized * GetTetherCount();
+            Vector3 force = 0.55f * distance * GetTetherCount() * direction.normalized;
 
             if (distance <= 4)
             {
