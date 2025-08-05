@@ -6,6 +6,8 @@ public class DeckScreenScript : MonoBehaviour
     [SerializeField] GameObject deckMenuScrollView;
     [SerializeField] GameObject cardUIPrefab;
 
+    [SerializeField] float y;
+
     private void OnEnable()
     {
         var count = PowerupCardData.GetCardCount();
@@ -76,8 +78,7 @@ public class DeckScreenScript : MonoBehaviour
             }
         }
 
-            // no idea why the y pos here is that magic number, it works tho
-            deckMenuScrollView.transform.localPosition = new Vector3(0, -4100, 0);
+        deckMenuScrollView.transform.localPosition = new Vector3(0, y, 0);
         DeckManager.Instance.UpdateTotalDeckCountUI();
         UIManagerScript.Instance.ApplyDarkMode();
     }
