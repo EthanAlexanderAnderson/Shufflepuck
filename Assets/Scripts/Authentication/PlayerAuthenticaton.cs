@@ -18,6 +18,8 @@ public class PlayerAuthentication : MonoBehaviour
     private string id;
     private string imgURL;
 
+    public int authProvider; // 0 = none, 1 = GPG, 2 = AGC
+
     [SerializeField] private TMP_Text loadingText;
     [SerializeField] private TMP_Text progressText;
     [SerializeField] private GameObject titleScreen;
@@ -35,7 +37,7 @@ public class PlayerAuthentication : MonoBehaviour
         // Ensure the string fits in FixedString32Bytes (max 32 characters) for online RPC
         if (string.IsNullOrEmpty(username))
         {
-            username = "You";
+            return "You";
         }
         if (username.Length > 32)
         {
@@ -126,6 +128,7 @@ public class PlayerAuthentication : MonoBehaviour
                     string androidServerAuthCode = await GetGooglePlayGamesServerAuthCodeAsync();
                     await AuthenticationService.Instance.LinkWithGooglePlayGamesAsync(androidServerAuthCode);
                     Debug.Log($"Linked with GooglePlayGames as {AuthenticationService.Instance.PlayerId}");
+                    authProvider = 1;
                 }
                 else if (Application.platform == RuntimePlatform.IPhonePlayer)
                 {
@@ -134,6 +137,7 @@ public class PlayerAuthentication : MonoBehaviour
                     var (appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp) = await GetAppleCredentialsAsync(result.LocalPlayer.DeveloperScopeIdentifier);
                     await AuthenticationService.Instance.LinkWithAppleGameCenterAsync(appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp);
                     Debug.Log($"Linked with AppleGameCenter as {AuthenticationService.Instance.PlayerId}");
+                    authProvider = 2;
                 }
             }
             else
@@ -146,6 +150,7 @@ public class PlayerAuthentication : MonoBehaviour
                     string androidServerAuthCode = await GetGooglePlayGamesServerAuthCodeAsync();
                     await AuthenticationService.Instance.SignInWithGooglePlayGamesAsync(androidServerAuthCode);
                     Debug.Log($"Signed In with GooglePlayGames as {AuthenticationService.Instance.PlayerId}");
+                    authProvider = 1;
                 }
                 else if (Application.platform == RuntimePlatform.IPhonePlayer)
                 {
@@ -154,6 +159,7 @@ public class PlayerAuthentication : MonoBehaviour
                     var (appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp) = await GetAppleCredentialsAsync(result.LocalPlayer.DeveloperScopeIdentifier);
                     await AuthenticationService.Instance.SignInWithAppleGameCenterAsync(appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp);
                     Debug.Log($"Signed In with AppleGameCenter as {AuthenticationService.Instance.PlayerId}");
+                    authProvider = 2;
                 }
             }
 

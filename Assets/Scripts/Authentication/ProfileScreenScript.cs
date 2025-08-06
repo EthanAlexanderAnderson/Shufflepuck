@@ -15,12 +15,22 @@ public class ProfileScreenScript : MonoBehaviour
     [SerializeField] private TMP_Text usernameText;
     [SerializeField] GameObject authenticationButtonsParent;
     [SerializeField] GameObject saveButtonsParent;
+    [SerializeField] private TMP_Text authText;
 
     private void OnEnable()
     {
         UpdateAuthenticationUI();
         // temporary replace PFP with selected puck Icon
         profilepicture.sprite = LogicScript.Instance.player.puckSprite;
+
+        if (PlayerAuthentication.Instance.authProvider == 1)
+        {
+            authText.text = "Account linked with Google Play Games.";
+        }
+        else if (PlayerAuthentication.Instance.authProvider == 2)
+        {
+            authText.text = "Account linked with Apple Game Center.";
+        }
     }
 
     public void UpdateAuthenticationUI()
