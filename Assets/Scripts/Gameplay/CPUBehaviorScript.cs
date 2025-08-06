@@ -77,7 +77,7 @@ public static class CPUBehaviorScript
             int randomCard = PowerupCardData.GetRandomCardOfRarity(rarity);
             if (deck.Count(n => n == randomCard) < (5 - rarity) && EvaluatePowerupEquipage(randomCard) && deck.Count(n => n == randomCard) < PowerupCardData.GetCardOwnedSum(randomCard + 5))
             {
-                deck.Add(36);
+                deck.Add(randomCard);
                 CPUDeckPowerLevel += (rarity + 1);
             }
             failSafe++;
