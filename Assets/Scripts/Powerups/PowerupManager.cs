@@ -1026,7 +1026,7 @@ public class PowerupManager : NetworkBehaviour
         }
         else
         {
-            LogicScript.Instance.IncrementWeaken();
+            LogicScript.Instance.IncrementWeaken(!activeCompetitor.isPlayer);
         }   
     }
 

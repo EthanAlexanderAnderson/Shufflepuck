@@ -44,9 +44,9 @@ public class LogicScript : MonoBehaviour
     [SerializeField] private GameObject powerupsMenu; // set in editor
     public int triplePowerup;
     public int triplePowerupMax;
-    int weakenCount = 0;
-    int nextWeakenCount = 0;
-    public void IncrementWeaken() { nextWeakenCount++; }
+    int playerWeakenCount = 0;
+    int CPUWeakenCount = 0;
+    public void IncrementWeaken(bool weakenPlayer) { if (weakenPlayer) { playerWeakenCount++; } else { CPUWeakenCount++; } }
 
     // game state
     public bool gameIsRunning { get; private set; }
@@ -227,7 +227,7 @@ public class LogicScript : MonoBehaviour
         bar.ToggleDim(false);
         line.isActive = true;
         arrow.SetActive(true);
-        bar.SetWeakenBarCover(weakenCount);
+        bar.SetWeakenBarCover(playerWeakenCount);
         GameHUDManager.Instance.ChangeTurnText(isLocal ? "Player 1's Turn" : "Your Turn");
         if (player.puckCount == 1)
         {
@@ -263,10 +263,8 @@ public class LogicScript : MonoBehaviour
                 soundManager.PlayClickSFXAlterPitch(1, 1.05f);
                 power = line.GetValue();
                 // weaken powerup
-                Debug.Log("weakenCount: " + weakenCount);
-                power = Math.Min(power, 100 - weakenCount * 10);
-                weakenCount = nextWeakenCount;
-                nextWeakenCount = 0;
+                power = Math.Min(power, 100 - playerWeakenCount * 10);
+                playerWeakenCount = 0;
                 // if non-hard diff, end turn
                 if (difficulty < 2)
                 {
@@ -306,7 +304,7 @@ public class LogicScript : MonoBehaviour
             bar.ToggleDim(true);
         }
         line.isActive = true;
-        bar.SetWeakenBarCover(weakenCount);
+        bar.SetWeakenBarCover(CPUWeakenCount);
         arrow.SetActive(true);
         puckHalo.SetActive(difficulty == 0);
         GameHUDManager.Instance.ChangeTurnText(isLocal ? "Player 2's Turn" : "CPU's Turn");
@@ -354,10 +352,8 @@ public class LogicScript : MonoBehaviour
             if (difficulty < 2)
             {
                 // weaken powerup
-                Debug.Log("weakenCount: " + weakenCount);
-                CPUShotPower = Math.Min(CPUShotPower, 100 - weakenCount * 10);
-                weakenCount = nextWeakenCount;
-                nextWeakenCount = 0;
+                CPUShotPower = Math.Min(CPUShotPower, 100 - CPUWeakenCount * 10);
+                CPUWeakenCount = 0;
                 Shoot(CPUShotAngle, CPUShotPower);
                 tempTime = 0;
             }
@@ -370,10 +366,8 @@ public class LogicScript : MonoBehaviour
         if (CPUShotSpin >= 0 && Mathf.Abs(line.GetValue() - CPUShotSpin) < (timer - (tempTime + 4.5 + powerupWaitTime))/2 && activeBar == "spin")
         {
             // weaken powerup
-            Debug.Log("weakenCount: " + weakenCount);
-            CPUShotPower = Math.Min(CPUShotPower, 100 - weakenCount * 10);
-            weakenCount = nextWeakenCount;
-            nextWeakenCount = 0;
+            CPUShotPower = Math.Min(CPUShotPower, 100 - CPUWeakenCount * 10);
+            CPUWeakenCount = 0;
             Shoot(CPUShotAngle, CPUShotPower, CPUShotSpin);
             tempTime = 0;
         }
@@ -382,9 +376,8 @@ public class LogicScript : MonoBehaviour
         if (((timer - tempTime) > 20) && opponent.isShooting)
         {
             (CPUShotAngle, CPUShotPower, CPUShotSpin) = CPUBehaviorScript.FindPath();
-            CPUShotPower = Math.Min(CPUShotPower, 100 - weakenCount * 10);
-            weakenCount = nextWeakenCount;
-            nextWeakenCount = 0;
+            CPUShotPower = Math.Min(CPUShotPower, 100 - CPUWeakenCount * 10);
+            CPUWeakenCount = 0;
             if (difficulty < 2)
             {
                 Shoot(CPUShotAngle, CPUShotPower);
@@ -450,6 +443,8 @@ public class LogicScript : MonoBehaviour
         PowerupAnimationManager.Instance.ClearPowerupPopupEffectAnimationQueue();
         triplePowerup = 0;
         triplePowerupMax = 0;
+        playerWeakenCount = 0;
+        CPUWeakenCount = 0;
         LaserScript.Instance.DisableLaser();
 
         // load player & CPU decks

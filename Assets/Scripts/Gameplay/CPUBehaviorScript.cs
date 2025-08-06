@@ -77,9 +77,7 @@ public static class CPUBehaviorScript
             int randomCard = PowerupCardData.GetRandomCardOfRarity(rarity);
             if (deck.Count(n => n == randomCard) < (5 - rarity) && EvaluatePowerupEquipage(randomCard) && deck.Count(n => n == randomCard) < PowerupCardData.GetCardOwnedSum(randomCard + 5))
             {
-                deck.Add(randomCard);
-                //deck.Add(36);
-                //deck.Add(8);
+                deck.Add(36);
                 CPUDeckPowerLevel += (rarity + 1);
             }
             failSafe++;
@@ -416,8 +414,8 @@ public static class CPUBehaviorScript
             32 => LogicScript.Instance.player.puckCount > 0,
             33 => EvaluateTeleport(),
             34 => LogicScript.Instance.player.puckCount > 0,
-            35 => true,
-            36 => true,
+            35 => DeckInExcess(),
+            36 => LogicScript.Instance.player.puckCount > 0,
             37 => !powerupsUsedThisTurn.Contains(12),
             _ => false,
         };
