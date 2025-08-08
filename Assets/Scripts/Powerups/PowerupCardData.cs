@@ -177,7 +177,7 @@ public static class PowerupCardData
         return cardVariationList;
     }
 
-    // return success (if fail because over max count, reimburse with more credits)
+    // returns true if we already discovered the card (even if quantity is 0 from crafting)
     public static bool AddCardToCollection(int cardIndex, int rank = 0, bool holo = false, int count = 1)
     {
         if (cardIndex < 0) { return false; }

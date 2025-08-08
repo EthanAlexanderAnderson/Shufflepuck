@@ -16,6 +16,7 @@ public class PackOpenPrefabScript : MonoBehaviour
     int cardIndex;
     int rank;
     bool holo;
+    bool isNew;
 
     private void Update()
     {
@@ -69,7 +70,7 @@ public class PackOpenPrefabScript : MonoBehaviour
     {
         GameObject powerupPopupObject = Instantiate(PowerupPopupPrefab, cardParent.transform);
         PowerupPopupPrefabScript powerupPopupScript = powerupPopupObject.GetComponent<PowerupPopupPrefabScript>();
-        powerupPopupScript.InitializePowerupPopup(cardIndex, rank, holo, PowerupCardData.GetCardOwnedCount(cardIndex, rank, holo) <= 1);
+        powerupPopupScript.InitializePowerupPopup(cardIndex, rank, holo, isNew);
         powerupPopupScript.Animate();
         SoundManagerScript.Instance.PlayPowerupPopup(true);
         if (holo) SoundManagerScript.Instance.PlayPowerupPopup(true, 1);
@@ -85,7 +86,8 @@ public class PackOpenPrefabScript : MonoBehaviour
         this.cardIndex = cardIndex;
         this.rank = rank;
         this.holo = holo;
-        if (PowerupCardData.AddCardToCollection(cardIndex, rank, holo))
+        isNew = !PowerupCardData.AddCardToCollection(cardIndex, rank, holo);
+        if (!isNew)
         {
             int creditReward = rarityBaseDupeCreditReward[PowerupCardData.GetCardRarity(cardIndex)] * rankMultDupeCreditReward[rank] * (holo ? 10 : 1);
             PackManager.Instance.RewardCraftingCredits(creditReward);
