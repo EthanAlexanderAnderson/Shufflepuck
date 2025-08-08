@@ -71,6 +71,9 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
     // particle colors
     private Color[] color = { new Color(0.5f, 0.5f, 0.5f) };
+
+    // base alpha opacity for phase/ghost
+    private float baseAlpha = 1f;
     #endregion
 
     // ---------- GETTERS AND SETTERS ----------
@@ -137,6 +140,8 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
             ZeroOutScoreClientRpc();
         }
     }
+
+    public void SetBaseAlpha(float value) { baseAlpha = value; }
     #endregion
 
     // ---------- INITIALIZER ----------
@@ -456,7 +461,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         // for ghost powerup
         if (HasGhost())
         {
-            if (spriteRenderer.color.a > baseAlpha)
+            if (spriteRenderer.color.a > baseAlpha && (LogicScript.Instance.gameIsRunning || ClientLogicScript.Instance.isRunning))
             {
                 // conditional is for lock
                 spriteRenderer.color = rb.bodyType == RigidbodyType2D.Kinematic ? new Color(0.5f, 0.5f, 0.5f, spriteRenderer.color.a - 0.01f) : new Color(1f, 1f, 1f, spriteRenderer.color.a - 0.01f);
@@ -1478,13 +1483,12 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         IncrementPuckBonusValue(3);
     }
 
-    private float baseAlpha = 1;
     public void ActivateGhost()
     {
         ghostPowerup = true;
         AddPowerupText("ghost");
 
-        baseAlpha = IsPlayersPuck() ? 0.75f : 0f;
+        SetBaseAlpha(IsPlayersPuck() ? 0.75f : 0f);
 
         if (!IsPlayersPuck())
         {

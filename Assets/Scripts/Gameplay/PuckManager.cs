@@ -279,6 +279,7 @@ public class PuckManager : MonoBehaviour
         foreach (var puck in allPucks)
         {
             puck.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 1f);
+            puck.GetComponent<PuckScript>().SetBaseAlpha(1f);
         }
     }
 }
