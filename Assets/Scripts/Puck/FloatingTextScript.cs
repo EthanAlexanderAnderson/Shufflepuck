@@ -77,7 +77,7 @@ public class FloatingTextScript : MonoBehaviour
     public void Initialize(string text, float speedUpRate, float speedShrinkRate, float speedFadeRate, Vector2 positionOffset, float scale = 1, bool textShouldFollowParent = false, float destroyTime = 3)
     {
         // regular
-        if (PlayerPrefs.GetInt("debug") != 1)
+        if (PlayerPrefs.GetInt("debug") != 1 || text == "nope!")
         {
             TMPtext.text = text;
             speedUp *= speedUpRate;

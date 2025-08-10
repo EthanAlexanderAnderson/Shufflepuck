@@ -28,7 +28,7 @@ public class ScoreZoneCalibrator : MonoBehaviour
 
     void Update()
     {
-        if (clicks > 10 && (activePuckObject == null || activePuckObjectScript.IsSafe()) && shotAngleIterator < angle.Length && shotPowerIterator < power.Length && shotSpinIterator < spin.Length && UIManagerScript.Instance.debugMode > 10 && !ClientLogicScript.Instance.isRunning)
+        if (clicks > 10 && (activePuckObject == null || activePuckObjectScript.IsSafe()) && shotAngleIterator < angle.Length && shotPowerIterator < power.Length && shotSpinIterator < spin.Length && PlayerPrefs.GetInt("debug") == 1 && !ClientLogicScript.Instance.isRunning)
         {
             activePuckObject = Instantiate(puck, new Vector3((left ? -3.6f : 3.6f), -10.0f, 0.0f), Quaternion.identity);
             activePuckObjectScript = activePuckObject.GetComponent<PuckScript>();
@@ -43,7 +43,7 @@ public class ScoreZoneCalibrator : MonoBehaviour
     }
     public void Increment()
     {
-        if (UIManagerScript.Instance.debugMode < 10 || ClientLogicScript.Instance.isRunning) { return; }
+        if (PlayerPrefs.GetInt("debug") != 1 || ClientLogicScript.Instance.isRunning) { return; }
 
         clicks++;
         if (clicks == 10)

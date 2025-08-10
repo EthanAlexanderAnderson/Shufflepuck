@@ -762,8 +762,9 @@ public class UIManagerScript : MonoBehaviour
             }
             PlayerPrefs.SetInt("debug", 1);
             Debug.Log("Started up logging.");
+            debugMode = 0;
         }
-        else if (debugMode == 5 || debugMode == 15)
+        else if (debugMode == 5)
         {
             ScreenLog.Instance.gameObject.SetActive(false);
             PlayerPrefs.SetInt("debug", 0);
