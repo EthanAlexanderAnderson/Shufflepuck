@@ -202,6 +202,7 @@ public class PowerupManager : NetworkBehaviour
         LogicScript.Instance.player.isOmniscient = false;
         LogicScript.Instance.opponent.isOmniscient = false;
         denyPowerup = 0;
+        deniedCards = new bool[] { false, false, false };
         playerUsed = new();
     }
 
@@ -226,6 +227,7 @@ public class PowerupManager : NetworkBehaviour
     {
         chaosEnsuing = false;
         isShuffling = false;
+        deniedCards = new bool[] { false, false, false };
         activeMovements = 0;
         if (deck == null) { LoadDeck(); }
         var deckCount = deck.Count;
@@ -265,11 +267,13 @@ public class PowerupManager : NetworkBehaviour
             {
                 powerupButtons[i].gameObject.GetComponent<Button>().interactable = false;
                 powerupButtons[i].gameObject.transform.GetChild(0).GetComponent<Image>().enabled = true;
+                deniedCards = new bool[] { true, true, false };
             }
             else if (denyPowerup >= 2)
             {
                 powerupButtons[i].gameObject.GetComponent<Button>().interactable = false;
                 powerupButtons[i].gameObject.transform.GetChild(0).GetComponent<Image>().enabled = true;
+                deniedCards = new bool[] { true, true, true };
             }
             else
             {
@@ -805,6 +809,7 @@ public class PowerupManager : NetworkBehaviour
     }
 
     private int denyPowerup;
+    private bool[] deniedCards = new bool[3];
     public void DenyPowerup(int encodedCard) // index 27 : disable 2 cards in your opponent’s hand
     {
         var index = Array.IndexOf(methodArray, DenyPowerup);
@@ -1157,7 +1162,7 @@ public class PowerupManager : NetworkBehaviour
         for (int i = 0; i < 3; i++)
         {
             var decodedCard = PowerupCardData.DecodeCard(hand[i]);
-            if (lastPlayedCard >= 0 && decodedCard.cardIndex == Array.IndexOf(methodArray, InsanityPowerup)) { powerupButtons[i].gameObject.GetComponent<Button>().interactable = true; }
+            if (lastPlayedCard >= 0 && decodedCard.cardIndex == Array.IndexOf(methodArray, InsanityPowerup) && !deniedCards[i]) { powerupButtons[i].gameObject.GetComponent<Button>().interactable = true; }
         }
         // add the powerup animation to the animation queue
         PowerupAnimationManager.Instance.AddPowerupPopupEffectAnimationToQueue(activeCompetitor.isPlayer, encodedCard);
