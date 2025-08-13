@@ -74,8 +74,8 @@ public class UIManagerScript : MonoBehaviour
     public Text playerPuckCountText;
     public Text opponentPuckCountText;
 
-    [SerializeField] private Text playerScoreText;
-    [SerializeField] private Text opponentScoreText;
+    [SerializeField] private TMP_Text playerScoreText;
+    [SerializeField] private TMP_Text opponentScoreText;
     [SerializeField] private Text playerScoreBonusText;
     [SerializeField] private Text opponentScoreBonusText;
 

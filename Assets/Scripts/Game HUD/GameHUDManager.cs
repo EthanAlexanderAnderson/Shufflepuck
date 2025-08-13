@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -174,7 +175,7 @@ public class GameHUDManager : MonoBehaviour
     public void ChangeScoreText(bool isPlayers, string score, bool playAnimation)
     {
         var textObject = isPlayers ? playerScoreText : opponentScoreText;
-        var text = textObject.GetComponent<Text>();
+        var text = textObject.GetComponent<TMP_Text>();
 
         var iconObject = isPlayers ? playerScoreIcon : opponentScoreIcon;
 
