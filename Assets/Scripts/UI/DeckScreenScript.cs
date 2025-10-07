@@ -100,4 +100,10 @@ public class DeckScreenScript : MonoBehaviour
             deckbuilderCardUI.UpdateCraftUI();
         }
     }
+
+    public void SwitchActiveDeckProfile(int profileID)
+    {
+        DeckManager.Instance.SwitchActiveDeckProfile(profileID);
+    }
+
 }

@@ -31,6 +31,8 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
 
     [SerializeField] private TMP_Text countText;
 
+    [SerializeField] private TMP_Text sectionHeaderCountText;
+
     // --- RARITY
     [SerializeField] private Image cardRarityIcon;
     [SerializeField] private Sprite[] rarityIcons = new Sprite[5];
@@ -109,6 +111,9 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
                 case -1:
                     cardNameText.text = "in deck:";
                     cardIcon.sprite = inDeckSprite;
+                    sectionHeaderCountText.gameObject.SetActive(true);
+                    sectionHeaderCountText.text = DeckManager.Instance.GetDeckCount().ToString();
+                    DeckManager.Instance.SetTotalDeckCountUITextObject(sectionHeaderCountText);
                     break;
                 case -2:
                     cardNameText.text = "collection:";
@@ -127,6 +132,8 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
             cardNameText.gameObject.tag = "Untagged";
             cardIcon.color = UIManagerScript.Instance.GetDarkMode() ? new Color(0f, 0f, 0f, 1f) : new Color(1f, 1f, 1f, 1f);
             cardIcon.gameObject.tag = "Untagged";
+            sectionHeaderCountText.color = UIManagerScript.Instance.GetDarkMode() ? new Color(0f, 0f, 0f, 1f) : new Color(1f, 1f, 1f, 1f);
+            sectionHeaderCountText.gameObject.tag = "Untagged";
             minusButtonObject.SetActive(false);
             plusButtonObject.SetActive(false);
             expandCollapseObject.SetActive(false);
