@@ -21,6 +21,19 @@ public static class PowerupCardData
     // TODO: rename this function
     public static int GetCardCount() { return cardImportNames.Length; }
 
+    // get the number of discovered cards (owned 1 or more)
+    public static int GetDiscoveredCount()
+    {
+        var sums = GetAllCardsOwnedSums();
+        int discovered = 0;
+        for (int i = 0; i < sums.Length; i++)
+        {
+            if (GetCardName(i) == null) continue;
+            if (sums[i] > 0) discovered++;
+        }
+        return discovered;
+    }
+
     public static int GetCardOwnedCount(int cardIndex, int rank = 0, bool holo = false)
     {
         // Get the card collection

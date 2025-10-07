@@ -118,10 +118,14 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
                 case -2:
                     cardNameText.text = "collection:";
                     cardIcon.sprite = collectionSprite;
+                    sectionHeaderCountText.gameObject.SetActive(true);
+                    sectionHeaderCountText.text = PowerupCardData.GetDiscoveredCount().ToString() + " / " + (PowerupCardData.GetCardCount() - 1).ToString();
                     break;
                 case -3:
                     cardNameText.text = "undiscovered:";
                     cardIcon.sprite = undiscoveredSprite;
+                    sectionHeaderCountText.gameObject.SetActive(true);
+                    sectionHeaderCountText.text = ((PowerupCardData.GetCardCount() - 1) - PowerupCardData.GetDiscoveredCount()).ToString() + " / " + (PowerupCardData.GetCardCount() - 1).ToString();
                     break;
                 default:
                     cardNameText.text = "ERROR";
