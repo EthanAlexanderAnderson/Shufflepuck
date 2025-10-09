@@ -220,7 +220,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
 
         baseLocalScale = transform.localScale.x;
 
-        if (PlayerPrefs.GetInt("debug") == 1)
+        if (PlayerPrefs.GetInt("experimental") == 1)
         {
             powerModifier = 20.5f;
             rb.linearDamping = 1f;
@@ -248,7 +248,7 @@ public class PuckScript : NetworkBehaviour, IPointerClickHandler
         // damp movement to make pucks come to a stop faster, debug mode only for now
         // linear damping 1
         // powermodifier 20.5
-        if (PlayerPrefs.GetInt("debug") == 1 && (LogicScript.Instance.gameIsRunning || ClientLogicScript.Instance.isRunning))
+        if (PlayerPrefs.GetInt("experimental") == 1 && (LogicScript.Instance.gameIsRunning || ClientLogicScript.Instance.isRunning))
         {
             isAccelerating = velocity >= previousVelocity;
             if (!isAccelerating && IsSlowed())

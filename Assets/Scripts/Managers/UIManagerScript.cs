@@ -123,6 +123,9 @@ public class UIManagerScript : MonoBehaviour
     [SerializeField] private Sprite tableLight;
     [SerializeField] private Sprite tableDark;
 
+    // settings menu misc
+    [SerializeField] private GameObject experimentalFeaturesToggle;
+
     public string TurnText
     {
         get => turnText.text;
@@ -166,6 +169,8 @@ public class UIManagerScript : MonoBehaviour
             ApplyDarkMode();
             darkModeToggle.GetComponent<Toggle>().isOn = true;
         }
+
+        experimentalFeaturesToggle.GetComponent<Toggle>().isOn = PlayerPrefs.GetInt("experimental") == 1;
     }
 
     float cooldownTime;
@@ -731,6 +736,12 @@ public class UIManagerScript : MonoBehaviour
                 img.color = darkMode ? Color.white : Color.black;
             }
         }
+    }
+
+    // helper for experimental mode button in settings menu
+    public void ToggleExperimentalFeatures(bool enabled)
+    {
+        PlayerPrefs.SetInt("experimental", enabled ? 1 : 0);
     }
 
     // helper for debug mode button
