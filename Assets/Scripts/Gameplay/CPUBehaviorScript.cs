@@ -386,7 +386,7 @@ public static class CPUBehaviorScript
             5 => !powerupsUsedThisTurn.Contains(cardIndex) && usePhase,
             6 => !powerupsUsedThisTurn.Contains(cardIndex) && EvaluateCull(),
             7 => LogicScript.Instance.opponent.puckCount > 2,
-            8 => LogicScript.Instance.player.puckCount > 0,
+            8 => LogicScript.Instance.player.puckCount > 0 && !powerupsUsedThisTurn.Contains(26),
             9 => !powerupsUsedThisTurn.Contains(cardIndex) && useExplosion,
             10 => !powerupsUsedThisTurn.Contains(cardIndex) && LogicScript.Instance.player.puckCount > 0,
             11 => !powerupsUsedThisTurn.Contains(13) && LogicScript.Instance.player.puckCount > 0,
@@ -405,7 +405,7 @@ public static class CPUBehaviorScript
             23 => false,
             24 => !powerupsUsedThisTurn.Contains(25) && DeckInExcess() && (PuckManager.Instance.GetPucksInPlayCount(true, -1) >= 3 || LogicScript.Instance.opponent.puckCount >= 3),
             25 => !powerupsUsedThisTurn.Contains(cardIndex) && !powerupsUsedThisTurn.Contains(24) && LogicScript.Instance.player.GetScore() > LogicScript.Instance.opponent.GetScore() && PuckManager.Instance.GetPucksInPlayCount(true) >= 3, // TODO: push based on path proximity to player pucks (this will be a nightmare to code) AT LEAST make sure angle is middle-ish so it's likely to do SOMETHING
-            26 => !powerupsUsedThisTurn.Contains(cardIndex) && LogicScript.Instance.player.puckCount > 0,
+            26 => !powerupsUsedThisTurn.Contains(cardIndex) && LogicScript.Instance.player.puckCount > 0 && !powerupsUsedThisTurn.Contains(8),
             27 => !powerupsUsedThisTurn.Contains(cardIndex) && LogicScript.Instance.player.puckCount > 0 && PowerupManager.Instance.GetDeck().Count > 0,
             28 => (deck.Count) < (LogicScript.Instance.opponent.puckCount - 1) * 3,
             29 => false,
