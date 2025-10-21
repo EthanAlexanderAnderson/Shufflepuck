@@ -89,6 +89,7 @@ SpriteRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -212,6 +213,7 @@ SpriteRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -285,7 +287,7 @@ CircleCollider2D:
   m_Radius: 4.99
 --- !u!50 &4782324925009279097
 Rigidbody2D:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -296,8 +298,8 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 0.615
-  m_AngularDrag: 0.3
+  m_LinearDamping: 0.615
+  m_AngularDamping: 0.3
   m_GravityScale: 0
   m_Material: {fileID: 6200000, guid: 7dd8b096257fd6d479d8fce276312c52, type: 2}
   m_IncludeLayers:
@@ -323,6 +325,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 3569049060
+  InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -356,24 +359,13 @@ MonoBehaviour:
   breakSFX: {fileID: 6334683933497849182}
   animationLayer: {fileID: 3448663806602933473}
   trail: {fileID: 6188019625278550676}
+  tetherSnapParticlesPrefab: {fileID: 1287183357352544012, guid: 296c27c5821767042b50d9f9aa7c8fa4, type: 3}
   velocityNetworkedRounded:
     m_InternalValue: 0
   powerModifier: 12
-  angularVelocity: 0
   angularVelocityModifier: 0.06
   counterForce: 0.3
   floatingTextPrefab: {fileID: 4579905589776270658, guid: a4af9b0b007a49c4ca9fa4d76af0f273, type: 3}
-  phasePowerup: 0
-  growthPowerup: 0
-  lockPowerup: 0
-  explosionPowerup: 0
-  hydraPowerup: 0
-  shieldPowerup: 0
-  resurrectPowerup: 0
-  factoryPowerup: 0
-  pushPowerup: 0
-  exponentPowerup: 0
-  erraticPowerup: 0
   collisionParticleEffectPrefab: {fileID: 4929346313033784861, guid: 9f76c534760375c468d38282f074644f, type: 3}
 --- !u!96 &6188019625278550676
 TrailRenderer:
@@ -395,6 +387,7 @@ TrailRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -509,6 +502,7 @@ SpriteMask:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1437,6 +1431,7 @@ ParticleSystemRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -6327,6 +6322,7 @@ SpriteRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

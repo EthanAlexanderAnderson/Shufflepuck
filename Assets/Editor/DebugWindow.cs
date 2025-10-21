@@ -1,4 +1,5 @@
 using System;
+using Unity.Collections;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -71,7 +72,7 @@ public class DebugWindow : EditorWindow
         rootVisualElement.Add(destroy);
 
         Button addPlayer = new() { text = "addPlayer" };
-        addPlayer.clicked += () => ServerLogicScript.Instance.AddPlayerServerRpc(0, true);
+        addPlayer.clicked += () => ServerLogicScript.Instance.AddPlayerServerRpc(0, new FixedString32Bytes("username"));
         rootVisualElement.Add(addPlayer);
 
         Button printPlayerPrefs = new() { text = "printPlayerPrefs" };
@@ -86,6 +87,10 @@ public class DebugWindow : EditorWindow
         setDateAsYesterday.clicked += () => SetDateAsYesterday();
         rootVisualElement.Add(setDateAsYesterday);
 
+        Button setDateAs4HoursAgo = new() { text = "setDateAs4HoursAgo" };
+        setDateAs4HoursAgo.clicked += () => SetDateAs4HoursAgo();
+        rootVisualElement.Add(setDateAs4HoursAgo);
+
         Button setDateAsTomorrow = new() { text = "setDateAsTomorrow" };
         setDateAsTomorrow.clicked += () => SetDateAsTomorrow();
         rootVisualElement.Add(setDateAsTomorrow);
@@ -97,6 +102,10 @@ public class DebugWindow : EditorWindow
         Button resetAllProgress = new() { text = "resetAllProgress" };
         resetAllProgress.clicked += () => ResetAllProgress();
         rootVisualElement.Add(resetAllProgress);
+
+        Button reGenerateChallenges = new() { text = "reGenerateChallenges" };
+        reGenerateChallenges.clicked += () => ReGenerateChallenges();
+        rootVisualElement.Add(reGenerateChallenges);
 
         // simulate game win
         IntegerField diff = new IntegerField();
@@ -188,33 +197,56 @@ public class DebugWindow : EditorWindow
         Debug.Log(log);
 
         PowerupCardData.LogRarityStats();
+
+        log = "";
+        log += "holo: " + PowerupCardData.GetCardOwnedSum(-1) + "\n";
+        log += "standard: " + PowerupCardData.GetCardOwnedSum(-2) + "\n";
+        log += "bronze: " + PowerupCardData.GetCardOwnedSum(-3) + "\n";
+        log += "gold: " + PowerupCardData.GetCardOwnedSum(-4) + "\n";
+        log += "diamond: " + PowerupCardData.GetCardOwnedSum(-5) + "\n";
+        log += "celestial: " + PowerupCardData.GetCardOwnedSum(-6) + "\n";
+        log += "different: " + PowerupCardData.GetCardOwnedSum(-7) + "\n";
+        log += "any: " + PowerupCardData.GetCardOwnedSum(-8) + "\n";
+
+        Debug.Log(log);
     }
 
     private void SetDateAs0001()
     {
-        PlayerPrefs.SetString("LastChallengeDate", "0001-01-01");
+        PlayerPrefs.SetString("LastChallengeDate", "0001-01-01 00:00:00");
         PlayerPrefs.SetString("LastPlinkoRewardDate", "0001-01-01");
         PlayerPrefs.SetString("LastDailyWinDate", "0001-01-01");
         PlayerPrefs.SetString("LastPackBoosterDate", "0001-01-01");
+        PlayerPrefs.SetString("LastStreakDate", "0001-01-01");
+
     }
 
     private void SetDateAsYesterday()
     {
-        PlayerPrefs.SetString("LastChallengeDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
+        PlayerPrefs.SetString("LastChallengeDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd HH:mm:ss"));
         PlayerPrefs.SetString("LastPlinkoRewardDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
         PlayerPrefs.SetString("LastDailyWinDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
         PlayerPrefs.SetString("LastPackBoosterDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
+        PlayerPrefs.SetString("LastStreakDate", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"));
+        StreakManager.Instance.IncrementStreak();
+    }
+
+    private void SetDateAs4HoursAgo()
+    {
+        PlayerPrefs.SetString("LastChallengeDate", DateTime.Now.AddHours(-4).ToString("yyyy-MM-dd HH:mm:ss"));
         StreakManager.Instance.IncrementStreak();
     }
 
     private void SetDateAsTomorrow()
     {
-        var currentSavedDate = PlayerPrefs.GetString("LastChallengeDate", DateTime.Today.ToString("yyyy-MM-dd"));
+        var currentSavedDate = PlayerPrefs.GetString("LastChallengeDate", DateTime.Today.ToString("yyyy-MM-dd HH:mm:ss"));
         var tomorrow = DateTime.Parse(currentSavedDate).AddDays(1);
-        PlayerPrefs.SetString("LastChallengeDate", tomorrow.ToString("yyyy-MM-dd"));
+        PlayerPrefs.SetString("LastChallengeDate", tomorrow.ToString("yyyy-MM-dd HH:mm:ss"));
         PlayerPrefs.SetString("LastPlinkoRewardDate", tomorrow.ToString("yyyy-MM-dd"));
         PlayerPrefs.SetString("LastDailyWinDate", tomorrow.ToString("yyyy-MM-dd"));
         PlayerPrefs.SetString("LastPackBoosterDate", tomorrow.ToString("yyyy-MM-dd"));
+        PlayerPrefs.SetString("LastStreakDate", tomorrow.ToString("yyyy-MM-dd"));
+
     }
 
     private void SetDateAsNull()
@@ -223,6 +255,7 @@ public class DebugWindow : EditorWindow
         PlayerPrefs.DeleteKey("LastPlinkoRewardDate");
         PlayerPrefs.DeleteKey("LastDailyWinDate");
         PlayerPrefs.DeleteKey("LastPackBoosterDate");
+        PlayerPrefs.DeleteKey("LastStreakDate");
     }
 
     private void ResetAllProgress()
@@ -236,6 +269,9 @@ public class DebugWindow : EditorWindow
         PlayerPrefs.DeleteKey("onlineWin");
         PlayerPrefs.DeleteKey("onlineLoss");
         PlayerPrefs.DeleteKey("onlineTie");
+        PlayerPrefs.DeleteKey("localWin");
+        PlayerPrefs.DeleteKey("localLoss");
+        PlayerPrefs.DeleteKey("localTie");
         PlayerPrefs.DeleteKey("easyWin");
         PlayerPrefs.DeleteKey("easyLoss");
         PlayerPrefs.DeleteKey("easyTie");
@@ -243,14 +279,18 @@ public class DebugWindow : EditorWindow
         PlayerPrefs.DeleteKey("mediumLoss");
         PlayerPrefs.DeleteKey("mediumTie");
         PlayerPrefs.DeleteKey("hardWin");
+        PlayerPrefs.DeleteKey("hardLoss");
         PlayerPrefs.DeleteKey("hardTie");
         PlayerPrefs.DeleteKey("DailyChallenge1");
         PlayerPrefs.DeleteKey("DailyChallenge2");
         PlayerPrefs.DeleteKey("OngoingChallenge");
+        PlayerPrefs.DeleteKey("ChallengeRefreshesToday");
         PlayerPrefs.DeleteKey("Streak");
         PlayerPrefs.DeleteKey("PackBooster");
         PlayerPrefs.DeleteKey("StandardPacks");
         PlayerPrefs.DeleteKey("PlusPacks");
+        PlayerPrefs.DeleteKey("StandardPacksOpened");
+        PlayerPrefs.DeleteKey("PlusPacksOpened");
         PlayerPrefs.DeleteKey("WelcomeBonus");
         PlayerPrefs.DeleteKey("XP");
         PlayerPrefs.DeleteKey("CraftingCredits");
@@ -260,8 +300,18 @@ public class DebugWindow : EditorWindow
         PlayerPrefs.DeleteKey("ShowNewSkinAlert");
         PlayerPrefs.DeleteKey("PlinkoReward");
         PlayerPrefs.DeleteKey("Deck1");
+        PlayerPrefs.DeleteKey("Deck2");
+        PlayerPrefs.DeleteKey("Deck3");
+        PlayerPrefs.DeleteKey("Deck4");
+        PlayerPrefs.DeleteKey("Deck5");
+        PlayerPrefs.DeleteKey("LoadAll");
 
         SetDateAsNull();
+    }
+
+    private void ReGenerateChallenges()
+    {
+        ChallengeManager.Instance.ReGenerateDailyChallenges();
     }
 
     private void SimulateGameWin(int diff, int winBy)

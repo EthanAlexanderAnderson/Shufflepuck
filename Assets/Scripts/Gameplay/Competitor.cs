@@ -1,5 +1,6 @@
 // Object Oriented style object to be used by the logic scripts 
 
+using Unity.Collections;
 using UnityEngine;
 
 public class Competitor
@@ -13,6 +14,7 @@ public class Competitor
     public PuckScript activePuckScript;
     public Sprite puckSprite;
     public int puckSpriteID;
+    public FixedString32Bytes username;
     public int score;
     public int scoreBonus;
     public int wins;
@@ -27,8 +29,11 @@ public class Competitor
     // default constructor
     public Competitor() { return; }
 
-    // optional constructor
+    // puck ID constructor
     public Competitor(int puckID) { SetSprite(puckID); }
+
+    // puck ID and username constructor
+    public Competitor(int puckID, FixedString32Bytes username) { SetSprite(puckID); this.username = username; }
 
     public void SetSprite(int puckID)
     {

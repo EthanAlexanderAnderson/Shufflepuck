@@ -18,6 +18,7 @@ public class PowerupAnimationManager : MonoBehaviour
     private GameObject popupEffectIconOutlineObject;
     private GameObject popupEffectTextObject;
     private GameObject popupEffectRarityObject;
+    private GameObject popupEffectRankObject;
 
     Queue<(bool, int)> PowerupPopupEffectAnimationQueue = new();
 
@@ -58,13 +59,14 @@ public class PowerupAnimationManager : MonoBehaviour
     }
 
     // this is the large icon and text effect than shows when a card is played
+    // todo: transfer this method to PowerupPopupPrefabScript.Animate()
     public void PlayPowerupPopupEffectAnimation(bool isPlayer, int encodedCard, float speedMultiplier)
     {
         GameObject powerupPopupObject = Instantiate(powerupPopupPrefab, popupEffectParent.transform);
         PowerupPopupPrefabScript powerupPopupScript = powerupPopupObject.GetComponent<PowerupPopupPrefabScript>();
         var decodedCard = PowerupCardData.DecodeCard(encodedCard);
         powerupPopupScript.InitializePowerupPopup(decodedCard.cardIndex, decodedCard.rank, decodedCard.holo);
-        (popupEffectIconObject, popupEffectIconOutlineObject, popupEffectTextObject, popupEffectRarityObject) = powerupPopupScript.GetObjects();
+        (popupEffectIconObject, popupEffectIconOutlineObject, popupEffectTextObject, popupEffectRarityObject, popupEffectRankObject) = powerupPopupScript.GetObjects();
 
         PlayPowerupPopupEffectSoundeffects(isPlayer, decodedCard.holo, decodedCard.rank > 0);
 
@@ -82,12 +84,15 @@ public class PowerupAnimationManager : MonoBehaviour
         LeanTween.scale(popupEffectIconOutlineObject, new Vector3(1f, 1f, 1f), duration).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
         LeanTween.scale(popupEffectTextObject, new Vector3(1f, 1f, 1f), duration).setEase(LeanTweenType.easeOutElastic).setDelay(0.21f);
         LeanTween.scale(popupEffectRarityObject, new Vector3(1f, 1f, 1f), duration).setEase(LeanTweenType.easeOutElastic).setDelay(0.41f);
+        LeanTween.scale(popupEffectRankObject, new Vector3(1f, 1f, 1f), duration).setEase(LeanTweenType.easeOutElastic).setDelay(0.41f);
 
         LeanTween.moveLocalX(powerupPopupObject, 300f * side, duration * 1.6f).setEase(LeanTweenType.easeInCubic).setDelay(duration * 3);
         LeanTween.scale(popupEffectIconObject, new Vector3(0f, 0f, 0f), duration).setEase(LeanTweenType.easeInElastic).setDelay(duration * 3 + 0.01f);
         LeanTween.scale(popupEffectIconOutlineObject, new Vector3(0f, 0f, 0f), duration).setEase(LeanTweenType.easeInElastic).setDelay(duration * 3 + 0.01f);
         LeanTween.scale(popupEffectTextObject, new Vector3(0f, 0f, 0f), duration).setEase(LeanTweenType.easeInElastic).setDelay(duration * 3 + 0.21f);
-        LeanTween.scale(popupEffectRarityObject, new Vector3(0f, 0f, 0f), duration).setEase(LeanTweenType.easeInElastic).setDelay(duration * 3 + 0.41f).setOnComplete(FinishCurrentPowerupPopupEffectAnimationInQueue);
+        LeanTween.scale(popupEffectRarityObject, new Vector3(0f, 0f, 0f), duration).setEase(LeanTweenType.easeInElastic).setDelay(duration * 3 + 0.41f);
+        LeanTween.scale(popupEffectRankObject, new Vector3(0f, 0f, 0f), duration).setEase(LeanTweenType.easeInElastic).setDelay(duration * 3 + 0.41f).setOnComplete(FinishCurrentPowerupPopupEffectAnimationInQueue);
+
 
         Destroy(powerupPopupObject, 3.5f);
     }
@@ -105,16 +110,21 @@ public class PowerupAnimationManager : MonoBehaviour
         Sprite icon = PowerupManager.Instance.powerupIcons[index];
 
         GameObject floatingIcon = Instantiate(floatingIconPrefab, position, Quaternion.identity);
-        SpriteRenderer sr = floatingIcon.GetComponent<SpriteRenderer>();
+
+        Image[] images = floatingIcon.GetComponentsInChildren<Image>();
+        Image sr = images[0];
+        Image outline = images[1];
+
         sr.sprite = icon;
         sr.color = UIManagerScript.Instance.GetDarkMode() ? Color.white : Color.black;
-
+        outline.sprite = icon;
+        outline.color = UIManagerScript.Instance.GetDarkMode() ? Color.black : Color.white;
 
         floatingIcon.transform.localScale = new Vector3(0f, 0f, 0f);
 
         float duration = 0.5f;
 
-        LeanTween.scale(floatingIcon, new Vector3(0.75f, 0.75f, 0.75f), duration).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
+        LeanTween.scale(floatingIcon, new Vector3(0.02f, 0.02f, 0.02f), duration).setEase(LeanTweenType.easeOutElastic).setDelay(0.01f);
         LeanTween.scale(floatingIcon, new Vector3(0f, 0f, 0f), duration).setEase(LeanTweenType.easeInElastic).setDelay(duration * 3 + 0.01f).setDestroyOnComplete(true);
     }
 }

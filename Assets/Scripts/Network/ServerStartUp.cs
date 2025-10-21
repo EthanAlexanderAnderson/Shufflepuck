@@ -14,6 +14,7 @@ using UnityEngine;
 
 public class ServerStartUp : MonoBehaviour
 {
+    /* This script is unused since migrating to peer-to-peer online
     public static event System.Action ClientInstance;
 
     private const string InternalServerIP = "0.0.0.0";
@@ -160,4 +161,5 @@ public class ServerStartUp : MonoBehaviour
         return null;
     }
 #endif
+*/
 }

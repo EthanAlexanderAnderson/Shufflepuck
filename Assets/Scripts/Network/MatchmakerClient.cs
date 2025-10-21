@@ -24,6 +24,7 @@ using TMPro;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using Unity.Networking.Transport.Relay;
+using Unity.Collections;
 
 public class MatchmakerClient : MonoBehaviour
 { 
@@ -180,7 +181,7 @@ public class MatchmakerClient : MonoBehaviour
             // Subscribe to lobby events
             LobbyEventCallbacks callbacks = new LobbyEventCallbacks();
             callbacks.LobbyChanged += OnLobbyChanged;
-            ILobbyEvents lobbyEvents = await Lobbies.Instance.SubscribeToLobbyEventsAsync(lobby.Id, callbacks);
+            ILobbyEvents lobbyEvents = await LobbyService.Instance.SubscribeToLobbyEventsAsync(lobby.Id, callbacks);
 
             // Allocate Relay server
             Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxPlayers);
@@ -194,7 +195,7 @@ public class MatchmakerClient : MonoBehaviour
             await LobbyService.Instance.UpdateLobbyAsync(lobby.Id, new UpdateLobbyOptions { Data = data });
 
             // Set up UnityTransport to use Relay
-            RelayServerData relayServerData = new RelayServerData(allocation, "dtls");
+            RelayServerData relayServerData = AllocationUtils.ToRelayServerData(allocation, "dtls");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
             //if (NetworkManager.Singleton.IsClient) { NetworkManager.Singleton.Shutdown(); }
@@ -239,7 +240,7 @@ public class MatchmakerClient : MonoBehaviour
                 return;
             }
 
-            Lobby lobby = await Lobbies.Instance.JoinLobbyByCodeAsync(lobbyCode);
+            Lobby lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode);
 
             // Retrieve Relay join code from lobby data
             string relayJoinCode = lobby.Data["RelayJoinCode"].Value;
@@ -248,7 +249,7 @@ public class MatchmakerClient : MonoBehaviour
             Debug.Log("Relay Join Code: " + relayJoinCode);
 
             // Set up UnityTransport to use Relay
-            RelayServerData relayServerData = new RelayServerData(joinAllocation, "dtls");
+            RelayServerData relayServerData = AllocationUtils.ToRelayServerData(joinAllocation, "dtls");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
             if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsHost) { NetworkManager.Singleton.Shutdown(); }
@@ -359,7 +360,7 @@ public class MatchmakerClient : MonoBehaviour
         try
         {
             if (serverLogic == null) { serverLogic = ServerLogicScript.Instance; }
-            serverLogic.AddPlayerServerRpc(logic.player.puckSpriteID, true); // TODO: instead of true, pass in "true" if the deck is NOT empty
+            serverLogic.AddPlayerServerRpc(logic.player.puckSpriteID, new FixedString32Bytes(PlayerAuthentication.Instance.GetUsername()));
         }
         catch (Exception e)
         {

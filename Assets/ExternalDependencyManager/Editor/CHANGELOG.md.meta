@@ -1,11 +1,20 @@
 fileFormatVersion: 2
-guid: b699fc553a294dbcad96ff0365038f6a
+guid: 15066d50e81445ed9e318d0c2beede4e
 labels:
 - gvh
-- gvh_version-1.2.182
+- gvh_version-1.2.185
 - gvhp_exportpath-ExternalDependencyManager/Editor/CHANGELOG.md
+timeCreated: 1584567712
+licenseType: Store
 TextScriptImporter:
-  externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 301752
+  packageName: Essential Kit V3 - IAP, Leaderboards, Cloud Save, Notifications, Gallery
+    & More
+  packageVersion: 3.4.2
+  assetPath: Assets/ExternalDependencyManager/Editor/CHANGELOG.md
+  uploadId: 751299

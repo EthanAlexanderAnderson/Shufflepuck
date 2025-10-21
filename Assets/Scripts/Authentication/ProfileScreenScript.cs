@@ -15,10 +15,22 @@ public class ProfileScreenScript : MonoBehaviour
     [SerializeField] private TMP_Text usernameText;
     [SerializeField] GameObject authenticationButtonsParent;
     [SerializeField] GameObject saveButtonsParent;
+    [SerializeField] private TMP_Text authText;
 
     private void OnEnable()
     {
         UpdateAuthenticationUI();
+        // temporary replace PFP with selected puck Icon
+        profilepicture.sprite = LogicScript.Instance.player.puckSprite;
+
+        if (PlayerAuthentication.Instance.authProvider == 1)
+        {
+            authText.text = "Account linked with Google Play Games.";
+        }
+        else if (PlayerAuthentication.Instance.authProvider == 2)
+        {
+            authText.text = "Account linked with Apple Game Center.";
+        }
     }
 
     public void UpdateAuthenticationUI()
@@ -29,12 +41,12 @@ public class ProfileScreenScript : MonoBehaviour
             if (!string.IsNullOrEmpty(username))
             {
                 usernameText.text = username;
-                authenticationButtonsParent.SetActive(false);
+                //authenticationButtonsParent.SetActive(false);
                 //saveButtonsParent.SetActive(true);
             }
             else
             {
-                authenticationButtonsParent.SetActive(true);
+                //authenticationButtonsParent.SetActive(true);
             }
 
             // TODO: put ID somewhere
@@ -56,7 +68,8 @@ public class ProfileScreenScript : MonoBehaviour
     {
         UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
         yield return www.SendWebRequest();
-        if (www.isNetworkError || www.isHttpError)
+
+        if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
         {
             Debug.LogError(www.error);
         }
@@ -71,5 +84,9 @@ public class ProfileScreenScript : MonoBehaviour
     {
         Debug.Log(AuthenticationService.Instance.PlayerId);
         GUIUtility.systemCopyBuffer = AuthenticationService.Instance.PlayerId;
+        UIManagerScript.Instance.SetErrorMessage("Copied Player ID to clipboard.");
+
+        Debug.Log("unity player ID: " + AuthenticationService.Instance.PlayerId);
+        Debug.Log("native platform player ID: " + id);
     }
 }

@@ -68,11 +68,14 @@ public class UIManagerScript : MonoBehaviour
     // HUD
     [SerializeField] private Text turnText;
 
+    public TMP_Text playerUsernameText;
+    public TMP_Text opponentUsernameText;
+
     public Text playerPuckCountText;
     public Text opponentPuckCountText;
 
-    [SerializeField] private Text playerScoreText;
-    [SerializeField] private Text opponentScoreText;
+    [SerializeField] private TMP_Text playerScoreText;
+    [SerializeField] private TMP_Text opponentScoreText;
     [SerializeField] private Text playerScoreBonusText;
     [SerializeField] private Text opponentScoreBonusText;
 
@@ -120,6 +123,9 @@ public class UIManagerScript : MonoBehaviour
     [SerializeField] private Sprite tableLight;
     [SerializeField] private Sprite tableDark;
 
+    // settings menu misc
+    [SerializeField] private GameObject experimentalFeaturesToggle;
+
     public string TurnText
     {
         get => turnText.text;
@@ -149,7 +155,6 @@ public class UIManagerScript : MonoBehaviour
 
         puckScreen.SetActive(true);
         UpdateLocks();
-        PlayerPrefs.SetInt("ShowNewSkinAlert", 0);
         puckScreen.SetActive(false);
         plinkoScreen.SetActive(true);
         PlayerDataManager.Instance.PlinkoDataSwap();
@@ -164,6 +169,8 @@ public class UIManagerScript : MonoBehaviour
             ApplyDarkMode();
             darkModeToggle.GetComponent<Toggle>().isOn = true;
         }
+
+        experimentalFeaturesToggle.GetComponent<Toggle>().isOn = PlayerPrefs.GetInt("experimental") == 1;
     }
 
     float cooldownTime;
@@ -460,7 +467,7 @@ public class UIManagerScript : MonoBehaviour
     }
 
     // unlock the unlockables based on player highscores
-    public void UpdateLocks()
+    public void UpdateLocks(bool setAlert = false)
     {
         foreach (GameObject go in GameObject.FindGameObjectsWithTag("customLock"))
         {
@@ -469,8 +476,8 @@ public class UIManagerScript : MonoBehaviour
             var id = CUS.Unlock();
             if (id > 0)
             {
-                PuckSkinManager.Instance.UnlockPuckID(id);
-                PuckSkinManager.Instance.UnlockPuckID(id * -1);
+                PuckSkinManager.Instance.UnlockPuckID(id, setAlert);
+                PuckSkinManager.Instance.UnlockPuckID(id * -1, setAlert);
             }
         }
         puckAlert.SetActive(PlayerPrefs.GetInt("ShowNewSkinAlert", 0) == 1);
@@ -501,7 +508,7 @@ public class UIManagerScript : MonoBehaviour
     public void SetErrorMessage(string msg)
     {
         // modifiers here are for puck select screen
-        if (msg.Contains("Unlocked"))
+        if (msg.Contains("Unlocked") || msg.Contains("Rewarded"))
         {
             errorMessage.color = new Color(0.4862745f, 0.7725491f, 0.4627451f);
         }
@@ -525,7 +532,7 @@ public class UIManagerScript : MonoBehaviour
         newUI.SetActive(true);
         activeUI = newUI;
         SetErrorMessage("");
-        UpdateLocks(); // for non-puck locks (difficulty locks)
+        UpdateLocks(true); // for non-puck locks (difficulty locks)
         if (newUI == gameHud)
         {
             ResetHUD();
@@ -534,7 +541,7 @@ public class UIManagerScript : MonoBehaviour
         {
             // blink puck screen for unlocks
             puckScreen.SetActive(true);
-            UpdateLocks();
+            UpdateLocks(true);
             puckScreen.SetActive(false);
             playerWins = 0;
             opponentWins = 0;
@@ -577,6 +584,7 @@ public class UIManagerScript : MonoBehaviour
         }
         ChangeUI(previousActiveUI);
     }
+
     // reset in-game HUD
     public void ResetHUD()
     {
@@ -590,6 +598,27 @@ public class UIManagerScript : MonoBehaviour
         opponentWinsObject.SetActive(playerWins > 0 || opponentWins > 0);
         ExitConfirmation.SetActive(false);
         RestartConfirmation.SetActive(false);
+
+        // set HUD username text
+        string username = PlayerAuthentication.Instance.GetUsername();
+        if (!string.IsNullOrEmpty(username))
+        {
+            playerUsernameText.text = username;
+        }
+        else
+        {
+            playerUsernameText.text = "you";
+        }
+
+        if (LogicScript.Instance.gameIsRunning && !LogicScript.Instance.IsLocal)
+        {
+            string[] diffStrings = { "easy", "medium", "hard" };
+            opponentUsernameText.text = diffStrings[LogicScript.Instance.GetDifficulty()] + " CPU";
+        }
+        else if (ClientLogicScript.Instance.isRunning || LogicScript.Instance.IsLocal)
+        {
+            opponentUsernameText.text = "opponent";
+        }
     }
 
     public void ResetWaitingScreen(string waitingTextInput)
@@ -658,20 +687,20 @@ public class UIManagerScript : MonoBehaviour
         // hacky way of enabling darkmode for disabled objects (run this with parameter onenable)
         if (parentObject == null) { parentObject = activeUI; }
 
-        if (activeUI == gameHud)
+        if (parentObject == gameHud)
         {
             table.GetComponent<SpriteRenderer>().sprite = darkMode ? tableDark : tableLight;
         }
-        else if (activeUI.tag == "mainMenu")
+        else if (parentObject.tag == "mainMenu")
         {
             titleScreenBackground.GetComponent<Image>().sprite = darkMode ? titleScreenBackgroundDark : titleScreenBackgroundLight;
-            activeUI.GetComponent<Image>().sprite = darkMode ? titleScreenDark : titleScreenLight;
+            parentObject.GetComponent<Image>().sprite = darkMode ? titleScreenDark : titleScreenLight;
         }
         // force dark mode for pack open because it looks better with particle effects (lame i know)
-        else if (activeUI == packOpenScreen)
+        else if (parentObject == packOpenScreen)
         {
             titleScreenBackground.GetComponent<Image>().sprite = titleScreenBackgroundDark;
-            activeUI.GetComponent<Image>().sprite = titleScreenDark;
+            parentObject.GetComponent<Image>().sprite = titleScreenDark;
         }
         // swap text color to white for all children TMP objects with the blackText tag
         foreach (TMP_Text text in parentObject.GetComponentsInChildren<TMP_Text>())
@@ -709,6 +738,12 @@ public class UIManagerScript : MonoBehaviour
         }
     }
 
+    // helper for experimental mode button in settings menu
+    public void ToggleExperimentalFeatures(bool enabled)
+    {
+        PlayerPrefs.SetInt("experimental", enabled ? 1 : 0);
+    }
+
     // helper for debug mode button
     public int debugMode = 0;
     public void DebugMode()
@@ -738,8 +773,9 @@ public class UIManagerScript : MonoBehaviour
             }
             PlayerPrefs.SetInt("debug", 1);
             Debug.Log("Started up logging.");
+            debugMode = 0;
         }
-        else if (debugMode == 5 || debugMode == 15)
+        else if (debugMode == 5)
         {
             ScreenLog.Instance.gameObject.SetActive(false);
             PlayerPrefs.SetInt("debug", 0);

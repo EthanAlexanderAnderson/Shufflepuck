@@ -1,10 +1,18 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class DeckScreenScript : MonoBehaviour
 {
     [SerializeField] GameObject deckMenuScrollView;
     [SerializeField] GameObject cardUIPrefab;
+
+    [SerializeField] GameObject[] deckProfileButtons;
+
+    [SerializeField] Sprite toggleOnSprite;
+    [SerializeField] Sprite toggleOffSprite;
+
+    [SerializeField] float y;
 
     private void OnEnable()
     {
@@ -76,9 +84,17 @@ public class DeckScreenScript : MonoBehaviour
             }
         }
 
-            // no idea why the y pos here is that magic number, it works tho
-            deckMenuScrollView.transform.localPosition = new Vector3(0, -4100, 0);
+        deckMenuScrollView.transform.localPosition = new Vector3(0, y, 0);
         DeckManager.Instance.UpdateTotalDeckCountUI();
+
+        // set active deck profile button
+        for (int i = 0; i < deckProfileButtons.Length; i++)
+        {
+            deckProfileButtons[i].GetComponent<Image>().sprite = toggleOffSprite;
+        }
+
+        deckProfileButtons[PlayerPrefs.GetInt("ActiveDeckProfile") - 1].GetComponent<Image>().sprite = toggleOnSprite;
+
         UIManagerScript.Instance.ApplyDarkMode();
     }
 
@@ -98,5 +114,10 @@ public class DeckScreenScript : MonoBehaviour
         {
             deckbuilderCardUI.UpdateCraftUI();
         }
+    }
+
+    public void SwitchActiveDeckProfile(int profileID)
+    {
+        DeckManager.Instance.SwitchActiveDeckProfile(profileID);
     }
 }

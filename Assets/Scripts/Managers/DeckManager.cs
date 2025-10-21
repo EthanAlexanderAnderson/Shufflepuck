@@ -10,6 +10,7 @@ public class DeckManager : MonoBehaviour
 
     [SerializeField] private TMP_Text deckCount; // total number of cards in deck
     private List<int> deck = new(); // Deck in encoded decklist format (NOT playdeck format)
+    private int activeDeckProfile;
     public List<int> GetDecklist() { return deck; }
 
     [SerializeField] private GameObject cardPreviewImage;
@@ -27,7 +28,7 @@ public class DeckManager : MonoBehaviour
     private void Start()
     {
         // Load deck from file
-        int activeDeckProfile = PlayerPrefs.GetInt("ActiveDeckProfile", 1);
+        activeDeckProfile = PlayerPrefs.GetInt("ActiveDeckProfile", 1);
         string deckKey = "Deck" + activeDeckProfile.ToString();
 
         // Get the decklist
@@ -47,6 +48,41 @@ public class DeckManager : MonoBehaviour
                 deck.Add(encodedCard);
             }
         }
+    }
+
+    public void SwitchActiveDeckProfile(int profileID)
+    {
+        if (profileID < 0 || profileID > 5) return;
+
+        // Save the previous decklist to file
+        SaveDeckToFile();
+
+        // Reset the deck
+        deck = new();
+
+        // Set deck profile
+        activeDeckProfile = profileID;
+        PlayerPrefs.SetInt("ActiveDeckProfile", activeDeckProfile);
+        string deckKey = "Deck" + activeDeckProfile.ToString();
+
+        // Get the decklist
+        string deckString = PlayerPrefs.GetString(deckKey, "");
+
+        // iterate through decklist
+        string[] cardEncoded = deckString.Split(',');
+
+        // add each card in the decklist to the deck
+        for (int i = 0; i < cardEncoded.Length; i++)
+        {
+            if (int.TryParse(cardEncoded[i], out int encodedCard))
+            {
+                deck.Add(encodedCard);
+            }
+        }
+
+        // blink menu to trigger onenable stuff to load deck from file
+        deckMenu.SetActive(false);
+        deckMenu.SetActive(true);
     }
 
     // Set the count of a specific card in the deck
@@ -94,8 +130,8 @@ public class DeckManager : MonoBehaviour
         return 0;
     }
 
-    // Update the UI to show how many cards are currently in the deck
-    public void UpdateTotalDeckCountUI()
+    // Get count of how many cards are in the deck
+    public int GetDeckCount()
     {
         var sum = 0;
         for (int i = 0; i < deck.Count; i++)
@@ -103,7 +139,18 @@ public class DeckManager : MonoBehaviour
             var decodedCard = PowerupCardData.DecodeCard(deck[i]);
             sum += decodedCard.quantity;
         }
-        deckCount.text = sum.ToString();
+        return sum;
+    }
+
+    public void SetTotalDeckCountUITextObject(TMP_Text textObject)
+    {
+        deckCount = textObject;
+    }
+
+    // Update the UI to show how many cards are currently in the deck
+    public void UpdateTotalDeckCountUI()
+    {
+        deckCount.text = GetDeckCount().ToString();
     }
 
     public List<int> GetPlayDeck()
@@ -132,15 +179,25 @@ public class DeckManager : MonoBehaviour
     // Export the decklist to the clipboard
     public void ExportDeckList()
     {
+        int[] cardIndexes = new int[PowerupCardData.GetCardCount()];
+
         // Convert the decklist to string
         var stringDeckList = "";
         foreach (var encodedCard in deck)
         {
             var decodedCard = PowerupCardData.DecodeCard(encodedCard);
             int cardIndex = decodedCard.cardIndex;
-            if (cardIndex >= 0)
+            if (cardIndex >= 0 && cardIndex < PowerupCardData.GetCardCount())
             {
-                stringDeckList += PowerupCardData.GetCardName(cardIndex) + ": " + decodedCard.quantity + "\n";
+                cardIndexes[cardIndex] += decodedCard.quantity;
+            }
+        }
+
+        for (int i = 0; i < cardIndexes.Length; i++)
+        {
+            if (cardIndexes[i] > 0)
+            {
+                stringDeckList += PowerupCardData.GetCardName(i) + ": " + cardIndexes[i] + "\n";
             }
         }
 
@@ -194,7 +251,7 @@ public class DeckManager : MonoBehaviour
                 if (int.TryParse(split[1].Trim(), out count))
                 {
                     // if we are importing more than we own or above maxCount, don't lol
-                    int owned = PowerupCardData.GetCardOwnedSum(cardIndex);
+                    int owned = PowerupCardData.GetCardOwnedSum(cardIndex + 5);
                     int maxCount = 5 - PowerupCardData.GetCardRarity(cardIndex);
                     if (count > owned || count > maxCount)
                     {

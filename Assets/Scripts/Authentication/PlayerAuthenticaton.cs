@@ -1,14 +1,14 @@
 using UnityEngine;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
-using GooglePlayGames;
-using GooglePlayGames.BasicApi;
 using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
-#if UNITY_IOS
-using System.Runtime.InteropServices;
-// note for me later: it might be possible to use apple gamekit plugin here as long it's building on unity cloud build servers?
-#endif
+using TMPro;
+using UnityEngine.UI;
+using VoxelBusters.CoreLibrary;
+using VoxelBusters.EssentialKit;
+using System;
+using UnityEngine.Networking;
 
 public class PlayerAuthentication : MonoBehaviour
 {
@@ -18,22 +18,35 @@ public class PlayerAuthentication : MonoBehaviour
     private string id;
     private string imgURL;
 
+    public int authProvider; // 0 = none, 1 = GPG, 2 = AGC
+
+    [SerializeField] private TMP_Text loadingText;
+    [SerializeField] private TMP_Text progressText;
+    [SerializeField] private GameObject titleScreen;
+    [SerializeField] private GameObject titleScreenBackground;
+    [SerializeField] private Sprite titleScreenDark;
+    [SerializeField] private Sprite titleScreenBackgroundDark;
+
     public (string username, string id, string imgURL) GetProfile()
     {
         return (username, id, imgURL);
     }
 
-#if UNITY_IOS
-    [DllImport("__Internal")] private static extern void AuthenticateGameCenterPlayer();
-    [DllImport("__Internal")] private static extern string GetGameCenterPlayerID();
-    [DllImport("__Internal")] private static extern string GetGameCenterTeamID();
-    [DllImport("__Internal")] private static extern string GetGameCenterPublicKeyURL();
-    [DllImport("__Internal")] private static extern string GetGameCenterSalt();
-    [DllImport("__Internal")] private static extern ulong GetGameCenterTimestamp();
-    [DllImport("__Internal")] private static extern string GetGameCenterSignature();
-    [DllImport("__Internal")] private static extern string GetGameCenterDisplayName();
+    public string GetUsername()
+    {
+        // Ensure the string fits in FixedString32Bytes (max 32 characters) for online RPC
+        if (string.IsNullOrEmpty(username))
+        {
+            return "You";
+        }
+        if (username.Length > 32)
+        {
+            Debug.LogWarning("Username too long. Truncating.");
+            username = username.Substring(0, 32);
+        }
 
-#endif
+        return username;
+    }
 
     private async void Awake()
     {
@@ -46,216 +59,295 @@ public class PlayerAuthentication : MonoBehaviour
         }
 
         DontDestroyOnLoad(gameObject);
-#if UNITY_ANDROID
-        PlayGamesPlatform.Activate();
-#endif
-        await UnityServices.InitializeAsync();
 
-        if (AuthenticationService.Instance.IsSignedIn)
+        LoadingSceneDarkMode();
+
+        SetLoadingText("checking connection...");
+        if (!await HasInternetConnection())
         {
-            Debug.Log("Player is already signed in.");
+            Debug.LogWarning("No internet connection.");
+            SetLoadingText("loading game...");
+            SceneManager.LoadScene("SampleScene");
             return;
         }
 
-#if UNITY_ANDROID
-        AuthenticateWithGooglePlayGames();
-#elif UNITY_IOS
-        SignInWithAppleGameCenterAsync();
-#else
-        SignInAnonymously();
-#endif
-    }
+        SetLoadingText("starting online services...");
+        await InitializeUnityServices();
 
-    // ---------- SIGN-IN FLOW ----------
-
-#if UNITY_ANDROID
-    private void AuthenticateWithGooglePlayGames()
-    {
-        try
+        if (GameServices.IsAvailable())
         {
-            PlayGamesPlatform.Instance.Authenticate(success =>
-            {
-                if (success == SignInStatus.Success)
-                {
-                    PlayGamesPlatform.Instance.RequestServerSideAccess(true, code =>
-                    {
-                        CompleteGooglePlaySignInAsync(code);
-                    });
-                }
-                else
-                {
-                    Debug.LogWarning("Google Play sign-in failed.");
-                    SignInAnonymously();
-                }
-            });
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogWarning($"Google Play - unexpected exception: {e.Message}");
-            SignInAnonymously();
-        }
-    }
-
-    private async void CompleteGooglePlaySignInAsync(string authCode)
-    {
-        try
-        {
-            await AuthenticationService.Instance.SignInWithGooglePlayGamesAsync(authCode);
-            Debug.Log("Signed in with Google Play Games!");
-
-            // These are checked for null values in ProfileScreenScript before they are used.
-            username = PlayGamesPlatform.Instance.GetUserDisplayName();
-            id = PlayGamesPlatform.Instance.GetUserId();
-            imgURL = PlayGamesPlatform.Instance.GetUserImageUrl();
-
-            await HandlePostSignInAsync();
-        }
-        catch (AuthenticationException e)
-        {
-            Debug.LogWarning($"Google Play sign-in failed: {e.Message}");
-        }
-    }
-#endif
-
-#if UNITY_IOS
-    private async void SignInWithAppleGameCenterAsync()
-    {
-        try
-        {
-            AuthenticateGameCenterPlayer();
-
-            string playerId = GetGameCenterPlayerID();
-            id = playerId;
-            string teamId = GetGameCenterTeamID();
-            string publicKeyUrl = GetGameCenterPublicKeyURL();
-            string salt = GetGameCenterSalt();
-            ulong timestamp = GetGameCenterTimestamp();
-            string signature = GetGameCenterSignature();
-
-            if (string.IsNullOrEmpty(playerId) || string.IsNullOrEmpty(signature))
-            {
-                Debug.LogWarning("Failed to retrieve Game Center credentials.");
-                SignInAnonymously();
-                return;
-            }
-
-            await AuthenticationService.Instance.SignInWithAppleGameCenterAsync(
-                signature, teamId, publicKeyUrl, salt, timestamp, new SignInOptions { CreateAccount = true });
-
-            try
-            {
-                username = GetGameCenterDisplayName();
-            }
-            catch (System.Exception)
-            {
-                Debug.Log("Couldn't get display name.");
-            }
-
-            Debug.Log("Successfully signed in with Apple Game Center!");
-
-            await HandlePostSignInAsync();
-        }
-        catch (AuthenticationException e)
-        {
-            Debug.LogWarning($"Apple Game Center sign-in failed: {e.Message}");
-            SignInAnonymously();
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogWarning($"Apple Game Center - unexpected exception: {e.Message}");
-            SignInAnonymously();
-        }
-    }
-#endif
-
-            private async void SignInAnonymously()
-    {
-        try
-        {
-            await AuthenticationService.Instance.SignInAnonymouslyAsync();
-            Debug.Log($"Signed In Anon as {AuthenticationService.Instance.PlayerId}");
-            SceneManager.LoadScene("SampleScene");
-        }
-        catch (AuthenticationException e)
-        {
-            Debug.LogError($"Guest sign-in failed: {e.Message}");
-        }
-    }
-
-    // ---------- ACCOUNT LINKING UI METHODS ----------
-
-#if UNITY_ANDROID
-    public void LinkGooglePlayGames()
-    {
-        PlayGamesPlatform.Instance.Authenticate(success =>
-        {
-            if (success == SignInStatus.Success)
-            {
-                PlayGamesPlatform.Instance.RequestServerSideAccess(true, code =>
-                {
-                    LinkWithGooglePlay(code);
-                });
-            }
-        });
-    }
-#endif
-
-    private async void LinkWithGooglePlay(string authCode)
-    {
-        try
-        {
-            await AuthenticationService.Instance.LinkWithGooglePlayGamesAsync(authCode);
-            Debug.Log("Google Play Games linked successfully!");
-            await PlayerDataManager.Instance.SaveAllData();
-        }
-        catch (AuthenticationException e)
-        {
-            Debug.LogError($"Failed to link Google Play: {e.Message}");
-        }
-    }
-
-#if UNITY_IOS
-    public async void LinkWithAppleGameCenter()
-    {
-        try
-        {
-            AuthenticateGameCenterPlayer();
-
-            string playerId = GetGameCenterPlayerID();
-            string teamId = GetGameCenterTeamID();
-            string publicKeyUrl = GetGameCenterPublicKeyURL();
-            string salt = GetGameCenterSalt();
-            ulong timestamp = GetGameCenterTimestamp();
-            string signature = GetGameCenterSignature();
-
-            if (string.IsNullOrEmpty(playerId) || string.IsNullOrEmpty(signature))
-            {
-                Debug.LogWarning("Failed to retrieve Game Center credentials for linking.");
-                return;
-            }
-
-            await AuthenticationService.Instance.LinkWithAppleGameCenterAsync(
-                signature, teamId, publicKeyUrl, salt, timestamp, new LinkOptions { ForceLink = true });
-
-            Debug.Log("Successfully linked Apple Game Center to guest account!");
-            await PlayerDataManager.Instance.SaveAllData();
-        }
-        catch (AuthenticationException e)
-        {
-            Debug.LogWarning($"Failed to link Apple Game Center: {e.Message}");
-        }
-    }
-#endif
-
-    private async Task HandlePostSignInAsync()
-    {
-        if (AuthenticationService.Instance.IsSignedIn)
-        {
-            await PlayerDataManager.Instance.SyncWithCloudIfNeeded();
+            GameServices.Authenticate();
         }
         else
         {
-            Debug.LogError("SaveAll/LoadAll Error: Not Signed In.");
+            Debug.LogError("GameServices is not available");
+            await SignInAnonymously();
+            SetLoadingText("loading game...");
+            SceneManager.LoadScene("SampleScene");
+        }
+    }
+
+    private void OnEnable()
+    {
+        // register for events
+        GameServices.OnAuthStatusChange += OnAuthStatusChange;
+    }
+
+    private void OnDisable()
+    {
+        // unregister from events
+        GameServices.OnAuthStatusChange -= OnAuthStatusChange;
+    }
+
+    private async void OnAuthStatusChange(GameServicesAuthStatusChangeResult result, Error error)
+    {
+        if (error != null || result.AuthStatus != LocalPlayerAuthStatus.Authenticated)
+        {
+            Debug.LogError("Failed to authenticate with Game Services");
+            await SignInAnonymously();
+            SetLoadingText("loading game...");
+            SceneManager.LoadScene("SampleScene");
+            return;
+        }
+
+        username = result.LocalPlayer.DisplayName;
+        Debug.Log("Username: " + username);
+        id = result.LocalPlayer.Identifier;
+        Debug.Log("Identifier: " + id);
+
+        // Link / Sign in
+        try
+        {
+            if (AuthenticationService.Instance.IsSignedIn)
+            {
+                // Already signed in anonymously: now link
+                if (Application.platform == RuntimePlatform.Android)
+                {
+                    Debug.Log("Linking with GooglePlayGames...");
+                    SetLoadingText("linking with GooglePlayGames...");
+                    string androidServerAuthCode = await GetGooglePlayGamesServerAuthCodeAsync();
+                    await AuthenticationService.Instance.LinkWithGooglePlayGamesAsync(androidServerAuthCode);
+                    Debug.Log($"Linked with GooglePlayGames as {AuthenticationService.Instance.PlayerId}");
+                    authProvider = 1;
+                }
+                else if (Application.platform == RuntimePlatform.IPhonePlayer)
+                {
+                    Debug.Log("Linking with AppleGameCenter...");
+                    SetLoadingText("linking with AppleGameCenter...");
+                    var (appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp) = await GetAppleCredentialsAsync(result.LocalPlayer.DeveloperScopeIdentifier);
+                    await AuthenticationService.Instance.LinkWithAppleGameCenterAsync(appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp);
+                    Debug.Log($"Linked with AppleGameCenter as {AuthenticationService.Instance.PlayerId}");
+                    authProvider = 2;
+                }
+            }
+            else
+            {
+                // Not signed in yet: sign in directly
+                if (Application.platform == RuntimePlatform.Android)
+                {
+                    Debug.Log("Signing In with GooglePlayGames...");
+                    SetLoadingText("signing in with GooglePlayGames...");
+                    string androidServerAuthCode = await GetGooglePlayGamesServerAuthCodeAsync();
+                    await AuthenticationService.Instance.SignInWithGooglePlayGamesAsync(androidServerAuthCode);
+                    Debug.Log($"Signed In with GooglePlayGames as {AuthenticationService.Instance.PlayerId}");
+                    authProvider = 1;
+                }
+                else if (Application.platform == RuntimePlatform.IPhonePlayer)
+                {
+                    Debug.Log("Signing In with AppleGameCenter...");
+                    SetLoadingText("signing in with AppleGameCenter...");
+                    var (appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp) = await GetAppleCredentialsAsync(result.LocalPlayer.DeveloperScopeIdentifier);
+                    await AuthenticationService.Instance.SignInWithAppleGameCenterAsync(appleSignature, appleTeamPlayerId, applePublicKeyURL, appleSalt, appleTimestamp);
+                    Debug.Log($"Signed In with AppleGameCenter as {AuthenticationService.Instance.PlayerId}");
+                    authProvider = 2;
+                }
+            }
+
+            // Now sync cloud data
+            if (AuthenticationService.Instance.IsSignedIn)
+            {
+                SetLoadingText("syncing with cloud...");
+                await PlayerDataManager.Instance.SyncWithCloudIfNeeded();
+            }
+        }
+        catch (AuthenticationException ex)
+        {
+            Debug.LogError("Auth error: " + ex.Message);
+        }
+        catch (RequestFailedException ex)
+        {
+            Debug.LogError("Request failed: " + ex.Message);
+        }
+
+        // if native login fails, try anon login
+        if (!AuthenticationService.Instance.IsSignedIn)
+        {
+            await SignInAnonymously();
+        }
+        SetLoadingText("loading game...");
+        SceneManager.LoadScene("SampleScene");
+    }
+
+
+    async Task InitializeUnityServices()
+    {
+        try
+        {
+            if (UnityServices.State != ServicesInitializationState.Initialized)
+            {
+                await UnityServices.InitializeAsync();
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Failed to initialize Unity Services: {e.Message}");
+        }
+    }
+
+    private Task<string> GetGooglePlayGamesServerAuthCodeAsync()
+    {
+        var tcs = new TaskCompletionSource<string>();
+
+        GameServices.LoadServerCredentials((result, error) =>
+        {
+            if (error == null && result?.ServerCredentials?.AndroidProperties != null)
+            {
+                string code = result.ServerCredentials.AndroidProperties.ServerAuthCode;
+                Debug.Log("ServerAuthCode: " + code);
+                tcs.SetResult(code);
+            }
+            else
+            {
+                tcs.SetException(new Exception("Failed to get ServerAuthCode"));
+            }
+        });
+
+        return tcs.Task;
+    }
+
+    private Task<(string signature, string playerId, string publicKeyUrl, string salt, ulong timestamp)> GetAppleCredentialsAsync(string appleTeamPlayerId)
+    {
+        var tcs = new TaskCompletionSource<(string signature, string playerId, string publicKeyUrl, string salt, ulong timestamp)>();
+
+        GameServices.LoadServerCredentials((result, error) =>
+        {
+            if (error == null && result?.ServerCredentials?.IosProperties != null)
+            {
+                var props = result.ServerCredentials.IosProperties;
+
+                Debug.Log("Signature: " + Convert.ToBase64String(props.Signature));
+                Debug.Log("Team Player Id: " + appleTeamPlayerId);
+                Debug.Log("Public Key Url: " + props.PublicKeyUrl);
+                Debug.Log("Salt: " + Convert.ToBase64String(props.Salt));
+                Debug.Log("Timestamp: " + (ulong)props.Timestamp);
+
+                tcs.SetResult((
+                    signature: Convert.ToBase64String(props.Signature),
+                    playerId: appleTeamPlayerId,
+                    publicKeyUrl: props.PublicKeyUrl,
+                    salt: Convert.ToBase64String(props.Salt),
+                    timestamp: (ulong)props.Timestamp
+                ));
+            }
+            else
+            {
+                tcs.SetException(new Exception("Failed to get Apple Game Center credentials."));
+            }
+        });
+
+        return tcs.Task;
+    }
+
+    private async Task SignInAnonymously()
+    {
+        SetLoadingText("signing in...");
+
+        try
+        {
+            if (AuthenticationService.Instance.IsSignedIn)
+            {
+                Debug.Log("Player is already signed in.");
+            }
+            else
+            {
+                await AuthenticationService.Instance.SignInAnonymouslyAsync();
+                Debug.Log($"Signed In Anon as {AuthenticationService.Instance.PlayerId}");
+            }
+
+            if (AuthenticationService.Instance.IsSignedIn)
+            {
+                SetLoadingText("syncing with cloud...");
+
+                await PlayerDataManager.Instance.SyncWithCloudIfNeeded();
+            }
+            else
+            {
+                Debug.LogError("Sync Error: Couldn't Sign In.");
+            }
+        }
+        catch (AuthenticationException ex)
+        {
+            Debug.LogError("Authentication failed: " + ex.Message);
+        }
+        catch (RequestFailedException ex)
+        {
+            Debug.LogError("Request failed: " + ex.Message);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"An unexpected error occurred during sign in: {e.Message}");
+        }
+    }
+
+    private void LoadingSceneDarkMode()
+    {
+        try
+        {
+            int darkMode = PlayerPrefs.GetInt("darkMode", 0);
+            if (darkMode == 1)
+            {
+                if (titleScreen != null && titleScreenDark != null)
+                {
+                    titleScreen.GetComponent<Image>().sprite = titleScreenDark;
+                }
+                if (titleScreenBackground != null && titleScreenBackgroundDark != null)
+                {
+                    titleScreenBackground.GetComponent<Image>().sprite = titleScreenBackgroundDark;
+                }
+                if (loadingText != null)
+                {
+                    loadingText.color = Color.white;
+                }
+            }
+        }
+        catch (System.Exception)
+        {
+            Debug.Log("Failed to set dark mode on LoadingScene");
+        }
+    }
+
+    public void SetLoadingText(string text)
+    {
+        if (loadingText == null) return;
+        loadingText.text = text;
+    }
+
+    public void SetProgressText(string text)
+    {
+        if (progressText == null) return;
+        progressText.text = text;
+    }
+
+    public async Task<bool> HasInternetConnection()
+    {
+        using (UnityWebRequest request = UnityWebRequest.Head("https://www.google.com/generate_204"))
+        {
+            request.timeout = 3; // short timeout to avoid delay
+
+            await request.SendWebRequest();
+
+            return !request.result.Equals(UnityWebRequest.Result.ConnectionError) &&
+                   !request.result.Equals(UnityWebRequest.Result.ProtocolError);
         }
     }
 }

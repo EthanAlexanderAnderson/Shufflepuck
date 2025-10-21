@@ -8,6 +8,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -32,13 +33,11 @@ public class ServerLogicScript : NetworkBehaviour
 
     private int randomlySelectedStartingPlayerIndex = -1;
 
-    private bool player1powerupsenabled = false;
-    private bool player2powerupsenabled = false;
-
     private bool sentGameResult = false;
 
     // variables for triplePowerup
     private int triplePowerup = 0;
+    private int triplePowerupMax = 0;
     private int triplePowerupUserCompetitorIndex = -1;
     private float lastShotAngle;
     private float lastShotPower;
@@ -58,6 +57,8 @@ public class ServerLogicScript : NetworkBehaviour
         shotTimer = 42;
     }
 
+    bool tripleSpawned = false;
+
     private void Update()
     {
         if (!IsServer) return;
@@ -71,20 +72,28 @@ public class ServerLogicScript : NetworkBehaviour
         }
 
         // do triple powerup
-        if (triplePowerup > 0)
+        int isNonActiveCompetitorBit = triplePowerupUserCompetitorIndex == activeCompetitorIndex ? 0 : 1;
+        if (triplePowerup > 0 && competitorList[activeCompetitorIndex ^ isNonActiveCompetitorBit].activePuckScript != null && competitorList[activeCompetitorIndex ^ isNonActiveCompetitorBit].activePuckObject.transform.position.y > -1 && !tripleSpawned)
         {
-            var allPucks = GameObject.FindGameObjectsWithTag("puck");
-            foreach (var puck in allPucks)
-            {
-                // If any pucks are not safe, return
-                if (!puck.GetComponent<PuckScript>().IsSafe())
-                {
-                    return;
-                }
-            }
-            CreatePuck(triplePowerupUserCompetitorIndex == activeCompetitorIndex ? 0 : 1);
-            Shoot(lastShotAngle + Random.Range(-10.0f, 10.0f), lastShotPower + Random.Range(-10.0f, 10.0f), 50, triplePowerupUserCompetitorIndex == activeCompetitorIndex ? 0 : 1);
+            GameObject previousActivePuckObject = competitorList[activeCompetitorIndex ^ isNonActiveCompetitorBit].activePuckObject;
+            previousActivePuckObject.GetComponent<PuckScript>().RemoveAllPowerupText("triple");
+            CreatePuck(isNonActiveCompetitorBit);
+            competitorList[activeCompetitorIndex ^ isNonActiveCompetitorBit].activePuckScript.CopyPuckStaticEffectsHelperClientRpc(previousActivePuckObject.GetComponent<NetworkObject>());
+            tripleSpawned = true;
+        }
+        // do triple powerup
+        if (triplePowerup > 0 && competitorList[activeCompetitorIndex ^ isNonActiveCompetitorBit].activePuckScript != null && competitorList[activeCompetitorIndex ^ isNonActiveCompetitorBit].activePuckObject.transform.localScale.x == competitorList[activeCompetitorIndex ^ isNonActiveCompetitorBit].activePuckScript.GetBaseLocalScale() && tripleSpawned)
+        {
+            float nextTripleShotPower = lastShotPower - (((triplePowerupMax - triplePowerup) / 2) + 1) * 12;
+            float nextTripleShotAngle = lastShotAngle - (8 - triplePowerup % 2 * 16);
+            float nextTripleShotSpin = lastShotSpin;
+            Shoot(nextTripleShotAngle, nextTripleShotPower, nextTripleShotSpin, triplePowerupUserCompetitorIndex == activeCompetitorIndex ? 0 : 1);
             triplePowerup--;
+            if (triplePowerup == 0)
+            {
+                triplePowerupMax = 0;
+            }
+            tripleSpawned = false;
         }
 
         // If both players have 0 pucks (aka game is over)
@@ -124,7 +133,7 @@ public class ServerLogicScript : NetworkBehaviour
     // When 1 competitor is ready, setup their variables and update the ready text
     // When both are ready, start the game
     [ServerRpc(RequireOwnership = false)]
-    public void AddPlayerServerRpc(int puckID, bool powerupsEnabled, ServerRpcParams serverRpcParams = default)
+    public void AddPlayerServerRpc(int puckID, FixedString32Bytes username, ServerRpcParams serverRpcParams = default)
     {
         if (!IsServer) return;
         try
@@ -140,7 +149,7 @@ public class ServerLogicScript : NetworkBehaviour
 
             clients.Add(clientId);
 
-            Competitor newCompetitor = new(puckID);
+            Competitor newCompetitor = new(puckID, username);
             newCompetitor.clientID = clientId;
             newCompetitor.puckCount = 5;
             newCompetitor.score = 0;
@@ -155,9 +164,6 @@ public class ServerLogicScript : NetworkBehaviour
                     TargetClientIds = new ulong[] { clientId }
                 }
             });
-
-            if (powerupsEnabled && player1powerupsenabled) { player2powerupsenabled = true; }
-            if (powerupsEnabled) { player1powerupsenabled = true; }
 
             // acknowledge the client has been added
             clientLogic.AddPlayerACKClientRPC(clientRpcParamsList[clients.Count - 1]);
@@ -217,11 +223,11 @@ public class ServerLogicScript : NetworkBehaviour
                 $"Client ID : {clients[activeCompetitorIndex]}\n");
 
             // tell both players to restart the game and who is going first
-            clientLogic.RestartGameOnlineClientRpc(competitorList[0].puckSpriteID, competitorList[1].puckSpriteID, player1powerupsenabled && player2powerupsenabled);
+            clientLogic.RestartGameOnlineClientRpc(competitorList[0].puckSpriteID, competitorList[0].username, competitorList[1].puckSpriteID, competitorList[1].username);
             clientLogic.StartTurnClientRpc(true, true, clientRpcParamsList[activeCompetitorIndex]);
             clientLogic.StartTurnClientRpc(false, true, clientRpcParamsList[activeCompetitorIndex ^ 1]);
             // reset the shot timer and set the game as running for server logic
-            shotTimer = (player1powerupsenabled && player2powerupsenabled) ? 42 : 30;
+            shotTimer = 42;
             gameIsRunning = true;
         }
         catch (System.Exception e)
@@ -334,7 +340,7 @@ public class ServerLogicScript : NetworkBehaviour
                 clientLogic.StartTurnClientRpc(true, activeCompetitorIndex == startingPlayerIndex, clientRpcParamsList[activeCompetitorIndex]);
                 clientLogic.StartTurnClientRpc(false, activeCompetitorIndex == startingPlayerIndex, clientRpcParamsList[activeCompetitorIndex ^ 1]);
                 // reset shot clock
-                shotTimer = (player1powerupsenabled && player2powerupsenabled) ? 42 : 30;
+                shotTimer = 42;
             }
         }
         catch (System.Exception e)
@@ -398,8 +404,6 @@ public class ServerLogicScript : NetworkBehaviour
         activeCompetitorIndex = 0;
         startingPlayerIndex = 0;
         gameIsRunning = false;
-        player1powerupsenabled = false;
-        player2powerupsenabled = false;
     }
 
     public void Rematch()
@@ -441,6 +445,61 @@ public class ServerLogicScript : NetworkBehaviour
                 puckScript.InitPuckClientRpc(i == activeCompetitorIndex, puckSpriteID, clientRpcParamsList[i]);
             }
             puckScript.InitBlockPuckClientRpc();
+
+            Debug.Log(
+                $"Puck has been spawned. \n" +
+                $"Owned by Client Index #{activeCompetitorIndex} \n" +
+                $"Client ID : {clients[activeCompetitorIndex]} \n" +
+                $"Puck Skin ID: {competitor.puckSpriteID} \n");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError(e);
+            clientLogic.SetErrorMessageClientRpc(4);
+        }
+    }
+
+    // Spawn Powerup
+    [ServerRpc(RequireOwnership = false)]
+    public void SpawnServerRpc()
+    {
+        if (!IsServer) return;
+        try
+        {
+            Competitor competitor = competitorList[activeCompetitorIndex];
+            int puckSpriteID = competitor.puckSpriteID;
+
+            Vector3 spawnPosition = Vector3.zero;
+            bool tooClose = true;
+            int failSafe = 0;
+            while (tooClose && failSafe < 1000)
+            {
+                spawnPosition = new Vector3(Random.Range(-10f, 10), Random.Range(1f, 15f), -1.0f);
+                tooClose = false;
+                failSafe++;
+
+                // don't place the puck overlapping with another puck
+                var pucks = GameObject.FindGameObjectsWithTag("puck");
+                foreach (var puck in pucks)
+                {
+                    if (Vector2.Distance(spawnPosition, puck.transform.position) < 2)
+                    {
+                        tooClose = true;
+                        continue;
+                    }
+                }
+            }
+
+            GameObject puckObject = Instantiate(puck, spawnPosition, Quaternion.identity);
+            puckObject.GetComponent<NetworkObject>().Spawn();
+
+            PuckScript puckScript = puckObject.GetComponent<PuckScript>();
+
+            // tell the active competitor this new puck is theirs, tell non-active competitors it's not theirs
+            for (int i = 0; i < competitorList.Count; i++)
+            {
+                puckScript.InitPuckClientRpc(i == activeCompetitorIndex, puckSpriteID, clientRpcParamsList[i]);
+            }
 
             Debug.Log(
                 $"Puck has been spawned. \n" +
@@ -513,7 +572,7 @@ public class ServerLogicScript : NetworkBehaviour
 
                 if (spawnCount == 2)
                 {
-                    puckScript.EnableHydraClientRpc();
+                    puckScript.ActivateHydraClientRpc();
                 }
 
                 Debug.Log(
@@ -549,6 +608,7 @@ public class ServerLogicScript : NetworkBehaviour
         int competitorIndex = clients.IndexOf(clientId);
         triplePowerupUserCompetitorIndex = competitorIndex;
         triplePowerup += 2;
+        triplePowerupMax += 2;
     }
 
     [ServerRpc(RequireOwnership = false)]

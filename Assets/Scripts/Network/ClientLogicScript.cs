@@ -4,6 +4,7 @@
 */
 
 using System;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -25,8 +26,10 @@ public class ClientLogicScript : NetworkBehaviour
 
     private bool receivedGameResult = false;
 
-    private bool powerupsAreEnabled;
     [SerializeField] private GameObject powerupsMenu;
+
+    [SerializeField] private GameObject exitConfirmationMenu;
+    [SerializeField] private GameObject restartConfirmationMenu;
 
     // bar and line
     private BarScript bar;
@@ -37,6 +40,8 @@ public class ClientLogicScript : NetworkBehaviour
     public float power;
     public float spin;
     public GameObject puckHalo;
+    private int weakenCount;
+    [ClientRpc] public void IncrementWeakenClientRpc() { if (!logic.player.isShooting) { weakenCount++; } }
 
     // wall
     private int wallCount = 3;
@@ -87,40 +92,45 @@ public class ClientLogicScript : NetworkBehaviour
             ServerLogicScript.Instance.CleanupDeadPucksServerRpc();
             activeBar = bar.ChangeBar("angle", logic.player.goingFirst);
             line.isActive = true;
+            bar.SetWeakenBarCover(weakenCount);
             arrow.SetActive(true);
             GameHUDManager.Instance.ChangeTurnText("Your Turn");
             serverLogic.CreatePuckServerRpc();
             logic.player.isTurn = false;
             logic.player.isShooting = true;
-            shotTimer = powerupsAreEnabled ? 30 : 18;
-            if (powerupsAreEnabled) { powerupManager.ShuffleDeck(); }
-            powerupsMenu.SetActive(powerupsAreEnabled);
+            shotTimer = 30;
+            powerupManager.ShuffleDeck();
+            powerupsMenu.SetActive(true);
         }
 
         if (logic.player.isShooting && Input.GetMouseButtonDown(0) && powerupsMenu.activeInHierarchy == false)
         {
             // make sure click is on the bottom half of the screen
-            if (logic.ClickNotOnPuck())
+            if (logic.ClickNotOnPuck() && !exitConfirmationMenu.activeInHierarchy && !restartConfirmationMenu.activeInHierarchy)
             {
                 switch (activeBar)
                 {
                     case "angle":
                         angle = line.GetValue();
                         activeBar = bar.ChangeBar("power", logic.player.goingFirst);
+                        SoundManagerScript.Instance.PlayClickSFXAlterPitch(1, 1f);
                         break;
                     case "power":
                         power = line.GetValue();
                         activeBar = bar.ChangeBar("spin");
+                        SoundManagerScript.Instance.PlayClickSFXAlterPitch(1, 1.05f);
                         break;
                     case "spin":
                         spin = line.GetValue();
-                        serverLogic.ShootServerRpc(angle, power, spin);
+                        serverLogic.ShootServerRpc(angle, Math.Min(power, 100 - weakenCount * 10), spin);
                         activeBar = bar.ChangeBar("none");
                         GameHUDManager.Instance.ChangeTurnText("Opponent's Turn");
                         UI.shotClockText.text = ""; // clear shot clock
                         line.isActive = false;
+                        weakenCount = 0;
                         arrow.SetActive(false);
                         logic.player.isShooting = false;
+                        SoundManagerScript.Instance.PlayClickSFXAlterPitch(1, 1.1f);
                         break;
                 }
             }
@@ -147,6 +157,7 @@ public class ClientLogicScript : NetworkBehaviour
             GameHUDManager.Instance.ChangeTurnText("Opponent's Turn");
             UI.shotClockText.text = ""; // clear shot clock
             line.isActive = false;
+            weakenCount = 0;
             arrow.SetActive(false);
             logic.player.isShooting = false;
             powerupsMenu.SetActive(false);
@@ -224,26 +235,26 @@ public class ClientLogicScript : NetworkBehaviour
         receivedGameResult = true;
         FogScript.Instance.DisableFog();
         LaserScript.Instance.DisableLaser();
+        puckManager.ResetAlphaOnAllPucks();
     }
 
     // Server tells the client to switch to game scene and start the game.
     // Inputs the two puck skins used by the competitors.
     [ClientRpc]
-    public void RestartGameOnlineClientRpc(int puckSpriteID_0, int puckSpriteID_1, bool powerupsEnabled = false)
+    public void RestartGameOnlineClientRpc(int puckSpriteID_0, FixedString32Bytes username_0, int puckSpriteID_1, FixedString32Bytes username_1)
     {
         if (!IsClient) return;
 
         UI.ChangeUI(UI.gameHud);
 
         UI.SetReButtons(false);
-        if (powerupsAreEnabled) { powerupManager.LoadDeck(); }
+        powerupManager.LoadDeck();
 
         isRunning = true;
         wallCount = 3;
         WallScript.Instance.WallEnabled(true);
         UI.UpdateWallText(wallCount);
         receivedGameResult = false;
-        powerupsAreEnabled = powerupsEnabled;
         logic.player.puckCount = 5;
         logic.player.scoreBonus = 0;
         logic.opponent.puckCount = 5;
@@ -261,16 +272,20 @@ public class ClientLogicScript : NetworkBehaviour
             var swapAlt = puckSpriteID_0 == puckSpriteID_1 ? -1 : 1;
             UI.SetOpponentPuckIcon(puckSkinManager.ColorIDtoPuckSprite(puckSpriteID_1 * swapAlt), Math.Abs(puckSpriteID_1) == 40);
             logic.player.puckSpriteID = puckSpriteID_0;
+            if (!string.IsNullOrEmpty(username_1.ToString()) && username_1.ToString() != "You") UIManagerScript.Instance.opponentUsernameText.text = username_1.ToString();
         }
         else
         {
             var swapAlt = puckSpriteID_0 == puckSpriteID_1 ? -1 : 1;
             UI.SetOpponentPuckIcon(puckSkinManager.ColorIDtoPuckSprite(puckSpriteID_0 * swapAlt), Math.Abs(puckSpriteID_0) == 40);
             logic.player.puckSpriteID = puckSpriteID_1;
+            if (!string.IsNullOrEmpty(username_0.ToString()) && username_0.ToString() != "You") UIManagerScript.Instance.opponentUsernameText.text = username_0.ToString();
         }
 
         puckHalo.SetActive(false);
         bar.ToggleDim(false);
+        weakenCount = 0;
+        bar.SetWeakenBarCover(weakenCount);
         UI.onlineRematchButton.SetActive(false);
         GameHUDManager.Instance.ChangeTurnText("Opponent's Turn");
         line.GetComponent<LineScript>().FullSpeed();
