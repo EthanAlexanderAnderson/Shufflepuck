@@ -29,10 +29,6 @@ using Unity.Collections;
 public class MatchmakerClient : MonoBehaviour
 { 
     private string ticketId;
-    private LogicScript logic;
-    private UIManagerScript UI;
-    private ServerLogicScript serverLogic;
-    private ClientLogicScript clientLogic;
 
     // Getter
     private string PlayerID()
@@ -46,14 +42,6 @@ public class MatchmakerClient : MonoBehaviour
         ServerStartUp.ClientInstance += SignIn;
     }
     */
-
-    private void Start()
-    {
-        logic = LogicScript.Instance;
-        UI = UIManagerScript.Instance;
-        serverLogic = ServerLogicScript.Instance;
-        clientLogic = ClientLogicScript.Instance;
-    }
 
     /*
     private void OnDisable()
@@ -103,8 +91,8 @@ public class MatchmakerClient : MonoBehaviour
         catch (MatchmakerServiceException e)
         {
             Debug.LogError(e);
-            UI.SetErrorMessage("Failed to connect to server. Please try again.");
-            UI.FailedToFindMatch();
+            UIManagerScript.Instance.SetErrorMessage("Failed to connect to server. Please try again.");
+            UIManagerScript.Instance.FailedToFindMatch();
         }
     }
 
@@ -134,16 +122,16 @@ public class MatchmakerClient : MonoBehaviour
                 case StatusOptions.Failed:
                     gotAssignement = true;
                     Debug.Log($"Failed to get ticket status. Error: {multiplayAssignment.Message}");
-                    UI.SetErrorMessage("Connection error. Please try again.");
+                    UIManagerScript.Instance.SetErrorMessage("Connection error. Please try again.");
                     await MatchmakerService.Instance.DeleteTicketAsync(ticketId);
                     break;
                 case StatusOptions.Timeout:
                     gotAssignement = true;
                     Debug.Log($"Failed to get ticket status. Timed out");
-                    if (UI.waitingGif.activeInHierarchy)
+                    if (UIManagerScript.Instance.waitingGif.activeInHierarchy)
                     {
-                        UI.SetErrorMessage("Connection timed out. Please try again.");
-                        UI.FailedToFindMatch();
+                        UIManagerScript.Instance.SetErrorMessage("Connection timed out. Please try again.");
+                        UIManagerScript.Instance.FailedToFindMatch();
                     }
                     await MatchmakerService.Instance.DeleteTicketAsync(ticketId);
                     break;
@@ -157,7 +145,7 @@ public class MatchmakerClient : MonoBehaviour
         Debug.Log($"Ticket assigned: {assignment.Ip}:{assignment.Port}");
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(assignment.Ip, (ushort)assignment.Port);
         NetworkManager.Singleton.StartClient();
-        UI.EnableReadyButton();
+        UIManagerScript.Instance.EnableReadyButton();
     }
 
     // this will be for host / join private lobby
@@ -167,13 +155,13 @@ public class MatchmakerClient : MonoBehaviour
 
     // Called by Online -> Host button
     // creates lobby with Unity Lobby service
-    public async void CreateLobby()
+    public async void CreateLobby(bool isPrivate)
     {
         try
         {
-            string lobbyName = "MyLobby";
+            string lobbyName = isPrivate ? "PrivateLobby" : "PublicLobby";
             int maxPlayers = 2;
-            CreateLobbyOptions options = new CreateLobbyOptions { IsPrivate = true };
+            CreateLobbyOptions options = new CreateLobbyOptions { IsPrivate = isPrivate };
 
             // Create the Lobby
             Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
@@ -184,7 +172,7 @@ public class MatchmakerClient : MonoBehaviour
             ILobbyEvents lobbyEvents = await LobbyService.Instance.SubscribeToLobbyEventsAsync(lobby.Id, callbacks);
 
             // Allocate Relay server
-            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxPlayers);
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxPlayers - 1);
             string relayJoinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
 
             // Pass Relay join code to lobby data
@@ -203,14 +191,21 @@ public class MatchmakerClient : MonoBehaviour
             hostLobby = lobby;
             isHost = true;
 
-            Debug.Log("Created Lobby. Code: " + lobby.LobbyCode);
-            UI.lobbyCodeText.text = "Lobby Code: " + lobby.LobbyCode;
-            GUIUtility.systemCopyBuffer = lobby.LobbyCode;
+            if (isPrivate)
+            {
+                Debug.Log("Created Private Lobby. Code: " + lobby.LobbyCode);
+                UIManagerScript.Instance.lobbyCodeText.text = "Lobby Code: " + lobby.LobbyCode;
+                GUIUtility.systemCopyBuffer = lobby.LobbyCode;
+            }
+            else
+            {
+                Debug.Log("Created Public Lobby.");
+            }
         }
         catch (Exception e)
         {
             Debug.LogError(e);
-            UI.SetErrorMessage("Failed to create Lobby with Relay.");
+            UIManagerScript.Instance.SetErrorMessage("Failed to create Lobby with Relay.");
         }
     }
 
@@ -228,19 +223,43 @@ public class MatchmakerClient : MonoBehaviour
     }
 
     // Called by Online -> Join -> Join button (after code is entered)
-    public async void JoinLobby()
+    public void JoinPrivateLobbyWithCode()
+    {
+        JoinLobby(true, lobbyCode:lobbyCodeInputField.text);
+    }
+
+    private async void JoinLobby(bool isPrivate, string lobbyId = "", string lobbyCode = "")
     {
         try
         {
-            string lobbyCode = lobbyCodeInputField.text;
-            if (lobbyCode.Length != 6)
+            if (isPrivate && lobbyCode.Length != 6)
             {
                 Debug.LogError("Invalid lobby code.");
-                UI.SetErrorMessage("Invalid lobby code.");
+                UIManagerScript.Instance.SetErrorMessage("Invalid lobby code.");
+                return;
+            }
+            else if (!isPrivate && lobbyId == "")
+            {
+                Debug.LogError("Invalid lobby ID.");
+                UIManagerScript.Instance.SetErrorMessage("Invalid lobby ID.");
                 return;
             }
 
-            Lobby lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode);
+            Lobby lobby = null;
+            if (isPrivate && lobbyCode.Length == 6)
+            {
+                lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode);
+            }
+            else if (!isPrivate && !string.IsNullOrEmpty(lobbyId))
+            {
+                lobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId);
+            }
+            else
+            {
+                Debug.LogError("Invalid lobby code or ID.");
+                UIManagerScript.Instance.SetErrorMessage("Invalid lobby code or ID.");
+                return;
+            }
 
             // Retrieve Relay join code from lobby data
             string relayJoinCode = lobby.Data["RelayJoinCode"].Value;
@@ -265,7 +284,7 @@ public class MatchmakerClient : MonoBehaviour
             if (NetworkManager.Singleton.IsConnectedClient || NetworkManager.Singleton.IsHost)
             {
                 Debug.LogError("Failed to shutdown previous NetworkManager before joining new lobby.");
-                UI.SetErrorMessage("Failed to join Lobby with Relay.");
+                UIManagerScript.Instance.SetErrorMessage("Failed to join Lobby with Relay.");
                 return;
             }
 
@@ -274,19 +293,27 @@ public class MatchmakerClient : MonoBehaviour
             hostLobby = lobby;
             isHost = false;
 
-            Debug.Log("Joined Lobby. Code: " + lobbyCode);
-            UI.lobbyCodeText.text = "Lobby Code: " + lobbyCode;
-            tryToEnableReadyButton = true;
+            if (isPrivate)
+            {
+                Debug.Log("Joined Private Lobby. Code: " + lobbyCode);
+                UIManagerScript.Instance.lobbyCodeText.text = "Lobby Code: " + lobbyCode;
+                UIManagerScript.Instance.EnableReadyButton();
+            }
+            else
+            {
+                Debug.Log("Joined Public Lobby. ID: " + lobbyId);
+                UIManagerScript.Instance.EnableReadyButton();
+            }
         }
         catch (LobbyServiceException)
         {
             Debug.LogError("LobbyServiceException: Failed to join Lobby (Invalid Join Code or Lobby is full)");
-            UI.SetErrorMessage("Failed to join Lobby (Invalid Join Code or Lobby is full).");
+            UIManagerScript.Instance.SetErrorMessage("Failed to join Lobby (Invalid Join Code or Lobby is full).");
         }
         catch (Exception e)
         {
             Debug.LogError(e);
-            UI.SetErrorMessage("Failed to join Lobby with Relay.");
+            UIManagerScript.Instance.SetErrorMessage("Failed to join Lobby with Relay.");
         }
     }
 
@@ -300,22 +327,53 @@ public class MatchmakerClient : MonoBehaviour
             Debug.Log("JOINER ID: " + changes.PlayerJoined.Value[0].Player.Id);
             // CreateATicket(hostLobby.Id); for multiplay
             // for relay
-            UI.EnableReadyButton();
+            UIManagerScript.Instance.EnableReadyButton();
         }
     }
 
-    bool tryToEnableReadyButton;
+    // Public Matchmaking
+    public async void PublicMatchmaking()
+    {
+        // Query for public, open lobbies
+        var query = new QueryLobbiesOptions
+        {
+            Count = 1,
+            Filters = new List<QueryFilter>
+            {
+            new QueryFilter(
+                field: QueryFilter.FieldOptions.AvailableSlots,
+                op: QueryFilter.OpOptions.GT,
+                value: "0"),
+            new QueryFilter(
+                field: QueryFilter.FieldOptions.IsLocked,
+                op: QueryFilter.OpOptions.EQ,
+                value: "false")
+            },
+            Order = new List<QueryOrder>
+            {
+            new QueryOrder(
+                asc: true,
+                field: QueryOrder.FieldOptions.Created)
+            }
+        };
+
+        QueryResponse response = await LobbyService.Instance.QueryLobbiesAsync(query);
+
+        // Handle query response
+
+        if (response.Results.Count > 0) // public lobby was found -> join it
+        {
+            Lobby foundLobby = response.Results[0];
+            JoinLobby(false, lobbyId: foundLobby.Id);
+            return;
+        }
+
+        CreateLobby(false); // public lobby wasn't found -> open one
+    }
+
     private void Update()
     {
         Heartbeat();
-        if (tryToEnableReadyButton)
-        {
-            if (!isHost && NetworkManager.Singleton.IsConnectedClient)
-            {
-                UI.EnableReadyButton();
-                tryToEnableReadyButton = false;
-            }
-        }
     }
 
     // Keep lobby open while waiting for joiner
@@ -359,13 +417,12 @@ public class MatchmakerClient : MonoBehaviour
     {
         try
         {
-            if (serverLogic == null) { serverLogic = ServerLogicScript.Instance; }
-            serverLogic.AddPlayerServerRpc(logic.player.puckSpriteID, new FixedString32Bytes(PlayerAuthentication.Instance.GetUsername()));
+            ServerLogicScript.Instance.AddPlayerServerRpc(LogicScript.Instance.player.puckSpriteID, new FixedString32Bytes(PlayerAuthentication.Instance.GetUsername()));
         }
         catch (Exception e)
         {
             Debug.LogError(e);
-            UI.SetErrorMessage("Server Error: -1 - Contact developer.");
+            UIManagerScript.Instance.SetErrorMessage("Server Error: -1 - Contact developer.");
         }
     }
 
@@ -399,7 +456,7 @@ public class MatchmakerClient : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogError(e);
-            UI.SetErrorMessage("Server Error: -3 - Contact developer.");
+            UIManagerScript.Instance.SetErrorMessage("Server Error: -3 - Contact developer.");
         }
     }
 }

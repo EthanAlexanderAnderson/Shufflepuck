@@ -626,6 +626,8 @@ public class UIManagerScript : MonoBehaviour
         waitingText.text = waitingTextInput;
         lobbyCodeText.text = "";
         waitingGif.SetActive(true);
+        readyButton.SetActive(false);
+        waitingBackButton.SetActive(true);
     }
 
     public void SetReButtons(bool boolean)
