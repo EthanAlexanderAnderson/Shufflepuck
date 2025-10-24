@@ -93,7 +93,7 @@ public class DeckScreenScript : MonoBehaviour
             deckProfileButtons[i].GetComponent<Image>().sprite = toggleOffSprite;
         }
 
-        deckProfileButtons[PlayerPrefs.GetInt("ActiveDeckProfile") - 1].GetComponent<Image>().sprite = toggleOnSprite;
+        deckProfileButtons[PlayerPrefs.GetInt("ActiveDeckProfile", 1) - 1].GetComponent<Image>().sprite = toggleOnSprite;
 
         UIManagerScript.Instance.ApplyDarkMode();
     }
