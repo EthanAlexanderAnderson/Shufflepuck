@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
 {
-    
     [SerializeField] private GameObject anchorPoint;
 
     [SerializeField] private float scanDistance = 30f; // Max raycast distance
@@ -13,20 +12,23 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
     int valueModifier = 0;
     float bestAngle = 0f;
     float powerModifier = 0;
+    bool bestPathRequireExplosionPowerup = false;
 
     // for gizmos
     private bool drawGizmos = true;
     private List<Vector3> hitPoints = new();
     private List<Vector3> gizRayOrigin = new();
     private List<Vector3> gizDirection = new();
+    private List<int> bestPathIndices = new(); // Indexes of best path rays
 
-    public (float, float, float) GetPath() => (((180f - bestAngle) - 60f) * 1.66666f, System.Math.Min(95f + powerModifier, 102.5f), 50f); // convert angel to line-readable format
+    public (float, float, float) GetPath() => (bestAngle, System.Math.Min(95f + powerModifier, 102.5f), 50f);
     public bool DoesPathRequirePhasePowerup() => false;
-    public bool DoesPathRequireExplosionPowerup() => false; // TODO: requires explosion IF theres no pucks in front and there are 3+ pucks behind
+    public bool DoesPathRequireExplosionPowerup() => bestPathRequireExplosionPowerup;
 
     public float CalculateValue(int modifiedDifficulty)
     {
         if (WallIsActive()) { return 0; }
+        if (LogicScript.Instance.opponent.puckCount >= 1 && LogicScript.Instance.player.puckCount <= 0 && LogicScript.Instance.opponent.GetScore() - LogicScript.Instance.player.GetScore() >= 1) { return 0; } // if cpu is winning and player has no pucks left, don't contact shot
         if (modifiedDifficulty < 0) { modifiedDifficulty = 0; }
 
         highestValue = 0;
@@ -34,10 +36,11 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
         bestAngle = 0;
         powerModifier = 0;
 
-        // these 3 lists are just for gizmos
+        // these lists are just for gizmos
         gizRayOrigin.Clear();
         gizDirection.Clear();
         hitPoints.Clear();
+        bestPathIndices.Clear();
 
         GameObject[] allPucks = GameObject.FindGameObjectsWithTag("puck");
 
@@ -47,7 +50,10 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
 
             PuckScript puckScript = puck.GetComponent<PuckScript>();
             if (puckScript == null) continue;
-            if (!puckScript.IsPlayersPuck() || puckScript.IsLocked()) continue;
+            if (!puckScript.IsPlayersPuck() || puckScript.HasLock()) continue;
+            // chance CPU sees ghost (increase with diff)
+            int seeGhostChance = Random.Range(0, Mathf.Max(2, 7 - modifiedDifficulty));
+            if (seeGhostChance != 0 && puckScript.HasGhost()) { continue; }
 
             int puckValue = puckScript.ComputeTotalFutureValue();
 
@@ -58,16 +64,27 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
                 bool isVisible;
                 float tempPowerModifier;
                 int tempValueModifier;
-                (isVisible, tempPowerModifier, tempValueModifier) = CheckPuckVisibility(puck);
+                bool needsExplosion;
+                (isVisible, tempPowerModifier, tempValueModifier, needsExplosion) = CheckPuckVisibility(puck);
                 if (isVisible)
                 {
-                    float angle = GetAngleToAnchor(puckPosition);puck.GetComponent<PuckScript>();
+                    float angle = GetAngleToAnchor(puckPosition);
                     if ((puckValue + tempValueModifier) > (highestValue + valueModifier))
                     {
                         highestValue = puckValue;
                         valueModifier = tempValueModifier;
                         bestAngle = angle;
                         powerModifier = tempPowerModifier;
+                        bestPathRequireExplosionPowerup = needsExplosion;
+
+                        // track which path is selected as best so we can highlight it in blue with gizmos
+                        bestPathIndices.Clear();
+                        int raysPerPuck = 4;
+                        int puckIndex = gizRayOrigin.Count / raysPerPuck - 1;
+                        for (int j = 0; j < raysPerPuck; j++)
+                        {
+                            bestPathIndices.Add(puckIndex * raysPerPuck + j);
+                        }
                     }
                 }
             }
@@ -79,21 +96,26 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
         // make sure we have good values
         if (highestValue <= 0 || (highestValue + valueModifier) <= 0) { return 0; } // this is just here so we don't Debug.Log for 0 value paths
         if (bestAngle < 60 || bestAngle > 120) { Debug.LogError("SMART SCAN ERROR: BAD ANGLE " + bestAngle); return 0; }
+        // convert angle to line-readable format
+        bestAngle = ((180f - bestAngle) - 60f) * 1.66666f;
+        // double check that bestAngle value is good
+        if (bestAngle < 0 || bestAngle > 100) { Debug.LogError("SMART SCAN ERROR: BAD ANGLE " + bestAngle); return 0; }
 
         // nerf based on modifiedDifficulty. (lower modifiedDifficulty = greater nerf). also additional nerf for earlier shots.
-        int diffNerf = Mathf.Max(0, (int)Mathf.Pow(2f, 4 - modifiedDifficulty) + (LogicScript.Instance.opponent.puckCount - 3));
+        int diffNerf = Mathf.Max(0, (int)Mathf.Pow(2f, 5 - modifiedDifficulty) + (LogicScript.Instance.opponent.puckCount - 3));
 
         // return best puck, highest value times two because hitting out the opponent's puck + CPU ending up there is net value of double
         Debug.Log($"Smart Scan Value: {highestValue + valueModifier - diffNerf}: ({highestValue} + {valueModifier} - {diffNerf}) at Angle: {bestAngle}");
         return highestValue + valueModifier - diffNerf;
     }
 
-    private (bool isVisible, float tempPowerModifier, int tempValueModifier) CheckPuckVisibility(GameObject puck)
+    private (bool isVisible, float tempPowerModifier, int tempValueModifier, bool needsExplosion) CheckPuckVisibility(GameObject puck)
     {
         PuckScript targetPuckScript = puck.GetComponent<PuckScript>();
         // CPU puck should end up vaguely where the hitout puck was (unless the target puck will explode the shot puck), so start the shot value with that
-        int tempValueModifier = !targetPuckScript.IsExplosion() ? targetPuckScript.GetZoneMultiplier() : 0;
-        float tempPowerModifier = 0;
+        int tempValueModifier = !targetPuckScript.HasExplosion() ? targetPuckScript.GetZoneMultiplier() : 0;
+        float tempPowerModifier = (targetPuckScript.GetHeavyCount() * 2.5f) + (targetPuckScript.GetTetherCount() * 2.5f);
+        bool needsExplosion = false;
 
         Vector3[] offsets = { new(-1f, 0, 0), new(1f, 0, 0) }; // 1 for puck width
         List<Vector3> directions = new();
@@ -119,14 +141,22 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
             gizDirection.Add(directions[i]);
         }
 
+        int pucksInFront = 0;
+        int pucksBehind = 0;
         // evaluate all our hits (collisions of raycast on pucks)
-        for (int i = 0; i < directions.Count; i++)
+        for (int j = 0; j < directions.Count; j++)
         {
+            // this is so scuffed but I think it means we evaluate the 2 in-front raycasts first. important for explosion usage
+            int i = j;
+            if (j == 1) i = 2;
+            else if (j == 2) i = 1;
+
             foreach (var hit in Physics2D.RaycastAll(rayOrigins[i], directions[i], scanDistance, puckLayer))
             {
-                // Ignore non-puck collisions, self-hit, and CPU's active puck
+                // Ignore non-puck collisions, self-hit, CPU's active puck, and player's ghost pucks
                 if (!hit.collider.CompareTag("puck") || hit.collider.gameObject == puck ||
-                    hit.collider.gameObject == LogicScript.Instance.opponent.activePuckObject)
+                    hit.collider.gameObject == LogicScript.Instance.opponent.activePuckObject ||
+                    (hit.collider.GetComponent<PuckScript>().IsPlayersPuck() && hit.collider.GetComponent<PuckScript>().HasGhost()))
                     continue;
 
                 hitPoints.Add(hit.point);
@@ -134,16 +164,18 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
                 // for forward facing raycasts (in front of target puck)
                 if (i % 2 == 0)
                 {
+                    pucksInFront++;
                     var puckScript = hit.collider.GetComponent<PuckScript>();
                     // if there is a lock or explosion in front, the path is blocked
-                    if (puckScript.IsLocked() || puckScript.IsExplosion())
+                    if (puckScript.HasLock() || puckScript.HasExplosion())
                     {
-                        return (false, 0, 0); // Puck is blocking
+                        return (false, 0, 0, false); // Puck is blocking
                     }
                     // if there is a players puck in front, add more power to the shot
                     else if (puckScript.IsPlayersPuck())
                     {
                         tempPowerModifier += 2.5f;
+                        tempPowerModifier += (puckScript.GetHeavyCount() * 2.5f) + (puckScript.GetTetherCount() * 2.5f);
                         tempValueModifier += puckScript.ComputeTotalFutureValue() - 1; // minus 1 here, so we slightly favor aiming towards the front puck
                     }
                     // if there is a CPU puck in front, make the path slightly less valuable
@@ -158,13 +190,25 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
                 // TODO: ignore pucks behind if the target puck has explosion
                 if (i % 2 == 1)
                 {
+                    pucksBehind++;
+
                     var puckScript = hit.collider.GetComponent<PuckScript>();
-                    if (puckScript.GetZoneMultiplier() <= 0) continue; // Ignore pucks in the offzone
-                    if (!puckScript.IsLocked()) // locked puck behind prevents knockout
+                    if (puckScript.GetZoneMultiplier() <= 0 && hit.point.y > 9) continue; // Ignore pucks in the offzone
+
+                    // if target puck is front and CPU Has Explosion in hand, ignore all pucks behind and mark this targetPuck as needing explosion
+                    if (pucksInFront == 0 && CPUBehaviorScript.HasExplosion())
+                    {
+                        tempValueModifier = 0;
+                        needsExplosion = true;
+                        break;
+                    }
+
+                    if (!puckScript.HasLock()) // locked puck behind prevents knockout
                     {
                         if (puckScript.IsPlayersPuck())
                         {
                             tempPowerModifier += 2.5f;
+                            tempPowerModifier += (puckScript.GetHeavyCount() * 2.5f) + (puckScript.GetTetherCount() * 2.5f);
                             tempValueModifier += puckScript.ComputeTotalFutureValue();
                         }
                         else // it's okay to have CPU pucks behind, it just makes the path less valuable
@@ -174,11 +218,16 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
                         tempPowerModifier += 2.5f;
                         continue;
                     }
+                    else
+                    {
+                        // if there is a lock behind, the target puck can't be hit out
+                        return (false, 0, 0, false);
+                    }
                 }
             }
         }
 
-        return (true, tempPowerModifier, tempValueModifier); // No pucks are blocking
+        return (true, tempPowerModifier, tempValueModifier, needsExplosion); // No pucks are blocking
     }
 
     private float GetAngleToAnchor(Vector3 puckPosition)
@@ -201,7 +250,14 @@ public class SmartScanCPUPathScript : MonoBehaviour, CPUPathInterface
         // draw scan lines from puck
         for (int i = 0; i < gizDirection.Count; i++)
         {
-            Debug.DrawRay(gizRayOrigin[i], gizDirection[i] * scanDistance);
+            if (bestPathIndices.Contains(i))
+            {
+                Debug.DrawRay(gizRayOrigin[i], gizDirection[i] * scanDistance, Color.blue);
+            }
+            else
+            {
+                Debug.DrawRay(gizRayOrigin[i], gizDirection[i] * scanDistance);
+            }
         }
     }
 

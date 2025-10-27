@@ -15,11 +15,24 @@ public class CardVariation
 
 public static class PowerupCardData
 {
-    private static string[] cardImportNames = { "PlusOne", "Foresight", "Block", "Bolt", "ForceField", "Phase", "Cull", "Growth", "Lock", "Explosion", "Fog", "Hydra", "Factory", "Shield", "Shuffle", "Chaos", "TimesTwo", "Resurrect", "Mill", "Research", "Insanity", "Triple", "Exponent", "Laser", "Aura", "Push", "Erratic", "Deny", "Investment", "Omniscience", null };
+    private static string[] cardImportNames = { "PlusOne", "Foresight", "Block", "Bolt", "ForceField", "Phase", "Cull", "Growth", "Lock", "Explosion", "Fog", "Hydra", "Factory", "Shield", "Shuffle", "Chaos", "TimesTwo", "Resurrect", "Mill", "Research", "Insanity", "Triple", "Exponent", "Laser", "Aura", "Push", "Erratic", "Deny", "Investment", "Omniscience", null, "Ghost", "Heavy", "Teleport", "Tether", "Spawn", "Weaken", "Fortune" };
     public static string GetCardName(int cardIndex) { return cardImportNames[cardIndex]; }
 
     // TODO: rename this function
     public static int GetCardCount() { return cardImportNames.Length; }
+
+    // get the number of discovered cards (owned 1 or more)
+    public static int GetDiscoveredCount()
+    {
+        var sums = GetAllCardsOwnedSums();
+        int discovered = 0;
+        for (int i = 0; i < sums.Length; i++)
+        {
+            if (GetCardName(i) == null) continue;
+            if (sums[i] > 0) discovered++;
+        }
+        return discovered;
+    }
 
     public static int GetCardOwnedCount(int cardIndex, int rank = 0, bool holo = false)
     {
@@ -54,7 +67,13 @@ public static class PowerupCardData
         }
         return 0;
     }
-    public static int GetCardOwnedSum(int cardIndex)
+
+    //  -8 = any, -7 = different, -6 = celestial, -5 = diamond, -4 = gold, -3 = bronze, -2 = standard, -1 = holo, 0 - 4 rarity, 5+ index - 5
+    public static bool CheckIfCardIsOwned(int cardIndex)
+    {
+        return GetCardOwnedSum(cardIndex) > 0;
+    }
+    public static int GetCardOwnedSum(int ID)
     {
         // Get the card collection
         string collectionString = PlayerPrefs.GetString("CardCollection", "");
@@ -65,6 +84,7 @@ public static class PowerupCardData
         // iterate through collection
         string[] cardEncoded = collectionString.Split(',');
         int sum = 0;
+        List<int> indexesSeen = new List<int>();
 
         // Search for the card in the collection and return quantity
         for (int i = 0; i < cardEncoded.Length; i++)
@@ -72,23 +92,44 @@ public static class PowerupCardData
             if (int.TryParse(cardEncoded[i], out int encodedCard))
             {
                 var decodedCard = DecodeCard(encodedCard);
-                if (decodedCard.cardIndex == cardIndex)
+
+                // card index
+                if (ID >= 5 && decodedCard.cardIndex == (ID - 5))
                 {
-                    // Add the count to the current quantity
-                    if (decodedCard.quantity > 0)
-                    {
-                        sum += decodedCard.quantity;
-                    }
+                    sum += decodedCard.quantity;
+                }
+                // card rarity
+                else if (ID >= 0 && ID < 5 && PowerupCardData.GetCardRarity(decodedCard.cardIndex) == ID)
+                {
+                    sum += decodedCard.quantity;
+                }
+                // holo
+                else if (ID == -1 && decodedCard.holo)
+                {
+                    sum += decodedCard.quantity;
+                }
+                // rank
+                else if (ID >= -6 && ID < -1 && decodedCard.rank == (ID * -1) - 2)
+                {
+                    sum += decodedCard.quantity;
+                }
+                // different
+                else if (ID == -7)
+                {
+                    if (!indexesSeen.Contains(decodedCard.cardIndex)) indexesSeen.Add(decodedCard.cardIndex);
+                    sum = indexesSeen.Count;
+                }
+                // any
+                else if (ID == -8)
+                {
+                    sum += decodedCard.quantity;
                 }
             }
         }
 
         return sum;
     }
-    public static bool CheckIfCardIsOwned(int cardIndex)
-    {
-        return GetCardOwnedSum(cardIndex) > 0;
-    }
+
     public static int[] GetAllCardsOwnedSums()
     {
         int[] sums = new int[GetCardCount()];
@@ -149,7 +190,7 @@ public static class PowerupCardData
         return cardVariationList;
     }
 
-    // return success (if fail because over max count, reimburse with more credits)
+    // returns true if we already discovered the card (even if quantity is 0 from crafting)
     public static bool AddCardToCollection(int cardIndex, int rank = 0, bool holo = false, int count = 1)
     {
         if (cardIndex < 0) { return false; }
@@ -206,7 +247,7 @@ public static class PowerupCardData
         return duplicate;
     }
 
-    private static int[] cardRarities = { 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 2, 2, 2, 1, 2, 2, 3, 3, 3, 1, 0, 0, 0, 1, 4, -1 };
+    private static int[] cardRarities = { 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 2, 2, 2, 1, 2, 2, 3, 3, 3, 1, 0, 0, 0, 1, 4, -1, 0, 0, 0, 0, 0, 0, 0 };
     public static int GetCardRarity(int index) { return cardRarities[index]; }
     public static int GetRandomCardOfRarity(int rarity)
     {

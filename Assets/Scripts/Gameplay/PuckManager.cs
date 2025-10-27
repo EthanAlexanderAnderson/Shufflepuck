@@ -184,13 +184,12 @@ public class PuckManager : MonoBehaviour
                 }
             }
 
-            float distanceToExit = minDistance - radius;
+            float distanceToExit = Math.Abs(minDistance - radius);
             if (distanceToExit < (velocity * 2))
             {
                 return false;
             }
         }
-
         return true;
     }
 
@@ -272,5 +271,15 @@ public class PuckManager : MonoBehaviour
         Vector2 ap = point - a;
         float t = Mathf.Clamp01(Vector2.Dot(ap, ab) / ab.sqrMagnitude);
         return a + t * ab;
+    }
+
+    public void ResetAlphaOnAllPucks()
+    {
+        var allPucks = GameObject.FindGameObjectsWithTag("puck");
+        foreach (var puck in allPucks)
+        {
+            puck.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 1f);
+            puck.GetComponent<PuckScript>().SetBaseAlpha(1f);
+        }
     }
 }

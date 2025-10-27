@@ -24,14 +24,11 @@ using TMPro;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using Unity.Networking.Transport.Relay;
+using Unity.Collections;
 
 public class MatchmakerClient : MonoBehaviour
 { 
     private string ticketId;
-    private LogicScript logic;
-    private UIManagerScript UI;
-    private ServerLogicScript serverLogic;
-    private ClientLogicScript clientLogic;
 
     // Getter
     private string PlayerID()
@@ -45,14 +42,6 @@ public class MatchmakerClient : MonoBehaviour
         ServerStartUp.ClientInstance += SignIn;
     }
     */
-
-    private void Start()
-    {
-        logic = LogicScript.Instance;
-        UI = UIManagerScript.Instance;
-        serverLogic = ServerLogicScript.Instance;
-        clientLogic = ClientLogicScript.Instance;
-    }
 
     /*
     private void OnDisable()
@@ -102,8 +91,8 @@ public class MatchmakerClient : MonoBehaviour
         catch (MatchmakerServiceException e)
         {
             Debug.LogError(e);
-            UI.SetErrorMessage("Failed to connect to server. Please try again.");
-            UI.FailedToFindMatch();
+            UIManagerScript.Instance.SetErrorMessage("Failed to connect to server. Please try again.");
+            UIManagerScript.Instance.FailedToFindMatch();
         }
     }
 
@@ -133,16 +122,16 @@ public class MatchmakerClient : MonoBehaviour
                 case StatusOptions.Failed:
                     gotAssignement = true;
                     Debug.Log($"Failed to get ticket status. Error: {multiplayAssignment.Message}");
-                    UI.SetErrorMessage("Connection error. Please try again.");
+                    UIManagerScript.Instance.SetErrorMessage("Connection error. Please try again.");
                     await MatchmakerService.Instance.DeleteTicketAsync(ticketId);
                     break;
                 case StatusOptions.Timeout:
                     gotAssignement = true;
                     Debug.Log($"Failed to get ticket status. Timed out");
-                    if (UI.waitingGif.activeInHierarchy)
+                    if (UIManagerScript.Instance.waitingGif.activeInHierarchy)
                     {
-                        UI.SetErrorMessage("Connection timed out. Please try again.");
-                        UI.FailedToFindMatch();
+                        UIManagerScript.Instance.SetErrorMessage("Connection timed out. Please try again.");
+                        UIManagerScript.Instance.FailedToFindMatch();
                     }
                     await MatchmakerService.Instance.DeleteTicketAsync(ticketId);
                     break;
@@ -156,7 +145,7 @@ public class MatchmakerClient : MonoBehaviour
         Debug.Log($"Ticket assigned: {assignment.Ip}:{assignment.Port}");
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(assignment.Ip, (ushort)assignment.Port);
         NetworkManager.Singleton.StartClient();
-        UI.EnableReadyButton();
+        UIManagerScript.Instance.EnableReadyButton();
     }
 
     // this will be for host / join private lobby
@@ -166,13 +155,13 @@ public class MatchmakerClient : MonoBehaviour
 
     // Called by Online -> Host button
     // creates lobby with Unity Lobby service
-    public async void CreateLobby()
+    public async void CreateLobby(bool isPrivate)
     {
         try
         {
-            string lobbyName = "MyLobby";
+            string lobbyName = isPrivate ? "PrivateLobby" : "PublicLobby";
             int maxPlayers = 2;
-            CreateLobbyOptions options = new CreateLobbyOptions { IsPrivate = true };
+            CreateLobbyOptions options = new CreateLobbyOptions { IsPrivate = isPrivate };
 
             // Create the Lobby
             Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
@@ -183,7 +172,7 @@ public class MatchmakerClient : MonoBehaviour
             ILobbyEvents lobbyEvents = await LobbyService.Instance.SubscribeToLobbyEventsAsync(lobby.Id, callbacks);
 
             // Allocate Relay server
-            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxPlayers);
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxPlayers - 1);
             string relayJoinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
 
             // Pass Relay join code to lobby data
@@ -203,11 +192,6 @@ public class MatchmakerClient : MonoBehaviour
             hostLobby = lobby;
             isHost = true;
 
-<<<<<<< Updated upstream
-            Debug.Log("Created Lobby. Code: " + lobby.LobbyCode);
-            UI.lobbyCodeText.text = "Lobby Code: " + lobby.LobbyCode;
-            GUIUtility.systemCopyBuffer = lobby.LobbyCode;
-=======
             if (isPrivate)
             {
                 Debug.Log("Created Private Lobby. Code: " + lobby.LobbyCode);
@@ -216,120 +200,27 @@ public class MatchmakerClient : MonoBehaviour
             }
             else
             {
-                Debug.Log("Created Public Lobby. Elo: " + PlayerPrefs.GetInt("Elo", 100).ToString());
-            }
->>>>>>> Stashed changes
-        }
-        catch (Exception e)
+        // Query for public, open lobbies
+        var query = new QueryLobbiesOptions
         {
-            Debug.LogError(e);
-            UI.SetErrorMessage("Failed to create Lobby with Relay.");
-        }
-    }
-
-    public class MatchmakingPlayerData
-    {
-        public string LobbyID;
-    }
-
-    public TMP_InputField lobbyCodeInputField;
-    [SerializeField] private GameObject joinButtion;
-    // only show the Join button when 6 characters are entered, helps misinput
-    public void ChangeJoinButtonVisibiity()
-    {
-        joinButtion.SetActive(lobbyCodeInputField.text.Length == 6);
-    }
-
-    // Called by Online -> Join -> Join button (after code is entered)
-    public async void JoinLobby()
-    {
-        try
-        {
-            string lobbyCode = lobbyCodeInputField.text;
-            if (lobbyCode.Length != 6)
+            Count = 1,
+            Filters = new List<QueryFilter>
             {
-                Debug.LogError("Invalid lobby code.");
-                UI.SetErrorMessage("Invalid lobby code.");
-                return;
-            }
-
-            Lobby lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode);
-
-            // Retrieve Relay join code from lobby data
-            string relayJoinCode = lobby.Data["RelayJoinCode"].Value;
-            JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(relayJoinCode);
-
-            Debug.Log("Relay Join Code: " + relayJoinCode);
-
-            // Set up UnityTransport to use Relay
-            RelayServerData relayServerData = AllocationUtils.ToRelayServerData(joinAllocation, "dtls");
-            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
-
-            if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsHost) { NetworkManager.Singleton.Shutdown(); }
-
-            // wait until the client is shutdown
-            int maxIterations = 0;
-            while ((NetworkManager.Singleton.IsConnectedClient || NetworkManager.Singleton.IsHost) && maxIterations < 50)
+            new QueryFilter(
+                field: QueryFilter.FieldOptions.AvailableSlots,
+                op: QueryFilter.OpOptions.GT,
+                value: "0"),
+            new QueryFilter(
+                field: QueryFilter.FieldOptions.IsLocked,
+                op: QueryFilter.OpOptions.EQ,
+                value: "false")
+            },
+            Order = new List<QueryOrder>
             {
-                await Task.Delay(100);
-                maxIterations++;
+            new QueryOrder(
+                asc: true,
+                field: QueryOrder.FieldOptions.Created)
             }
-
-            if (NetworkManager.Singleton.IsConnectedClient || NetworkManager.Singleton.IsHost)
-            {
-                Debug.LogError("Failed to shutdown previous NetworkManager before joining new lobby.");
-                UI.SetErrorMessage("Failed to join Lobby with Relay.");
-                return;
-            }
-
-            NetworkManager.Singleton.StartClient(); // Start as Client
-
-            hostLobby = lobby;
-            isHost = false;
-
-            Debug.Log("Joined Lobby. Code: " + lobbyCode);
-            UI.lobbyCodeText.text = "Lobby Code: " + lobbyCode;
-            tryToEnableReadyButton = true;
-        }
-        catch (LobbyServiceException)
-        {
-            Debug.LogError("LobbyServiceException: Failed to join Lobby (Invalid Join Code or Lobby is full)");
-            UI.SetErrorMessage("Failed to join Lobby (Invalid Join Code or Lobby is full).");
-        }
-        catch (Exception e)
-        {
-            Debug.LogError(e);
-            UI.SetErrorMessage("Failed to join Lobby with Relay.");
-        }
-    }
-
-    // For the host: when a competitor joins your lobby, tell Matchmaker to queue for a server
-    private void OnLobbyChanged(ILobbyChanges changes)
-    {
-        if (changes.PlayerJoined.Changed)
-        {
-            Debug.Log("Player Joined");
-            Debug.Log("HOST ID: " + PlayerID());
-            Debug.Log("JOINER ID: " + changes.PlayerJoined.Value[0].Player.Id);
-            // CreateATicket(hostLobby.Id); for multiplay
-            // for relay
-            UI.EnableReadyButton();
-        }
-    }
-
-    bool tryToEnableReadyButton;
-    private void Update()
-    {
-<<<<<<< Updated upstream
-        Heartbeat();
-        if (tryToEnableReadyButton)
-        {
-            if (!isHost && NetworkManager.Singleton.IsConnectedClient)
-            {
-                UI.EnableReadyButton();
-                tryToEnableReadyButton = false;
-            }
-=======
         int playerElo = PlayerPrefs.GetInt("Elo", 100);
         int[] searchRanges = { 100, 300, 9999 }; // progressively widen Elo range
         int rateLimitDelay = 750;
@@ -380,7 +271,7 @@ public class MatchmakerClient : MonoBehaviour
                 if (response.Results.Count > 0) // public lobby was found -> join it
                 {
                     Lobby foundLobby = response.Results[0];
-                    Debug.Log($"Found lobby within ±{searchRanges[i]} Elo range: {foundLobby.Data["Elo"].Value}");
+                    Debug.Log($"Found lobby within ï¿½{searchRanges[i]} Elo range: {foundLobby.Data["Elo"].Value}");
                     JoinLobby(false, lobbyId: foundLobby.Id);
                     return;
                 }
@@ -392,7 +283,7 @@ public class MatchmakerClient : MonoBehaviour
             {
                 if (e.Reason == LobbyExceptionReason.RateLimited)
                 {
-                    Debug.LogWarning("Rate limited — waiting longer...");
+                    Debug.LogWarning("Rate limited, waiting longer...");
                     // the search at the current elo failed, so we need to retry this iteration
                     i--;
                     // increase the delay between requests each time we get rate limited.
@@ -409,8 +300,14 @@ public class MatchmakerClient : MonoBehaviour
                     await Task.Delay(rateLimitDelay);
                 }
             }
->>>>>>> Stashed changes
         }
+
+        CreateLobby(false); // public lobby wasn't found -> open one
+    }
+
+    private void Update()
+    {
+        Heartbeat();
     }
 
     // Keep lobby open while waiting for joiner
@@ -454,17 +351,12 @@ public class MatchmakerClient : MonoBehaviour
     {
         try
         {
-<<<<<<< Updated upstream
-            if (serverLogic == null) { serverLogic = ServerLogicScript.Instance; }
-            serverLogic.AddPlayerServerRpc(logic.player.puckSpriteID, true); // TODO: instead of true, pass in "true" if the deck is NOT empty
-=======
             ServerLogicScript.Instance.AddPlayerServerRpc(LogicScript.Instance.player.puckSpriteID, new FixedString32Bytes(PlayerAuthentication.Instance.GetUsername()), PlayerPrefs.GetInt("Elo", 100));
->>>>>>> Stashed changes
         }
         catch (Exception e)
         {
             Debug.LogError(e);
-            UI.SetErrorMessage("Server Error: -1 - Contact developer.");
+            UIManagerScript.Instance.SetErrorMessage("Server Error: -1 - Contact developer.");
         }
     }
 
@@ -498,7 +390,7 @@ public class MatchmakerClient : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogError(e);
-            UI.SetErrorMessage("Server Error: -3 - Contact developer.");
+            UIManagerScript.Instance.SetErrorMessage("Server Error: -3 - Contact developer.");
         }
     }
 }

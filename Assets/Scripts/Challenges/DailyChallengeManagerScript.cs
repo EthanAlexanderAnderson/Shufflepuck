@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using System.Globalization;
 
 public class DailyChallengeManagerScript : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class DailyChallengeManagerScript : MonoBehaviour
     [SerializeField] private GameObject titleScreen;
 
     [SerializeField] private TMP_Text countdownText;
+
+    [SerializeField] private GameObject ADRefreshCountdownParent;
+    [SerializeField] private TMP_Text ADRefreshCountdownText;
 
     [SerializeField] private TMP_Text challenge1Text;
     [SerializeField] private TMP_Text challenge2Text;
@@ -26,6 +30,9 @@ public class DailyChallengeManagerScript : MonoBehaviour
     [SerializeField] private Button claim2;
     [SerializeField] private GameObject glow1;
     [SerializeField] private GameObject glow2;
+
+    // Ad Refresh
+    [SerializeField] private GameObject adRefreshButtonObject;
 
     private void Awake()
     {
@@ -53,12 +60,12 @@ public class DailyChallengeManagerScript : MonoBehaviour
         int numberOfHardDailyChallenges = hardDailyChallenges.Count;
 
         // assert the challenge ID is within range, prevent index error
-        if (DC1 >= numberOfEasyDailyChallenges || DC1 <= (numberOfEasyDailyChallenges * -1) || DC1 <= (numberOfEasyDailyChallenges * -1) || DC1 <= (numberOfEasyDailyChallenges * -1))
+        if (Mathf.Abs(DC1) >= numberOfEasyDailyChallenges)
         {
             DC1 = 0;
             PlayerPrefs.SetInt("DailyChallenge1", 0);
         }
-        if (DC2 >= numberOfHardDailyChallenges || DC2 <= (numberOfHardDailyChallenges * -1) || DC2 >= numberOfHardDailyChallenges || DC2 <= (numberOfHardDailyChallenges * -1))
+        if (Mathf.Abs(DC2) >= numberOfHardDailyChallenges)
         {
             DC2 = 0;
             PlayerPrefs.SetInt("DailyChallenge2", 0);
@@ -83,6 +90,12 @@ public class DailyChallengeManagerScript : MonoBehaviour
             hardRewardTexts[i].text = hardRewardStrings[i];
         }
         challenge2Text.text = hardDailyChallenges[Mathf.Abs(DC2)].challengeText;
+
+        // if both quests are completed, show how long is remaining until the next ad refresh
+        if (DC1 == 0 && DC2 == 0)
+        {
+            ADRefreshCountdownParent.SetActive(true);
+        }
     }
 
     void Update()
@@ -90,6 +103,7 @@ public class DailyChallengeManagerScript : MonoBehaviour
         UpdateCountdown();
     }
 
+    private bool challengeAssignedToday = false;
     private void UpdateCountdown()
     {
         // Calculate the time remaining until midnight
@@ -104,29 +118,54 @@ public class DailyChallengeManagerScript : MonoBehaviour
                 timeUntilMidnight.Hours, timeUntilMidnight.Minutes, timeUntilMidnight.Seconds);
         }
 
-        // Check if the countdown has reached zero
-        if (timeUntilMidnight.TotalSeconds <= 0)
+        // Calculate the time remaining until next ad refresh
+        if (ADRefreshCountdownParent.activeInHierarchy && DateTime.TryParseExact(PlayerPrefs.GetString("LastChallengeDate", string.Empty), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime lastChallengeDateTime))
         {
+            if (ADRefreshCountdownText != null)
+            {
+                TimeSpan timeUntilNextAdRefresh = lastChallengeDateTime.AddHours(4) - now;
+                // Update countdown text
+                ADRefreshCountdownText.text = string.Format("{0:D2}:{1:D2}:{2:D2}",
+                    timeUntilNextAdRefresh.Hours, timeUntilNextAdRefresh.Minutes, timeUntilNextAdRefresh.Seconds);
+
+                // if ad refresh countdown is zero, hide the text
+                if (timeUntilNextAdRefresh.TotalSeconds <= 0)
+                {
+                    ADRefreshCountdownParent.SetActive(false);
+                }
+            }
+        }
+
+        // Check if the countdown has reached zero
+        if (timeUntilMidnight.TotalSeconds <= 0 && !challengeAssignedToday)
+        {
+            challengeAssignedToday = true;
             AssignNewChallenge();
         }
     }
 
     private void CheckForNewDailyChallenge()
     {
-        // Get the last saved date or use a default if it's the first time
-        string lastSavedDate = PlayerPrefs.GetString("LastChallengeDate", string.Empty);
-        DateTime lastChallengeDate;
-
-        if (DateTime.TryParse(lastSavedDate, out lastChallengeDate))
+        // Try to read the DateTime from the "LastChallengeDate" PlayerPref
+        if (DateTime.TryParseExact(PlayerPrefs.GetString("LastChallengeDate", string.Empty), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime lastChallengeDateTime))
         {
             // Compare the last saved date to today's date & make sure current date is NEWER than lastChallengeDate to prevent device time tampering
-            if (DateTime.Today.Subtract(lastChallengeDate).Days >= 1)
+            if (lastChallengeDateTime.Date < DateTime.Today)
             {
                 AssignNewChallenge();
+                PlayerPrefs.SetInt("ChallengeRefreshesToday", 0);
+            }
+            // Check if more than 4 hours have passed since the last challenge and current time is ahead to prevent tampering
+            else if (DateTime.Now.Subtract(lastChallengeDateTime).TotalHours >= 4)
+            {
+                EnableAdRefreshButton();
+                Debug.Log("Daily quests already assigned: " + PlayerPrefs.GetInt("DailyChallenge1", 0) + " & " + PlayerPrefs.GetInt("DailyChallenge2", 0));
+                Debug.Log("Daily quest AD refresh is available now.");
             }
             else
             {
-                Debug.Log("Today's daily challenges are already assigned. easy: " + PlayerPrefs.GetInt("DailyChallenge1", 0) + "   hard: " + PlayerPrefs.GetInt("DailyChallenge2", 0));
+                Debug.Log("Daily quests already assigned: " + PlayerPrefs.GetInt("DailyChallenge1", 0) + " & " + PlayerPrefs.GetInt("DailyChallenge2", 0));
+                Debug.Log("Hours until daily quest AD refresh: " + Math.Round(4.0 - DateTime.Now.Subtract(lastChallengeDateTime).TotalHours, 4));
             }
         }
         else // no date ever written
@@ -137,34 +176,40 @@ public class DailyChallengeManagerScript : MonoBehaviour
 
     private void AssignNewChallenge()
     {
+        PlayerPrefs.SetString("LastChallengeDate", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+
+        // re-generate daily challenges since their content depends on "LastChallengeDate" player pref
+        ChallengeManager.Instance.ReGenerateDailyChallenges();
+
         List<Challenge> easyDailyChallenges = ChallengeManager.Instance.challengeData.easyDailyChallenges;
         List<Challenge> hardDailyChallenges = ChallengeManager.Instance.challengeData.hardDailyChallenges;
         int numberOfEasyDailyChallenges = easyDailyChallenges.Count;
         int numberOfHardDailyChallenges = hardDailyChallenges.Count;
-
-        PlayerPrefs.SetString("LastChallengeDate", DateTime.Today.ToString("yyyy-MM-dd"));
+        int xpRequirement = LevelManager.Instance.GetLevelUpXPRequirement();
 
         // only overwrite the challenge if it's not already completed (not a negative int id)
         if (PlayerPrefs.GetInt("DailyChallenge1", 0) >= 0)
         {
             int DC1 = UnityEngine.Random.Range(1, numberOfEasyDailyChallenges);
 
-            // ensure challenge is assignable
-            if (PlayerPrefs.GetInt("easyHighscore", 0) == 0)
+            // force default
+            if (PlayerPrefs.GetInt("easyHighscore", 0) <= 0 && PlayerPrefs.GetInt("easyWin") < 5)
             {
                 PlayerPrefs.SetInt("DailyChallenge1", 1);
             }
+            // ensure challenge is assignable
             else
             {
                 Challenge selectedChallenge = easyDailyChallenges[DC1];
                 int failsafe = 0;
-                while (!selectedChallenge.condition.IsAssignable() && failsafe < 1000)
+                // Re-roll the challenge while it's not assignable or it's the same as the previous uncompleted challenge. Also, slightly favor challenges with XP value more than 1/5 of what is required to level up.
+                while ((!selectedChallenge.condition.IsAssignable() || PlayerPrefs.GetInt("DailyChallenge1") == easyDailyChallenges.IndexOf(selectedChallenge) || (selectedChallenge.rewards[0].amount < (xpRequirement / 5) && failsafe < 10)) && failsafe < 1000)
                 {
                     selectedChallenge = easyDailyChallenges[UnityEngine.Random.Range(1, numberOfEasyDailyChallenges)];
                     failsafe++;
                     if (failsafe >= 1000)
                     {
-                        Debug.Log("failsafe triggered");
+                        Debug.LogError("failsafe triggered");
                         selectedChallenge = easyDailyChallenges[1];
                     }
                 }
@@ -175,22 +220,24 @@ public class DailyChallengeManagerScript : MonoBehaviour
         {
             int DC2 = UnityEngine.Random.Range(1, numberOfHardDailyChallenges);
 
-            // ensure challenge is assignable
-            if (PlayerPrefs.GetInt("hardHighscore", 0) == 0)
+            // force default
+            if (PlayerPrefs.GetInt("hardHighscore", 0) <= 0 && PlayerPrefs.GetInt("hardWin") < 5)
             {
                 PlayerPrefs.SetInt("DailyChallenge2", 1);
             }
+            // ensure challenge is assignable
             else
             {
                 Challenge selectedChallenge = hardDailyChallenges[DC2];
                 int failsafe = 0;
-                while (!selectedChallenge.condition.IsAssignable() && failsafe < 1000)
+                // Re-roll the challenge while it's not assignable or it's the same as the previous uncompleted challenge. Also, slightly favor challenges with XP value more than 1/3 of what is required to level up.
+                while ((!selectedChallenge.condition.IsAssignable() || PlayerPrefs.GetInt("DailyChallenge2") == hardDailyChallenges.IndexOf(selectedChallenge) || (selectedChallenge.rewards[0].amount < (xpRequirement / 3) && failsafe < 10)) && failsafe < 1000)
                 {
                     selectedChallenge = hardDailyChallenges[UnityEngine.Random.Range(1, numberOfHardDailyChallenges)];
                     failsafe++;
                     if (failsafe >= 1000)
                     {
-                        Debug.Log("failsafe triggered");
+                        Debug.LogError("failsafe triggered");
                         selectedChallenge = hardDailyChallenges[1];
                     }
                 }
@@ -213,19 +260,17 @@ public class DailyChallengeManagerScript : MonoBehaviour
 
         // bonus XP for first win of the day
         string dailyWin = "";
-        string lastSavedDate = PlayerPrefs.GetString("LastDailyWinDate", string.Empty);
-        DateTime lastChallengeDate;
-
-        if (DateTime.TryParse(lastSavedDate, out lastChallengeDate))
+        // Try to read the DateTime from the "LastDailyWinDate" PlayerPref
+        if (DateTime.TryParseExact(PlayerPrefs.GetString("LastDailyWinDate", string.Empty), "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime lastWinDate))
         {
-            // Compare the last saved date to today's date & make sure current date is NEWER than lastChallengeDate to prevent device time tampering
-            if (DateTime.Today.Subtract(lastChallengeDate).Days >= 1)
+            // Compare the last win date to today's date & make sure current date is NEWER than lastWinDate to prevent device time tampering
+            if (DateTime.Today.Subtract(lastWinDate).Days >= 1)
             {
                 dailyWin += "\nDaily Win +50XP";
                 LevelManager.Instance.AddXP(50);
                 PlayerPrefs.SetString("LastDailyWinDate", DateTime.Today.ToString("yyyy-MM-dd"));
             }
-        } 
+        }
         else // no date ever written
         {
             dailyWin += "\nDaily Win +50XP";
@@ -240,27 +285,37 @@ public class DailyChallengeManagerScript : MonoBehaviour
         List<Challenge> hardDailyChallenges = ChallengeManager.Instance.challengeData.hardDailyChallenges;
         int numberOfEasyDailyChallenges = easyDailyChallenges.Count;
         int numberOfHardDailyChallenges = hardDailyChallenges.Count;
-        if (DC1 >= numberOfEasyDailyChallenges || DC1 <= (numberOfEasyDailyChallenges * -1))
+        if (Mathf.Abs(DC1) >= numberOfEasyDailyChallenges)
         {
             DC1 = 0;
             PlayerPrefs.SetInt("DailyChallenge1", 0);
         }
-        if (DC1 >= numberOfHardDailyChallenges || DC1 <= (numberOfHardDailyChallenges * -1))
+        if (Mathf.Abs(DC2) >= numberOfHardDailyChallenges)
         {
-            DC1 = 0;
+            DC2 = 0;
             PlayerPrefs.SetInt("DailyChallenge2", 0);
         }
 
         if (isOnline == 1) { difficulty = -1; }
 
         // Evalute condition is met
-        if (DC1 > 0 && easyDailyChallenges[DC1].CheckCompletion(scoreDifference, difficulty))
+        if (DC1 > 0)
         {
-            PlayerPrefs.SetInt("DailyChallenge1", -DC1);
+            if ((easyDailyChallenges[DC1].condition is BeatByCondition && easyDailyChallenges[DC1].CheckCompletion(scoreDifference, difficulty)) ||
+            (easyDailyChallenges[DC1].condition is WinUsingCondition && easyDailyChallenges[DC1].CheckCompletion(PowerupManager.Instance.GetPlayerUsed(), difficulty)))
+            {
+                Debug.Log("easy daily challenge (" + DC1 + ") completed.");
+                PlayerPrefs.SetInt("DailyChallenge1", -DC1);
+            }
         }
-        if (DC2 > 0 && hardDailyChallenges[DC2].CheckCompletion(scoreDifference, difficulty))
+        if (DC2 > 0)
         {
-            PlayerPrefs.SetInt("DailyChallenge2", -DC2);
+            if ((hardDailyChallenges[DC2].condition is BeatByCondition && hardDailyChallenges[DC2].CheckCompletion(scoreDifference, difficulty)) ||
+            (hardDailyChallenges[DC2].condition is WinUsingCondition && hardDailyChallenges[DC2].CheckCompletion(PowerupManager.Instance.GetPlayerUsed(), difficulty)))
+            {
+                Debug.Log("hard daily challenge (" + DC2 + ") completed.");
+                PlayerPrefs.SetInt("DailyChallenge2", -DC2);
+            }
         }
         SetText();
 
@@ -314,5 +369,46 @@ public class DailyChallengeManagerScript : MonoBehaviour
             SoundManagerScript.Instance.PlayWinSFX();
         }
         titleScreen.GetComponent<TitleScreenScript>().UpdateAlerts();
+    }
+
+    private void EnableAdRefreshButton()
+    {
+        // player is only allowed to refresh challenges twice a daily to discourage unhealthy play patterns
+        if (PlayerPrefs.GetInt("ChallengeRefreshesToday") >= 2) return;
+
+        adRefreshButtonObject.SetActive(true);
+        adRefreshButtonObject.transform.localScale = new(0f, 1f);
+        adRefreshButtonObject.transform.localPosition = new(-190f, adRefreshButtonObject.transform.localPosition.y);
+        LeanTween.scaleX(adRefreshButtonObject, 1f, 1).setEaseOutElastic();
+        LeanTween.moveLocalX(adRefreshButtonObject, -50f, 1).setEaseOutElastic();
+
+        ADRefreshCountdownParent.SetActive(false);
+    }
+
+    public void ClickAdRefreshButton()
+    {
+        PlayerPrefs.SetInt("ChallengeRefreshesToday", PlayerPrefs.GetInt("ChallengeRefreshesToday") + 1);
+        AssignNewChallenge();
+        SetText();
+    }
+
+    public void PackOpenDailyChallengeHelper(int type = 0)
+    {
+        int DC1 = PlayerPrefs.GetInt("DailyChallenge1", 0);
+        List<Challenge> easyDailyChallenges = ChallengeManager.Instance.challengeData.easyDailyChallenges;
+        int numberOfEasyDailyChallenges = easyDailyChallenges.Count;
+        if (Mathf.Abs(DC1) >= numberOfEasyDailyChallenges)
+        {
+            DC1 = 0;
+            PlayerPrefs.SetInt("DailyChallenge1", 0);
+        }
+
+        // Evalute condition is met
+        if (DC1 > 0 &&
+            easyDailyChallenges[DC1].condition is OpenPacksCondition && easyDailyChallenges[DC1].CheckCompletion())
+        {
+            Debug.Log("easy daily challenge (" + DC1 + ") completed.");
+            PlayerPrefs.SetInt("DailyChallenge1", -DC1);
+        }
     }
 }

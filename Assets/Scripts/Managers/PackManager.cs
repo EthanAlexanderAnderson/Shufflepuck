@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,6 +24,8 @@ public class PackManager : MonoBehaviour
     [SerializeField] private Button openTenPlusButton;
 
     [SerializeField] private TMP_Text bottomText;
+    [SerializeField] private Button backButton;
+    [SerializeField] private Button openAnotherButton;
 
     [SerializeField] private GameObject PowerupPopupPrefab;
     [SerializeField] private GameObject boosterPopupParent;
@@ -30,14 +33,7 @@ public class PackManager : MonoBehaviour
     [SerializeField] private TMP_Text chanceMultText;
     private GameObject powerupPopupObject;
     // pack booster Ids & probability weights & required level
-    List<(int id, int weight, int level)> packBoosterIDs = new()
-    {
-        (-5, 1, 50),
-        (-4, 10, 25),
-        (-3, 20, 15),
-        (-2, 40, 10),
-        (-1, 50, 0)
-    };
+    List<(int id, int weight, int level)> packBoosterIDs;
     float[] boosterRankMult = { 0.1f, 0.08f, 0.04f, 0.02f, 0.002f };
 
 
@@ -83,14 +79,11 @@ public class PackManager : MonoBehaviour
 
     private void CheckForNewDailyPackBooster()
     {
-        // Get the last saved date or use a default if it's the first time
-        string lastSavedDate = PlayerPrefs.GetString("LastPackBoosterDate", string.Empty);
-        DateTime lastChallengeDate;
-
-        if (DateTime.TryParse(lastSavedDate, out lastChallengeDate))
+        // Try to read the DateTime from the "LastPackBoosterDate" PlayerPref
+        if (DateTime.TryParseExact(PlayerPrefs.GetString("LastPackBoosterDate", string.Empty), "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime lastPackBoosterDate))
         {
             // Compare the last saved date to today's date & make sure current date is NEWER than lastChallengeDate to prevent device time tampering
-            if (DateTime.Today.Subtract(lastChallengeDate).Days >= 1)
+            if (DateTime.Today.Subtract(lastPackBoosterDate).Days >= 1)
             {
                 AssignNewPackBooster();
             }
@@ -108,6 +101,52 @@ public class PackManager : MonoBehaviour
         PlayerPrefs.SetString("LastPackBoosterDate", DateTime.Today.ToString("yyyy-MM-dd"));
         int currentPackBooster = PlayerPrefs.GetInt("PackBooster");
 
+        // celestial and holo are always assignable
+        packBoosterIDs = new()
+        {
+            (-5, 1, 50), // celestial
+            (-1, 50, 0) // holo
+        };
+
+        // add uncompleted ranks to weights list
+        bool[] canAssign = new bool[4];
+        for (int i = 0; i < PowerupCardData.GetCardCount(); i++)
+        {
+            if (PowerupCardData.GetCardName(i) == null)
+            {
+                continue;
+            }
+            // if any card is unowned in a specific rank, that rank is eligible to be assigned as the daily pack booster
+            bool[] owns = new bool[4];
+            foreach (var v in PowerupCardData.GetAllVariations(i))
+            {
+                if (v.rank >= 0 && v.rank < 4 && !v.holo)
+                {
+                    owns[v.rank] = true;
+                }
+            }
+            for (int j = 0; j < owns.Length; j++)
+            {
+                if (!owns[j])
+                {
+                    canAssign[j] = true;
+                }
+            }
+        }
+        List<(int id, int weight, int level)> rankPackBoosterIDsToAdd = new List<(int id, int weight, int level)>{
+            (-2, 40, 10), // bronze
+            (-3, 20, 15), // gold
+            (-4, 10, 25) // diamond
+            };
+        for (int i = 1; i < canAssign.Length; i++) // start at 1 for bronze (skip standard)
+        {
+            // actually add the weights using the data from the array above
+            if (canAssign[i])
+            {
+                packBoosterIDs.Add(rankPackBoosterIDsToAdd[i - 1]);
+            }
+        }
+
         // add unowned cards to weights list
         var sums = PowerupCardData.GetAllCardsOwnedSums();
         for (int i = 0; i < sums.Length; i++)
@@ -118,8 +157,8 @@ public class PackManager : MonoBehaviour
             {
                 packBoosterIDs.Add((i, (5 - PowerupCardData.GetCardRarity(i)) * 100, 0));
             }
-            // small chance at boosting a specific card if you own less than 5
-            else if (sums[i] < 5)
+            // small chance at boosting a specific card if you own less than a full set
+            else if (sums[i] < (5 - PowerupCardData.GetCardRarity(i)))
             {
                 packBoosterIDs.Add((i, (5 - PowerupCardData.GetCardRarity(i)) * 10, 0));
             }
@@ -183,7 +222,7 @@ public class PackManager : MonoBehaviour
             powerupPopupScript.InitializePowerupPopup(currentReward, (currentReward * -1) - 1, currentReward == -1);
         }
 
-        var (popupEffectIconObject, popupEffectIconOutlineObject, popupEffectTextObject, popupEffectRarityObject) = powerupPopupScript.GetObjects();
+        var (popupEffectIconObject, popupEffectIconOutlineObject, popupEffectTextObject, popupEffectRarityObject, _) = powerupPopupScript.GetObjects();
         popupEffectIconObject.transform.localScale = new Vector3(1f, 1f, 1f);
         popupEffectIconOutlineObject.transform.localScale = new Vector3(1f, 1f, 1f);
         popupEffectTextObject.transform.localScale = new Vector3(1f, 1f, 1f);
@@ -201,7 +240,7 @@ public class PackManager : MonoBehaviour
             int index = (packBooster * -1) - 1;
             mult = 1f + (level * boosterRankMult[index]);
         }
-        chanceMultText.text = $"x{mult}";
+        chanceMultText.text = $"x{Math.Truncate(100 * mult) / 100}";
     }
 
     public void RewardPacks(bool isPlus, int count)
@@ -225,7 +264,9 @@ public class PackManager : MonoBehaviour
         opened++;
         if (opened >= targetOpened)
         {
-            bottomText.text = dupeCreditReward > 0 ? ("+" + dupeCreditReward.ToString() + " credits") : "";
+            bottomText.text = dupeCreditReward > 0 ? ("+" + dupeCreditReward.ToString() + " credits") : "NEW";
+            backButton.interactable = true;
+            openAnotherButton.interactable = PlayerPrefs.GetInt(!openAnotherPlus ? "StandardPacks" : "PlusPacks") > (openAnotherx10 ? 9 : 0);
         }
     }
 
@@ -246,8 +287,18 @@ public class PackManager : MonoBehaviour
         // open the pack
         GameObject pack = Instantiate(cardOpenPrefab, packParent.transform);
         pack.transform.localScale = new Vector3(3f, 3f, 3f);
-        pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(RollRarity(), RollRankStandard(), RollHolo(false));
+        int cardIndex = RollRarity();
+        pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(cardIndex, RollRankStandard(cardIndex), RollHolo(false));
         targetOpened = 1;
+        openAnotherPlus = false;
+        openAnotherx10 = false;
+        openAnotherButtonObject.sprite = !openAnotherPlus ? openAnotherStandardSprite : openAnotherPlusSprite;
+        DailyChallengeManagerScript.Instance.PackOpenDailyChallengeHelper(0);
+        PlayerPrefs.SetInt("StandardPacksOpened", PlayerPrefs.GetInt("StandardPacksOpened") + 1);
+
+        // disable buttons
+        backButton.interactable = false;
+        openAnotherButton.interactable = false;
     }
 
     public void OpenStandardTen()
@@ -264,12 +315,8 @@ public class PackManager : MonoBehaviour
         PlayerPrefs.SetInt("StandardPacks", standardPackCount - 10);
         UpdatePackSreenUI();
 
-        // god pack chance
-        bool godpack = false;
-        if (Random.Range(0, 1000) < 1) // 1 in 1000 : 0.1% chance
-        {
-            godpack = true;
-        }
+        // god pack chance (1 in 1000 : 0.1%)
+        bool godpack = Random.Range(0, 1000) < 1;
 
         // open the packs
         for (int i = 0; i < 10; i++)
@@ -279,20 +326,30 @@ public class PackManager : MonoBehaviour
 
             if (i < 3)
             {
-                pack.transform.localPosition = new Vector3(-600f, 350f - 500f * i, 0f);
+                pack.transform.localPosition = new Vector3(-600f, 450f - 520f * i, 0f);
             }
             else if (i < 7)
             {
-                pack.transform.localPosition = new Vector3(0f, 600f - 500f * (i - 3), 0f);
+                pack.transform.localPosition = new Vector3(0f, 700f - 520f * (i - 3), 0f);
             }
             else if (i < 10)
             {
-                pack.transform.localPosition = new Vector3(600f, 350f - 500f * (i-7), 0f);
+                pack.transform.localPosition = new Vector3(600f, 450f - 520f * (i-7), 0f);
             }
 
-            pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(RollRarity(), RollRankStandard(), RollHolo(false) || godpack);
+            int cardIndex = RollRarity();
+            pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(cardIndex, RollRankStandard(cardIndex), RollHolo(false) || godpack);
         }
         targetOpened = 10;
+        openAnotherPlus = false;
+        openAnotherx10 = true;
+        openAnotherButtonObject.sprite = !openAnotherPlus ? openAnotherStandardSprite : openAnotherPlusSprite;
+        DailyChallengeManagerScript.Instance.PackOpenDailyChallengeHelper(0);
+        PlayerPrefs.SetInt("StandardPacksOpened", PlayerPrefs.GetInt("StandardPacksOpened") + 10);
+
+        // disable buttons
+        backButton.interactable = false;
+        openAnotherButton.interactable = false;
     }
 
     public void OpenPlusOne()
@@ -311,8 +368,18 @@ public class PackManager : MonoBehaviour
 
         GameObject pack = Instantiate(cardOpenPrefab, packParent.transform);
         pack.transform.localScale = new Vector3(3f, 3f, 3f);
-        pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(RollRarity(), RollRankPlus(), RollHolo(true));
+        int cardIndex = RollRarity();
+        pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(cardIndex, RollRankPlus(cardIndex), RollHolo(true));
         targetOpened = 1;
+        openAnotherPlus = true;
+        openAnotherx10 = false;
+        openAnotherButtonObject.sprite = !openAnotherPlus ? openAnotherStandardSprite : openAnotherPlusSprite;
+        DailyChallengeManagerScript.Instance.PackOpenDailyChallengeHelper(1);
+        PlayerPrefs.SetInt("PlusPacksOpened", PlayerPrefs.GetInt("PlusPacksOpened") + 1);
+
+        // disable buttons
+        backButton.interactable = false;
+        openAnotherButton.interactable = false;
     }
 
     public void OpenPlusTen()
@@ -329,12 +396,8 @@ public class PackManager : MonoBehaviour
         PlayerPrefs.SetInt("PlusPacks", plusPackCount - 10);
         UpdatePackSreenUI();
 
-        // god pack chance
-        bool godpack = false;
-        if (Random.Range(0, 100) < 1) // 1 in 100 : 1% chance
-        {
-            godpack = true;
-        }
+        // god pack chance (1 in 100 : 1%)
+        bool godpack = Random.Range(0, 100) < 1;
 
         // open packs
         for (int i = 0; i < 10; i++)
@@ -344,20 +407,30 @@ public class PackManager : MonoBehaviour
 
             if (i < 3)
             {
-                pack.transform.localPosition = new Vector3(-600f, 350f - 500f * i, 0f);
+                pack.transform.localPosition = new Vector3(-600f, 450f - 520f * i, 0f);
             }
             else if (i < 7)
             {
-                pack.transform.localPosition = new Vector3(0f, 600f - 500f * (i - 3), 0f);
+                pack.transform.localPosition = new Vector3(0f, 700f - 520f * (i - 3), 0f);
             }
             else if (i < 10)
             {
-                pack.transform.localPosition = new Vector3(600f, 350f - 500f * (i - 7), 0f);
+                pack.transform.localPosition = new Vector3(600f, 450f - 520f * (i - 7), 0f);
             }
 
-            pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(RollRarity(), RollRankPlus(), RollHolo(true) || godpack);
+            int cardIndex = RollRarity();
+            pack.GetComponent<PackOpenPrefabScript>().InitializePackOpen(cardIndex, RollRankPlus(cardIndex), RollHolo(true) || godpack);
         }
         targetOpened = 10;
+        openAnotherPlus = true;
+        openAnotherx10 = true;
+        openAnotherButtonObject.sprite = !openAnotherPlus ? openAnotherStandardSprite : openAnotherPlusSprite;
+        DailyChallengeManagerScript.Instance.PackOpenDailyChallengeHelper(1);
+        PlayerPrefs.SetInt("PlusPacksOpened", PlayerPrefs.GetInt("PlusPacksOpened") + 10);
+
+        // disable buttons
+        backButton.interactable = false;
+        openAnotherButton.interactable = false;
     }
 
     private int RollRarity()
@@ -370,20 +443,20 @@ public class PackManager : MonoBehaviour
         int packBooster = PlayerPrefs.GetInt("PackBooster");
         int boosterPoints = packBooster >= 0 ? 50 + level * 10 : 0;
 
-        if (packBooster >= 0) Debug.Log("card booster points: " + boosterPoints);
+        if (packBooster >= 0) Debug.Log("card booster points: " + boosterPoints + " - card: " + packBooster);
 
         while (boosterPoints >= 0 && returnValue != packBooster)
         {
             int rand = Random.Range(0, 1000);
-            if (rand < 10 && level >= 10)           // legendary : 0 - 9 : 10 in 1000 : 1%
+            if (rand < 10 && level >= 15)           // legendary : 0 - 9 : 10 in 1000 : 1%
             {
                 returnValue = PowerupCardData.GetRandomCardOfRarity(4);
             }
-            else if (rand < 60 && level >= 5)      // epic : 10 - 59 : 50 in 1000 : 5%
+            else if (rand < 60 && level >= 10)      // epic : 10 - 59 : 50 in 1000 : 5%
             {
                 returnValue = PowerupCardData.GetRandomCardOfRarity(3);
             }
-            else if (rand < 180)                    // rare : 60 - 179 : 120 in 1000 : 12%
+            else if (rand < 180 && level >= 5)      // rare : 60 - 179 : 120 in 1000 : 12%
             {
                 returnValue = PowerupCardData.GetRandomCardOfRarity(2);
             }
@@ -403,6 +476,7 @@ public class PackManager : MonoBehaviour
             }
             else
             {
+                // if boosterPoints < 100, reroll with that percentage chance (15 booster points means 15% percent chance to reroll)
                 int boosterRand = Random.Range(0, 100);
                 if (boosterPoints > boosterRand)
                 {
@@ -418,7 +492,7 @@ public class PackManager : MonoBehaviour
         return returnValue;
     }
 
-    private int RollRankStandard()
+    private int RollRankStandard(int cardIndex)
     {
         int returnValue = 9999999;
 
@@ -430,7 +504,7 @@ public class PackManager : MonoBehaviour
         if (packBooster > 0 && packBooster < 5)
         {
             boosterPoints = (int)(level * (float)(boosterRankMult[packBooster] * 100));
-            Debug.Log("rank booster points: " + boosterPoints);
+            Debug.Log("rank booster points: " + boosterPoints + " - rank: " + packBooster);
         }
 
         while (boosterPoints >= 0 && returnValue != packBooster)
@@ -464,6 +538,7 @@ public class PackManager : MonoBehaviour
             }
             else
             {
+                // if boosterPoints < 100, reroll with that percentage chance (15 booster points means 15% percent chance to reroll)
                 int boosterRand = Random.Range(0, 100);
                 if (boosterPoints > boosterRand)
                 {
@@ -476,10 +551,13 @@ public class PackManager : MonoBehaviour
             }
         }
 
+        // Downgrade to best undiscovered rank
+        returnValue = DowngradeRankIfNeeded(returnValue, cardIndex);
+
         return returnValue;
     }
 
-    private int RollRankPlus()
+    private int RollRankPlus(int cardIndex)
     {
         int returnValue = 9999999;
 
@@ -491,7 +569,7 @@ public class PackManager : MonoBehaviour
         if (packBooster > 0 && packBooster < 5)
         {
             boosterPoints = (int)(level * (float)(boosterRankMult[packBooster] * 100));
-            Debug.Log("rank booster points: " + boosterPoints);
+            Debug.Log("rank booster points: " + boosterPoints + " - rank: " + packBooster);
         }
 
         while (boosterPoints >= 0 && returnValue != packBooster)
@@ -521,6 +599,7 @@ public class PackManager : MonoBehaviour
             }
             else
             {
+                // if boosterPoints < 100, reroll with that percentage chance (15 booster points means 15% percent chance to reroll)
                 int boosterRand = Random.Range(0, 100);
                 if (boosterPoints > boosterRand)
                 {
@@ -531,6 +610,36 @@ public class PackManager : MonoBehaviour
                     boosterPoints = -1; // don't reroll
                 }
             }
+        }
+
+        // Downgrade to worst undiscovered rank
+        returnValue = DowngradeRankIfNeeded(returnValue, cardIndex);
+        if (returnValue <= 0) returnValue = 1;
+
+        return returnValue;
+    }
+
+    // this makes sure you unlock the ranks somewhat in order, for crafting purposes
+    private int DowngradeRankIfNeeded(int returnValue, int cardIndex)
+    {
+        if (returnValue <= 0) return 0;
+
+        // Downgrade to worst undiscovered rank
+        try
+        {
+            // figure out which ranks we already own of this cardIndex
+            bool[] owns = new bool[4];
+            foreach (var v in PowerupCardData.GetAllVariations(cardIndex))
+                if (v.rank >= 0 && v.rank < 4 && !v.holo)
+                    owns[v.rank] = true;
+
+                // downgrade by one rank if we don't own it
+                while (returnValue > 0 && !owns[returnValue - 1])
+                    returnValue--;
+        }
+        catch (Exception)
+        {
+            Debug.LogWarning("Failed to check for downgrade.");
         }
 
         return returnValue;
@@ -559,6 +668,7 @@ public class PackManager : MonoBehaviour
             }
             else
             {
+                // if boosterPoints < 100, reroll with that percentage chance (15 booster points means 15% percent chance to reroll)
                 int boosterRand = Random.Range(0, 100);
                 if (boosterPoints > boosterRand)
                 {
@@ -580,5 +690,33 @@ public class PackManager : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
+    }
+
+    bool openAnotherPlus = false;
+    bool openAnotherx10 = false;
+    [SerializeField] private Image openAnotherButtonObject;
+    [SerializeField] private Sprite openAnotherStandardSprite;
+    [SerializeField] private Sprite openAnotherPlusSprite;
+
+    public void OpenAnother()
+    {
+        if (!openAnotherPlus && !openAnotherx10)
+        {
+            OpenStandardOne();
+        }
+        else if (!openAnotherPlus && openAnotherx10)
+        {
+            OpenStandardTen();
+        }
+        else if (openAnotherPlus && !openAnotherx10)
+        {
+            OpenPlusOne();
+        }
+        else if (openAnotherPlus && openAnotherx10)
+        {
+            OpenPlusTen();
+        }
+        openAnotherButtonObject.sprite = !openAnotherPlus ? openAnotherStandardSprite : openAnotherPlusSprite;
+        bottomText.text = "tap to open!";
     }
 }

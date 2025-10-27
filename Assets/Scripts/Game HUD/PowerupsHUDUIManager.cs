@@ -99,7 +99,7 @@ public class PowerupsHUDUIManager : MonoBehaviour
             LeanTween.cancel(powerupButtonObjects[i]);
             powerupButtonObjects[i].GetComponent<Button>().onClick.RemoveAllListeners();
             var index = i;
-            LeanTween.moveLocalX(powerupButtonObjects[i], -startXLocalPos, 0.5f).setEase(LeanTweenType.easeInBack).setDelay((0.1f * i) + 0.01f).setOnComplete(() => powerupButtonObjects[index].SetActive(false));
+            LeanTween.moveLocalX(powerupButtonObjects[i], startXLocalPos, 0.5f).setEase(LeanTweenType.easeInBack).setDelay((0.1f * i) + 0.01f).setOnComplete(() => powerupButtonObjects[index].SetActive(false));
         }
         AlphaHelper(false);
         LeanTween.cancel(powerupButtonObjects[3]);

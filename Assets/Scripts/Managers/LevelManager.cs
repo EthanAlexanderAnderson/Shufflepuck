@@ -7,8 +7,6 @@ public class LevelManager : MonoBehaviour
     // self
     public static LevelManager Instance;
 
-    private int level;
-    private int XP;
     private float levelProgressBarValue;
 
     [SerializeField] private TMP_Text currentLevelText;
@@ -16,6 +14,10 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private TMP_Text xpText;
 
     [SerializeField] private Slider levelProgressBar;
+
+    private const int baseXPRequirement = 100;
+    private const int incrementXPRequirement = 10;
+    private const int maximumXPRequirement = 1000;
 
     private void Awake()
     {
@@ -27,33 +29,26 @@ public class LevelManager : MonoBehaviour
 
     void OnEnable()
     {
-        LoadXP();
         SetText();
-    }
-
-    public void LoadXP()
-    {
-        XP = PlayerPrefs.GetInt("XP");
     }
 
     public void AddXP(int xp)
     {
         Debug.Log("AddXP called " + xp);
-        XP += xp;
-        PlayerPrefs.SetInt("XP", XP);
+        PlayerPrefs.SetInt("XP", PlayerPrefs.GetInt("XP") + xp);
         SetText();
         OngoingChallengeManagerScript.Instance.EvaluateChallengeAndSetText();
     }
 
     public void SetText()
     {
-        int XPiterator;
-        (XPiterator, level) = GetXPAndLevel();
+        (int XPiterator, int level) = GetXPAndLevel();
 
         currentLevelText.text = level.ToString();
         nextLevelText.text = (level + 1).ToString();
-        xpText.text = (XPiterator + 100 + 10 * level).ToString() + "/" + (100 + 10 * level).ToString() + " XP";
-        levelProgressBarValue = (((float)XPiterator + 100 + 10 * (float)level) / (100 + 10 * (float)level) * 100);
+        int levelUpXpRequirement = Mathf.Min(maximumXPRequirement, baseXPRequirement + incrementXPRequirement * level);
+        xpText.text = (XPiterator + levelUpXpRequirement).ToString() + "/" + (levelUpXpRequirement).ToString() + " XP";
+        levelProgressBarValue = (((float)XPiterator + (float)levelUpXpRequirement) / (float)levelUpXpRequirement) * 100;
     }
 
     // gets current XP progress (not total XP) and current level
@@ -64,9 +59,15 @@ public class LevelManager : MonoBehaviour
         while (XPiterator >= 0)
         {
             leveliterator++;
-            XPiterator -= 100 + 10 * leveliterator;
+            XPiterator -= Mathf.Min(maximumXPRequirement, baseXPRequirement + incrementXPRequirement * leveliterator);
         }
         return (XPiterator, leveliterator);
+    }
+
+    public int GetLevelUpXPRequirement()
+    {
+        (_, int level) = GetXPAndLevel();
+        return Mathf.Min(maximumXPRequirement, baseXPRequirement + incrementXPRequirement * level);
     }
 
     private void Update()

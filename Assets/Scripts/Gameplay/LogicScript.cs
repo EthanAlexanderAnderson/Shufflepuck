@@ -31,6 +31,10 @@ public class LogicScript : MonoBehaviour
     private float power;
     private float spin;
 
+    // UI
+    [SerializeField] private GameObject exitConfirmationMenu;
+    [SerializeField] private GameObject restartConfirmationMenu;
+
     // wall
     private int wallCount = 3;
     [SerializeField] private GameObject wall; // set in editor
@@ -39,11 +43,16 @@ public class LogicScript : MonoBehaviour
     // powerups
     [SerializeField] private GameObject powerupsMenu; // set in editor
     public int triplePowerup;
+    public int triplePowerupMax;
+    int playerWeakenCount = 0;
+    int CPUWeakenCount = 0;
+    public void IncrementWeaken(bool weakenPlayer) { if (weakenPlayer) { playerWeakenCount++; } else { CPUWeakenCount++; } }
 
     // game state
     public bool gameIsRunning { get; private set; }
     private float timer = 0;
     private int difficulty; // 0 easy 1 medium 2 hard
+    public int GetDifficulty() { return difficulty; }
 
     private bool isLocal;
     public bool IsLocal
@@ -109,6 +118,7 @@ public class LogicScript : MonoBehaviour
         UI.ChangeUI(UI.titleScreen);
     }
 
+    bool tripleSpawned = false;
     // Update is called once per frame
     void Update()
     {
@@ -118,7 +128,7 @@ public class LogicScript : MonoBehaviour
         }
 
         // only do this stuff when game is running (not in menu etc.)
-        if (gameIsRunning && (player.puckCount > 0 || opponent.puckCount > 0))
+        if (gameIsRunning)
         {
             // update wall status
             if (wallCount == 0 && puckManager.AllPucksAreSlowedMore())
@@ -129,12 +139,25 @@ public class LogicScript : MonoBehaviour
             }
 
             // do triple powerup
-            if (triplePowerup > 0 && activeCompetitor.activePuckScript != null && activeCompetitor.activePuckScript.IsSafe())
+            if (triplePowerup > 0 && activeCompetitor.activePuckScript != null && activeCompetitor.activePuckObject.transform.position.y > -1 && !tripleSpawned)
             {
-                activeCompetitor.activePuckScript.RemovePowerupText("triple");
+                activeCompetitor.activePuckScript.RemoveAllPowerupText("triple");
+                GameObject previousActivePuckObject = activeCompetitor.activePuckObject;
                 puckManager.CreatePuck(activeCompetitor);
-                activeCompetitor.ShootActivePuck(triplePower + Random.Range(-10.0f, 10.0f), tripleAngle + Random.Range(-10.0f, 10.0f), 50, false);
+                activeCompetitor.activePuckScript.CopyPuckStaticEffects(previousActivePuckObject);
+                tripleSpawned = true;
+            }
+            if (triplePowerup > 0 && activeCompetitor.activePuckScript != null && activeCompetitor.activePuckObject.transform.localScale.x == activeCompetitor.activePuckScript.GetBaseLocalScale() && tripleSpawned)
+            {
+                float nextTripleShotPowerup = triplePower - (((triplePowerupMax - triplePowerup) / 2) + 1) * 12;
+                float nextTripleShotAngle = tripleAngle - (8 - triplePowerup % 2 * 16);
+                activeCompetitor.ShootActivePuck(nextTripleShotAngle, nextTripleShotPowerup, tripleSpin, false);
                 triplePowerup--;
+                if (triplePowerup == 0)
+                {
+                    triplePowerupMax = 0;
+                }
+                tripleSpawned = false;
             }
 
             // start Players turn, do this then start shooting
@@ -147,7 +170,7 @@ public class LogicScript : MonoBehaviour
             if ((Input.GetMouseButtonDown(0)) && gameIsRunning && (player.isShooting || isLocal) && powerupsMenu.activeInHierarchy == false)
             {
                 // make sure click is not on a puck
-                if (ClickNotOnPuck())
+                if (ClickNotOnPuck() && !exitConfirmationMenu.activeInHierarchy && !restartConfirmationMenu.activeInHierarchy)
                 {
                     PlayerShootingHelper();
                 }
@@ -164,19 +187,19 @@ public class LogicScript : MonoBehaviour
                 OpponentShootingHelper();
             }
 
-            // lastly, increment timer while game is running
+            // lastly, increment CPU shooting helper timer while game is running
             timer += Time.deltaTime;
         }
         // ran out of pucks (game over)
-        else if (gameIsRunning && puckManager.AllPucksAreStopped() && puckManager.AllPucksAreNotNearingScoreZoneEdge())
+        if (gameIsRunning && puckManager.AllPucksAreStopped() && puckManager.AllPucksAreNotNearingScoreZoneEdge() && player.puckCount <= 0 && opponent.puckCount <= 0)
         {
             gameIsRunning = false;
             UpdateScores();
             UI.ChangeUI(UI.gameResultScreen);
             UI.UpdateGameResult(player.GetScore(), opponent.GetScore(), difficulty, isLocal);
-            isLocal = false;
             arrow.SetActive(false);
             FogScript.Instance.DisableFog();
+            puckManager.ResetAlphaOnAllPucks();
         }
     }
 
@@ -189,7 +212,7 @@ public class LogicScript : MonoBehaviour
         }
 
         // if we start our turn with no pucks remaining, skip our turn
-        if (player.puckCount <= 0 && opponent.puckCount > 0)
+        if (player.puckCount <= 0)
         {
             player.isTurn = false;
             opponent.isTurn = true;
@@ -204,6 +227,7 @@ public class LogicScript : MonoBehaviour
         bar.ToggleDim(false);
         line.isActive = true;
         arrow.SetActive(true);
+        bar.SetWeakenBarCover(playerWeakenCount);
         GameHUDManager.Instance.ChangeTurnText(isLocal ? "Player 1's Turn" : "Your Turn");
         if (player.puckCount == 1)
         {
@@ -238,6 +262,9 @@ public class LogicScript : MonoBehaviour
             case "power":
                 soundManager.PlayClickSFXAlterPitch(1, 1.05f);
                 power = line.GetValue();
+                // weaken powerup
+                power = Math.Min(power, 100 - playerWeakenCount * 10);
+                playerWeakenCount = 0;
                 // if non-hard diff, end turn
                 if (difficulty < 2)
                 {
@@ -261,7 +288,7 @@ public class LogicScript : MonoBehaviour
     private void StartingOpponentsTurnHelper()
     {
         // if opponents starts their turn with no pucks remaining, skip their turn
-        if (opponent.puckCount <= 0 && player.puckCount > 0)
+        if (opponent.puckCount <= 0)
         {
             opponent.isTurn = false;
             player.isTurn = true;
@@ -277,6 +304,7 @@ public class LogicScript : MonoBehaviour
             bar.ToggleDim(true);
         }
         line.isActive = true;
+        bar.SetWeakenBarCover(CPUWeakenCount);
         arrow.SetActive(true);
         puckHalo.SetActive(difficulty == 0);
         GameHUDManager.Instance.ChangeTurnText(isLocal ? "Player 2's Turn" : "CPU's Turn");
@@ -323,6 +351,9 @@ public class LogicScript : MonoBehaviour
         {
             if (difficulty < 2)
             {
+                // weaken powerup
+                CPUShotPower = Math.Min(CPUShotPower, 100 - CPUWeakenCount * 10);
+                CPUWeakenCount = 0;
                 Shoot(CPUShotAngle, CPUShotPower);
                 tempTime = 0;
             }
@@ -334,7 +365,27 @@ public class LogicScript : MonoBehaviour
         // after 4.5 seconds elapsed, CPU selects spin (for hard mode only)
         if (CPUShotSpin >= 0 && Mathf.Abs(line.GetValue() - CPUShotSpin) < (timer - (tempTime + 4.5 + powerupWaitTime))/2 && activeBar == "spin")
         {
+            // weaken powerup
+            CPUShotPower = Math.Min(CPUShotPower, 100 - CPUWeakenCount * 10);
+            CPUWeakenCount = 0;
             Shoot(CPUShotAngle, CPUShotPower, CPUShotSpin);
+            tempTime = 0;
+        }
+
+        // fallback force shot after 20 seconds
+        if (((timer - tempTime) > 20) && opponent.isShooting)
+        {
+            (CPUShotAngle, CPUShotPower, CPUShotSpin) = CPUBehaviorScript.FindPath();
+            CPUShotPower = Math.Min(CPUShotPower, 100 - CPUWeakenCount * 10);
+            CPUWeakenCount = 0;
+            if (difficulty < 2)
+            {
+                Shoot(CPUShotAngle, CPUShotPower);
+            }
+            else
+            {
+                Shoot(CPUShotAngle, CPUShotPower, CPUShotSpin);
+            }
             tempTime = 0;
         }
     }
@@ -344,13 +395,12 @@ public class LogicScript : MonoBehaviour
     {
         puckManager.CleanupDeadPucks();
         powerupManager.DisableForceFieldIfNecessary();
-        Debug.Log("Shooting: " + angle + " | " + power + " | " + spin);
         activeBar = bar.ChangeBar("none");
         line.isActive = false;
         arrow.SetActive(false);
         GameHUDManager.Instance.ChangeTurnText(string.Empty);
         activeCompetitor.ShootActivePuck(angle, power, spin);
-        (triplePower, tripleAngle, tripleSpin) = (angle, power, spin);
+        (tripleAngle, triplePower, tripleSpin) = (angle, power, spin);
         UI.PostShotUpdate(player.puckCount, opponent.puckCount);
         UI.UpdateShotDebugText(angle, power, spin);
         if (activeCompetitor.isPlayer)
@@ -392,6 +442,9 @@ public class LogicScript : MonoBehaviour
         UpdateScores();
         PowerupAnimationManager.Instance.ClearPowerupPopupEffectAnimationQueue();
         triplePowerup = 0;
+        triplePowerupMax = 0;
+        playerWeakenCount = 0;
+        CPUWeakenCount = 0;
         LaserScript.Instance.DisableLaser();
 
         // load player & CPU decks
@@ -435,7 +488,7 @@ public class LogicScript : MonoBehaviour
         line.GetComponent<LineScript>().FullSpeed();
         bar.ChangeBar("none");
         UI.ChangeUI(UI.gameHud);
-        powerupManager.DisableForceFieldIfNecessary();
+        ForcefieldScript.Instance.DisableForcefield();
         FogScript.Instance.DisableFog();
         powerupsMenu.SetActive(false);
     }
@@ -511,8 +564,8 @@ public class LogicScript : MonoBehaviour
             // Calculate the distance between the mouse click position and the puck position
             float distance = Vector3.Distance(worldPosition, puck.transform.position);
 
-            // If the distance is less than or equal to 1 unit, the click is on or near a puck
-            if (distance <= 1f)
+            // If the distance is less than or equal to 1.5 units, the click is on or near a puck
+            if (distance <= 1.5f)
             {
                 return false; // Click is too close to a puck
             }

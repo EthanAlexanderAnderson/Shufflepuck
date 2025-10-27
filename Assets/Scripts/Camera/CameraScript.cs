@@ -7,47 +7,31 @@ using UnityEngine;
 [RequireComponent(typeof(Camera))]
 public class CameraScript : MonoBehaviour
 {
-    // Set this to the in-world distance between the left & right edges of your scene.
+    // In-world distance between left & right edges of your scene.
     public float sceneWidth;
-    public float ratioCutoff;
-    public float sizeMod;
-    public float ratioCutoff2;
-    public float sizeMod2;
-    public float sizeMod3;
+    // In-world distance between top & bottom edges of your scene.
+    public float sceneHeight;
 
-    Camera _camera;
+    public float sizeMod;
+
+    private Camera _camera;
+
     void Start()
     {
         _camera = GetComponent<Camera>();
     }
 
-    // Adjust the camera's height so the desired scene width fits in view
-    // even if the screen/window size changes dynamically.
     void Update()
     {
-        if (!(Screen.width < Screen.height * ratioCutoff))
-        {
-            float unitsPerPixel = sceneWidth / Screen.width;
+        float desiredHalfHeight;
 
-            float desiredHalfHeight = sizeMod * unitsPerPixel * Screen.height;
+        float unitsPerPixel = sceneWidth / Screen.width;
+        desiredHalfHeight = sizeMod * unitsPerPixel * Screen.height;
 
-            _camera.orthographicSize = desiredHalfHeight;
-        }
-        else if (!(Screen.width < Screen.height * ratioCutoff2))
-        {
-            float unitsPerPixel = sceneWidth / Screen.width;
+        // Calculate size required to fit the scene height exactly
+        float heightBasedHalfSize = sceneHeight / 2f;
 
-            float desiredHalfHeight = sizeMod2 * unitsPerPixel * Screen.height;
-
-            _camera.orthographicSize = desiredHalfHeight;
-        }
-        else
-        {
-            float unitsPerPixel = sceneWidth / Screen.width;
-
-            float desiredHalfHeight = sizeMod3 * unitsPerPixel * Screen.height;
-
-            _camera.orthographicSize = desiredHalfHeight;
-        }
+        // Pick whichever is larger to ensure nothing is cut off
+        _camera.orthographicSize = Mathf.Max(desiredHalfHeight, heightBasedHalfSize);
     }
 }

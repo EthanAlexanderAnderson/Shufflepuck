@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Unity.Services.CloudSave;
 using Unity.Services.Authentication;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class PlayerDataManager : MonoBehaviour
 {
@@ -18,18 +17,14 @@ public class PlayerDataManager : MonoBehaviour
         "easyWin", "easyLoss", "easyTie",
         "mediumWin", "mediumLoss", "mediumTie",
         "hardWin", "hardLoss", "hardTie",
-        "DailyChallenge1", "DailyChallenge2", "OngoingChallenge",
+        "DailyChallenge1", "DailyChallenge2", "OngoingChallenge", "ChallengeRefreshesToday",
         "PlinkoReward", "PlinkoPegsDropped", "WelcomeBonus", "Streak", "XP",
-<<<<<<< Updated upstream
-        "CraftingCredits", "PackBooster", "StandardPacks", "PlusPacks"
-=======
         "CraftingCredits", "PackBooster", "StandardPacks", "PlusPacks", "StandardPacksOpened", "PlusPacksOpened",
         "Elo"
->>>>>>> Stashed changes
     };
 
     string[] stringKeys = {
-        "LastChallengeDate", "LastPlinkoRewardDate", "LastDailyWinDate", "LastPackBoosterDate",
+        "LastChallengeDate", "LastPlinkoRewardDate", "LastDailyWinDate", "LastPackBoosterDate", "LastStreakDate",
         "PlinkoSkinsUnlocked",
         "Deck1", "Deck2", "Deck3", "Deck4", "Deck5", "CardCollection",
         "WonUsing"
@@ -49,15 +44,13 @@ public class PlayerDataManager : MonoBehaviour
 
         try
         {
-            var playerData = new Dictionary<string, object>{
-            {"testKey", "a text value"},
-        };
+            var playerData = new Dictionary<string, object>{ {"testKey", "a text value"} };
             await CloudSaveService.Instance.Data.Player.SaveAsync(playerData);
             Debug.Log("Test save successful");
         }
         catch (System.Exception e)
         {
-            Debug.Log($"Test save failed {e}");
+            Debug.LogError($"Test save failed {e}");
         }
     }
 
@@ -66,6 +59,7 @@ public class PlayerDataManager : MonoBehaviour
     {
         if (!AuthenticationService.Instance.IsSignedIn) return;
 
+        /*
         // set username and id in cloud
         try
         {
@@ -81,6 +75,7 @@ public class PlayerDataManager : MonoBehaviour
         {
             Debug.Log($"loginData save failed {e}");
         }
+        */
 
         PlinkoDataSwap();
 
@@ -101,6 +96,24 @@ public class PlayerDataManager : MonoBehaviour
                 {
                     if (PlayerPrefs.GetInt("easyWin") > 0)
                     {
+                        var loadresults = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { "LoadAll" });
+
+                        if (loadresults.TryGetValue("LoadAll", out var loadvalue))
+                        {
+                            int loadall = loadvalue.Value.GetAs<int>(); // Convert JSON object to int
+                            if (loadall == 1)
+                            {
+                                Debug.Log("Attempting to load all data from cloud...");
+                                await LoadAllData();
+                                PlayerPrefs.SetInt("LoadAll", 0);
+                                await SaveDataInt("LoadAll");
+                                return;
+                            }
+                        }
+
+                        PlayerPrefs.SetInt("LoadAll", 0);
+                        await SaveDataInt("LoadAll");
+
                         Debug.Log("Attempting to save all data to cloud...");
                         await SaveAllData();
                     }
@@ -115,12 +128,13 @@ public class PlayerDataManager : MonoBehaviour
         {
             if (PlayerPrefs.GetInt("easyWin") > 0)
             {
+                PlayerPrefs.SetInt("LoadAll", 0);
+                await SaveDataInt("LoadAll");
+
                 Debug.Log("No prior backup, attempting to save all data to cloud...");
                 await SaveAllData();
             }
         }
-
-        SceneManager.LoadScene("SampleScene");
     }
 
     public void SaveAllDataButtonHelper() { _ = SaveAllData(); }
@@ -152,6 +166,10 @@ public class PlayerDataManager : MonoBehaviour
         {
             await CloudSaveService.Instance.Data.Player.SaveAsync(playerData);
             Debug.Log("Player data successfully saved to Cloud.");
+            if (UIManagerScript.Instance != null)
+            {
+                UIManagerScript.Instance.SetErrorMessage("Player data successfully saved to Cloud.");
+            }
         }
         else
         {
@@ -165,16 +183,21 @@ public class PlayerDataManager : MonoBehaviour
     {
         if (!AuthenticationService.Instance.IsSignedIn) return;
 
-        // TODO: daily quest date, main quest progress
-
-        foreach (string key in intKeys)
+        for (int i = 0; i < intKeys.Length; i++)
         {
-            await LoadDataInt(key);
+            await LoadDataInt(intKeys[i]);
+            PlayerAuthentication.Instance.SetProgressText($"{i}/{intKeys.Length + stringKeys.Length}");
         }
 
-        foreach (string key in stringKeys)
+        for (int i = 0; i < stringKeys.Length; i++)
         {
-            await LoadDataString(key);
+            await LoadDataString(stringKeys[i]);
+            PlayerAuthentication.Instance.SetProgressText($"{i + intKeys.Length}/{intKeys.Length + stringKeys.Length}");
+        }
+
+        if (UIManagerScript.Instance != null)
+        {
+            UIManagerScript.Instance.SetErrorMessage("Player data successfully loaded from Cloud.");
         }
     }
 
@@ -215,7 +238,7 @@ public class PlayerDataManager : MonoBehaviour
         {
             try
             {
-                string valueFromFile = outValue.Value.GetAs<string>(); // Convert JSON object to int
+                string valueFromFile = outValue.Value.GetAs<string>(); // Convert JSON object to string
                 Debug.Log($"Loaded data: {key} = {valueFromFile}");
                 PlayerPrefs.SetString(key, valueFromFile);
             }

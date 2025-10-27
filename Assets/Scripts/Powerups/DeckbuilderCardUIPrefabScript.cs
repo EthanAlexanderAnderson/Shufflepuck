@@ -31,6 +31,8 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
 
     [SerializeField] private TMP_Text countText;
 
+    [SerializeField] private TMP_Text sectionHeaderCountText;
+
     // --- RARITY
     [SerializeField] private Image cardRarityIcon;
     [SerializeField] private Sprite[] rarityIcons = new Sprite[5];
@@ -109,14 +111,21 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
                 case -1:
                     cardNameText.text = "in deck:";
                     cardIcon.sprite = inDeckSprite;
+                    sectionHeaderCountText.gameObject.SetActive(true);
+                    sectionHeaderCountText.text = DeckManager.Instance.GetDeckCount().ToString();
+                    DeckManager.Instance.SetTotalDeckCountUITextObject(sectionHeaderCountText);
                     break;
                 case -2:
                     cardNameText.text = "collection:";
                     cardIcon.sprite = collectionSprite;
+                    sectionHeaderCountText.gameObject.SetActive(true);
+                    sectionHeaderCountText.text = PowerupCardData.GetDiscoveredCount().ToString() + " / " + (PowerupCardData.GetCardCount() - 1).ToString();
                     break;
                 case -3:
                     cardNameText.text = "undiscovered:";
                     cardIcon.sprite = undiscoveredSprite;
+                    sectionHeaderCountText.gameObject.SetActive(true);
+                    sectionHeaderCountText.text = ((PowerupCardData.GetCardCount() - 1) - PowerupCardData.GetDiscoveredCount()).ToString() + " / " + (PowerupCardData.GetCardCount() - 1).ToString();
                     break;
                 default:
                     cardNameText.text = "ERROR";
@@ -127,6 +136,8 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
             cardNameText.gameObject.tag = "Untagged";
             cardIcon.color = UIManagerScript.Instance.GetDarkMode() ? new Color(0f, 0f, 0f, 1f) : new Color(1f, 1f, 1f, 1f);
             cardIcon.gameObject.tag = "Untagged";
+            sectionHeaderCountText.color = UIManagerScript.Instance.GetDarkMode() ? new Color(0f, 0f, 0f, 1f) : new Color(1f, 1f, 1f, 1f);
+            sectionHeaderCountText.gameObject.tag = "Untagged";
             minusButtonObject.SetActive(false);
             plusButtonObject.SetActive(false);
             expandCollapseObject.SetActive(false);
@@ -490,7 +501,7 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
 
         // text
         ownedCount1.text = ownedCardVariationList[selectedCardVariationIndex].count.ToString();
-        ownedCount2.text = selectedCurrency.ToString();
+        ownedCount2.text = selectedCurrency.ToString() + "/" + craftCost;
         ownedText2.text = selectedCardRank > 0 ? rankCraftNames[selectedCardRank - 1] + ":" : "";
         craftCreditsImage2.SetActive(selectedCardRank == 0);
         craftArrow1.enabled = (toCraftCount > 0);
@@ -501,7 +512,7 @@ public class DeckbuilderCardUIPrefabScript : MonoBehaviour, IPointerDownHandler,
 
         // buttons
         craftMinusButton.interactable = (toCraftCount > 0);
-        craftConfirmButton.interactable = (toCraftCount > 0 && remainingCredits >= 0);
+        craftConfirmButton.interactable = (toCraftCount > 0 && remainingCredits >= 0) && (ownedCardVariationList[selectedCardVariationIndex].count + toCraftCount <= 4095);
         craftPlusButton.interactable = ((remainingCredits - craftCost) >= 0 && craftCost > 0);
     }
 

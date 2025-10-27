@@ -116,7 +116,7 @@ public abstract class ChallengeCondition
 public class BeatByCondition : ChallengeCondition
 {
     public int winByTargetPoints = 1; // Example: win by 3+ points
-    public int difficultyLevel = -2; // Example: Any Difficulty = -3, Online = -1, Easy = 0, Medium = 1, Hard = 2
+    public int targetDifficultyLevel = -3; // Example: Any Difficulty = -3, Online = -1, Easy = 0, Medium = 1, Hard = 2
 
     // TODO: investigate if there is a better way to do this
     public override (float, float) GetConditionVariables()
@@ -129,24 +129,39 @@ public class BeatByCondition : ChallengeCondition
         int pointsWonBy = (int)args[0];
         int difficulty = (int)args[1];
 
-        return pointsWonBy >= winByTargetPoints && (difficulty == difficultyLevel || difficultyLevel == -3) ;
+        return pointsWonBy >= winByTargetPoints && (difficulty == targetDifficultyLevel || targetDifficultyLevel == -3);
     }
 
     public override bool IsAssignable()
     {
         string[] diffKeys = { "easyHighscore", "mediumHighscore", "hardHighscore" };
         // don't assign a daily challenge that is too hard or too easy
-        if (difficultyLevel >= 0 && (PlayerPrefs.GetInt(diffKeys[difficultyLevel]) < (winByTargetPoints + 2) || PlayerPrefs.GetInt(diffKeys[difficultyLevel]) > (winByTargetPoints + 6)))
+        int currentScore = 0;
+        if (targetDifficultyLevel >= 0 && targetDifficultyLevel < diffKeys.Length)
         {
-            return false;
+            currentScore = PlayerPrefs.GetInt(diffKeys[targetDifficultyLevel]);
         }
         // don't assign "win online" challenge if the player hasn't beat the hard CPU 5 times
-        else if (difficultyLevel == -1 && PlayerPrefs.GetInt("hardWin") < 5)
+        else if (targetDifficultyLevel == -1)
+        {
+            return PlayerPrefs.GetInt("hardWin") >= 5;
+        }
+        else if (targetDifficultyLevel == -3)
+        {
+           currentScore = Mathf.Max(PlayerPrefs.GetInt(diffKeys[0]), PlayerPrefs.GetInt(diffKeys[1]), PlayerPrefs.GetInt(diffKeys[2]));
+        }
+
+        if (targetDifficultyLevel >= 0 &&
+            (winByTargetPoints > currentScore - 3 || winByTargetPoints < currentScore - 5) && // too hard or too easy
+            !(currentScore <= 3 && winByTargetPoints == 1) // don't deny default "win by 1" if it's the only assignable
+            )
         {
             return false;
         }
-
-        return true;
+        else
+        {
+            return winByTargetPoints > 0;
+        }
     }
 }
 
@@ -256,12 +271,14 @@ public class HighscoreCondition : ChallengeCondition
 // Card Condition, example: "Win a match using 'plus one'", "Win a match using any holo card", "Win matches using 'growth' 3 times", "Win a match using any common card"
 public class WinUsingCondition : ChallengeCondition
 {
-    public int ID; // -5 = celestial, -4 = diamond, -3 = gold, -2 = bronze, -1 = holo, 0 - 4 rarity, 5+ index - 5
-    public int targetNumberUsed;
+    public int ID; // -8 = any, -7 = different, -6 = celestial, -5 = diamond, -4 = gold, -3 = bronze, -2 = standard, -1 = holo, 0 - 4 rarity, 5+ index - 5
+    public int targetNumberUsed = 1;
+    public int targetDifficultyLevel = -3; // Example: Any Difficulty = -3, Online = -1, Easy = 0, Medium = 1, Hard = 2
 
     public override (float, float) GetConditionVariables()
     {
         int currentNumberUsed = 0;
+        List<int> indexesSeen = new List<int>();
 
         // Get the current WonUsing string
         string wonUsingString = PlayerPrefs.GetString("WonUsing", "");
@@ -285,7 +302,7 @@ public class WinUsingCondition : ChallengeCondition
                     currentNumberUsed += decodedCard.quantity;
                 }
                 // card rarity
-                else if (ID >= 0 && PowerupCardData.GetCardRarity(decodedCard.cardIndex) == ID)
+                else if (ID >= 0 && ID < 5 && PowerupCardData.GetCardRarity(decodedCard.cardIndex) == ID)
                 {
                     currentNumberUsed += decodedCard.quantity;
                 }
@@ -295,7 +312,18 @@ public class WinUsingCondition : ChallengeCondition
                     currentNumberUsed += decodedCard.quantity;
                 }
                 // rank
-                else if (ID >= -5 && decodedCard.rank == (ID * -1) - 1)
+                else if (ID >= -6 && ID < -1 && decodedCard.rank == (ID * -1) - 2)
+                {
+                    currentNumberUsed += decodedCard.quantity;
+                }
+                // different
+                else if (ID == -7 )
+                {
+                    if (!indexesSeen.Contains(decodedCard.cardIndex)) indexesSeen.Add(decodedCard.cardIndex);
+                    currentNumberUsed = indexesSeen.Count;
+                }
+                // any
+                else if (ID == -8)
                 {
                     currentNumberUsed += decodedCard.quantity;
                 }
@@ -305,8 +333,72 @@ public class WinUsingCondition : ChallengeCondition
         return (currentNumberUsed, targetNumberUsed);
     }
 
-    // TODO: make sure player has the card
-    public override bool IsAssignable() { return true; }
+    public override bool IsConditionMet(params object[] args)
+    {
+        // for ongoing
+        if (args.Length <= 0)
+        {
+            return base.IsConditionMet(args);
+        }
+        // for daily
+        else
+        {
+            List<int> playerUsed = (List<int>)args[0];
+            int difficulty = (int)args[1];
+
+            if (playerUsed == null || playerUsed.Count <= 0) return false;
+            if (difficulty != targetDifficultyLevel && targetDifficultyLevel != -3) return false;
+
+            int currentNumberUsed = 0;
+            List<int> indexesSeen = new List<int>();
+
+            // for each card the player used
+            //  -8 = any, -7 = different, -6 = celestial, -5 = diamond, -4 = gold, -3 = bronze, -2 = standard, -1 = holo, 0 - 4 rarity, 5+ index - 5
+            for (int i = 0; i < playerUsed.Count; i++)
+            {
+                var decodedCard = PowerupCardData.DecodeCard(playerUsed[i]);
+
+                // card index
+                if (ID >= 5 && decodedCard.cardIndex == (ID - 5))
+                {
+                    currentNumberUsed += decodedCard.quantity;
+                }
+                // card rarity
+                else if (ID >= 0 && ID < 5 && PowerupCardData.GetCardRarity(decodedCard.cardIndex) == ID)
+                {
+                    currentNumberUsed += decodedCard.quantity;
+                }
+                // holo
+                else if (ID == -1 && decodedCard.holo)
+                {
+                    currentNumberUsed += decodedCard.quantity;
+                }
+                // rank
+                else if (ID >= -6 && ID < -1 && decodedCard.rank == (ID * -1) - 2)
+                {
+                    currentNumberUsed += decodedCard.quantity;
+                }
+                // different
+                else if (ID == -7)
+                {
+                    if (!indexesSeen.Contains(decodedCard.cardIndex)) indexesSeen.Add(decodedCard.cardIndex);
+                    currentNumberUsed = indexesSeen.Count;
+                }
+                // any
+                else if (ID == -8)
+                {
+                    currentNumberUsed += decodedCard.quantity;
+                }
+            }
+
+            return currentNumberUsed >= targetNumberUsed;
+        }
+    }
+
+    public override bool IsAssignable()
+    {
+        return PowerupCardData.GetCardOwnedSum(ID) >= targetNumberUsed;
+    }
 }
 
 public class LevelCondition : ChallengeCondition
@@ -335,6 +427,58 @@ public class StreakCondition : ChallengeCondition
     }
 
     public override bool IsAssignable() { return true; }
+}
+
+public class OpenPacksCondition : ChallengeCondition
+{
+    public int targetNumberOpened = 1;
+    public int targetPackType = -1; // -1 = any, 0 = standard, 1 = plus
+
+    public override (float, float) GetConditionVariables()
+    {
+        int standardPacksOpened = PlayerPrefs.GetInt("StandardPacksOpened");
+        int plusPacksOpened = PlayerPrefs.GetInt("PlusPacksOpened");
+
+        if (targetPackType == -1)
+        {
+            return (standardPacksOpened + plusPacksOpened, targetNumberOpened);
+        }
+        else if (targetPackType == 0)
+        {
+            return (standardPacksOpened, targetNumberOpened);
+        }
+        else if (targetPackType == 1)
+        {
+            return (plusPacksOpened, targetNumberOpened);
+        }
+
+        return (0, targetNumberOpened);
+    }
+
+    public override bool IsConditionMet(params object[] args)
+    {
+        // I guess only call this when a pack is opened
+        return true;
+        // TODO: handle different types standard vs plus vs any
+    }
+
+    public override bool IsAssignable()
+    {
+        if (targetPackType == -1)
+        {
+            return (PlayerPrefs.GetInt("StandardPacks") + PlayerPrefs.GetInt("PlusPacks")) > 0;
+        }
+        else if (targetPackType == 0)
+        {
+            return PlayerPrefs.GetInt("StandardPacks") > 0;
+        }
+        else if (targetPackType == 1)
+        {
+            return PlayerPrefs.GetInt("PlusPacks") > 0;
+        }
+
+        return false;
+    }
 }
 
 public class Reward
