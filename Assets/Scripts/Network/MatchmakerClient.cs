@@ -188,7 +188,8 @@ public class MatchmakerClient : MonoBehaviour
 
             // Pass Relay join code to lobby data
             Dictionary<string, DataObject> data = new Dictionary<string, DataObject> {
-                { "RelayJoinCode", new DataObject(DataObject.VisibilityOptions.Public, relayJoinCode) }
+                { "RelayJoinCode", new DataObject(DataObject.VisibilityOptions.Public, relayJoinCode) },
+                { "Elo", new DataObject(DataObject.VisibilityOptions.Public, PlayerPrefs.GetInt("Elo", 100).ToString(), DataObject.IndexOptions.N1) }
             };
 
             await LobbyService.Instance.UpdateLobbyAsync(lobby.Id, new UpdateLobbyOptions { Data = data });
@@ -202,9 +203,22 @@ public class MatchmakerClient : MonoBehaviour
             hostLobby = lobby;
             isHost = true;
 
+<<<<<<< Updated upstream
             Debug.Log("Created Lobby. Code: " + lobby.LobbyCode);
             UI.lobbyCodeText.text = "Lobby Code: " + lobby.LobbyCode;
             GUIUtility.systemCopyBuffer = lobby.LobbyCode;
+=======
+            if (isPrivate)
+            {
+                Debug.Log("Created Private Lobby. Code: " + lobby.LobbyCode);
+                UIManagerScript.Instance.lobbyCodeText.text = "Lobby Code: " + lobby.LobbyCode;
+                GUIUtility.systemCopyBuffer = lobby.LobbyCode;
+            }
+            else
+            {
+                Debug.Log("Created Public Lobby. Elo: " + PlayerPrefs.GetInt("Elo", 100).ToString());
+            }
+>>>>>>> Stashed changes
         }
         catch (Exception e)
         {
@@ -306,6 +320,7 @@ public class MatchmakerClient : MonoBehaviour
     bool tryToEnableReadyButton;
     private void Update()
     {
+<<<<<<< Updated upstream
         Heartbeat();
         if (tryToEnableReadyButton)
         {
@@ -314,6 +329,87 @@ public class MatchmakerClient : MonoBehaviour
                 UI.EnableReadyButton();
                 tryToEnableReadyButton = false;
             }
+=======
+        int playerElo = PlayerPrefs.GetInt("Elo", 100);
+        int[] searchRanges = { 100, 300, 9999 }; // progressively widen Elo range
+        int rateLimitDelay = 750;
+
+        for ( int i = 0; i < searchRanges.Length; i++ )
+        {
+            int minElo = playerElo - searchRanges[i];
+            int maxElo = playerElo + searchRanges[i];
+
+            // Query for public, open lobbies
+            var query = new QueryLobbiesOptions
+            {
+                Count = 1,
+                Filters = new List<QueryFilter>
+                {
+                    new QueryFilter(
+                        field: QueryFilter.FieldOptions.AvailableSlots,
+                        op: QueryFilter.OpOptions.GT,
+                        value: "0"),
+                    new QueryFilter(
+                        field: QueryFilter.FieldOptions.IsLocked,
+                        op: QueryFilter.OpOptions.EQ,
+                        value: "false"),
+
+                    new QueryFilter(
+                        field: QueryFilter.FieldOptions.N1,
+                        op: QueryFilter.OpOptions.GE,
+                        value: minElo.ToString()),
+                    new QueryFilter(
+                        field: QueryFilter.FieldOptions.N1,
+                        op: QueryFilter.OpOptions.LE,
+                        value: maxElo.ToString())
+                },
+                Order = new List<QueryOrder>
+                {
+                new QueryOrder(
+                    asc: true,
+                    field: QueryOrder.FieldOptions.Created)
+                }
+            };
+
+            try
+            {
+                // make query to get lobbies
+                QueryResponse response = await LobbyService.Instance.QueryLobbiesAsync(query);
+
+                // Handle query response
+                if (response.Results.Count > 0) // public lobby was found -> join it
+                {
+                    Lobby foundLobby = response.Results[0];
+                    Debug.Log($"Found lobby within ±{searchRanges[i]} Elo range: {foundLobby.Data["Elo"].Value}");
+                    JoinLobby(false, lobbyId: foundLobby.Id);
+                    return;
+                }
+
+                // default query delay
+                await Task.Delay(rateLimitDelay);
+            }
+            catch (LobbyServiceException e)
+            {
+                if (e.Reason == LobbyExceptionReason.RateLimited)
+                {
+                    Debug.LogWarning("Rate limited — waiting longer...");
+                    // the search at the current elo failed, so we need to retry this iteration
+                    i--;
+                    // increase the delay between requests each time we get rate limited.
+                    rateLimitDelay += 500;
+
+                    // if the delay is longer than 10 seconds, clearly there is some issue, so cancel matchmaking
+                    if (rateLimitDelay > 10000)
+                    {
+                        Debug.LogError("QueryLobbiesAsync Rate Limit Error");
+                        UIManagerScript.Instance.SetErrorMessage("Matchmaking failed: rate limit error");
+                        return;
+                    }
+
+                    await Task.Delay(rateLimitDelay);
+                }
+            }
+>>>>>>> Stashed changes
         }
     }
 
@@ -358,8 +454,12 @@ public class MatchmakerClient : MonoBehaviour
     {
         try
         {
+<<<<<<< Updated upstream
             if (serverLogic == null) { serverLogic = ServerLogicScript.Instance; }
             serverLogic.AddPlayerServerRpc(logic.player.puckSpriteID, true); // TODO: instead of true, pass in "true" if the deck is NOT empty
+=======
+            ServerLogicScript.Instance.AddPlayerServerRpc(LogicScript.Instance.player.puckSpriteID, new FixedString32Bytes(PlayerAuthentication.Instance.GetUsername()), PlayerPrefs.GetInt("Elo", 100));
+>>>>>>> Stashed changes
         }
         catch (Exception e)
         {

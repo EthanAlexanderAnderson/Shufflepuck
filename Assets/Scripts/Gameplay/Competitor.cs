@@ -13,6 +13,11 @@ public class Competitor
     public PuckScript activePuckScript;
     public Sprite puckSprite;
     public int puckSpriteID;
+<<<<<<< Updated upstream
+=======
+    public FixedString32Bytes username;
+    public int elo;
+>>>>>>> Stashed changes
     public int score;
     public int scoreBonus;
     public int wins;
@@ -30,6 +35,15 @@ public class Competitor
     // optional constructor
     public Competitor(int puckID) { SetSprite(puckID); }
 
+<<<<<<< Updated upstream
+=======
+    // puck ID and username constructor
+    public Competitor(int puckID, FixedString32Bytes username) { SetSprite(puckID); this.username = username; }
+
+    // puck ID, username, and elo constructor
+    public Competitor(int puckID, FixedString32Bytes username, int elo) { SetSprite(puckID); this.username = username; this.elo = elo; }
+
+>>>>>>> Stashed changes
     public void SetSprite(int puckID)
     {
         puckSpriteID = puckID;

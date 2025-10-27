@@ -20,7 +20,12 @@ public class PlayerDataManager : MonoBehaviour
         "hardWin", "hardLoss", "hardTie",
         "DailyChallenge1", "DailyChallenge2", "OngoingChallenge",
         "PlinkoReward", "PlinkoPegsDropped", "WelcomeBonus", "Streak", "XP",
+<<<<<<< Updated upstream
         "CraftingCredits", "PackBooster", "StandardPacks", "PlusPacks"
+=======
+        "CraftingCredits", "PackBooster", "StandardPacks", "PlusPacks", "StandardPacksOpened", "PlusPacksOpened",
+        "Elo"
+>>>>>>> Stashed changes
     };
 
     string[] stringKeys = {
