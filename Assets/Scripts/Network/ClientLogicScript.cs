@@ -25,6 +25,7 @@ public class ClientLogicScript : NetworkBehaviour
     private float shotTimer;
 
     private bool receivedGameResult = false;
+    private int opponentElo = -1;
 
     [SerializeField] private GameObject powerupsMenu;
 
@@ -229,7 +230,7 @@ public class ClientLogicScript : NetworkBehaviour
         if (!IsClient) return;
         if (receivedGameResult) return;
 
-        UI.UpdateGameResult(-1, -1, -1, false, true);
+        UI.UpdateGameResult(-1, -1, -1, false, true, opponentElo: opponentElo);
         UI.ChangeUI(UI.gameResultScreen);
         arrow.SetActive(false);
         receivedGameResult = true;
@@ -241,7 +242,7 @@ public class ClientLogicScript : NetworkBehaviour
     // Server tells the client to switch to game scene and start the game.
     // Inputs the two puck skins used by the competitors.
     [ClientRpc]
-    public void RestartGameOnlineClientRpc(int puckSpriteID_0, FixedString32Bytes username_0, int puckSpriteID_1, FixedString32Bytes username_1)
+    public void RestartGameOnlineClientRpc(int puckSpriteID_0, FixedString32Bytes username_0, int elo_0, int puckSpriteID_1, FixedString32Bytes username_1, int elo_1)
     {
         if (!IsClient) return;
 
@@ -271,6 +272,7 @@ public class ClientLogicScript : NetworkBehaviour
         {
             var swapAlt = puckSpriteID_0 == puckSpriteID_1 ? -1 : 1;
             UI.SetOpponentPuckIcon(puckSkinManager.ColorIDtoPuckSprite(puckSpriteID_1 * swapAlt), Math.Abs(puckSpriteID_1) == 40);
+            opponentElo = elo_1;
             logic.player.puckSpriteID = puckSpriteID_0;
             if (!string.IsNullOrEmpty(username_1.ToString()) && username_1.ToString() != "You") UIManagerScript.Instance.opponentUsernameText.text = username_1.ToString();
         }
@@ -278,6 +280,7 @@ public class ClientLogicScript : NetworkBehaviour
         {
             var swapAlt = puckSpriteID_0 == puckSpriteID_1 ? -1 : 1;
             UI.SetOpponentPuckIcon(puckSkinManager.ColorIDtoPuckSprite(puckSpriteID_0 * swapAlt), Math.Abs(puckSpriteID_0) == 40);
+            opponentElo = elo_0;
             logic.player.puckSpriteID = puckSpriteID_1;
             if (!string.IsNullOrEmpty(username_0.ToString()) && username_0.ToString() != "You") UIManagerScript.Instance.opponentUsernameText.text = username_0.ToString();
         }

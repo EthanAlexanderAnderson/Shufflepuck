@@ -15,6 +15,7 @@ public class Competitor
     public Sprite puckSprite;
     public int puckSpriteID;
     public FixedString32Bytes username;
+    public int elo;
     public int score;
     public int scoreBonus;
     public int wins;
@@ -34,6 +35,9 @@ public class Competitor
 
     // puck ID and username constructor
     public Competitor(int puckID, FixedString32Bytes username) { SetSprite(puckID); this.username = username; }
+
+    // puck ID, username, and elo constructor
+    public Competitor(int puckID, FixedString32Bytes username, int elo) { SetSprite(puckID); this.username = username; this.elo = elo; }
 
     public void SetSprite(int puckID)
     {

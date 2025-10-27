@@ -314,7 +314,7 @@ public class UIManagerScript : MonoBehaviour
         wallText.text = "wall drops in " + wallCount;
     }
 
-    public void UpdateGameResult(int playerScore, int opponentScore, int difficulty, bool isLocal, bool isOnline = false)
+    public void UpdateGameResult(int playerScore, int opponentScore, int difficulty, bool isLocal, bool isOnline = false, int opponentElo = -1)
     {
         // for online mode
         if (playerScore == -1) playerScore = Int32.Parse(playerScoreText.text);
@@ -356,6 +356,13 @@ public class UIManagerScript : MonoBehaviour
                 gameResultHighscoreMessageText.text += dailyChallenge.EvaluateChallenge(2, scoreDifference, 1);
                 playerWinsText.text = playerWins.ToString();
                 opponentWinsText.text = opponentWins.ToString();
+
+                // update players elo
+                if (opponentElo >= 0)
+                {
+                    var (newElo, _) = EloCalculator.CalculateElo(PlayerPrefs.GetInt("Elo", 100), opponentElo, 1f);
+                    PlayerPrefs.SetInt("Elo", newElo);
+                }
             }
             else if (opponentScore > playerScore)
             {
@@ -370,6 +377,13 @@ public class UIManagerScript : MonoBehaviour
                 }
                 playerWinsText.text = playerWins.ToString();
                 opponentWinsText.text = opponentWins.ToString();
+
+                // update players elo
+                if (opponentElo >= 0)
+                {
+                    var (newElo, _) = EloCalculator.CalculateElo(PlayerPrefs.GetInt("Elo", 100), opponentElo, 0f);
+                    PlayerPrefs.SetInt("Elo", newElo);
+                }
             }
             else
             {
@@ -380,6 +394,13 @@ public class UIManagerScript : MonoBehaviour
                 {
                     gameResultHighscoreMessageText.text += $"\nWins: {playerWins} - {opponentWins}";
 
+                }
+
+                // update players elo
+                if (opponentElo >= 0)
+                {
+                    var (newElo, _) = EloCalculator.CalculateElo(PlayerPrefs.GetInt("Elo", 100), opponentElo, 0.5f);
+                    PlayerPrefs.SetInt("Elo", newElo);
                 }
             }
             OngoingChallengeManagerScript.Instance.EvaluateChallengeAndSetText();

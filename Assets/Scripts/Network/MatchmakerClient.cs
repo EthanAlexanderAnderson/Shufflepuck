@@ -177,7 +177,8 @@ public class MatchmakerClient : MonoBehaviour
 
             // Pass Relay join code to lobby data
             Dictionary<string, DataObject> data = new Dictionary<string, DataObject> {
-                { "RelayJoinCode", new DataObject(DataObject.VisibilityOptions.Public, relayJoinCode) }
+                { "RelayJoinCode", new DataObject(DataObject.VisibilityOptions.Public, relayJoinCode) },
+                { "Elo", new DataObject(DataObject.VisibilityOptions.Public, PlayerPrefs.GetInt("Elo", 100).ToString(), DataObject.IndexOptions.N1) }
             };
 
             await LobbyService.Instance.UpdateLobbyAsync(lobby.Id, new UpdateLobbyOptions { Data = data });
@@ -199,141 +200,6 @@ public class MatchmakerClient : MonoBehaviour
             }
             else
             {
-                Debug.Log("Created Public Lobby.");
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError(e);
-            UIManagerScript.Instance.SetErrorMessage("Failed to create Lobby with Relay.");
-        }
-    }
-
-    public class MatchmakingPlayerData
-    {
-        public string LobbyID;
-    }
-
-    public TMP_InputField lobbyCodeInputField;
-    [SerializeField] private GameObject joinButtion;
-    // only show the Join button when 6 characters are entered, helps misinput
-    public void ChangeJoinButtonVisibiity()
-    {
-        joinButtion.SetActive(lobbyCodeInputField.text.Length == 6);
-    }
-
-    // Called by Online -> Join -> Join button (after code is entered)
-    public void JoinPrivateLobbyWithCode()
-    {
-        JoinLobby(true, lobbyCode:lobbyCodeInputField.text);
-    }
-
-    private async void JoinLobby(bool isPrivate, string lobbyId = "", string lobbyCode = "")
-    {
-        try
-        {
-            if (isPrivate && lobbyCode.Length != 6)
-            {
-                Debug.LogError("Invalid lobby code.");
-                UIManagerScript.Instance.SetErrorMessage("Invalid lobby code.");
-                return;
-            }
-            else if (!isPrivate && lobbyId == "")
-            {
-                Debug.LogError("Invalid lobby ID.");
-                UIManagerScript.Instance.SetErrorMessage("Invalid lobby ID.");
-                return;
-            }
-
-            Lobby lobby = null;
-            if (isPrivate && lobbyCode.Length == 6)
-            {
-                lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode);
-            }
-            else if (!isPrivate && !string.IsNullOrEmpty(lobbyId))
-            {
-                lobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId);
-            }
-            else
-            {
-                Debug.LogError("Invalid lobby code or ID.");
-                UIManagerScript.Instance.SetErrorMessage("Invalid lobby code or ID.");
-                return;
-            }
-
-            // Retrieve Relay join code from lobby data
-            string relayJoinCode = lobby.Data["RelayJoinCode"].Value;
-            JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(relayJoinCode);
-
-            Debug.Log("Relay Join Code: " + relayJoinCode);
-
-            // Set up UnityTransport to use Relay
-            RelayServerData relayServerData = AllocationUtils.ToRelayServerData(joinAllocation, "dtls");
-            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
-
-            if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsHost) { NetworkManager.Singleton.Shutdown(); }
-
-            // wait until the client is shutdown
-            int maxIterations = 0;
-            while ((NetworkManager.Singleton.IsConnectedClient || NetworkManager.Singleton.IsHost) && maxIterations < 50)
-            {
-                await Task.Delay(100);
-                maxIterations++;
-            }
-
-            if (NetworkManager.Singleton.IsConnectedClient || NetworkManager.Singleton.IsHost)
-            {
-                Debug.LogError("Failed to shutdown previous NetworkManager before joining new lobby.");
-                UIManagerScript.Instance.SetErrorMessage("Failed to join Lobby with Relay.");
-                return;
-            }
-
-            NetworkManager.Singleton.StartClient(); // Start as Client
-
-            hostLobby = lobby;
-            isHost = false;
-
-            if (isPrivate)
-            {
-                Debug.Log("Joined Private Lobby. Code: " + lobbyCode);
-                UIManagerScript.Instance.lobbyCodeText.text = "Lobby Code: " + lobbyCode;
-                UIManagerScript.Instance.EnableReadyButton();
-            }
-            else
-            {
-                Debug.Log("Joined Public Lobby. ID: " + lobbyId);
-                UIManagerScript.Instance.EnableReadyButton();
-            }
-        }
-        catch (LobbyServiceException)
-        {
-            Debug.LogError("LobbyServiceException: Failed to join Lobby (Invalid Join Code or Lobby is full)");
-            UIManagerScript.Instance.SetErrorMessage("Failed to join Lobby (Invalid Join Code or Lobby is full).");
-        }
-        catch (Exception e)
-        {
-            Debug.LogError(e);
-            UIManagerScript.Instance.SetErrorMessage("Failed to join Lobby with Relay.");
-        }
-    }
-
-    // For the host: when a competitor joins your lobby, tell Matchmaker to queue for a server
-    private void OnLobbyChanged(ILobbyChanges changes)
-    {
-        if (changes.PlayerJoined.Changed)
-        {
-            Debug.Log("Player Joined");
-            Debug.Log("HOST ID: " + PlayerID());
-            Debug.Log("JOINER ID: " + changes.PlayerJoined.Value[0].Player.Id);
-            // CreateATicket(hostLobby.Id); for multiplay
-            // for relay
-            UIManagerScript.Instance.EnableReadyButton();
-        }
-    }
-
-    // Public Matchmaking
-    public async void PublicMatchmaking()
-    {
         // Query for public, open lobbies
         var query = new QueryLobbiesOptions
         {
@@ -355,17 +221,85 @@ public class MatchmakerClient : MonoBehaviour
                 asc: true,
                 field: QueryOrder.FieldOptions.Created)
             }
-        };
+        int playerElo = PlayerPrefs.GetInt("Elo", 100);
+        int[] searchRanges = { 100, 300, 9999 }; // progressively widen Elo range
+        int rateLimitDelay = 750;
 
-        QueryResponse response = await LobbyService.Instance.QueryLobbiesAsync(query);
-
-        // Handle query response
-
-        if (response.Results.Count > 0) // public lobby was found -> join it
+        for ( int i = 0; i < searchRanges.Length; i++ )
         {
-            Lobby foundLobby = response.Results[0];
-            JoinLobby(false, lobbyId: foundLobby.Id);
-            return;
+            int minElo = playerElo - searchRanges[i];
+            int maxElo = playerElo + searchRanges[i];
+
+            // Query for public, open lobbies
+            var query = new QueryLobbiesOptions
+            {
+                Count = 1,
+                Filters = new List<QueryFilter>
+                {
+                    new QueryFilter(
+                        field: QueryFilter.FieldOptions.AvailableSlots,
+                        op: QueryFilter.OpOptions.GT,
+                        value: "0"),
+                    new QueryFilter(
+                        field: QueryFilter.FieldOptions.IsLocked,
+                        op: QueryFilter.OpOptions.EQ,
+                        value: "false"),
+
+                    new QueryFilter(
+                        field: QueryFilter.FieldOptions.N1,
+                        op: QueryFilter.OpOptions.GE,
+                        value: minElo.ToString()),
+                    new QueryFilter(
+                        field: QueryFilter.FieldOptions.N1,
+                        op: QueryFilter.OpOptions.LE,
+                        value: maxElo.ToString())
+                },
+                Order = new List<QueryOrder>
+                {
+                new QueryOrder(
+                    asc: true,
+                    field: QueryOrder.FieldOptions.Created)
+                }
+            };
+
+            try
+            {
+                // make query to get lobbies
+                QueryResponse response = await LobbyService.Instance.QueryLobbiesAsync(query);
+
+                // Handle query response
+                if (response.Results.Count > 0) // public lobby was found -> join it
+                {
+                    Lobby foundLobby = response.Results[0];
+                    Debug.Log($"Found lobby within �{searchRanges[i]} Elo range: {foundLobby.Data["Elo"].Value}");
+                    JoinLobby(false, lobbyId: foundLobby.Id);
+                    return;
+                }
+
+                // default query delay
+                await Task.Delay(rateLimitDelay);
+            }
+            catch (LobbyServiceException e)
+            {
+                if (e.Reason == LobbyExceptionReason.RateLimited)
+                {
+                    Debug.LogWarning("Rate limited, waiting longer...");
+                    // the search at the current elo failed, so we need to retry this iteration
+                    i--;
+                    // increase the delay between requests each time we get rate limited.
+                    rateLimitDelay += 500;
+
+                    // if the delay is longer than 10 seconds, clearly there is some issue, so cancel matchmaking
+                    if (rateLimitDelay > 10000)
+                    {
+                        Debug.LogError("QueryLobbiesAsync Rate Limit Error");
+                        UIManagerScript.Instance.SetErrorMessage("Matchmaking failed: rate limit error");
+                        return;
+                    }
+
+                    await Task.Delay(rateLimitDelay);
+                }
+            }
         }
 
         CreateLobby(false); // public lobby wasn't found -> open one
@@ -417,7 +351,7 @@ public class MatchmakerClient : MonoBehaviour
     {
         try
         {
-            ServerLogicScript.Instance.AddPlayerServerRpc(LogicScript.Instance.player.puckSpriteID, new FixedString32Bytes(PlayerAuthentication.Instance.GetUsername()));
+            ServerLogicScript.Instance.AddPlayerServerRpc(LogicScript.Instance.player.puckSpriteID, new FixedString32Bytes(PlayerAuthentication.Instance.GetUsername()), PlayerPrefs.GetInt("Elo", 100));
         }
         catch (Exception e)
         {

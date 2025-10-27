@@ -133,7 +133,7 @@ public class ServerLogicScript : NetworkBehaviour
     // When 1 competitor is ready, setup their variables and update the ready text
     // When both are ready, start the game
     [ServerRpc(RequireOwnership = false)]
-    public void AddPlayerServerRpc(int puckID, FixedString32Bytes username, ServerRpcParams serverRpcParams = default)
+    public void AddPlayerServerRpc(int puckID, FixedString32Bytes username, int elo, ServerRpcParams serverRpcParams = default)
     {
         if (!IsServer) return;
         try
@@ -149,7 +149,7 @@ public class ServerLogicScript : NetworkBehaviour
 
             clients.Add(clientId);
 
-            Competitor newCompetitor = new(puckID, username);
+            Competitor newCompetitor = new(puckID, username, elo);
             newCompetitor.clientID = clientId;
             newCompetitor.puckCount = 5;
             newCompetitor.score = 0;
@@ -172,7 +172,8 @@ public class ServerLogicScript : NetworkBehaviour
                 $"Client added to client list. \n" +
                 $"Client Index: {clients.Count - 1} \n" +
                 $"Client ID: {clientId} \n" +
-                $"Puck ID: {puckID} \n");
+                $"Puck ID: {puckID} \n" +
+                $"elo: {elo} \n");
         }
         catch (System.Exception e)
         {
@@ -223,7 +224,7 @@ public class ServerLogicScript : NetworkBehaviour
                 $"Client ID : {clients[activeCompetitorIndex]}\n");
 
             // tell both players to restart the game and who is going first
-            clientLogic.RestartGameOnlineClientRpc(competitorList[0].puckSpriteID, competitorList[0].username, competitorList[1].puckSpriteID, competitorList[1].username);
+            clientLogic.RestartGameOnlineClientRpc(competitorList[0].puckSpriteID, competitorList[0].username, competitorList[0].elo, competitorList[1].puckSpriteID, competitorList[1].username, competitorList[1].elo);
             clientLogic.StartTurnClientRpc(true, true, clientRpcParamsList[activeCompetitorIndex]);
             clientLogic.StartTurnClientRpc(false, true, clientRpcParamsList[activeCompetitorIndex ^ 1]);
             // reset the shot timer and set the game as running for server logic

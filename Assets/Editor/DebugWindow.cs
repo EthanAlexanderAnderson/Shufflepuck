@@ -72,7 +72,7 @@ public class DebugWindow : EditorWindow
         rootVisualElement.Add(destroy);
 
         Button addPlayer = new() { text = "addPlayer" };
-        addPlayer.clicked += () => ServerLogicScript.Instance.AddPlayerServerRpc(0, new FixedString32Bytes("username"));
+        addPlayer.clicked += () => ServerLogicScript.Instance.AddPlayerServerRpc(0, new FixedString32Bytes("username"), -1);
         rootVisualElement.Add(addPlayer);
 
         Button printPlayerPrefs = new() { text = "printPlayerPrefs" };
